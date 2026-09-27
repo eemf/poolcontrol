@@ -1,0 +1,62 @@
+
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user's global profile.",
+      "properties": {
+        "authUid": { "type": "string" },
+        "nombre": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "rol": { "type": "string" },
+        "sucursalId": { "type": "string" }
+      },
+      "required": ["authUid", "email", "rol", "sucursalId"]
+    },
+    "UserAuthLookup": {
+      "title": "UserAuthLookup",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "nombre": { "type": "string" },
+        "rol": { "type": "string" },
+        "sucursalId": { "type": "string" }
+      },
+      "required": ["email", "rol", "sucursalId"]
+    },
+    "CuadreTragamonedas": {
+      "title": "CuadreTragamonedas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "idCuadre": { "type": "number" },
+        "fecha": { "type": "string", "format": "date-time" },
+        "estado": { "type": "string", "enum": ["pendiente", "procesado"] },
+        "gananciaATrasladar": { "type": "number" },
+        "maquinas": { "type": "array", "items": { "type": "object" } },
+        "resumen": { "type": "object" },
+        "existenciaSiguiente": { "type": "number" },
+        "efectivoAcumuladoSiguiente": { "type": "number" },
+        "observaciones": { "type": "string" }
+      },
+      "required": ["id", "idCuadre", "fecha", "estado", "gananciaATrasladar"]
+    }
+  },
+  "auth": {
+    "providers": ["password", "anonymous"]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/sucursales/{sucursalId}/cuadre_tragamonedas/{cuadreId}",
+        "definition": {
+          "entityName": "CuadreTragamonedas",
+          "schema": { "$ref": "#/backend/entities/CuadreTragamonedas" },
+          "description": "Historial de cierres de máquinas tragamonedas."
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,84 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root, .theme-default {
+    --background: 38 7% 95%; /* Light Cream */
+    --foreground: 220 10% 15%; /* Dark Gray */
+    
+    --card: 0 0% 100%; /* Off-White */
+    --card-foreground: 220 10% 15%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 10% 15%;
+    
+    --primary: 220 90% 55%; /* Deeper Blue */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 240 5% 85%; /* Gris un poco más oscuro */
+    --secondary-foreground: 240 5% 25%; /* Texto más oscuro para contraste */
+    
+    --muted: 38 7% 90%;
+    --muted-foreground: 220 5% 45%;
+    
+    --accent: 35 85% 65%; /* Soft Amber */
+    --accent-foreground: 35 50% 25%; /* Dark Brown for contrast */
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 38 7% 85%;
+    --input: 38 7% 88%;
+    --ring: 210 80% 50%;
+
+    --chart-1: 220 70% 50%;
+    --chart-2: 170 45% 45%;
+    --chart-3: 350 87% 55%;
+    --chart-4: 25 95% 53%;
+    --chart-5: 43 96% 58%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 17%; /* Azul marino oscuro y elegante solicitado */
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 220 90% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 25%;
+    --secondary-foreground: 210 40% 90%;
+    --muted: 217 33% 22%; /* Tono ligeramente más claro solicitado */
+    --muted-foreground: 215 28% 65%;
+    --accent: 217 33% 22%;
+    --accent-foreground: 220 90% 55%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 27% 27%;
+    --input: 217 27% 27%;
+    --ring: 220 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+  }
+  .hide-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+  }
+}

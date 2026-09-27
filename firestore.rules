@@ -1,0 +1,84 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- FUNCIONES DE SEGURIDAD ---
+    
+    // Verifica si el usuario está autenticado
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Verifica si el usuario tiene el claim de administrador en su token
+    function isSuperAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+    
+    // Obtiene los datos del perfil global del usuario desde la colección de lookup
+    function getUserProfile() {
+      let path = /databases/$(database)/documents/user_auth_lookup/$(request.auth.uid);
+      return exists(path) ? get(path).data : null;
+    }
+    
+    // Verifica si el usuario tiene permiso para acceder a una sucursal específica
+    // Un usuario solo puede acceder a su propia sucursal asignada, a menos que sea Super Admin
+    // o tenga el flag 'accesoGlobal' activo en su perfil.
+    function belongsToBranch(sucursalId) {
+      let profile = getUserProfile();
+      return isSignedIn() && (
+        isSuperAdmin() || 
+        (profile != null && (
+          profile.accesoGlobal == true || 
+          string(profile.sucursalId) == string(sucursalId)
+        ))
+      );
+    }
+
+    // --- REGLAS DE COLECCIONES ---
+
+    // 1. Aislamiento de Sucursales
+    match /sucursales/{sucursalId} {
+      // Lectura de info de sucursal: Solo Super Admin o usuarios con Acceso Global pueden listar todas.
+      // Usuarios locales pueden hacer 'get' de su propia sucursal.
+      allow list: if isSuperAdmin() || (getUserProfile() != null && getUserProfile().accesoGlobal == true);
+      allow get: if belongsToBranch(sucursalId);
+      
+      // Gestión de estructura de sucursales: Operación exclusiva de Super Administrador
+      allow create, update, delete: if isSuperAdmin();
+
+      // TODAS las subcolecciones
+      match /{allSubPath=**} {
+        allow read, write: if belongsToBranch(sucursalId);
+      }
+    }
+    
+    // 2. Correlativos Globales
+    match /correlativos/{document=**} {
+      allow read, write: if isSuperAdmin();
+    }
+    
+    // 3. Lookup de Autenticación (user_auth_lookup)
+    match /user_auth_lookup/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
+      // Solo el Super Administrador puede crear o modificar estos vínculos globales.
+      allow write: if isSuperAdmin();
+    }
+
+    // 4. Regla para Consultas de Grupo (collectionGroup)
+    match /{path=**}/historial/{docId} {
+      allow read: if isSignedIn() && (
+        isSuperAdmin() || 
+        (getUserProfile() != null && (
+          getUserProfile().accesoGlobal == true || 
+          resource.data.sucursalId == getUserProfile().sucursalId
+        ))
+      );
+    }
+    
+    // 5. Denegación por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
