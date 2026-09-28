@@ -63,30 +63,35 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
   if (items.length === 0) return null;
 
   return (
-    <Card className="border-muted/60 shadow-sm overflow-hidden font-body">
-      <CardHeader className="p-4 bg-muted/5 border-b">
-        <CardTitle className="font-bold text-lg">Ingresos por Tarjeta</CardTitle>
-        <CardDescription className="text-xs">Selecciona los cierres que contienen ingresos por tarjeta a procesar.</CardDescription>
+    <Card 
+      className="shadow-sm overflow-hidden font-body !bg-[#1d283a] border !border-[#324157]"
+      style={{ backgroundColor: '#1d283a', borderColor: '#324157' }}
+    >
+      <CardHeader className="p-4 pb-2 bg-transparent">
+        <CardTitle className="font-bold text-base sm:text-lg text-foreground">Ingresos por Tarjeta</CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-2">
+      <CardContent className="p-4 pt-1">
         <div className="space-y-3">
-          <div className="flex items-center p-2 border-b">
+          <div className="flex items-center p-2 border-b !border-[#324157]">
             <Checkbox 
               id="select-all-tarjeta" 
               checked={selected.size === items.length && items.length > 0} 
-              onCheckedChange={onSelectAll}
+              onCheckedChange={onSelectAll} 
             />
-            <Label htmlFor="select-all-tarjeta" className="ml-4 flex-1 font-bold text-sm">Seleccionar Todos</Label>
+            <Label htmlFor="select-all-tarjeta" className="ml-3 flex-1 font-bold text-sm text-foreground cursor-pointer">
+              Seleccionar Todos
+            </Label>
           </div>
           <Accordion type="single" collapsible className="w-full space-y-2">
             {items.map(cierre => (
               <AccordionItem 
                 value={cierre.id} 
                 key={cierre.id} 
-                className="relative border rounded-lg bg-card-foreground/5 overflow-hidden border-b-0 shadow-sm transition-all hover:border-primary/20 mb-2"
+                style={{ backgroundColor: '#283244', borderColor: '#324157' }}
+                className="border-b-0 rounded-xl border !border-[#324157] !bg-[#283244] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
               >
-                {/* Checkbox posicionado absolutamente para no romper el flujo del trigger */}
-                <div className="absolute left-4 top-7 -translate-y-1/2 z-20 flex items-center justify-center">
+                {/* Checkbox anclado a la cabecera del acordeón */}
+                <div className="absolute left-3 top-6 -translate-y-1/2 z-20 flex items-center justify-center">
                   <Checkbox 
                     id={`cierre-tarjeta-${cierre.id}`} 
                     checked={selected.has(cierre.id)} 
@@ -94,37 +99,37 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
                   />
                 </div>
 
-                <AccordionTrigger className="pl-14 pr-4 hover:no-underline py-4 w-full">
-                  <div className="flex-1 flex items-center justify-between gap-4 mr-2">
-                    <div className="flex items-center gap-3 min-w-0 text-left">
-                      <div className="hidden sm:flex h-9 w-9 rounded-full bg-blue-500/10 items-center justify-center shrink-0">
-                        <CreditCard className="h-5 w-5 text-blue-600" />
+                <AccordionTrigger className="pl-10 pr-3 hover:no-underline py-3 w-full">
+                  <div className="flex-1 min-w-0 flex items-center justify-between gap-2 mr-2 text-left">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <div className="hidden sm:flex h-8 w-8 rounded-full bg-blue-500/10 items-center justify-center shrink-0">
+                        <CreditCard className="h-4 w-4 text-blue-400" />
                       </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-bold text-sm sm:text-base leading-tight text-foreground">
-                          Pagos con Tarjeta (Cierre #{cierre.idCuadre})
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className="font-bold text-xs sm:text-sm leading-tight text-foreground truncate">
+                          Pagos Tarjeta (Cierre #{cierre.idCuadre})
                         </span>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <Clock className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">
                             {format(cierre.fecha.toDate(), "dd MMM, yyyy", { locale: es })}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right shrink-0 flex flex-col items-end gap-1">
-                      <p className="font-bold text-base sm:text-lg text-blue-600 whitespace-nowrap tabular-nums leading-none">
+                    <div className="text-right shrink-0 flex flex-col items-end gap-0.5">
+                      <p className="font-bold text-xs sm:text-sm text-blue-400 whitespace-nowrap tabular-nums leading-tight">
                         Q{cierre.pagosTarjeta.toFixed(2)}
                       </p>
-                      <Badge className="h-4 text-[8px] font-bold border-none bg-blue-100 text-blue-700">
+                      <Badge className="h-4 text-[9px] font-semibold border-none bg-blue-500/20 text-blue-300 px-1.5 py-0">
                         Pendiente
                       </Badge>
                     </div>
                   </div>
                 </AccordionTrigger>
 
-                <AccordionContent className="px-4 pb-4">
-                  <div className="pl-10">
+                <AccordionContent className="px-3 pb-3">
+                  <div className="pt-2 border-t !border-[#324157]">
                     <DetalleVentasTarjeta 
                       firestore={firestore} 
                       sucursalId={sucursalId} 

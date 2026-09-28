@@ -12,9 +12,38 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 259,
+    build: 261,
     fecha: "2026-09-28",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b261",
+    descripcion: "Corrección de posición de checkbox en acordeones y aprovechamiento total de espacio.",
+    cambios: [
+      "Fijación del checkbox a la cabecera del acordeón al expandir detalles",
+      "Expansión al ancho total para tarjetas de artículos y detalles de ventas",
+      "Eliminación de la línea divisoria del encabezado de contenedores principales"
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 260,
+    fecha: "2026-09-28",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b260",
+    descripcion: "Ajuste de diseño y vista móvil en Cuadre Semanal.",
+    cambios: [
+      "Paleta unificada (#1d283a contenedor, #283244 tarjetas y #324157 bordes) en Cuadre Semanal",
+      "Reducción de títulos y eliminación de descripciones en contenedores para vista móvil",
+      "Corrección de desbordamiento horizontal en compras pendientes y tarjetas de ingresos",
+      "Formateo de fechas compacto y diseño responsivo para montos, badges y acordeones"
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 259,
+    fecha: "2026-09-28",
+    estado: "archivada",
     tipo: "Compilación",
     tagGit: "v1.0.0-b259",
     descripcion: "Corrección de selector de sucursales en vista móvil y mejoras de navegación.",
@@ -28,7 +57,7 @@ export const releaseHistory: ReleaseItem[] = [
     version: "1.0.0",
     build: 258,
     fecha: "2026-09-28",
-    estado: "publicada_anterior",
+    estado: "archivada",
     tipo: "Compilación",
     tagGit: "v1.0.0-b258",
     descripcion: "Versión publicada en Firebase App Hosting. Incluye optimizaciones de compras, paleta personalizada, reglas de capitalización y sección de historial.",
@@ -73,9 +102,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 259,
+  build: 261,
   date: "2026-09-28",
-  publicadaActual: releaseHistory[0], // Build 259
-  publicadaAnterior: releaseHistory[1], // Build 258
+  publicadaActual: releaseHistory[0], // Build 261
+  publicadaAnterior: releaseHistory[1], // Build 260
   historial: releaseHistory
 };
