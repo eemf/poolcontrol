@@ -54,8 +54,11 @@ export function PurchaseList({
   };
 
   return (
-    <Card className="shadow-sm border-muted/60 overflow-hidden font-body">
-      <CardHeader className="p-4 bg-muted/5 border-b">
+    <Card 
+      className="shadow-sm overflow-hidden font-body !bg-[#1d283a] border !border-[#324157]"
+      style={{ backgroundColor: '#1d283a', borderColor: '#324157' }}
+    >
+      <CardHeader className="p-4 border-b !border-[#324157] bg-transparent">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="relative flex-grow w-full max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -88,7 +91,8 @@ export function PurchaseList({
               <AccordionItem
                 value={compra.docId}
                 key={compra.docId}
-                className="border-b-0 rounded-xl border border-muted/60 bg-muted/30 hover:bg-muted/50 transition-all overflow-hidden mb-2 shadow-sm"
+                style={{ backgroundColor: '#283244', borderColor: '#324157' }}
+                className="border-b-0 rounded-xl border !border-[#324157] !bg-[#283244] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm"
               >
                 <AccordionTrigger className="px-4 py-4 hover:no-underline">
                   <div className="flex-1 grid grid-cols-[1fr_auto] sm:grid-cols-3 gap-4 items-center text-sm text-left text-foreground">
@@ -160,7 +164,7 @@ export function PurchaseList({
         )}
       </CardContent>
       {pagination.totalPages > 1 && (
-        <CardFooter className="flex flex-col items-center gap-4 border-t p-4 sm:flex-row sm:justify-between bg-muted/5 font-body">
+        <CardFooter className="flex flex-col items-center gap-4 border-t !border-[#324157] p-4 sm:flex-row sm:justify-between bg-transparent font-body">
           <div className="flex items-center space-x-2">
             <p className="text-xs font-medium text-muted-foreground">Filas por página</p>
             <Select

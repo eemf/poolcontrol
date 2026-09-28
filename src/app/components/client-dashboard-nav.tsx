@@ -8,7 +8,7 @@ import {
   Palette, Contact, UserCheck, ShieldCheck, Package, DollarSign, 
   TableProperties,
   Truck, Scale, History, HandCoins, Landmark, BookUser, CalendarDays, 
-  Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2
+  Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2, Info
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -91,12 +91,13 @@ export const navItems: NavItemType[] = [
   {
     label: 'Configuraciones',
     icon: Settings,
-    anyPermission: ['config.usuarios', 'config.permisos', 'config.mesas', 'config.tragamonedas'],
+    anyPermission: ['config.usuarios', 'config.permisos', 'config.mesas', 'config.tragamonedas', 'dashboard.ver'],
     items: [
       { href: '/dashboard/configuraciones/usuarios', label: 'Usuarios', icon: UserCheck, permission: 'config.usuarios' },
       { href: '/dashboard/configuraciones/permisos', label: 'Permisos', icon: ShieldCheck, permission: 'config.permisos' },
       { href: '/dashboard/configuraciones/mesas', label: 'Mesas', icon: LayoutGrid, permission: 'config.mesas', feature: 'configMesas' },
       { href: '/dashboard/configuraciones/tragamonedas', label: 'Tragamonedas', icon: Dices, permission: 'config.tragamonedas', feature: 'configTragamonedas' },
+      { href: '/dashboard/configuraciones/acerca-de', label: 'Acerca del Sistema', icon: Info, permission: 'dashboard.ver' },
     ]
   },
   {
@@ -124,7 +125,8 @@ const NavItem = ({
     onNavigate, 
     hasPermission, 
     hasAnyPermission,
-    branchFeatures
+    branchFeatures,
+    isSubItem = false,
 }: { 
     item: NavItemType, 
     pathname: string, 
@@ -132,7 +134,8 @@ const NavItem = ({
     onNavigate?: () => void, 
     hasPermission: (k: string) => boolean, 
     hasAnyPermission: (k: string[]) => boolean,
-    branchFeatures: { [key: string]: boolean }
+    branchFeatures: { [key: string]: boolean },
+    isSubItem?: boolean,
 }) => {
   if (item.feature && branchFeatures[item.feature] === false) return null;
 
@@ -167,20 +170,35 @@ const NavItem = ({
       <Button
         asChild
         variant={isActive ? "default" : "ghost"}
+        title={item.label}
         className={cn(
-          "w-full rounded-full transition-all duration-300 h-10",
-          isCollapsed ? "justify-center px-0 gap-0" : "justify-start px-3 gap-3",
+          "w-full rounded-full transition-all duration-300",
+          isSubItem ? "h-9" : "h-10",
+          isCollapsed 
+            ? "justify-center px-0 gap-0" 
+            : isSubItem 
+              ? "justify-start px-2.5 gap-2" 
+              : "justify-start px-3 gap-3",
           !isActive && "hover:bg-primary/10 hover:text-primary"
         )}
       >
-        <Link href={item.href} onClick={onNavigate}>
-          <item.icon className="h-5 w-5 shrink-0" />
-          <span className={cn(
-            "whitespace-nowrap transition-all duration-300 ease-in-out",
-            isCollapsed ? "opacity-0 w-0 ml-0 overflow-hidden" : "opacity-100 ml-3 w-auto"
-          )}>
-            {item.label}
-          </span>
+        <Link 
+          href={item.href} 
+          onClick={onNavigate} 
+          className={cn(
+            "flex items-center min-w-0 w-full",
+            isCollapsed ? "justify-center" : "justify-start"
+          )}
+        >
+          <item.icon className={cn(isSubItem ? "h-4 w-4" : "h-5 w-5", "shrink-0")} />
+          {!isCollapsed && (
+            <span className={cn(
+              "transition-all duration-300 ease-in-out truncate min-w-0 flex-1 text-left",
+              isSubItem ? "ml-2 text-xs" : "ml-3 text-sm"
+            )}>
+              {item.label}
+            </span>
+          )}
         </Link>
       </Button>
     );
@@ -204,6 +222,7 @@ const NavItem = ({
         <CollapsibleTrigger asChild>
           <Button
             variant={isTriggerActive ? "default" : "ghost"}
+            title={item.label}
             className={cn(
               "w-full justify-start rounded-full px-3 h-10 transition-all duration-300 gap-3",
               !isTriggerActive && "hover:bg-primary/10 hover:text-primary"
@@ -211,17 +230,27 @@ const NavItem = ({
           >
             <item.icon className="h-5 w-5 shrink-0" />
             <span className={cn(
-              "ml-0 whitespace-nowrap flex-1 text-left transition-all duration-300"
+              "ml-0 truncate min-w-0 flex-1 text-left transition-all duration-300 text-sm"
             )}>
               {item.label}
             </span>
-            <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
+            <ChevronDown className={cn("h-4 w-4 transition-transform shrink-0", isOpen && "rotate-180")} />
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="pl-6 py-1 space-y-1 border-l-2 border-muted/50 ml-4">
+          <div className="pl-2 py-1 space-y-1 border-l-2 border-muted/50 ml-4">
             {visibleSubItems.map(subItem => (
-              <NavItem key={subItem.label} item={subItem} pathname={pathname} isCollapsed={isCollapsed} onNavigate={onNavigate} hasPermission={hasPermission} hasAnyPermission={hasAnyPermission} branchFeatures={branchFeatures} />
+              <NavItem 
+                key={subItem.label} 
+                item={subItem} 
+                pathname={pathname} 
+                isCollapsed={isCollapsed} 
+                onNavigate={onNavigate} 
+                hasPermission={hasPermission} 
+                hasAnyPermission={hasAnyPermission} 
+                branchFeatures={branchFeatures}
+                isSubItem={true}
+              />
             ))}
           </div>
         </CollapsibleContent>
@@ -231,7 +260,7 @@ const NavItem = ({
 
   if (hasSubItems && isCollapsed) {
     return (
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -280,8 +309,9 @@ const NavItem = ({
 
 export default function ClientDashboardNav({ pathname }: { pathname: string }) {
   const { firestore } = useFirebase();
-  const { isMobile, setOpenMobile, state: sidebarState } = useSidebar();
+  const { isMobile, setOpenMobile, state: sidebarState, setIsLocked, setOpen } = useSidebar();
   const isCollapsed = !isMobile && sidebarState === 'collapsed';
+  const [isBranchDropdownOpen, setIsBranchDropdownOpen] = React.useState(false);
   const { isAdmin: isSuperAdmin, profile } = useUser();
   const { sucursalId } = useSucursal();
   const { hasPermission, hasAnyPermission, isLoading: isLoadingPerms } = usePermissions();
@@ -341,7 +371,9 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
             <Dices className="h-6 w-6 text-primary shrink-0" />
             <div>
                 <h2 className="text-base font-headline font-semibold leading-tight text-foreground">Pool Control</h2>
-                <p className="text-[9px] text-muted-foreground font-medium">v{appVersion.version} (b{appVersion.build})</p>
+                <Link href="/dashboard/configuraciones/acerca-de">
+                  <p className="text-[9px] text-muted-foreground font-medium hover:text-primary hover:underline transition-colors">v{appVersion.version} (b{appVersion.build})</p>
+                </Link>
             </div>
         </div>
       <SidebarContent>
@@ -364,7 +396,15 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
       <div className={cn("mt-auto p-2 flex flex-col gap-2 border-t border-sidebar-border/50")}>
         
         {puedeSaltar ? (
-          <DropdownMenu>
+          <DropdownMenu
+            modal={false}
+            open={isBranchDropdownOpen}
+            onOpenChange={(open) => {
+              setIsBranchDropdownOpen(open);
+              setIsLocked(open);
+              if (open) setOpen(true);
+            }}
+          >
             <DropdownMenuTrigger asChild>
               <div className="group cursor-pointer">
                 {isCollapsed ? (
@@ -390,7 +430,11 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                       "px-3 py-2.5 rounded-xl cursor-pointer font-bold flex items-center gap-3",
                       s.id === sucursalId ? "bg-primary/10 text-primary" : "hover:bg-muted"
                     )}
-                    onClick={() => handleSwitchBranch(s.id)}
+                    onClick={() => {
+                      setIsBranchDropdownOpen(false);
+                      setIsLocked(false);
+                      handleSwitchBranch(s.id);
+                    }}
                   >
                     <Building2 className="h-4 w-4 shrink-0" />
                     <div className="min-w-0 flex-1">

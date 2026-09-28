@@ -34,6 +34,8 @@ type SidebarContext = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  isLocked: boolean
+  setIsLocked: (locked: boolean) => void
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -69,12 +71,14 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
+    const [isLocked, setIsLocked] = React.useState(false)
 
     const [_open, _setOpen] = React.useState(defaultOpen)
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === "function" ? value(open) : value
+        if (isLocked && !openState) return
         if (setOpenProp) {
           setOpenProp(openState)
         } else {
@@ -82,7 +86,7 @@ const SidebarProvider = React.forwardRef<
         }
         document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
       },
-      [setOpenProp, open]
+      [setOpenProp, open, isLocked]
     )
 
     const toggleSidebar = React.useCallback(() => {
@@ -117,8 +121,10 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        isLocked,
+        setIsLocked,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, isLocked]
     )
 
     return (
@@ -165,7 +171,17 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, setOpen, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, setOpen, openMobile, setOpenMobile, isLocked } = useSidebar()
+    const containerRef = React.useRef<HTMLDivElement | null>(null)
+
+    React.useEffect(() => {
+      if (!isLocked && containerRef.current && !isMobile) {
+        const isHovering = containerRef.current.matches(':hover')
+        if (!isHovering) {
+          setOpen(false)
+        }
+      }
+    }, [isLocked, isMobile, setOpen])
 
     if (collapsible === "none") {
       return (
@@ -205,9 +221,19 @@ const Sidebar = React.forwardRef<
 
     return (
       <div
-        ref={ref}
+        ref={(node) => {
+          containerRef.current = node
+          if (typeof ref === "function") {
+            ref(node)
+          } else if (ref) {
+            ref.current = node
+          }
+        }}
         onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        onMouseLeave={() => {
+          if (isLocked) return
+          setOpen(false)
+        }}
         className={cn(
           "hidden h-full flex-col bg-card text-sidebar-foreground transition-[width] duration-300 ease-out md:flex overflow-x-hidden",
           "w-[var(--sidebar-width)] border-r",
@@ -278,7 +304,7 @@ const SidebarContent = React.forwardRef<
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[state=collapsed]:overflow-hidden p-2",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden group-data-[state=collapsed]:overflow-hidden p-2 custom-scrollbar",
         className
       )}
       {...props}

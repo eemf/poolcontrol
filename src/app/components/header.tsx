@@ -15,6 +15,7 @@ import { useSucursal } from '@/hooks/use-sucursal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserNav } from './user-nav';
 import { appVersion } from '@/lib/version';
+import Link from 'next/link';
 
 function CashDisplay({ features }: { features?: { [key: string]: boolean } }) {
     const { firestore } = useFirebase();
@@ -172,7 +173,11 @@ export function Header() {
           <Dices className="h-8 w-8 text-primary shrink-0" />
           <div className="flex flex-col">
             <h2 className="text-lg font-headline font-bold leading-none text-foreground">Pool Control</h2>
-            <p className="text-[10px] text-muted-foreground font-medium mt-0.5">v{appVersion.version} (b{appVersion.build})</p>
+            <Link href="/dashboard/configuraciones/acerca-de">
+              <p className="text-[10px] text-muted-foreground font-medium mt-0.5 hover:text-primary hover:underline transition-colors cursor-pointer" title="Ver historial de versiones publicadas">
+                v{appVersion.version} (b{appVersion.build})
+              </p>
+            </Link>
           </div>
         </div>
         <div className="h-8 w-px bg-border" />

@@ -300,6 +300,8 @@ export default function PaginaCompras() {
         proveedorOptions={proveedores.map(p => ({ value: p.docId, label: p.nombre }))}
         productoOptions={productosConDocId.map(p => ({ value: p.docId, label: p.nombre, description: `Stock: ${p.existencia}` }))}
         productos={productosConDocId}
+        compras={comprasConDocId}
+        editingCompraId={editingCompra?.docId}
         onCrearProveedor={handleCrearProveedor}
       />
 
