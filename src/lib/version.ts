@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 258,
+    build: 259,
     fecha: "2026-09-28",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b259",
+    descripcion: "Corrección de selector de sucursales en vista móvil y mejoras de navegación.",
+    cambios: [
+      "Selector de sucursales nativo (Collapsible) en pie del menú para vista móvil",
+      "Solución al bloqueo de interacción/z-index del Sheet de navegación móvil",
+      "Remoción de estilos en mayúsculas sostenidas en badges y menús"
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 258,
+    fecha: "2026-09-28",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b258",
     descripcion: "Versión publicada en Firebase App Hosting. Incluye optimizaciones de compras, paleta personalizada, reglas de capitalización y sección de historial.",
@@ -32,10 +46,10 @@ export const releaseHistory: ReleaseItem[] = [
     version: "1.0.0-estable",
     build: 241,
     fecha: "2026-09-27",
-    estado: "publicada_anterior",
+    estado: "archivada",
     tipo: "Mayor",
     tagGit: "v1.0.0-estable",
-    descripcion: "Última versión anterior que estuvo publicada en Firebase App Hosting.",
+    descripcion: "Versión anterior que estuvo publicada en Firebase App Hosting.",
     cambios: [
       "Despliegue inicial de Pool Control 1.0 en Firebase App Hosting",
       "Arquitectura multi-sucursal con aislamiento estricto de datos en Firestore",
@@ -59,9 +73,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 258,
+  build: 259,
   date: "2026-09-28",
-  publicadaActual: releaseHistory[0], // Build 258 (Publicada actual en Firebase Hosting)
-  publicadaAnterior: releaseHistory[1], // Build 241 (Última versión anterior)
+  publicadaActual: releaseHistory[0], // Build 259
+  publicadaAnterior: releaseHistory[1], // Build 258
   historial: releaseHistory
 };

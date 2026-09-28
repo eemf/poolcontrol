@@ -312,6 +312,7 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
   const { isMobile, setOpenMobile, state: sidebarState, setIsLocked, setOpen } = useSidebar();
   const isCollapsed = !isMobile && sidebarState === 'collapsed';
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = React.useState(false);
+  const [isMobileBranchOpen, setIsMobileBranchOpen] = React.useState(false);
   const { isAdmin: isSuperAdmin, profile } = useUser();
   const { sucursalId } = useSucursal();
   const { hasPermission, hasAnyPermission, isLoading: isLoadingPerms } = usePermissions();
@@ -359,7 +360,14 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
       {!isCollapsed && (
         <div className="min-w-0 flex-1 overflow-hidden flex items-center justify-between">
           <p className="text-sm font-bold truncate text-foreground pr-2">{sucursalData?.nombre || "Sin sucursal"}</p>
-          {puedeSaltar && <ChevronUp className="h-3 w-3 text-muted-foreground shrink-0" />}
+          {puedeSaltar && (
+            <ChevronUp
+              className={cn(
+                "h-3.5 w-3.5 text-muted-foreground shrink-0 transition-transform duration-200",
+                isBranchDropdownOpen && "rotate-180"
+              )}
+            />
+          )}
         </div>
       )}
     </div>
@@ -396,56 +404,123 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
       <div className={cn("mt-auto p-2 flex flex-col gap-2 border-t border-sidebar-border/50")}>
         
         {puedeSaltar ? (
-          <DropdownMenu
-            modal={false}
-            open={isBranchDropdownOpen}
-            onOpenChange={(open) => {
-              setIsBranchDropdownOpen(open);
-              setIsLocked(open);
-              if (open) setOpen(true);
-            }}
-          >
-            <DropdownMenuTrigger asChild>
-              <div className="group cursor-pointer">
-                {isCollapsed ? (
-                  <TooltipProvider delayDuration={0}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>{branchDisplay}</TooltipTrigger>
-                      <TooltipContent side="right"><p>Cambiar Sucursal</p></TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ) : branchDisplay}
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side={isCollapsed ? "right" : "top"} align={isCollapsed ? "start" : "center"} className="w-64 font-body rounded-2xl shadow-2xl border-none">
-              <DropdownMenuLabel className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-3 py-2">
-                Cambiar de Sucursal
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <ScrollArea className="h-64">
-                {(todasLasSucursales || []).map(s => (
-                  <DropdownMenuItem 
-                    key={s.id} 
-                    className={cn(
-                      "px-3 py-2.5 rounded-xl cursor-pointer font-bold flex items-center gap-3",
-                      s.id === sucursalId ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                    )}
-                    onClick={() => {
-                      setIsBranchDropdownOpen(false);
-                      setIsLocked(false);
-                      handleSwitchBranch(s.id);
-                    }}
-                  >
-                    <Building2 className="h-4 w-4 shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs">{s.nombre}</p>
-                      <p className="text-[9px] opacity-60 font-medium">ID #{s.idSucursal}</p>
+          isMobile ? (
+            <Collapsible
+              open={isMobileBranchOpen}
+              onOpenChange={setIsMobileBranchOpen}
+              className="w-full"
+            >
+              <CollapsibleTrigger asChild>
+                <button
+                  type="button"
+                  className="w-full text-left group cursor-pointer focus:outline-none"
+                >
+                  <div className="flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-300 min-h-[48px] bg-primary/5 hover:bg-primary/10">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary shrink-0">
+                      <Dices className="h-4 w-4" />
                     </div>
-                  </DropdownMenuItem>
-                ))}
-              </ScrollArea>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                    <div className="min-w-0 flex-1 overflow-hidden flex items-center justify-between">
+                      <p className="text-sm font-bold truncate text-foreground pr-2">
+                        {sucursalData?.nombre || "Sin sucursal"}
+                      </p>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200",
+                          isMobileBranchOpen && "rotate-180"
+                        )}
+                      />
+                    </div>
+                  </div>
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="mt-1 rounded-xl bg-sidebar-accent/40 border border-sidebar-border/60 p-1.5 space-y-1 max-h-56 overflow-y-auto">
+                  <p className="text-[10px] font-bold text-muted-foreground px-2 py-1 tracking-wider">
+                    Cambiar de sucursal
+                  </p>
+                  {(todasLasSucursales || []).map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={cn(
+                        "w-full px-2.5 py-2 rounded-lg cursor-pointer font-bold flex items-center gap-3 transition-colors text-left",
+                        s.id === sucursalId
+                          ? "bg-primary/15 text-primary"
+                          : "hover:bg-muted/70 text-foreground"
+                      )}
+                      onClick={() => {
+                        setIsMobileBranchOpen(false);
+                        handleSwitchBranch(s.id);
+                        setOpenMobile(false);
+                      }}
+                    >
+                      <Building2 className="h-4 w-4 shrink-0 opacity-70" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs">{s.nombre}</p>
+                        <p className="text-[9px] opacity-60 font-medium">ID #{s.idSucursal}</p>
+                      </div>
+                      {s.id === sucursalId && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-primary/20 text-primary shrink-0">
+                          Activa
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ) : (
+            <DropdownMenu
+              modal={false}
+              open={isBranchDropdownOpen}
+              onOpenChange={(open) => {
+                setIsBranchDropdownOpen(open);
+                setIsLocked(open);
+                if (open) setOpen(true);
+              }}
+            >
+              <DropdownMenuTrigger asChild>
+                <div className="group cursor-pointer">
+                  {isCollapsed ? (
+                    <TooltipProvider delayDuration={0}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>{branchDisplay}</TooltipTrigger>
+                        <TooltipContent side="right"><p>Cambiar Sucursal</p></TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : branchDisplay}
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side={isCollapsed ? "right" : "top"} align={isCollapsed ? "start" : "center"} className="w-64 font-body rounded-2xl shadow-2xl border-none">
+                <DropdownMenuLabel className="text-[10px] font-bold text-muted-foreground tracking-wider px-3 py-2">
+                  Cambiar de Sucursal
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <ScrollArea className="h-64">
+                  {(todasLasSucursales || []).map(s => (
+                    <DropdownMenuItem 
+                      key={s.id} 
+                      className={cn(
+                        "px-3 py-2.5 rounded-xl cursor-pointer font-bold flex items-center gap-3",
+                        s.id === sucursalId ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                      )}
+                      onClick={() => {
+                        setIsBranchDropdownOpen(false);
+                        setIsLocked(false);
+                        handleSwitchBranch(s.id);
+                      }}
+                    >
+                      <Building2 className="h-4 w-4 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs">{s.nombre}</p>
+                        <p className="text-[9px] opacity-60 font-medium">ID #{s.idSucursal}</p>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </ScrollArea>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
         ) : (
           sucursalData && (
             <div className="cursor-default">
@@ -464,7 +539,7 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
         {(isSuperAdmin || puedeSaltar) && sucursalId && (
           <div className="w-full">
               <div className={cn(
-                  "text-center text-[10px] font-bold uppercase tracking-wider text-destructive-foreground bg-destructive rounded-lg transition-all duration-300 overflow-hidden",
+                  "text-center text-[10px] font-bold tracking-wider text-destructive-foreground bg-destructive rounded-lg transition-all duration-300 overflow-hidden",
                   isCollapsed ? "p-2 opacity-50" : "p-1.5 opacity-100"
               )}>
                   {isCollapsed ? (
