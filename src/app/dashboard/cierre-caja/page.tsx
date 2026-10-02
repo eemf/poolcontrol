@@ -613,13 +613,11 @@ export default function PaginaCierreCaja() {
                 </Card>
                 <div className="mt-8 flex items-center gap-2 text-muted-foreground">
                     <AlertTriangle className="h-4 w-4 text-amber-500" />
-                    <p className="text-[10px] font-bold uppercase tracking-tighter">Esto creará el registro base necesario para operar el sistema.</p>
+                    <p className="text-[10px] font-bold tracking-tight">Esto creará el registro base necesario para operar el sistema.</p>
                 </div>
             </div>
         )
     }
-    
-    const hayOperacionesPendientes = cuentasPendientes.length > 0;
     
     return (
         <div className='space-y-6'>

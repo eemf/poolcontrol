@@ -12,9 +12,22 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 264,
+    build: 265,
     fecha: "2026-10-01",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b265",
+    descripcion: "Corrección de declaración en página de cierre de caja.",
+    cambios: [
+      "Eliminación de declaración duplicada de variable hayOperacionesPendientes",
+      "Restablecimiento de la carga fluida y sin errores de compilación en el módulo de cierre de caja"
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 264,
+    fecha: "2026-10-01",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b264",
     descripcion: "Bloqueo de cierre de caja por estaciones de juego activas y cuentas pendientes.",
@@ -144,9 +157,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 264,
+  build: 265,
   date: "2026-10-01",
-  publicadaActual: releaseHistory[0], // Build 264
-  publicadaAnterior: releaseHistory[1], // Build 263
+  publicadaActual: releaseHistory[0], // Build 265
+  publicadaAnterior: releaseHistory[1], // Build 264
   historial: releaseHistory
 };
