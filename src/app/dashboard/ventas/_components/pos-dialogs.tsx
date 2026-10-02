@@ -203,40 +203,36 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                     ))}
                   </div>
                 </div>
-
-                {/* SECCIÓN: DEUDA HISTÓRICA (UNIFICADA) */}
-                {tieneDeudaCredito && !esVentaCredito && (
-                  <>
-                    <Separator className="bg-muted-foreground/10" />
-                    <div className="space-y-3">
-                      <p className="text-[10px] font-bold text-muted-foreground tracking-widest px-1">Deuda Histórica</p>
-                      <div 
-                        className={cn(
-                          "flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer",
-                          state.incluirCreditoEnPago ? "bg-orange-50 border-orange-400 ring-1 ring-orange-200" : "bg-card border-muted/60 hover:bg-muted/5"
-                        )}
-                        onClick={() => actions.setIncluirCreditoEnPago(!state.incluirCreditoEnPago)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Checkbox checked={state.incluirCreditoEnPago} onCheckedChange={() => {}} className="h-5 w-5 rounded-md" />
-                          <div>
-                            <p className={cn("text-sm font-bold", state.incluirCreditoEnPago ? "text-orange-700" : "")}>Total Créditos</p>
-                            <div className="flex items-center gap-1 mt-0.5">
-                              <History className="h-3 w-3 text-muted-foreground" />
-                              <p className="text-[10px] text-muted-foreground font-bold tracking-tight">Cierres anteriores</p>
-                            </div>
-                          </div>
-                        </div>
-                        <span className={cn("font-bold tabular-nums", state.incluirCreditoEnPago ? "text-orange-700" : "text-foreground")}>
-                          Q{state.saldoCreditoCliente.toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                  </>
-                )}
               </div>
             </ScrollArea>
           </div>
+
+          {/* SECCIÓN: DEUDA HISTÓRICA (FIJA SOBRE EL FOOTER) */}
+          {tieneDeudaCredito && !esVentaCredito && (
+            <div className="px-6 py-3 border-t border-muted-foreground/10 bg-card/95 backdrop-blur-sm shrink-0">
+              <div 
+                className={cn(
+                  "flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer shadow-sm",
+                  state.incluirCreditoEnPago ? "bg-orange-50 dark:bg-orange-950/20 border-orange-400 ring-1 ring-orange-200 dark:ring-orange-900/40" : "bg-muted/10 border-muted/60 hover:bg-muted/20"
+                )}
+                onClick={() => actions.setIncluirCreditoEnPago(!state.incluirCreditoEnPago)}
+              >
+                <div className="flex items-center gap-3">
+                  <Checkbox checked={state.incluirCreditoEnPago} onCheckedChange={() => {}} className="h-5 w-5 rounded-md" />
+                  <div>
+                    <p className={cn("text-sm font-bold", state.incluirCreditoEnPago ? "text-orange-700 dark:text-orange-400" : "")}>Total créditos</p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <History className="h-3 w-3 text-muted-foreground" />
+                      <p className="text-[10px] text-muted-foreground font-bold tracking-tight">Cierres anteriores</p>
+                    </div>
+                  </div>
+                </div>
+                <span className={cn("font-bold tabular-nums text-base", state.incluirCreditoEnPago ? "text-orange-700 dark:text-orange-400" : "text-foreground")}>
+                  Q{state.saldoCreditoCliente.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Footer: Acciones de Pago */}
           <DialogFooter className="p-4 sm:p-6 bg-muted/5 shrink-0 border-t border-muted-foreground/10">

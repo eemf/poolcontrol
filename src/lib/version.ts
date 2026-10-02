@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 262,
+    build: 263,
     fecha: "2026-10-01",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b263",
+    descripcion: "Fijación permanente de tarjeta de deuda histórica sobre el pie del diálogo de cobro.",
+    cambios: [
+      "Extracción de la tarjeta de saldo a crédito fuera del scroll de productos",
+      "Posicionamiento fijo sobre los botones de cobro para visibilidad garantizada en cuentas con muchos artículos",
+      "Mantenimiento de interactividad con checkbox de inclusión de créditos y formato compacto"
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 262,
+    fecha: "2026-10-01",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b262",
     descripcion: "Abono general a cuenta y ventas a crédito en cascada.",
@@ -116,9 +130,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 262,
+  build: 263,
   date: "2026-10-01",
-  publicadaActual: releaseHistory[0], // Build 262
-  publicadaAnterior: releaseHistory[1], // Build 261
+  publicadaActual: releaseHistory[0], // Build 263
+  publicadaAnterior: releaseHistory[1], // Build 262
   historial: releaseHistory
 };
