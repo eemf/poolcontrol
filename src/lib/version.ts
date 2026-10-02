@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 263,
+    build: 264,
     fecha: "2026-10-01",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b264",
+    descripcion: "Bloqueo de cierre de caja por estaciones de juego activas y cuentas pendientes.",
+    cambios: [
+      "Detección en tiempo real de estaciones de juego ocupadas (mesas de billar y consolas)",
+      "Banner informativo de bloqueo con accesos directos al POS y a la Sala de Juegos",
+      "Validación de seguridad atómica en el servicio de cierre de caja para evitar inconsistencias"
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 263,
+    fecha: "2026-10-01",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b263",
     descripcion: "Fijación permanente de tarjeta de deuda histórica sobre el pie del diálogo de cobro.",
@@ -130,9 +144,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 263,
+  build: 264,
   date: "2026-10-01",
-  publicadaActual: releaseHistory[0], // Build 263
-  publicadaAnterior: releaseHistory[1], // Build 262
+  publicadaActual: releaseHistory[0], // Build 264
+  publicadaAnterior: releaseHistory[1], // Build 263
   historial: releaseHistory
 };

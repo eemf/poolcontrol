@@ -60,12 +60,23 @@ export async function realizarCierreDeCaja(
 ) {
     const productosVirtualesRef = collection(firestore, `sucursales/${sucursalId}/productos_virtuales`);
     const qMonedasPorCodigo = query(productosVirtualesRef, where("codigoBusqueda", "==", "moneda-virtual"), limit(1));
-    const qMonedasPorNombre = query(productosVirtualesRef, where("nombre", "==", "Monedas"), limit(1));
+    const qVentasPendientes = query(collection(firestore, `sucursales/${sucursalId}/ventas`), where("estado", "==", "Pendiente de pago"), limit(1));
+    const qMesasActivas = query(collection(firestore, `sucursales/${sucursalId}/mesas_de_billar`), where("estado", "==", "ocupado"), limit(1));
     
-    const [monedasPorCodigoSnap, monedasPorNombreSnap] = await Promise.all([
+    const [monedasPorCodigoSnap, monedasPorNombreSnap, ventasPendientesSnap, mesasActivasSnap] = await Promise.all([
         getDocs(qMonedasPorCodigo),
-        getDocs(qMonedasPorNombre)
+        getDocs(qMonedasPorNombre),
+        getDocs(qVentasPendientes),
+        getDocs(qMesasActivas)
     ]);
+
+    if (!ventasPendientesSnap.empty) {
+        throw new Error("No se puede realizar el cierre de caja mientras existan cuentas pendientes de pago en el Punto de Venta.");
+    }
+
+    if (!mesasActivasSnap.empty) {
+        throw new Error("No se puede realizar el cierre de caja mientras existan estaciones de juego activas en la Sala de Juegos.");
+    }
 
     let monedaVirtualDoc;
     if (!monedasPorCodigoSnap.empty) {
@@ -77,7 +88,6 @@ export async function realizarCierreDeCaja(
         monedaVirtualDoc = null;
     }
     const existenciaActualMonedas = monedaVirtualDoc?.existencia || 0;
-
 
     return runTransaction(firestore, async (transaction) => {
         const correlativoRef = doc(firestore, `sucursales/${sucursalId}/correlativos`, 'cierre_caja');

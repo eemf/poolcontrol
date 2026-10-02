@@ -6,7 +6,7 @@
 import * as React from 'react';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Timestamp, doc, collection, query, where, getDocs, Firestore, onSnapshot, orderBy, collectionGroup } from 'firebase/firestore';
-import type { Generales, Venta, DetalleVenta, HistorialTragamonedas, CierreCaja as CierreCajaTipo, Pago } from '@/lib/tipos';
+import type { Generales, Venta, DetalleVenta, HistorialTragamonedas, CierreCaja as CierreCajaTipo, Pago, Mesa } from '@/lib/tipos';
 import { useToast } from '@/hooks/use-toast';
 import { realizarCierreDeCaja, inicializarCaja } from '@/lib/firebase/servicios/cierre-caja';
 import { sincronizarContadorCredito } from '@/lib/firebase/servicios/ventas';
@@ -435,6 +435,14 @@ export default function PaginaCierreCaja() {
     , [firestore, sucursalId]);
     const { data: ventasPendientesData, isLoading: isLoadingVentas } = useCollection<Venta>(ventasPendientesQuery);
 
+    const mesasActivasQuery = useMemoFirebase(() => 
+        firestore && sucursalId ? query(
+            collection(firestore, `sucursales/${sucursalId}/mesas_de_billar`),
+            where('estado', '==', 'ocupado')
+        ) : null
+    , [firestore, sucursalId]);
+    const { data: mesasActivasData, isLoading: isLoadingMesas } = useCollection<Mesa>(mesasActivasQuery);
+
     // --- ESTADOS LOCALES ---
     const [historialVisible, setHistorialVisible] = useState<VistaHistorial>(null);
     const [procesandoCierre, setProcesandoCierre] = useState(false);
@@ -457,6 +465,10 @@ export default function PaginaCierreCaja() {
     const efectivoEnCaja = (estadoCaja?.efectivoInicial || 0) + (estadoCaja?.totalMesas || 0) + (estadoCaja?.totalEfectivo || 0);
     
     const cuentasPendientes = ventasPendientesData || [];
+    const mesasActivas = mesasActivasData || [];
+    const hayVentasPendientes = cuentasPendientes.length > 0;
+    const hayMesasActivas = mesasActivas.length > 0;
+    const hayOperacionesPendientes = hayVentasPendientes || hayMesasActivas;
     
     const fechaInicioPeriodo = useMemo(() => {
         if (!estadoCaja?.fechaInicioPeriodo) return null;
@@ -552,7 +564,7 @@ export default function PaginaCierreCaja() {
         setHistorialVisible(current => (current === vista ? null : vista));
     };
     
-    if (cargandoContext || isLoadingSucursal || isLoadingVentas) return <div className="flex justify-center items-center h-64"><Loader /></div>;
+    if (cargandoContext || isLoadingSucursal || isLoadingVentas || isLoadingMesas) return <div className="flex justify-center items-center h-64"><Loader /></div>;
     
     // VISTA DE INICIALIZACIÓN (Sucursal Nueva)
     if (!estadoCaja || !fechaInicioPeriodo) {
@@ -629,19 +641,42 @@ export default function PaginaCierreCaja() {
             </div>
 
             {hayOperacionesPendientes && (
-                <div className="bg-destructive text-destructive-foreground border-l-8 border-black/20 p-4 rounded-2xl shadow-xl animate-in slide-in-from-top duration-300" role="alert">
-                    <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                <div className="bg-destructive text-destructive-foreground border-l-8 border-black/20 p-5 rounded-2xl shadow-xl animate-in slide-in-from-top duration-300" role="alert">
+                    <div className="flex items-start gap-4">
+                        <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
                             <AlertTriangle className="h-7 w-7 text-white"/>
                         </div>
-                        <div className="flex-1">
-                            <p className="font-black text-lg uppercase tracking-tight">Bloqueo: Acción Requerida</p>
-                            <p className="text-sm font-medium opacity-90">Hay {cuentasPendientes.length} cuenta(s) pendiente(s) de cobro. No puedes cerrar caja hasta liquidarlas.</p>
-                            <p className="text-sm mt-2 font-bold">
-                                <Link href="/dashboard/ventas" className="underline decoration-2 underline-offset-4 hover:opacity-80 transition-opacity">
-                                    Ir a Punto de Venta para liquidarlas →
-                                </Link>
-                            </p>
+                        <div className="flex-1 space-y-3">
+                            <div>
+                                <p className="font-black text-lg tracking-tight">Bloqueo: acción requerida</p>
+                                <p className="text-sm font-medium opacity-95">No puedes realizar el cierre de caja mientras existan operaciones activas en el negocio.</p>
+                            </div>
+
+                            <div className="grid gap-2 sm:grid-cols-2 pt-1">
+                                {hayVentasPendientes && (
+                                    <div className="bg-black/15 p-3 rounded-xl flex items-center justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <p className="font-bold text-sm">Punto de venta</p>
+                                            <p className="text-xs opacity-90 truncate">{cuentasPendientes.length} cuenta(s) pendiente(s) de pago</p>
+                                        </div>
+                                        <Link href="/dashboard/ventas" className="shrink-0 bg-white text-destructive font-bold text-xs px-3 py-1.5 rounded-full hover:bg-white/90 transition-colors shadow-sm">
+                                            Revisar POS →
+                                        </Link>
+                                    </div>
+                                )}
+
+                                {hayMesasActivas && (
+                                    <div className="bg-black/15 p-3 rounded-xl flex items-center justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <p className="font-bold text-sm">Sala de juegos</p>
+                                            <p className="text-xs opacity-90 truncate">{mesasActivas.length} estación(es) de juego activa(s)</p>
+                                        </div>
+                                        <Link href="/dashboard/mesas" className="shrink-0 bg-white text-destructive font-bold text-xs px-3 py-1.5 rounded-full hover:bg-white/90 transition-colors shadow-sm">
+                                            Revisar mesas →
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
