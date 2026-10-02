@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 262,
+    fecha: "2026-10-01",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b262",
+    descripcion: "Abono general a cuenta y ventas a crédito en cascada.",
+    cambios: [
+      "Distribución atómica y en cascada de abonos entre cuenta abierta y ventas a crédito",
+      "Habilitación del botón de abono para ventas a crédito y cuentas con deuda histórica",
+      "Desglose informativo de cuenta actual, créditos acumulados y saldo total en el diálogo de abono"
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 261,
     fecha: "2026-09-28",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b261",
     descripcion: "Corrección de posición de checkbox en acordeones y aprovechamiento total de espacio.",
@@ -102,9 +116,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 261,
-  date: "2026-09-28",
-  publicadaActual: releaseHistory[0], // Build 261
-  publicadaAnterior: releaseHistory[1], // Build 260
+  build: 262,
+  date: "2026-10-01",
+  publicadaActual: releaseHistory[0], // Build 262
+  publicadaAnterior: releaseHistory[1], // Build 261
   historial: releaseHistory
 };

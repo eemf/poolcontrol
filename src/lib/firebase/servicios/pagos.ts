@@ -541,3 +541,235 @@ export async function procesarPagoUnificado(
         transaction.set(corrPagosRef, { correlativo: siguienteIdPago - 1 }, { merge: true });
     });
 }
+
+/**
+ * Registra un abono a la cuenta general del cliente con distribución en cascada:
+ * 1. Liquida o abona a la cuenta abierta/pendiente actual (si existe).
+ * 2. Si hay saldo restante del abono, se distribuye en orden cronológico sobre las ventas a crédito pendientes.
+ * Todo se procesa de forma transaccional y atómica en Firestore.
+ */
+export async function registrarAbonoGeneral(
+    firestore: Firestore,
+    sucursalId: string,
+    usuarioId: string,
+    params: {
+        clienteId: string;
+        montoAbono: number;
+        ventaPrincipalId?: string | null;
+        ventaCreditoId?: string | null;
+        metodoDePago?: 'Efectivo' | 'Tarjeta';
+    }
+) {
+    if (!usuarioId) throw new Error("Se requiere un ID de usuario para registrar un abono.");
+    const sid = validarSucursal(sucursalId);
+    const { clienteId, montoAbono, ventaPrincipalId, ventaCreditoId, metodoDePago = 'Efectivo' } = params;
+
+    if (montoAbono <= 0) throw new Error("El monto del abono debe ser mayor a cero.");
+
+    return runTransaction(firestore, async (transaction) => {
+        const generalesRef = doc(firestore, `sucursales/${sid}/generales`, 'actual');
+        const corrPagosRef = doc(firestore, `sucursales/${sid}/correlativos`, 'pagos');
+
+        // 1. Obtener todas las ventas a crédito del cliente
+        const qCredito = query(
+            collection(firestore, `sucursales/${sid}/ventas`),
+            where("clienteId", "==", clienteId),
+            where("estado", "==", "credito")
+        );
+        const creditSnap = await getDocs(qCredito);
+
+        const ventaPrincipalRef = ventaPrincipalId ? doc(firestore, `sucursales/${sid}/ventas`, ventaPrincipalId) : null;
+        const ventaCreditoRef = ventaCreditoId ? doc(firestore, `sucursales/${sid}/ventas`, ventaCreditoId) : null;
+
+        // FASE DE LECTURA (Todas las lecturas antes de cualquier escritura)
+        const [generalesDoc, corrPagosDoc, ventaPrincipalDoc, ventaCreditoDoc] = await Promise.all([
+            transaction.get(generalesRef),
+            transaction.get(corrPagosRef),
+            ventaPrincipalRef ? transaction.get(ventaPrincipalRef) : Promise.resolve(null),
+            ventaCreditoRef ? transaction.get(ventaCreditoRef) : Promise.resolve(null)
+        ]);
+
+        const creditDocsMap = new Map<string, any>();
+        for (const d of creditSnap.docs) {
+            if (d.id === ventaCreditoId && ventaCreditoDoc) {
+                creditDocsMap.set(d.id, ventaCreditoDoc);
+            } else {
+                const docSnap = await transaction.get(d.ref);
+                creditDocsMap.set(d.id, docSnap);
+            }
+        }
+
+        // Ordenar las ventas de crédito de la más antigua a la más reciente
+        const creditDocsSorted = Array.from(creditDocsMap.values())
+            .filter(d => d.exists() && (d.data() as Venta).saldo > 0)
+            .sort((a, b) => {
+                const vA = a.data() as Venta;
+                const vB = b.data() as Venta;
+                const tA = vA.fecha instanceof Timestamp ? vA.fecha.toDate().getTime() : new Date(vA.fecha).getTime();
+                const tB = vB.fecha instanceof Timestamp ? vB.fecha.toDate().getTime() : new Date(vB.fecha).getTime();
+                return tA - tB;
+            });
+
+        // Calcular deuda total disponible
+        let saldoTotalDisponible = 0;
+        let ventaPrincipalData: Venta | null = null;
+        if (ventaPrincipalDoc && ventaPrincipalDoc.exists()) {
+            ventaPrincipalData = ventaPrincipalDoc.data() as Venta;
+            if (ventaPrincipalData.estado !== 'Pagada') {
+                saldoTotalDisponible += ventaPrincipalData.saldo;
+            }
+        }
+        for (const cd of creditDocsSorted) {
+            if (!ventaPrincipalDoc || cd.id !== ventaPrincipalDoc.id) {
+                saldoTotalDisponible += (cd.data() as Venta).saldo;
+            }
+        }
+
+        if (montoAbono > saldoTotalDisponible + 0.05) {
+            throw new Error(`El abono (Q${montoAbono.toFixed(2)}) excede la deuda total del cliente (Q${saldoTotalDisponible.toFixed(2)}).`);
+        }
+
+        let abonoRestante = montoAbono;
+        let siguienteIdPago = (corrPagosDoc.data()?.correlativo || 0) + 1;
+
+        let totalEfectivoSum = 0;
+        let totalMesasSum = 0;
+        let totalMonedasSum = 0;
+        let totalMonedasCreditoRestar = 0;
+
+        // Procesa el abono sobre los detalles de una venta
+        const procesarVentaConAbono = (ventaDocSnap: any, esCredito: boolean) => {
+            if (abonoRestante <= 0) return;
+            const venta = ventaDocSnap.data() as Venta;
+            if (venta.saldo <= 0) return;
+
+            const montoParaVenta = Math.min(venta.saldo, abonoRestante);
+            let montoLocalRestante = montoParaVenta;
+            const itemsSaldados: Pago['itemsSaldados'] = [];
+
+            const detallesOriginales = venta.detalles;
+            const detallesActualizadosMap = new Map<number, DetalleVenta>();
+            detallesOriginales.forEach(d => detallesActualizadosMap.set(d.idDetalle, { ...d }));
+
+            const detallesPendientes = detallesOriginales.filter(d => d.saldo > 0);
+            const detallesMonedas = detallesPendientes.filter(d => d.esVirtual);
+            const detallesTiempo = detallesPendientes.filter(d => !d.esVirtual && esAlquilerMesa(d.idProducto, d.nombreProducto));
+            const detallesConsumo = detallesPendientes.filter(d => !d.esVirtual && !esAlquilerMesa(d.idProducto, d.nombreProducto));
+
+            const aplicarDetalle = (detalle: DetalleVenta) => {
+                if (montoLocalRestante <= 0) return detalle;
+                const montoAplicar = Math.min(detalle.saldo, montoLocalRestante);
+
+                if (detalle.esVirtual) {
+                    totalMonedasSum += montoAplicar;
+                    if (esCredito) totalMonedasCreditoRestar += montoAplicar;
+                } else if (esAlquilerMesa(detalle.idProducto, detalle.nombreProducto)) {
+                    totalMesasSum += montoAplicar;
+                } else {
+                    totalEfectivoSum += montoAplicar;
+                }
+
+                itemsSaldados.push({
+                    idDetalle: detalle.idDetalle,
+                    nombreProducto: detalle.nombreProducto,
+                    montoAplicado: montoAplicar,
+                    subtotalItem: detalle.subtotal,
+                    cantidad: detalle.cantidad || 1,
+                    esVirtual: !!detalle.esVirtual,
+                    idProducto: detalle.idProducto
+                });
+
+                const nuevoSaldoDetalle = detalle.saldo - montoAplicar;
+                montoLocalRestante -= montoAplicar;
+                const yaPagadoConTarjeta = (detalle.pagadoTarjeta ?? 0) > 0;
+                const metodoPagoItem = yaPagadoConTarjeta ? 'Mixto' : metodoDePago;
+
+                return {
+                    ...detalle,
+                    saldo: nuevoSaldoDetalle,
+                    pagadoEfectivo: metodoDePago === 'Efectivo' ? (detalle.pagadoEfectivo || 0) + montoAplicar : (detalle.pagadoEfectivo || 0),
+                    pagadoTarjeta: metodoDePago === 'Tarjeta' ? (detalle.pagadoTarjeta || 0) + montoAplicar : (detalle.pagadoTarjeta || 0),
+                    estado: nuevoSaldoDetalle < 0.01 ? 'Pagada' : 'Pendiente de pago',
+                    metodoPago: nuevoSaldoDetalle < 0.01 ? metodoPagoItem : detalle.metodoPago,
+                } as DetalleVenta;
+            };
+
+            detallesMonedas.forEach(d => {
+                const det = detallesActualizadosMap.get(d.idDetalle);
+                if (det) detallesActualizadosMap.set(d.idDetalle, aplicarDetalle(det));
+            });
+            detallesTiempo.forEach(d => {
+                if (montoLocalRestante > 0) {
+                    const det = detallesActualizadosMap.get(d.idDetalle);
+                    if (det) detallesActualizadosMap.set(d.idDetalle, aplicarDetalle(det));
+                }
+            });
+            detallesConsumo.forEach(d => {
+                if (montoLocalRestante > 0) {
+                    const det = detallesActualizadosMap.get(d.idDetalle);
+                    if (det) detallesActualizadosMap.set(d.idDetalle, aplicarDetalle(det));
+                }
+            });
+
+            const detallesFinales = detallesOriginales.map(orig => detallesActualizadosMap.get(orig.idDetalle) || orig);
+            const nuevoSaldoTotal = detallesFinales.reduce((acc, item) => acc + item.saldo, 0);
+            const ventaFinalizada = nuevoSaldoTotal < 0.01;
+
+            transaction.update(ventaDocSnap.ref, {
+                saldo: nuevoSaldoTotal,
+                detalles: detallesFinales,
+                estado: ventaFinalizada ? 'Pagada' : venta.estado,
+            });
+
+            // Registrar comprobante de Pago para esta venta
+            const idPagoActual = siguienteIdPago++;
+            const pagoData: Omit<Pago, 'id'> = {
+                idPago: idPagoActual,
+                sucursalId: sid,
+                fecha: Timestamp.now(),
+                idVenta: venta.idVenta,
+                ventaDocId: ventaDocSnap.id,
+                clienteNombre: venta.nombreCliente,
+                montoTotalPagado: montoParaVenta,
+                ventaTotal: venta.total,
+                metodoPago: metodoDePago,
+                usuarioId,
+                itemsSaldados,
+            };
+            transaction.set(doc(firestore, `sucursales/${sid}/pagos`, idPagoActual.toString()), pagoData);
+
+            abonoRestante -= montoParaVenta;
+        };
+
+        // 1. Aplicar primero a la venta principal (cuenta abierta / pendiente)
+        if (ventaPrincipalDoc && ventaPrincipalDoc.exists()) {
+            procesarVentaConAbono(ventaPrincipalDoc, (ventaPrincipalDoc.data() as Venta).estado === 'credito');
+        }
+
+        // 2. Si se abrió desde una venta a crédito específica y no había venta principal
+        if (!ventaPrincipalDoc && ventaCreditoDoc && ventaCreditoDoc.exists()) {
+            procesarVentaConAbono(ventaCreditoDoc, true);
+        }
+
+        // 3. Si aún queda dinero del abono, distribuir en las ventas a crédito cronológicamente
+        for (const creditDocSnap of creditDocsSorted) {
+            if (abonoRestante <= 0) break;
+            if (ventaPrincipalDoc && creditDocSnap.id === ventaPrincipalDoc.id) continue;
+            if (ventaCreditoDoc && creditDocSnap.id === ventaCreditoDoc.id) continue;
+            procesarVentaConAbono(creditDocSnap, true);
+        }
+
+        // Actualizar contadores globales de caja
+        if (totalEfectivoSum > 0) transaction.update(generalesRef, { totalEfectivo: increment(totalEfectivoSum) });
+        if (totalMesasSum > 0) transaction.update(generalesRef, { totalMesas: increment(totalMesasSum) });
+        if (totalMonedasSum > 0) transaction.update(generalesRef, { totalVentasMonedas: increment(totalMonedasSum) });
+        if (totalMonedasCreditoRestar > 0) {
+            transaction.update(generalesRef, { totalMonedasCredito: increment(-totalMonedasCreditoRestar) });
+        }
+
+        transaction.set(corrPagosRef, { correlativo: siguienteIdPago - 1 }, { merge: true });
+
+        return { success: true, montoAbonado: montoAbono };
+    });
+}
+

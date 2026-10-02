@@ -20,7 +20,8 @@ import {
   descontarStockVirtualTemporal, 
   devolverStockVirtualTemporal,
   sincronizarContadorCredito,
-  procesarPagoUnificado
+  procesarPagoUnificado,
+  registrarAbonoGeneral
 } from '@/lib/firebase/servicios';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSucursal } from '@/hooks/use-sucursal';
@@ -282,12 +283,37 @@ export default function PaginaVentasPOS() {
 
   const manejarConfirmarAbono = async () => {
     if (!firestore || !user || !ventaParaPagar || !montoAbono) return;
+    const abonoNum = Number(montoAbono);
+    if (abonoNum <= 0) return;
+
     try {
-      await registrarAbonoACuenta(firestore, sucursalId, ventaParaPagar.id, Number(montoAbono), user.uid);
-      setDialogoAbonoAbierto(false); setDialogoPagoAbierto(false);
-      toast({ title: "Abono registrado", description: "Q" + Number(montoAbono).toFixed(2) });
+      const deudaVentaActual = ventaParaPagar.saldo || 0;
+      const tieneCreditos = saldoCreditoCliente > 0;
+      const esVentaCredito = ventaParaPagar.estado === 'credito';
+
+      if (incluirCreditoEnPago || esVentaCredito || (tieneCreditos && abonoNum > deudaVentaActual)) {
+        await registrarAbonoGeneral(firestore, sucursalId, user.uid, {
+          clienteId: ventaParaPagar.clienteId,
+          montoAbono: abonoNum,
+          ventaPrincipalId: !esVentaCredito ? ventaParaPagar.id : null,
+          ventaCreditoId: esVentaCredito ? ventaParaPagar.id : null,
+          metodoDePago: 'Efectivo',
+        });
+        toast({ 
+          title: "Abono general registrado", 
+          description: `Q${abonoNum.toFixed(2)} distribuido en cuenta y créditos.` 
+        });
+      } else {
+        await registrarAbonoACuenta(firestore, sucursalId, ventaParaPagar.id, abonoNum, user.uid);
+        toast({ title: "Abono registrado", description: "Q" + abonoNum.toFixed(2) });
+      }
+      setDialogoAbonoAbierto(false); 
+      setDialogoPagoAbierto(false);
+      setMontoAbono('');
       clienteInputRef.current?.focus();
-    } catch (e: any) { toast({ title: "Error", description: e.message, variant: "destructive" }); }
+    } catch (e: any) { 
+      toast({ title: "Error al abonar", description: e.message, variant: "destructive" }); 
+    }
   };
 
   const procederConPago = async (metodo: 'Efectivo' | 'Tarjeta') => {

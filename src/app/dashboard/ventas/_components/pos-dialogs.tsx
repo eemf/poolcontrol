@@ -241,16 +241,14 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           {/* Footer: Acciones de Pago */}
           <DialogFooter className="p-4 sm:p-6 bg-muted/5 shrink-0 border-t border-muted-foreground/10">
             {state.vistaDialogo === 'pago' ? (
-              <div className={cn("grid gap-3 w-full", esVentaCredito ? "grid-cols-2" : "grid-cols-3")}>
-                {!esVentaCredito && (
-                  <Button 
-                    className="rounded-2xl h-16 flex-col bg-orange-600 hover:bg-orange-700 gap-1 font-bold text-[11px] shadow-md border-none text-white transition-transform active:scale-95"
-                    onClick={() => actions.setDialogoAbonoAbierto(true)}
-                    disabled={state.montoAPagarDialogo <= 0 || state.incluirCreditoEnPago}
-                  >
-                    <CoinsIcon className="h-5 w-5" /> Abono
-                  </Button>
-                )}
+              <div className="grid gap-3 w-full grid-cols-3">
+                <Button 
+                  className="rounded-2xl h-16 flex-col bg-orange-600 hover:bg-orange-700 gap-1 font-bold text-[11px] shadow-md border-none text-white transition-transform active:scale-95"
+                  onClick={() => actions.setDialogoAbonoAbierto(true)}
+                  disabled={state.montoAPagarDialogo <= 0}
+                >
+                  <CoinsIcon className="h-5 w-5" /> Abono
+                </Button>
                 <Button 
                   className="rounded-2xl h-16 flex-col bg-blue-600 hover:bg-blue-700 gap-1 font-bold text-[11px] shadow-md border-none text-white transition-transform active:scale-95" 
                   disabled={state.montoAPagarDialogo <= 0}
@@ -286,14 +284,32 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
       <Dialog open={state.dialogoAbonoAbierto} onOpenChange={state.procesandoGuardado ? undefined : actions.setDialogoAbonoAbierto}>
         <DialogContent className="rounded-2xl font-body border-none shadow-2xl p-0 overflow-hidden max-w-sm">
           <DialogHeader className="p-6 pb-2">
-            <DialogTitle className="font-headline text-xl font-bold">Realizar un Abono</DialogTitle>
+            <DialogTitle className="font-headline text-xl font-bold">Realizar un abono</DialogTitle>
             <DialogDescription className="text-sm font-medium text-muted-foreground">
-              Monto parcial para {state.ventaParaPagar?.nombreCliente}.
+              Abono a la cuenta de {state.ventaParaPagar?.nombreCliente}.
             </DialogDescription>
           </DialogHeader>
-          <div className="p-6 pt-2">
+          <div className="p-6 pt-2 space-y-4">
+            {(state.saldoCreditoCliente > 0 || state.incluirCreditoEnPago) && (
+              <div className="rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 p-3 text-xs space-y-1">
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Cuenta actual:</span>
+                  <span className="font-bold text-foreground">Q{(state.ventaParaPagar?.saldo || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Ventas a crédito:</span>
+                  <span className="font-bold text-orange-700 dark:text-orange-400">Q{state.saldoCreditoCliente.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between font-bold pt-1 border-t border-orange-200 dark:border-orange-900/30 text-foreground">
+                  <span>Deuda total:</span>
+                  <span className="text-primary font-black">
+                    Q{((state.ventaParaPagar?.saldo || 0) + state.saldoCreditoCliente).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            )}
             <div className="rounded-2xl bg-muted/20 p-6 border border-muted/40 flex flex-col items-center">
-              <Label htmlFor="monto-abono" className="text-[10px] font-bold tracking-widest text-muted-foreground mb-3">Monto a Recibir (Q)</Label>
+              <Label htmlFor="monto-abono" className="text-[10px] font-bold tracking-widest text-muted-foreground mb-3">Monto a recibir (Q)</Label>
               <InputNumero 
                 id="monto-abono" 
                 ref={refs.abonoInputRef}
@@ -309,8 +325,13 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           </div>
           <DialogFooter className="p-6 bg-muted/5 sm:justify-between flex-col-reverse sm:flex-row gap-3">
             <Button type="button" variant="outline" onClick={() => actions.setDialogoAbonoAbierto(false)} className="rounded-full h-10 px-6 font-bold">Cancelar</Button>
-            <Button type="button" onClick={actions.manejarConfirmarAbono} className="rounded-full h-10 px-8 font-bold bg-orange-500 hover:bg-orange-600 text-white shadow-md">
-              Confirmar Abono
+            <Button 
+              type="button" 
+              onClick={actions.manejarConfirmarAbono} 
+              disabled={!state.montoAbono || Number(state.montoAbono) <= 0}
+              className="rounded-full h-10 px-8 font-bold bg-orange-500 hover:bg-orange-600 text-white shadow-md"
+            >
+              Confirmar abono
             </Button>
           </DialogFooter>
         </DialogContent>
