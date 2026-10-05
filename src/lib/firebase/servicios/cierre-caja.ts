@@ -61,6 +61,7 @@ export async function realizarCierreDeCaja(
 ) {
     const productosVirtualesRef = collection(firestore, `sucursales/${sucursalId}/productos_virtuales`);
     const qMonedasPorCodigo = query(productosVirtualesRef, where("codigoBusqueda", "==", "moneda-virtual"), limit(1));
+    const qMonedasPorNombre = query(productosVirtualesRef, where("nombre", "==", "Monedas"), limit(1));
     const qVentasPendientes = query(collection(firestore, `sucursales/${sucursalId}/ventas`), where("estado", "==", "Pendiente de pago"), limit(1));
     const qMesasActivas = query(collection(firestore, `sucursales/${sucursalId}/mesas_de_billar`), where("estado", "==", "ocupado"), limit(1));
     

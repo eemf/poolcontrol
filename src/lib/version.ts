@@ -12,9 +12,22 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 273,
+    build: 274,
     fecha: "2026-10-04",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b274",
+    descripcion: "Corrección de error crítico en cierre de caja por referencia no definida de qMonedasPorNombre.",
+    cambios: [
+      "Declaración y definición de la consulta qMonedasPorNombre en el servicio de cierre de caja.",
+      "Restablecimiento de la ejecución fluida del cierre de turno y cuadre de caja."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 273,
+    fecha: "2026-10-04",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b273",
     descripcion: "Simplificación visual de auditoría: remoción de banner de período y tarjetas de métricas.",
@@ -279,9 +292,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 273,
+  build: 274,
   date: "2026-10-04",
-  publicadaActual: releaseHistory[0], // Build 273
-  publicadaAnterior: releaseHistory[1], // Build 272
+  publicadaActual: releaseHistory[0], // Build 274
+  publicadaAnterior: releaseHistory[1], // Build 273
   historial: releaseHistory
 };
