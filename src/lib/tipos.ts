@@ -447,6 +447,13 @@ export interface RegistroAuditoria {
   usuarioEmail?: string;
   usuarioRol?: string;
   nombreEquipo?: string;
+  tipoDispositivo?: 'computadora' | 'tablet' | 'telefono';
+  detallesDispositivo?: {
+    so?: string;
+    navegador?: string;
+    modelo?: string;
+    resolucion?: string;
+  };
   categoria: CategoriaAuditoria;
   accion: AccionAuditoria;
   titulo: string;

@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore';
 import type { RegistroAuditoria, CategoriaAuditoria, AccionAuditoria } from '@/lib/tipos';
 import { validarSucursal } from './utils';
-import { obtenerNombreEquipo } from '@/lib/utils/dispositivo';
+import { obtenerInfoDetalladaDispositivo, type TipoDispositivo } from '@/lib/utils/dispositivo';
 
 export interface RegistrarAuditoriaParams {
   usuarioId: string;
@@ -18,6 +18,13 @@ export interface RegistrarAuditoriaParams {
   usuarioEmail?: string;
   usuarioRol?: string;
   nombreEquipo?: string;
+  tipoDispositivo?: TipoDispositivo;
+  detallesDispositivo?: {
+    so?: string;
+    navegador?: string;
+    modelo?: string;
+    resolucion?: string;
+  };
   categoria: CategoriaAuditoria;
   accion: AccionAuditoria;
   titulo: string;
@@ -118,8 +125,16 @@ export async function registrarAuditoria(
       ? params.usuarioRol
       : (usuarioEnCache?.rol || (typeof window !== 'undefined' ? localStorage.getItem('poolcontrol_user_rol') || 'Operador' : 'Operador'));
 
-    // 2. Resolver el nombre del equipo o estación de trabajo
-    const finalNombreEquipo = params.nombreEquipo || obtenerNombreEquipo();
+    // 2. Resolver información detallada del equipo o estación de trabajo
+    const infoDisp = obtenerInfoDetalladaDispositivo();
+    const finalNombreEquipo = params.nombreEquipo || infoDisp.nombre;
+    const finalTipoDispositivo = params.tipoDispositivo || infoDisp.tipo;
+    const finalDetallesDispositivo = params.detallesDispositivo || {
+      so: infoDisp.so,
+      navegador: infoDisp.navegador,
+      modelo: infoDisp.modelo || '',
+      resolucion: infoDisp.resolucion || '',
+    };
 
     // Sanitizar detalles para que no contengan valores undefined (incompatibles con Firestore)
     const detallesSanitizados: Record<string, any> = {};
@@ -139,6 +154,8 @@ export async function registrarAuditoria(
       usuarioEmail: finalUsuarioEmail,
       usuarioRol: finalUsuarioRol,
       nombreEquipo: finalNombreEquipo,
+      tipoDispositivo: finalTipoDispositivo,
+      detallesDispositivo: finalDetallesDispositivo,
       categoria: params.categoria,
       accion: params.accion,
       titulo: params.titulo,

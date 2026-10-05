@@ -10,7 +10,7 @@ import {
   ShieldCheck, Search, Filter, Calendar, User, 
   ShoppingCart, Gamepad2, Scale, Package, Boxes, Truck, 
   Clock, ArrowUpDown, ChevronRight, RefreshCw, Eye,
-  Monitor, Laptop, Edit3, Check, CheckCircle2, History,
+  Monitor, Laptop, Tablet, Smartphone, Edit3, Check, CheckCircle2, History,
   CalendarRange, Sparkles, ArrowLeft
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -36,10 +36,13 @@ import { Loader } from '@/components/ui/loader';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { 
+  obtenerInfoDetalladaDispositivo,
   obtenerNombreEquipo, 
   guardarNombreEquipo, 
   SUGERENCIAS_EQUIPOS, 
-  EVENTO_EQUIPO_CAMBIADO 
+  EVENTO_EQUIPO_CAMBIADO,
+  type InfoDispositivo,
+  type TipoDispositivo
 } from '@/lib/utils/dispositivo';
 
 const CATEGORIAS_CONFIG: Record<
@@ -84,6 +87,49 @@ const CATEGORIAS_CONFIG: Record<
   },
 };
 
+/**
+ * Función auxiliar para resolver el icono, etiqueta y colores según el tipo de dispositivo
+ */
+export function resolverMetaDispositivo(tipo?: string, nombre?: string, so?: string) {
+  const n = (nombre || '').toLowerCase();
+  const t = (tipo || '').toLowerCase();
+  const s = (so || '').toLowerCase();
+
+  if (t === 'tablet' || n.includes('tablet') || n.includes('ipad') || s.includes('ipad')) {
+    return {
+      icon: Tablet,
+      label: 'Tablet',
+      badgeClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-800',
+      color: 'text-amber-500 dark:text-amber-400',
+    };
+  }
+
+  if (
+    t === 'telefono' ||
+    n.includes('celular') ||
+    n.includes('teléfono') ||
+    n.includes('telefono') ||
+    n.includes('móvil') ||
+    n.includes('movil') ||
+    n.includes('iphone') ||
+    (t !== 'computadora' && (s.includes('ios') || s.includes('android')) && !s.includes('ipad'))
+  ) {
+    return {
+      icon: Smartphone,
+      label: 'Teléfono',
+      badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800',
+      color: 'text-emerald-500 dark:text-emerald-400',
+    };
+  }
+
+  return {
+    icon: Monitor,
+    label: 'Computadora',
+    badgeClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-800',
+    color: 'text-blue-500 dark:text-blue-400',
+  };
+}
+
 export default function PaginaAuditoria() {
   const { firestore } = useFirebase();
   const { user: currentUser, profile: currentProfile } = useUser();
@@ -102,7 +148,13 @@ export default function PaginaAuditoria() {
   // Modal de detalles de registro
   const [registroDetalle, setRegistroDetalle] = useState<RegistroAuditoria | null>(null);
 
-  // Gestión del Nombre de Equipo / Máquina
+  // Gestión e Información del Dispositivo Local Actual
+  const [infoDispositivoLocal, setInfoDispositivoLocal] = useState<InfoDispositivo>({
+    tipo: 'computadora',
+    nombre: 'Terminal POS',
+    so: 'Windows',
+    navegador: 'Chrome',
+  });
   const [nombreEquipoLocal, setNombreEquipoLocal] = useState<string>('Terminal POS');
   const [dialogoEquipoAbierto, setDialogoEquipoAbierto] = useState<boolean>(false);
   const [inputNombreEquipo, setInputNombreEquipo] = useState<string>('');
@@ -110,15 +162,19 @@ export default function PaginaAuditoria() {
   // Cache dinámico de usuarios consultados desde Firestore (user_auth_lookup o usuarios)
   const [usuariosExtra, setUsuariosExtra] = useState<Record<string, { nombre: string; email: string; rol: string }>>({});
 
-  // Cargar y escuchar el nombre del equipo configurado localmente
+  // Cargar y escuchar el dispositivo y nombre configurado localmente
   useEffect(() => {
-    const actual = obtenerNombreEquipo();
-    setNombreEquipoLocal(actual);
-    setInputNombreEquipo(actual);
+    const info = obtenerInfoDetalladaDispositivo();
+    setInfoDispositivoLocal(info);
+    setNombreEquipoLocal(info.nombre);
+    setInputNombreEquipo(info.nombre);
 
     const handleCambioEquipo = (e: any) => {
-      if (e?.detail) {
-        setNombreEquipoLocal(e.detail);
+      const nuevoNom = typeof e?.detail === 'string' ? e.detail : e?.detail?.nombre;
+      if (nuevoNom) {
+        setNombreEquipoLocal(nuevoNom);
+        const actual = obtenerInfoDetalladaDispositivo();
+        setInfoDispositivoLocal(actual);
       }
     };
 
@@ -188,7 +244,6 @@ export default function PaginaAuditoria() {
       if (cierre.inicioDelPeriodo) {
         inicio = toDate(cierre.inicioDelPeriodo);
       } else if (cierres) {
-        // Si no tenía inicioDelPeriodo guardado, buscar el cierre anterior
         const ordenados = [...cierres].sort((a, b) => b.idCuadre - a.idCuadre);
         const idx = ordenados.findIndex((item) => item.id === cierre.id);
         if (idx !== -1 && idx + 1 < ordenados.length) {
@@ -196,7 +251,6 @@ export default function PaginaAuditoria() {
         }
       }
       if (!inicio) {
-        // Fallback: 24 horas antes del cierre
         inicio = new Date(fin.getTime() - 24 * 60 * 60 * 1000);
       }
 
@@ -219,7 +273,7 @@ export default function PaginaAuditoria() {
     };
   }, [periodoSeleccionado, turnoActual, cierres]);
 
-  // 4. Consulta de auditoría optimizada: filtra por los límites del período en Firestore
+  // 4. Consulta de auditoría optimizada delimitada por fecha en Firestore
   const auditoriaQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
 
@@ -233,10 +287,8 @@ export default function PaginaAuditoria() {
           limit(limiteConsulta)
         );
       }
-      // Mientras carga turnoActual, retornar null para evitar cargar todo el historial
       if (isLoadingTurnoActual) return null;
 
-      // Si no hay fechaInicioPeriodo definida en generales, fallback a inicio del día de hoy
       const inicioHoy = new Date();
       inicioHoy.setHours(0, 0, 0, 0);
       return query(
@@ -339,7 +391,6 @@ export default function PaginaAuditoria() {
           return;
         }
 
-        // Si no está en lookup, intentar en usuarios raíz
         const snapRoot = await getDoc(doc(firestore, 'usuarios', uid));
         if (snapRoot.exists()) {
           const dataRoot = snapRoot.data();
@@ -360,19 +411,16 @@ export default function PaginaAuditoria() {
   }, [firestore, registrosRaw, mapaUsuarios, usuariosExtra, currentUser]);
 
   // Función robusta para resolver nombre, correo y rol reales del usuario
-  // NUNCA devuelve un UID alfanumérico crudo como nombre
   const resolverUsuario = (reg: RegistroAuditoria) => {
     const esNombreValido = (nom?: string) => {
       if (!nom) return false;
       const t = nom.trim();
       if (t === '' || t === 'Usuario del sistema' || t === 'desconocido') return false;
       if (t === reg.usuarioId) return false;
-      // Descartar UIDs crudos de Firebase (ej: 22+ caracteres seguidos sin espacios ni arroba)
       if (t.length >= 20 && !t.includes(' ') && !t.includes('@')) return false;
       return true;
     };
 
-    // 1. Si el registro guardó un nombre legible directamente
     if (esNombreValido(reg.usuarioNombre)) {
       return {
         nombre: reg.usuarioNombre,
@@ -381,7 +429,6 @@ export default function PaginaAuditoria() {
       };
     }
 
-    // 2. Si coincide con el usuario actualmente logueado en la sesión
     if (currentUser && (currentUser.uid === reg.usuarioId || (reg.usuarioEmail && currentUser.email === reg.usuarioEmail))) {
       const nombreActual = currentProfile?.nombre 
         || currentUser.displayName 
@@ -393,7 +440,6 @@ export default function PaginaAuditoria() {
       };
     }
 
-    // 3. Buscar en el mapa de usuarios de la sucursal
     const infoSucursal = mapaUsuarios.get(reg.usuarioId);
     if (infoSucursal && esNombreValido(infoSucursal.nombre)) {
       return {
@@ -403,7 +449,6 @@ export default function PaginaAuditoria() {
       };
     }
 
-    // 4. Buscar en usuarios extra cargados dinámicamente
     const infoExtra = usuariosExtra[reg.usuarioId];
     if (infoExtra && esNombreValido(infoExtra.nombre)) {
       return {
@@ -413,7 +458,6 @@ export default function PaginaAuditoria() {
       };
     }
 
-    // 5. Deducir desde el correo electrónico registrado
     if (reg.usuarioEmail && reg.usuarioEmail.includes('@')) {
       const parteCorreo = reg.usuarioEmail.split('@')[0];
       const capitalizado = parteCorreo.charAt(0).toUpperCase() + parteCorreo.slice(1);
@@ -434,7 +478,6 @@ export default function PaginaAuditoria() {
       };
     }
 
-    // 6. En última instancia, mostrar un rótulo amigable y legible (NUNCA el ID crudo)
     return {
       nombre: 'Operador del sistema',
       email: reg.usuarioEmail || '',
@@ -484,7 +527,6 @@ export default function PaginaAuditoria() {
   const listaUsuarios = useMemo(() => {
     const map = new Map<string, { id: string; nombre: string }>();
 
-    // 1. Agregar usuarios registrados en la sucursal
     (usuariosRegistrados || []).forEach((u: any) => {
       const uid = u.authUid || u.id;
       if (uid && u.nombre) {
@@ -492,13 +534,11 @@ export default function PaginaAuditoria() {
       }
     });
 
-    // 2. Si el usuario actual no está, agregarlo
     if (currentUser?.uid) {
       const miNombre = currentProfile?.nombre || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Mi Usuario');
       map.set(currentUser.uid, { id: currentUser.uid, nombre: `${miNombre} (Tú)` });
     }
 
-    // 3. Complementar con los registros de auditoría
     (registrosRaw || []).forEach((reg) => {
       if (reg.usuarioId && !map.has(reg.usuarioId)) {
         const u = resolverUsuario(reg);
@@ -512,7 +552,7 @@ export default function PaginaAuditoria() {
     return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
   }, [registrosRaw, usuariosRegistrados, mapaUsuarios, usuariosExtra, currentUser, currentProfile]);
 
-  // Filtrado reactivo en cliente (categoría, usuario, búsqueda)
+  // Filtrado reactivo en cliente (categoría, usuario, búsqueda por equipo/dispositivo)
   const registrosFiltrados = useMemo(() => {
     if (!registrosRaw) return [];
 
@@ -522,17 +562,14 @@ export default function PaginaAuditoria() {
     const hace30Dias = ahora.getTime() - 30 * 24 * 60 * 60 * 1000;
 
     return registrosRaw.filter((reg) => {
-      // 1. Filtro por categoría
       if (categoriaSeleccionada !== 'TODAS' && reg.categoria !== categoriaSeleccionada) {
         return false;
       }
 
-      // 2. Filtro por usuario
       if (usuarioSeleccionado !== 'TODOS' && reg.usuarioId !== usuarioSeleccionado) {
         return false;
       }
 
-      // 3. Filtro por fecha (solo activo si se seleccionó 'Historial completo')
       if (periodoSeleccionado === 'todos') {
         const fechaMs = reg.fecha?.toDate ? reg.fecha.toDate().getTime() : new Date(reg.fecha).getTime();
         if (filtroFecha === 'HOY' && fechaMs < inicioHoy) return false;
@@ -540,7 +577,6 @@ export default function PaginaAuditoria() {
         if (filtroFecha === '30DIAS' && fechaMs < hace30Dias) return false;
       }
 
-      // 4. Filtro por texto de búsqueda (busca en título, descripción, usuario, email, acción y nombre de equipo)
       if (busqueda.trim() !== '') {
         const queryTerm = busqueda.toLowerCase().trim();
         const userResolved = resolverUsuario(reg);
@@ -549,6 +585,7 @@ export default function PaginaAuditoria() {
         const textoUsuario = (userResolved.nombre || '').toLowerCase();
         const textoEmail = (userResolved.email || '').toLowerCase();
         const textoEquipo = (reg.nombreEquipo || 'Terminal POS').toLowerCase();
+        const textoTipoDisp = (reg.tipoDispositivo || '').toLowerCase();
         const textoAccion = (reg.accion || '').toLowerCase();
         const textoDetalles = JSON.stringify(reg.detalles || {}).toLowerCase();
 
@@ -558,6 +595,7 @@ export default function PaginaAuditoria() {
           textoUsuario.includes(queryTerm) ||
           textoEmail.includes(queryTerm) ||
           textoEquipo.includes(queryTerm) ||
+          textoTipoDisp.includes(queryTerm) ||
           textoAccion.includes(queryTerm) ||
           textoDetalles.includes(queryTerm);
 
@@ -578,6 +616,17 @@ export default function PaginaAuditoria() {
     return { total, ventas, mesas, caja, otros };
   }, [registrosFiltrados]);
 
+  // Resolver metadata visual del dispositivo local actual
+  const metaDispositivoLocal = useMemo(() => {
+    return resolverMetaDispositivo(
+      infoDispositivoLocal.tipo, 
+      nombreEquipoLocal, 
+      infoDispositivoLocal.so
+    );
+  }, [infoDispositivoLocal, nombreEquipoLocal]);
+
+  const CurrentDeviceIcon = metaDispositivoLocal.icon;
+
   if (isLoadingSucursal) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -596,12 +645,12 @@ export default function PaginaAuditoria() {
             Auditoría de Operaciones
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Registro cronológico y trazabilidad completa de transacciones, usuarios y equipos en el sistema.
+            Registro cronológico y trazabilidad completa de transacciones, usuarios, computadoras, tablets y teléfonos.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* Identificador interactivo de este equipo */}
+          {/* Identificador interactivo de este equipo con su icono real (PC, Tablet o Teléfono) */}
           <Button
             variant="outline"
             size="sm"
@@ -610,10 +659,13 @@ export default function PaginaAuditoria() {
               setDialogoEquipoAbierto(true);
             }}
             className="h-8 gap-1.5 text-xs bg-card hover:bg-muted/60 border shadow-xs"
-            title="Haz clic para cambiar el nombre de este equipo/estación"
+            title="Haz clic para personalizar el nombre de este equipo o ver sus datos"
           >
-            <Monitor className="h-3.5 w-3.5 text-primary shrink-0" />
+            <CurrentDeviceIcon className={`h-3.5 w-3.5 ${metaDispositivoLocal.color} shrink-0`} />
             <span>Este equipo: <strong className="text-foreground">{nombreEquipoLocal}</strong></span>
+            <Badge variant="outline" className={`text-[9px] px-1 py-0 h-3.5 ${metaDispositivoLocal.badgeClass}`}>
+              {metaDispositivoLocal.label}
+            </Badge>
             <Edit3 className="h-3 w-3 text-muted-foreground ml-0.5" />
           </Button>
 
@@ -757,7 +809,7 @@ export default function PaginaAuditoria() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por usuario, equipo, acción..."
+              placeholder="Buscar por usuario, equipo, tablet, PC..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               className="pl-9 h-9 text-sm"
@@ -868,6 +920,14 @@ export default function PaginaAuditoria() {
             const IconComponent = catConfig.icon;
             const userInfo = resolverUsuario(registro);
             const equipoNombre = registro.nombreEquipo || 'Terminal POS';
+            
+            // Resolver icono y etiqueta específicos del dispositivo (PC, Tablet o Teléfono)
+            const deviceMeta = resolverMetaDispositivo(
+              registro.tipoDispositivo,
+              registro.nombreEquipo,
+              registro.detallesDispositivo?.so
+            );
+            const DeviceIcon = deviceMeta.icon;
 
             return (
               <div
@@ -913,10 +973,13 @@ export default function PaginaAuditoria() {
                         </Badge>
                       )}
 
-                      {/* Nombre del equipo / estación */}
-                      <span className="flex items-center gap-1 text-muted-foreground font-medium bg-muted/30 px-1.5 py-0.5 rounded border border-border/50 text-[11px]">
-                        <Monitor className="h-2.5 w-2.5 text-primary/70 shrink-0" />
-                        {equipoNombre}
+                      {/* Identificación de Computadora, Tablet o Teléfono */}
+                      <span className="flex items-center gap-1.5 text-muted-foreground font-medium bg-muted/30 px-2 py-0.5 rounded border border-border/50 text-[11px]">
+                        <DeviceIcon className={`h-3 w-3 ${deviceMeta.color} shrink-0`} />
+                        <span className="text-foreground/90 font-medium">{equipoNombre}</span>
+                        <span className="text-[10px] text-muted-foreground/70 font-normal">
+                          ({deviceMeta.label})
+                        </span>
                       </span>
 
                       <span>•</span>
@@ -966,9 +1029,16 @@ export default function PaginaAuditoria() {
           {registroDetalle && (() => {
             const modalUser = resolverUsuario(registroDetalle);
             const equipoNombre = registroDetalle.nombreEquipo || 'Terminal POS';
+            const modalDeviceMeta = resolverMetaDispositivo(
+              registroDetalle.tipoDispositivo,
+              registroDetalle.nombreEquipo,
+              registroDetalle.detallesDispositivo?.so
+            );
+            const ModalDeviceIcon = modalDeviceMeta.icon;
+
             return (
               <div className="space-y-4 py-2 text-sm">
-                {/* Cuadro de Información: Operador y Equipo */}
+                {/* Cuadro de Información: Operador y Dispositivo */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {/* Operador Responsable */}
                   <div className="bg-muted/30 p-3 rounded-lg border space-y-1">
@@ -992,18 +1062,30 @@ export default function PaginaAuditoria() {
                     </p>
                   </div>
 
-                  {/* Equipo / Terminal de Trabajo */}
+                  {/* Dispositivo / Estación (PC, Tablet, Teléfono) */}
                   <div className="bg-muted/30 p-3 rounded-lg border space-y-1">
-                    <span className="text-[11px] font-semibold text-muted-foreground tracking-wide flex items-center gap-1">
-                      <Monitor className="h-3 w-3 text-primary" />
-                      Equipo / Estación
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-muted-foreground tracking-wide flex items-center gap-1">
+                        <ModalDeviceIcon className={`h-3 w-3 ${modalDeviceMeta.color}`} />
+                        Dispositivo de Registro
+                      </span>
+                      <Badge variant="outline" className={`text-[10px] px-1 py-0 h-4 ${modalDeviceMeta.badgeClass}`}>
+                        {modalDeviceMeta.label}
+                      </Badge>
+                    </div>
                     <div className="pt-0.5">
                       <span className="font-semibold text-foreground text-sm flex items-center gap-1.5">
                         {equipoNombre}
                       </span>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Dispositivo donde se realizó la operación
+                        {registroDetalle.detallesDispositivo?.so 
+                          ? `${registroDetalle.detallesDispositivo.so} • ${registroDetalle.detallesDispositivo.navegador || 'Navegador Web'}` 
+                          : 'Dispositivo detectado automáticamente'}
+                        {registroDetalle.detallesDispositivo?.resolucion && (
+                          <span className="text-[10px] text-muted-foreground/70 block mt-0.5 font-mono">
+                            Pantalla: {registroDetalle.detallesDispositivo.resolucion}
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -1057,26 +1139,49 @@ export default function PaginaAuditoria() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal para Renombrar e Identificar este Equipo */}
+      {/* Modal para Renombrar e Identificar este Equipo / Dispositivo */}
       <Dialog open={dialogoEquipoAbierto} onOpenChange={setDialogoEquipoAbierto}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base font-bold flex items-center gap-2">
-              <Monitor className="h-5 w-5 text-primary" />
-              Identificar este Equipo / Terminal
+              <CurrentDeviceIcon className={`h-5 w-5 ${metaDispositivoLocal.color}`} />
+              Identificar este {metaDispositivoLocal.label}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Asigna un nombre descriptivo a esta computadora o terminal (por ejemplo: &quot;Caja Principal&quot;, &quot;Barra&quot;, &quot;Caja 2&quot;). Este nombre quedará grabado en todas las transacciones y auditorías que se efectúen desde este dispositivo.
+              Asigna un nombre descriptivo a este dispositivo (por ejemplo: &quot;Tablet Mesas 1&quot;, &quot;Caja Principal&quot;, &quot;Celular Edil&quot;). Este nombre quedará grabado en todas las transacciones y auditorías que se efectúen desde aquí.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
+            {/* Banner de hardware detectado automáticamente */}
+            <div className="bg-muted/40 p-3 rounded-lg border space-y-1 text-xs">
+              <span className="font-semibold text-foreground flex items-center gap-1.5">
+                <CurrentDeviceIcon className={`h-4 w-4 ${metaDispositivoLocal.color}`} />
+                Hardware detectado en este dispositivo:
+              </span>
+              <div className="flex flex-wrap items-center gap-1.5 text-muted-foreground pt-0.5">
+                <Badge variant="secondary" className="text-[11px] font-medium">
+                  {metaDispositivoLocal.label}
+                </Badge>
+                <span>•</span>
+                <span>{infoDispositivoLocal.so}</span>
+                <span>•</span>
+                <span>{infoDispositivoLocal.navegador}</span>
+                {infoDispositivoLocal.resolucion && (
+                  <>
+                    <span>•</span>
+                    <span className="font-mono text-[10px]">{infoDispositivoLocal.resolucion}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-foreground">
-                Nombre de esta estación de trabajo
+                Nombre para este dispositivo
               </label>
               <Input
-                placeholder="Ej. Caja Principal, Barra, Mostrador..."
+                placeholder="Ej. Tablet Mesas 1, Caja Mostrador, Celular Admin..."
                 value={inputNombreEquipo}
                 onChange={(e) => setInputNombreEquipo(e.target.value)}
                 className="text-sm h-9"
@@ -1084,7 +1189,7 @@ export default function PaginaAuditoria() {
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-xs text-muted-foreground">Sugerencias rápidas:</span>
+              <span className="text-xs text-muted-foreground">Sugerencias rápidas recomendadas:</span>
               <div className="flex flex-wrap gap-1.5">
                 {SUGERENCIAS_EQUIPOS.map((sug) => (
                   <Button
