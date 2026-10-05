@@ -19,14 +19,12 @@ export function WeeklyHeader({ hayDatosPendientes }: WeeklyHeaderProps) {
         </h1>
         <p className="text-sm text-muted-foreground hidden sm:block">Consolida los ingresos y egresos pendientes para generar un reporte.</p>
       </div>
-      {hayDatosPendientes && (
-        <Link href="/dashboard/administracion/cuadre-semanal/historial" className="w-full sm:w-auto">
-          <Button variant="outline" className="w-full sm:w-auto rounded-full h-10 px-6 font-bold">
-            <History className="mr-2 h-4 w-4" /> 
-            Historial
-          </Button>
-        </Link>
-      )}
+      <Link href="/dashboard/administracion/cuadre-semanal/historial" className="w-full sm:w-auto">
+        <Button variant="outline" className="w-full sm:w-auto rounded-full h-10 px-6 font-bold shadow-xs">
+          <History className="mr-2 h-4 w-4" /> 
+          Historial
+        </Button>
+      </Link>
     </div>
   );
 }

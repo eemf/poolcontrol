@@ -6,7 +6,11 @@ import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase
 import type { CierreCaja, Compra, Gasto as GastoType, Cuenta, CuadreTragamonedas } from '@/lib/tipos';
 import { 
     Loader2, 
+    History,
+    CalendarDays
 } from "lucide-react";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { realizarCuadreSemanal, type CuadreSemanalData } from '@/lib/firebase/servicios/cuadre-semanal';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -225,8 +229,18 @@ export default function CuadreSemanalPage() {
       <EncabezadoSemanal hayDatosPendientes={hayDatosPendientes} />
 
       {!hayDatosPendientes ? (
-        <div className="p-12 text-center border-2 border-dashed rounded-lg">
-          <p className="text-muted-foreground">No hay registros pendientes de procesar.</p>
+        <div className="p-12 text-center border-2 border-dashed rounded-xl bg-card/40 space-y-4">
+          <CalendarDays className="h-12 w-12 mx-auto text-primary/40" />
+          <div className="space-y-1">
+            <p className="font-semibold text-lg text-foreground">No hay registros pendientes de procesar</p>
+            <p className="text-sm text-muted-foreground">Todos los ingresos, egresos y gastos semanales están al día.</p>
+          </div>
+          <Link href="/dashboard/administracion/cuadre-semanal/historial" className="inline-block pt-1">
+            <Button variant="outline" className="rounded-full px-6 font-semibold gap-2 shadow-xs">
+              <History className="h-4 w-4" />
+              Ver Historial de Cuadres Semanales
+            </Button>
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">

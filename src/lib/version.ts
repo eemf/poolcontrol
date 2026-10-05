@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 275,
+    fecha: "2026-10-05",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b275",
+    descripcion: "Disponibilidad permanente de botones de Historial en Cuadre Semanal y Cuadre Mensual.",
+    cambios: [
+      "Habilitación incondicional del botón 'Historial' en el encabezado principal de Cuadre Semanal.",
+      "Inclusión de botones de acceso directo a sus historiales respectivos en los estados vacíos de Cuadre Semanal y Cuadre Mensual.",
+      "Garantía de acceso completo al historial de cierres y liquidaciones aún cuando no existan registros pendientes."
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 274,
     fecha: "2026-10-04",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b274",
     descripcion: "Corrección de error crítico en cierre de caja por referencia no definida de qMonedasPorNombre.",
@@ -292,9 +306,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 274,
-  date: "2026-10-04",
-  publicadaActual: releaseHistory[0], // Build 274
-  publicadaAnterior: releaseHistory[1], // Build 273
+  build: 275,
+  date: "2026-10-05",
+  publicadaActual: releaseHistory[0], // Build 275
+  publicadaAnterior: releaseHistory[1], // Build 274
   historial: releaseHistory
 };

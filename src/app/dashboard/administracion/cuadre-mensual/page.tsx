@@ -201,10 +201,17 @@ export default function CuadreMensualPage() {
                     <CardContent>
                         {cargando ? <div className="flex justify-center items-center h-48"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
                         : !cuadresSemanales || cuadresSemanales.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-48 border-2 border-dashed rounded-lg">
-                                <FileSignature className="h-12 w-12 mb-4 text-primary/50" />
-                                <p className="font-semibold text-lg">No hay cuadres semanales pendientes</p>
-                                <p className="text-sm">Completa un cuadre semanal para que aparezca aquí.</p>
+                            <div className="flex flex-col items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-xl bg-card/40 space-y-3">
+                                <FileSignature className="h-12 w-12 text-primary/50" />
+                                <div className="space-y-1">
+                                    <p className="font-semibold text-lg text-foreground">No hay cuadres semanales pendientes</p>
+                                    <p className="text-sm text-muted-foreground">Completa un cuadre semanal para que aparezca aquí o consulta los anteriores.</p>
+                                </div>
+                                <Button variant="outline" asChild className="rounded-full px-6 gap-2 shadow-xs font-semibold">
+                                    <Link href="/dashboard/administracion/cuadre-mensual/historial">
+                                        <History className="h-4 w-4" /> Ver Historial de Cuadres Mensuales
+                                    </Link>
+                                </Button>
                             </div>
                         ) : (
                             <div className="space-y-3">
