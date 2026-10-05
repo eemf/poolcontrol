@@ -40,6 +40,8 @@ export default function PaginaCatalogoProductos() {
   const [precioVenta, setPrecioVenta] = useState<number | ''>('');
   const [existencia, setExistencia] = useState<number | ''>('');
   const [existenciaMinima, setExistenciaMinima] = useState<number | ''>('');
+  const [ubicacion, setUbicacion] = useState('');
+  const [ubicacionFiltro, setUbicacionFiltro] = useState('todas');
   const [preparaciones, setPreparaciones] = useState<Preparacion[]>([]);
 
   const resetForm = useCallback(() => {
@@ -48,6 +50,7 @@ export default function PaginaCatalogoProductos() {
     setPrecioVenta('');
     setExistencia('');
     setExistenciaMinima('');
+    setUbicacion('');
     setPreparaciones([]);
     setEditingProduct(null);
   }, []);
@@ -71,6 +74,7 @@ export default function PaginaCatalogoProductos() {
       setPrecioVenta(editingProduct.precioVenta ?? '');
       setExistencia(editingProduct.existencia ?? '');
       setExistenciaMinima(editingProduct.existenciaMinima ?? '');
+      setUbicacion(editingProduct.ubicacion || '');
       setPreparaciones(editingProduct.preparaciones || []);
     } else if (!isModalOpen) {
       resetForm();
@@ -81,10 +85,20 @@ export default function PaginaCatalogoProductos() {
     return (rawProductos || []).map((p) => ({ ...p, docId: p.id } as ProductoConDocId));
   }, [rawProductos]);
 
+  const ubicacionesDisponibles = useMemo(() => {
+    const defaultSet = new Set(['Estantes', 'Refris', 'Congeladores', 'Mostrador', 'Bodega']);
+    (rawProductos || []).forEach(p => {
+      if (p.ubicacion && p.ubicacion.trim()) defaultSet.add(p.ubicacion.trim());
+    });
+    return Array.from(defaultSet);
+  }, [rawProductos]);
+
   const filteredProducts = useMemo(() => {
-    let result = productosConDocId.filter(p => 
-      (p.nombre || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    let result = productosConDocId.filter(p => {
+      const matchSearch = (p.nombre || '').toLowerCase().includes(searchTerm.toLowerCase());
+      const matchUbicacion = ubicacionFiltro === 'todas' || (p.ubicacion || '').toLowerCase() === ubicacionFiltro.toLowerCase();
+      return matchSearch && matchUbicacion;
+    });
 
     result.sort((a, b) => {
       if (sortOrder === 'name-asc') return a.nombre.localeCompare(b.nombre);
@@ -95,7 +109,11 @@ export default function PaginaCatalogoProductos() {
     });
 
     return result;
-  }, [productosConDocId, searchTerm, sortOrder]);
+  }, [productosConDocId, searchTerm, sortOrder, ubicacionFiltro]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortOrder, ubicacionFiltro]);
 
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -118,6 +136,7 @@ export default function PaginaCatalogoProductos() {
       precioVenta: Number(precioVenta),
       existencia: Number(existencia),
       existenciaMinima: Number(existenciaMinima) || 0,
+      ubicacion: ubicacion.trim() || undefined,
       preparaciones
     };
 
@@ -170,6 +189,9 @@ export default function PaginaCatalogoProductos() {
         onSearchChange={setSearchTerm}
         orden={sortOrder}
         onSortOrderChange={setSortOrder}
+        ubicacionFiltro={ubicacionFiltro}
+        onUbicacionFiltroChange={setUbicacionFiltro}
+        ubicacionesDisponibles={ubicacionesDisponibles}
         onEditar={setEditingProduct}
         onEliminar={setProductToDelete}
         paginacion={{
@@ -194,6 +216,7 @@ export default function PaginaCatalogoProductos() {
           precioVenta, setPrecioVenta,
           existencia, setExistencia,
           existenciaMinima, setExistenciaMinima,
+          ubicacion, setUbicacion,
           preparaciones, setPreparaciones
         }}
       />

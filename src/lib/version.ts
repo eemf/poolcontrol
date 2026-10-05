@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 266,
+    fecha: "2026-10-04",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b266",
+    descripcion: "Organización de productos por ubicación (estantes, refrigeradores, congeladores, mostrador).",
+    cambios: [
+      "Asignación de ubicación en catálogo con sugerencias rápidas (Estantes, Refris, Congeladores, Mostrador, Bodega) y texto libre",
+      "Filtrado dinámico por ubicación en el catálogo de productos con insignias visuales",
+      "Filtro por ubicación en control y revisión física de inventario para conteo sectorizado"
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 265,
     fecha: "2026-10-01",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b265",
     descripcion: "Corrección de declaración en página de cierre de caja.",
@@ -157,9 +171,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 265,
-  date: "2026-10-01",
-  publicadaActual: releaseHistory[0], // Build 265
-  publicadaAnterior: releaseHistory[1], // Build 264
+  build: 266,
+  date: "2026-10-04",
+  publicadaActual: releaseHistory[0], // Build 266
+  publicadaAnterior: releaseHistory[1], // Build 265
   historial: releaseHistory
 };

@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Save, PlusCircle, Utensils, Trash2, Edit, X } from "lucide-react";
+import { Loader2, Save, PlusCircle, Utensils, Trash2, Edit, X, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import type { Producto, Preparacion, Ingrediente } from "@/lib/tipos";
 
 interface ModalProductoProps {
@@ -22,6 +23,7 @@ interface ModalProductoProps {
     precioVenta: number | ''; setPrecioVenta: (v: number | '') => void;
     existencia: number | ''; setExistencia: (v: number | '') => void;
     existenciaMinima: number | ''; setExistenciaMinima: (v: number | '') => void;
+    ubicacion: string; setUbicacion: (v: string) => void;
     preparaciones: Preparacion[]; setPreparaciones: (v: Preparacion[]) => void;
   };
   productosParaIngredientes: (Producto & { docId: string })[];
@@ -113,6 +115,39 @@ export function ModalProducto({
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-muted-foreground ml-1">Mínimo sugerido</Label>
                     <Input type="number" value={form.existenciaMinima} onChange={e => form.setExistenciaMinima(e.target.value === '' ? '' : Number(e.target.value))} className="rounded-full h-11 text-center" />
+                  </div>
+                </div>
+
+                {/* Ubicación / Organización física */}
+                <div className="space-y-2 pt-1">
+                  <Label className="text-xs font-semibold text-muted-foreground ml-1 flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-primary" /> Ubicación / Almacenamiento
+                  </Label>
+                  <Input 
+                    placeholder="Ej: Estante 1, Refrigerador, Mostrador..." 
+                    value={form.ubicacion} 
+                    onChange={e => form.setUbicacion(e.target.value)} 
+                    className="rounded-full h-11 border-muted-foreground/20" 
+                  />
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {['Estantes', 'Refris', 'Congeladores', 'Mostrador', 'Bodega'].map((sug) => {
+                      const seleccionada = form.ubicacion.trim().toLowerCase() === sug.toLowerCase();
+                      return (
+                        <button
+                          key={sug}
+                          type="button"
+                          onClick={() => form.setUbicacion(sug)}
+                          className={cn(
+                            "text-[10px] font-bold px-2.5 py-1 rounded-full transition-all border",
+                            seleccionada 
+                              ? "bg-primary text-primary-foreground border-primary shadow-xs" 
+                              : "bg-muted/40 hover:bg-muted text-muted-foreground border-muted-foreground/20"
+                          )}
+                        >
+                          {sug}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

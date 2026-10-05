@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowUpDown, Loader2, Edit, Trash2, ChevronLeft, ChevronRight, Info, Utensils } from "lucide-react";
+import { Search, ArrowUpDown, Loader2, Edit, Trash2, ChevronLeft, ChevronRight, Info, Utensils, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Producto } from "@/lib/tipos";
 
@@ -20,6 +20,9 @@ interface ListaProductosProps {
   onSearchChange: (val: string) => void;
   orden: string;
   onSortOrderChange: (val: string) => void;
+  ubicacionFiltro: string;
+  onUbicacionFiltroChange: (val: string) => void;
+  ubicacionesDisponibles: string[];
   onEditar: (producto: ProductoConDocId) => void;
   onEliminar: (producto: ProductoConDocId) => void;
   paginacion: {
@@ -38,6 +41,9 @@ export function ListaProductos({
   onSearchChange,
   orden,
   onSortOrderChange,
+  ubicacionFiltro,
+  onUbicacionFiltroChange,
+  ubicacionesDisponibles,
   onEditar,
   onEliminar,
   paginacion
@@ -45,7 +51,7 @@ export function ListaProductos({
   return (
     <Card className="border rounded-lg transition-all bg-card-foreground/5 shadow-sm font-body overflow-hidden">
       <CardHeader className="p-4">
-        <div className="flex flex-col sm:flex-row items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-grow w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -55,18 +61,32 @@ export function ListaProductos({
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
-          <Select value={orden} onValueChange={onSortOrderChange}>
-            <SelectTrigger className="w-full sm:w-[200px] rounded-full h-10 border-muted-foreground/20">
-              <ArrowUpDown className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Ordenar por..." />
-            </SelectTrigger>
-            <SelectContent className="font-body">
-              <SelectItem value="name-asc">Nombre (A-Z)</SelectItem>
-              <SelectItem value="name-desc">Nombre (Z-A)</SelectItem>
-              <SelectItem value="stock-asc">Stock (Menor a Mayor)</SelectItem>
-              <SelectItem value="stock-desc">Stock (Mayor a Menor)</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Select value={ubicacionFiltro} onValueChange={onUbicacionFiltroChange}>
+              <SelectTrigger className="w-full sm:w-[170px] rounded-full h-10 border-muted-foreground/20">
+                <MapPin className="mr-2 h-4 w-4 text-primary" />
+                <SelectValue placeholder="Ubicación..." />
+              </SelectTrigger>
+              <SelectContent className="font-body">
+                <SelectItem value="todas">Todas las ubicaciones</SelectItem>
+                {ubicacionesDisponibles.map((u) => (
+                  <SelectItem key={u} value={u}>{u}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={orden} onValueChange={onSortOrderChange}>
+              <SelectTrigger className="w-full sm:w-[180px] rounded-full h-10 border-muted-foreground/20">
+                <ArrowUpDown className="mr-2 h-4 w-4" />
+                <SelectValue placeholder="Ordenar por..." />
+              </SelectTrigger>
+              <SelectContent className="font-body">
+                <SelectItem value="name-asc">Nombre (A-Z)</SelectItem>
+                <SelectItem value="name-desc">Nombre (Z-A)</SelectItem>
+                <SelectItem value="stock-asc">Stock (Menor a Mayor)</SelectItem>
+                <SelectItem value="stock-desc">Stock (Mayor a Menor)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0">
@@ -96,11 +116,19 @@ export function ListaProductos({
                     <div className="flex flex-1 items-center justify-between pr-2">
                       <div className="flex flex-col items-start min-w-[100px] text-left">
                         <span className="font-bold text-base truncate w-full text-foreground">{producto.nombre}</span>
-                        {numPrep > 0 && (
-                          <div className="mt-1 px-2 py-0.5 bg-muted text-[9px] font-bold text-muted-foreground rounded-full leading-none">
-                            {numPrep} prep.
-                          </div>
-                        )}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                          {producto.ubicacion && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-[9px] font-bold text-primary rounded-full leading-none">
+                              <MapPin className="h-2.5 w-2.5" />
+                              {producto.ubicacion}
+                            </span>
+                          )}
+                          {numPrep > 0 && (
+                            <div className="px-2 py-0.5 bg-muted text-[9px] font-bold text-muted-foreground rounded-full leading-none">
+                              {numPrep} prep.
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex flex-col items-center text-center">
@@ -133,7 +161,7 @@ export function ListaProductos({
                           <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                             <Info className="h-3.5 w-3.5" /> Detalles del producto
                           </h4>
-                          <div className="grid grid-cols-2 gap-4 bg-muted/20 p-4 rounded-xl border border-muted/40">
+                          <div className="grid grid-cols-3 gap-3 bg-muted/20 p-4 rounded-xl border border-muted/40">
                             <div>
                               <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">Precio compra</p>
                               <p className="font-bold text-sm">Q{producto.precioCompra.toFixed(2)}</p>
@@ -141,6 +169,10 @@ export function ListaProductos({
                             <div>
                               <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">Cód. búsqueda</p>
                               <p className="font-bold text-sm truncate">{producto.codigoBusqueda || 'N/A'}</p>
+                            </div>
+                            <div>
+                              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">Ubicación</p>
+                              <p className="font-bold text-sm truncate text-primary">{producto.ubicacion || 'Sin asignar'}</p>
                             </div>
                           </div>
                         </div>

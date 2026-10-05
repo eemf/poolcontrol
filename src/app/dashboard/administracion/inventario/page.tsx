@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { InputNumero } from '@/components/ui/input-numero';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Loader2, Boxes, Search, AlertTriangle, Save, ClipboardCheck, ChevronLeft, ChevronRight, History, Pencil, ArrowLeft } from 'lucide-react';
+import { Loader2, Boxes, Search, AlertTriangle, Save, ClipboardCheck, ChevronLeft, ChevronRight, History, Pencil, ArrowLeft, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSucursal } from '@/hooks/use-sucursal';
 import { Badge } from '@/components/ui/badge';
@@ -39,6 +39,7 @@ export default function PaginaInventario() {
   const [observaciones, setObservaciones] = useState('');
   const [filtro, setFiltro] = useState('');
   const [orden, setOrden] = useState('nombre-asc');
+  const [ubicacionFiltro, setUbicacionFiltro] = useState('todas');
   const [alertaGuardado, setAlertaGuardado] = useState(false);
   const [procesando, setProcesando] = useState(false);
   const [confirmadoCheck, setConfirmadoCheck] = useState(false);
@@ -90,20 +91,38 @@ export default function PaginaInventario() {
     }
   };
 
+  const ubicacionesDisponibles = useMemo(() => {
+    const set = new Set<string>();
+    (productos || []).forEach(p => {
+      if (p.ubicacion && p.ubicacion.trim()) set.add(p.ubicacion.trim());
+    });
+    if (set.size === 0) {
+      ['Estantes', 'Refris', 'Congeladores', 'Mostrador', 'Bodega'].forEach(s => set.add(s));
+    }
+    return Array.from(set);
+  }, [productos]);
+
   const productosFiltrados = useMemo(() => {
     let result = [...productosAjuste];
     if (filtro) {
       const filtroLower = filtro.toLowerCase();
       result = result.filter(p => p.nombre.toLowerCase().includes(filtroLower));
     }
+    if (ubicacionFiltro !== 'todas') {
+      if (ubicacionFiltro === 'sin_ubicacion') {
+        result = result.filter(p => !p.ubicacion || !p.ubicacion.trim());
+      } else {
+        result = result.filter(p => (p.ubicacion || '').toLowerCase() === ubicacionFiltro.toLowerCase());
+      }
+    }
     
     if (orden === 'nombre-asc') result.sort((a, b) => a.nombre.localeCompare(b.nombre));
-    if (orden === 'nombre-desc') result.sort((a, b) => a.nombre.localeCompare(a.nombre));
+    if (orden === 'nombre-desc') result.sort((a, b) => a.nombre.localeCompare(b.nombre));
     if (orden === 'stock-asc') result.sort((a, b) => (a.existencia || 0) - (b.existencia || 0));
     if (orden === 'stock-desc') result.sort((a, b) => (b.existencia || 0) - (a.existencia || 0));
     
     return result;
-  }, [productosAjuste, filtro, orden]);
+  }, [productosAjuste, filtro, orden, ubicacionFiltro]);
 
   const totalPages = Math.ceil(productosFiltrados.length / itemsPerPage);
   const paginatedProductos = useMemo(() => {
@@ -113,7 +132,7 @@ export default function PaginaInventario() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filtro, orden, itemsPerPage, isRevisionMode]);
+  }, [filtro, orden, itemsPerPage, isRevisionMode, ubicacionFiltro]);
 
   const manejarGuardarAjuste = async () => {
     if (!firestore || !user || !sucursalId) return;
@@ -201,22 +220,35 @@ export default function PaginaInventario() {
 
       <Card className="shadow-sm border-border bg-card overflow-hidden">
         <CardHeader className="p-4 bg-muted/5">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
             <div className="relative flex-1 w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Buscar producto..."
-                className="pl-9"
+                className="pl-9 rounded-full h-10 border-muted-foreground/20"
                 value={filtro}
                 onChange={(e) => setFiltro(e.target.value)}
               />
             </div>
-            <div className="w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Select value={ubicacionFiltro} onValueChange={setUbicacionFiltro}>
+                <SelectTrigger className="w-full sm:w-[170px] rounded-full h-10 border-muted-foreground/20">
+                  <MapPin className="mr-2 h-4 w-4 text-primary" />
+                  <SelectValue placeholder="Ubicación..." />
+                </SelectTrigger>
+                <SelectContent className="font-body">
+                  <SelectItem value="todas">Todas las ubicaciones</SelectItem>
+                  {ubicacionesDisponibles.map(u => (
+                    <SelectItem key={u} value={u}>{u}</SelectItem>
+                  ))}
+                  <SelectItem value="sin_ubicacion">Sin ubicación</SelectItem>
+                </SelectContent>
+              </Select>
               <Select value={orden} onValueChange={setOrden}>
-                <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectTrigger className="w-full sm:w-[180px] rounded-full h-10 border-muted-foreground/20">
                   <SelectValue placeholder="Ordenar por..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="font-body">
                   <SelectItem value="nombre-asc">Nombre (A-Z)</SelectItem>
                   <SelectItem value="nombre-desc">Nombre (Z-A)</SelectItem>
                   <SelectItem value="stock-asc">Stock (Menor a Mayor)</SelectItem>
@@ -247,13 +279,19 @@ export default function PaginaInventario() {
                     )}>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-base sm:text-lg truncate text-foreground">{p.nombre}</h3>
-                        <div className="mt-1">
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5">
                           <Badge className={cn(
                             "rounded-full px-3 py-0.5 text-[10px] font-bold border-none",
                             esStockBajo ? "bg-orange-500 text-white" : "bg-emerald-500 text-white"
                           )}>
                             {esStockBajo ? 'Bajo' : 'En stock'}
                           </Badge>
+                          {p.ubicacion && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-primary/10 text-[10px] font-bold text-primary rounded-full">
+                              <MapPin className="h-2.5 w-2.5" />
+                              {p.ubicacion}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-4 sm:gap-8 shrink-0">
@@ -289,6 +327,12 @@ export default function PaginaInventario() {
                         <span className="font-semibold text-sm sm:text-base text-foreground truncate block">
                           {p.nombre}
                         </span>
+                        {p.ubicacion && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary mt-0.5">
+                            <MapPin className="h-2.5 w-2.5" />
+                            {p.ubicacion}
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-4">
                         <InputNumero 

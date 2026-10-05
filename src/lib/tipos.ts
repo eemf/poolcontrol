@@ -53,6 +53,7 @@ export interface Producto {
   existencia: number;
   existenciaMinima?: number;
   preparaciones?: Preparacion[];
+  ubicacion?: string;
 }
 
 export interface ProductoVirtual {
