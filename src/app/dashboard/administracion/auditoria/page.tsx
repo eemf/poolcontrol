@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
+import { useFirebase, useUser, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
-import { collection, query, orderBy, limit, doc, getDoc } from 'firebase/firestore';
-import type { RegistroAuditoria, CategoriaAuditoria, UsuarioSucursal } from '@/lib/tipos';
+import { collection, query, orderBy, limit, doc, getDoc, where, Timestamp } from 'firebase/firestore';
+import type { RegistroAuditoria, CategoriaAuditoria, UsuarioSucursal, Generales, CierreCaja } from '@/lib/tipos';
+import { toDate } from '@/lib/firebase/servicios/utils';
 import { 
   ShieldCheck, Search, Filter, Calendar, User, 
   ShoppingCart, Gamepad2, Scale, Package, Boxes, Truck, 
   Clock, ArrowUpDown, ChevronRight, RefreshCw, Eye,
-  Monitor, Laptop, Edit3, Check, CheckCircle2
+  Monitor, Laptop, Edit3, Check, CheckCircle2, History,
+  CalendarRange, Sparkles, ArrowLeft
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -87,7 +89,10 @@ export default function PaginaAuditoria() {
   const { user: currentUser, profile: currentProfile } = useUser();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
 
-  // Filtros
+  // Selector de Período (Predeterminado: 'abierto')
+  const [periodoSeleccionado, setPeriodoSeleccionado] = useState<string>('abierto');
+
+  // Filtros generales
   const [busqueda, setBusqueda] = useState('');
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('TODAS');
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState<string>('TODOS');
@@ -132,15 +137,143 @@ export default function PaginaAuditoria() {
     setDialogoEquipoAbierto(false);
   };
 
-  // Consulta de auditoría en tiempo real
+  // 1. Obtener información del turno actual (generales/actual) para conocer la fecha de apertura
+  const generalesRef = useMemoFirebase(() => {
+    if (!firestore || !sucursalId) return null;
+    return doc(firestore, `sucursales/${sucursalId}/generales/actual`);
+  }, [firestore, sucursalId]);
+
+  const { data: turnoActual, isLoading: isLoadingTurnoActual } = useDoc<Generales>(generalesRef);
+
+  // 2. Obtener lista de cierres de caja anteriores para permitir seleccionar turnos pasados
+  const cierresQuery = useMemoFirebase(() => {
+    if (!firestore || !sucursalId) return null;
+    return query(
+      collection(firestore, `sucursales/${sucursalId}/cierre_caja`),
+      orderBy('fecha', 'desc'),
+      limit(60)
+    );
+  }, [firestore, sucursalId]);
+
+  const { data: cierres, isLoading: isLoadingCierres } = useCollection<CierreCaja>(cierresQuery);
+
+  // 3. Resolver los límites temporales del período seleccionado
+  const infoPeriodo = useMemo(() => {
+    if (periodoSeleccionado === 'abierto') {
+      const inicio = turnoActual?.fechaInicioPeriodo ? toDate(turnoActual.fechaInicioPeriodo) : null;
+      return {
+        tipo: 'abierto' as const,
+        label: 'Período Abierto (En curso)',
+        inicio,
+        fin: null,
+        esAbierto: true,
+      };
+    }
+
+    if (periodoSeleccionado === 'todos') {
+      return {
+        tipo: 'todos' as const,
+        label: 'Historial Completo (Todos los períodos)',
+        inicio: null,
+        fin: null,
+        esAbierto: false,
+      };
+    }
+
+    // Buscar en los turnos cerrados
+    const cierre = cierres?.find((c) => c.id === periodoSeleccionado);
+    if (cierre) {
+      const fin = toDate(cierre.fecha);
+      let inicio: Date | null = null;
+      if (cierre.inicioDelPeriodo) {
+        inicio = toDate(cierre.inicioDelPeriodo);
+      } else if (cierres) {
+        // Si no tenía inicioDelPeriodo guardado, buscar el cierre anterior
+        const ordenados = [...cierres].sort((a, b) => b.idCuadre - a.idCuadre);
+        const idx = ordenados.findIndex((item) => item.id === cierre.id);
+        if (idx !== -1 && idx + 1 < ordenados.length) {
+          inicio = toDate(ordenados[idx + 1].fecha);
+        }
+      }
+      if (!inicio) {
+        // Fallback: 24 horas antes del cierre
+        inicio = new Date(fin.getTime() - 24 * 60 * 60 * 1000);
+      }
+
+      return {
+        tipo: 'cierre' as const,
+        label: `Turno #${cierre.idCuadre}`,
+        inicio,
+        fin,
+        cierre,
+        esAbierto: false,
+      };
+    }
+
+    return {
+      tipo: 'abierto' as const,
+      label: 'Período Abierto',
+      inicio: null,
+      fin: null,
+      esAbierto: true,
+    };
+  }, [periodoSeleccionado, turnoActual, cierres]);
+
+  // 4. Consulta de auditoría optimizada: filtra por los límites del período en Firestore
   const auditoriaQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
+
+    // Caso 1: Período abierto (comportamiento predeterminado)
+    if (periodoSeleccionado === 'abierto') {
+      if (infoPeriodo.inicio) {
+        return query(
+          collection(firestore, `sucursales/${sucursalId}/auditoria`),
+          where('fecha', '>=', Timestamp.fromDate(infoPeriodo.inicio)),
+          orderBy('fecha', 'desc'),
+          limit(limiteConsulta)
+        );
+      }
+      // Mientras carga turnoActual, retornar null para evitar cargar todo el historial
+      if (isLoadingTurnoActual) return null;
+
+      // Si no hay fechaInicioPeriodo definida en generales, fallback a inicio del día de hoy
+      const inicioHoy = new Date();
+      inicioHoy.setHours(0, 0, 0, 0);
+      return query(
+        collection(firestore, `sucursales/${sucursalId}/auditoria`),
+        where('fecha', '>=', Timestamp.fromDate(inicioHoy)),
+        orderBy('fecha', 'desc'),
+        limit(limiteConsulta)
+      );
+    }
+
+    // Caso 2: Turno cerrado específico
+    if (periodoSeleccionado !== 'abierto' && periodoSeleccionado !== 'todos') {
+      if (infoPeriodo.inicio && infoPeriodo.fin) {
+        return query(
+          collection(firestore, `sucursales/${sucursalId}/auditoria`),
+          where('fecha', '>=', Timestamp.fromDate(infoPeriodo.inicio)),
+          where('fecha', '<=', Timestamp.fromDate(infoPeriodo.fin)),
+          orderBy('fecha', 'desc'),
+          limit(limiteConsulta)
+        );
+      } else if (infoPeriodo.fin) {
+        return query(
+          collection(firestore, `sucursales/${sucursalId}/auditoria`),
+          where('fecha', '<=', Timestamp.fromDate(infoPeriodo.fin)),
+          orderBy('fecha', 'desc'),
+          limit(limiteConsulta)
+        );
+      }
+    }
+
+    // Caso 3: Historial completo seleccionado explícitamente
     return query(
       collection(firestore, `sucursales/${sucursalId}/auditoria`),
       orderBy('fecha', 'desc'),
       limit(limiteConsulta)
     );
-  }, [firestore, sucursalId, limiteConsulta]);
+  }, [firestore, sucursalId, periodoSeleccionado, infoPeriodo, isLoadingTurnoActual, limiteConsulta]);
 
   const { data: registrosRaw, isLoading: isLoadingRegistros } = useCollection<RegistroAuditoria>(auditoriaQuery);
 
@@ -309,19 +442,30 @@ export default function PaginaAuditoria() {
     };
   };
 
-  // Formateador de fecha
+  // Formateadores de fecha
   const formatearFechaHora = (fecha: any) => {
     if (!fecha) return 'Fecha no disponible';
-    const dateObj = fecha.toDate ? fecha.toDate() : new Date(fecha);
+    const dateObj = toDate(fecha);
     return new Intl.DateTimeFormat('es-GT', {
       dateStyle: 'medium',
       timeStyle: 'medium',
     }).format(dateObj);
   };
 
+  const formatearFechaCorta = (fecha: any) => {
+    if (!fecha) return '';
+    const dateObj = toDate(fecha);
+    return new Intl.DateTimeFormat('es-GT', {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(dateObj);
+  };
+
   const formatearHoraRelativa = (fecha: any) => {
     if (!fecha) return '';
-    const dateObj = fecha.toDate ? fecha.toDate() : new Date(fecha);
+    const dateObj = toDate(fecha);
     const ahora = new Date();
     const diffMs = ahora.getTime() - dateObj.getTime();
     const diffMins = Math.floor(diffMs / 60000);
@@ -368,7 +512,7 @@ export default function PaginaAuditoria() {
     return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
   }, [registrosRaw, usuariosRegistrados, mapaUsuarios, usuariosExtra, currentUser, currentProfile]);
 
-  // Filtrado reactivo en cliente (incluyendo búsqueda por nombre de equipo y nombre de usuario)
+  // Filtrado reactivo en cliente (categoría, usuario, búsqueda)
   const registrosFiltrados = useMemo(() => {
     if (!registrosRaw) return [];
 
@@ -388,11 +532,13 @@ export default function PaginaAuditoria() {
         return false;
       }
 
-      // 3. Filtro por fecha
-      const fechaMs = reg.fecha?.toDate ? reg.fecha.toDate().getTime() : new Date(reg.fecha).getTime();
-      if (filtroFecha === 'HOY' && fechaMs < inicioHoy) return false;
-      if (filtroFecha === '7DIAS' && fechaMs < hace7Dias) return false;
-      if (filtroFecha === '30DIAS' && fechaMs < hace30Dias) return false;
+      // 3. Filtro por fecha (solo activo si se seleccionó 'Historial completo')
+      if (periodoSeleccionado === 'todos') {
+        const fechaMs = reg.fecha?.toDate ? reg.fecha.toDate().getTime() : new Date(reg.fecha).getTime();
+        if (filtroFecha === 'HOY' && fechaMs < inicioHoy) return false;
+        if (filtroFecha === '7DIAS' && fechaMs < hace7Dias) return false;
+        if (filtroFecha === '30DIAS' && fechaMs < hace30Dias) return false;
+      }
 
       // 4. Filtro por texto de búsqueda (busca en título, descripción, usuario, email, acción y nombre de equipo)
       if (busqueda.trim() !== '') {
@@ -420,7 +566,7 @@ export default function PaginaAuditoria() {
 
       return true;
     });
-  }, [registrosRaw, categoriaSeleccionada, usuarioSeleccionado, filtroFecha, busqueda, mapaUsuarios, usuariosExtra]);
+  }, [registrosRaw, categoriaSeleccionada, usuarioSeleccionado, filtroFecha, periodoSeleccionado, busqueda, mapaUsuarios, usuariosExtra]);
 
   // Resumen de estadísticas
   const estadisticas = useMemo(() => {
@@ -441,7 +587,7 @@ export default function PaginaAuditoria() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Encabezado Principal */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -487,30 +633,77 @@ export default function PaginaAuditoria() {
         </div>
       </div>
 
-      {/* Tarjetas de Métricas Rápidas */}
+      {/* Banner de Estado del Período Consultado */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 rounded-lg border bg-card/70 backdrop-blur-sm shadow-xs">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-semibold text-foreground flex items-center gap-1.5">
+            <CalendarRange className="h-4 w-4 text-primary" />
+            Período visualizado:
+          </span>
+
+          {periodoSeleccionado === 'abierto' ? (
+            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800 gap-1.5 font-medium py-0.5">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              Período Abierto (En curso)
+            </Badge>
+          ) : periodoSeleccionado === 'todos' ? (
+            <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-800 font-medium py-0.5">
+              Historial Completo
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-800 font-medium py-0.5">
+              {infoPeriodo.label} (Cerrado)
+            </Badge>
+          )}
+
+          <span className="text-muted-foreground text-xs">
+            {periodoSeleccionado === 'abierto'
+              ? (infoPeriodo.inicio 
+                  ? `Iniciado el ${formatearFechaHora(infoPeriodo.inicio)} (operaciones en tiempo real)` 
+                  : 'Turno activo actualmente')
+              : infoPeriodo.inicio && infoPeriodo.fin
+              ? `Del ${formatearFechaHora(infoPeriodo.inicio)} al ${formatearFechaHora(infoPeriodo.fin)}`
+              : 'Todos los registros almacenados'}
+          </span>
+        </div>
+
+        {periodoSeleccionado !== 'abierto' && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setPeriodoSeleccionado('abierto')}
+            className="h-7 text-xs text-primary hover:text-primary gap-1 self-start sm:self-auto px-2"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Volver al período abierto
+          </Button>
+        )}
+      </div>
+
+      {/* Tarjetas de Métricas Rápidas del Período */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-sm">
+        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">Total Eventos</span>
             <ShieldCheck className="h-4 w-4 text-primary" />
           </div>
           <div className="text-2xl font-bold mt-1 text-foreground">{estadisticas.total}</div>
         </Card>
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-sm">
+        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">Ventas y Cobros</span>
             <ShoppingCart className="h-4 w-4 text-blue-500" />
           </div>
           <div className="text-2xl font-bold mt-1 text-blue-600 dark:text-blue-400">{estadisticas.ventas}</div>
         </Card>
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-sm">
+        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">Sala de Juegos</span>
             <Gamepad2 className="h-4 w-4 text-emerald-500" />
           </div>
           <div className="text-2xl font-bold mt-1 text-emerald-600 dark:text-emerald-400">{estadisticas.mesas}</div>
         </Card>
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-sm">
+        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">Caja y Turnos</span>
             <Scale className="h-4 w-4 text-amber-500" />
@@ -519,9 +712,47 @@ export default function PaginaAuditoria() {
         </Card>
       </div>
 
-      {/* Barra de Filtros y Búsqueda */}
-      <Card className="p-4 bg-card/80 border shadow-sm space-y-3">
+      {/* Barra de Filtros, Selector de Período y Búsqueda */}
+      <Card className="p-4 bg-card/80 border shadow-xs space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Selector de Período de Caja (Turno Abierto / Cierres) */}
+          <div>
+            <Select value={periodoSeleccionado} onValueChange={setPeriodoSeleccionado}>
+              <SelectTrigger className="h-9 text-sm font-medium">
+                <div className="flex items-center gap-2 truncate">
+                  <History className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <SelectValue placeholder="Seleccionar período" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                <SelectItem value="abierto" className="font-semibold text-emerald-600 dark:text-emerald-400">
+                  🟢 Período Abierto (En curso)
+                </SelectItem>
+                
+                {cierres && cierres.length > 0 && (
+                  <>
+                    <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground">
+                      Turnos Cerrados Anteriores
+                    </div>
+                    {cierres.map((c) => {
+                      const fechaStr = formatearFechaCorta(c.fecha);
+                      return (
+                        <SelectItem key={c.id} value={c.id}>
+                          Turno #{c.idCuadre} • {fechaStr}
+                        </SelectItem>
+                      );
+                    })}
+                  </>
+                )}
+
+                <Separator className="my-1" />
+                <SelectItem value="todos" className="text-muted-foreground font-medium">
+                  🌐 Historial Completo (Todos)
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Buscador */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -549,24 +780,6 @@ export default function PaginaAuditoria() {
                     {u.nombre}
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Selector de Rango de Fecha */}
-          <div>
-            <Select value={filtroFecha} onValueChange={(val: any) => setFiltroFecha(val)}>
-              <SelectTrigger className="h-9 text-sm">
-                <div className="flex items-center gap-2 truncate">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <SelectValue placeholder="Periodo de tiempo" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="HOY">Hoy</SelectItem>
-                <SelectItem value="7DIAS">Últimos 7 días</SelectItem>
-                <SelectItem value="30DIAS">Últimos 30 días</SelectItem>
-                <SelectItem value="TODOS">Todo el historial cargado</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -625,17 +838,23 @@ export default function PaginaAuditoria() {
 
       {/* Lista de Eventos de Auditoría */}
       <div className="space-y-2.5">
-        {isLoadingRegistros ? (
+        {(isLoadingRegistros || (periodoSeleccionado === 'abierto' && isLoadingTurnoActual)) ? (
           <div className="flex flex-col items-center justify-center p-12 bg-card rounded-lg border">
             <Loader className="h-8 w-8 animate-spin text-primary mb-2" />
-            <p className="text-sm text-muted-foreground">Cargando bitácora de auditoría...</p>
+            <p className="text-sm text-muted-foreground">
+              {periodoSeleccionado === 'abierto'
+                ? 'Cargando movimientos del período abierto...'
+                : 'Cargando registros de auditoría...'}
+            </p>
           </div>
         ) : registrosFiltrados.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 bg-card rounded-lg border text-center">
             <ShieldCheck className="h-12 w-12 text-muted-foreground/40 mb-3" />
-            <h3 className="text-base font-semibold text-foreground">No se encontraron eventos</h3>
+            <h3 className="text-base font-semibold text-foreground">No se encontraron movimientos</h3>
             <p className="text-sm text-muted-foreground max-w-sm mt-1">
-              No hay actividades registradas con los filtros seleccionados. Intenta ampliar el rango de fecha o buscar otro término.
+              {periodoSeleccionado === 'abierto'
+                ? 'Aún no hay transacciones u operaciones registradas en el turno actual abierto.'
+                : 'No hay actividades registradas para este período o con los filtros seleccionados.'}
             </p>
           </div>
         ) : (

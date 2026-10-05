@@ -12,9 +12,24 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 269,
+    build: 270,
     fecha: "2026-10-04",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b270",
+    descripcion: "Carga optimizada de auditoría por período abierto predeterminado y selector de turnos.",
+    cambios: [
+      "Carga predeterminada enfocada exclusivamente en los movimientos del período abierto actual de caja.",
+      "Selector interactivo de períodos para consultar turnos cerrados anteriores (Turno #N con fecha/hora) o historial completo.",
+      "Optimización a nivel de consulta Firestore delimitando por fechaInicioPeriodo para reducir lecturas y acelerar la carga.",
+      "Banner informativo del período consultado con acceso directo para volver al período abierto con un solo clic."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 269,
+    fecha: "2026-10-04",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b269",
     descripcion: "Reemplazo de ID de usuario por nombre legible e identificación del equipo/terminal en auditoría.",
