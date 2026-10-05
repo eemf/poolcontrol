@@ -12,9 +12,24 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 268,
+    build: 269,
     fecha: "2026-10-04",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b269",
+    descripcion: "Reemplazo de ID de usuario por nombre legible e identificación del equipo/terminal en auditoría.",
+    cambios: [
+      "Sustitución de IDs crudos por el nombre real del operador en todos los registros y filtros de auditoría.",
+      "Registro y visualización del nombre del equipo o terminal de trabajo en cada transacción auditada.",
+      "Módulo interactivo para identificar y asignar nombre a cada estación de trabajo (Caja Principal, Barra, etc.).",
+      "Búsqueda instantánea en auditoría filtrando también por el nombre del equipo utilizado."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 268,
+    fecha: "2026-10-04",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b268",
     descripcion: "Resolución automática y visualización del nombre real del operador en auditoría.",

@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { collection, query, orderBy, limit, doc, getDoc } from 'firebase/firestore';
 import type { RegistroAuditoria, CategoriaAuditoria, UsuarioSucursal } from '@/lib/tipos';
 import { 
   ShieldCheck, Search, Filter, Calendar, User, 
   ShoppingCart, Gamepad2, Scale, Package, Boxes, Truck, 
-  Clock, ArrowUpDown, ChevronRight, RefreshCw, Eye
+  Clock, ArrowUpDown, ChevronRight, RefreshCw, Eye,
+  Monitor, Laptop, Edit3, Check, CheckCircle2
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,10 +28,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Loader } from '@/components/ui/loader';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { 
+  obtenerNombreEquipo, 
+  guardarNombreEquipo, 
+  SUGERENCIAS_EQUIPOS, 
+  EVENTO_EQUIPO_CAMBIADO 
+} from '@/lib/utils/dispositivo';
 
 const CATEGORIAS_CONFIG: Record<
   CategoriaAuditoria,
@@ -76,6 +84,7 @@ const CATEGORIAS_CONFIG: Record<
 
 export default function PaginaAuditoria() {
   const { firestore } = useFirebase();
+  const { user: currentUser, profile: currentProfile } = useUser();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
 
   // Filtros
@@ -85,8 +94,43 @@ export default function PaginaAuditoria() {
   const [filtroFecha, setFiltroFecha] = useState<'HOY' | '7DIAS' | '30DIAS' | 'TODOS'>('HOY');
   const [limiteConsulta, setLimiteConsulta] = useState<number>(150);
 
-  // Modal de detalles
+  // Modal de detalles de registro
   const [registroDetalle, setRegistroDetalle] = useState<RegistroAuditoria | null>(null);
+
+  // Gestión del Nombre de Equipo / Máquina
+  const [nombreEquipoLocal, setNombreEquipoLocal] = useState<string>('Terminal POS');
+  const [dialogoEquipoAbierto, setDialogoEquipoAbierto] = useState<boolean>(false);
+  const [inputNombreEquipo, setInputNombreEquipo] = useState<string>('');
+
+  // Cache dinámico de usuarios consultados desde Firestore (user_auth_lookup o usuarios)
+  const [usuariosExtra, setUsuariosExtra] = useState<Record<string, { nombre: string; email: string; rol: string }>>({});
+
+  // Cargar y escuchar el nombre del equipo configurado localmente
+  useEffect(() => {
+    const actual = obtenerNombreEquipo();
+    setNombreEquipoLocal(actual);
+    setInputNombreEquipo(actual);
+
+    const handleCambioEquipo = (e: any) => {
+      if (e?.detail) {
+        setNombreEquipoLocal(e.detail);
+      }
+    };
+
+    window.addEventListener(EVENTO_EQUIPO_CAMBIADO, handleCambioEquipo);
+    return () => {
+      window.removeEventListener(EVENTO_EQUIPO_CAMBIADO, handleCambioEquipo);
+    };
+  }, []);
+
+  // Guardar cambio de nombre del equipo
+  const handleGuardarNombreEquipo = (nombreAGuardar?: string) => {
+    const valor = (nombreAGuardar || inputNombreEquipo).trim();
+    if (!valor) return;
+    const finalGuardado = guardarNombreEquipo(valor);
+    setNombreEquipoLocal(finalGuardado);
+    setDialogoEquipoAbierto(false);
+  };
 
   // Consulta de auditoría en tiempo real
   const auditoriaQuery = useMemoFirebase(() => {
@@ -124,17 +168,145 @@ export default function PaginaAuditoria() {
     return map;
   }, [usuariosRegistrados]);
 
-  // Función para resolver nombre, correo y rol reales del usuario
+  // Efecto para buscar en Firestore los usuarios faltantes (de user_auth_lookup o usuarios)
+  useEffect(() => {
+    if (!firestore || !registrosRaw || registrosRaw.length === 0) return;
+
+    const uidsFaltantes = new Set<string>();
+    registrosRaw.forEach((reg) => {
+      const uid = reg.usuarioId;
+      if (
+        uid && 
+        uid !== 'desconocido' && 
+        !mapaUsuarios.has(uid) && 
+        !usuariosExtra[uid] && 
+        uid !== currentUser?.uid
+      ) {
+        uidsFaltantes.add(uid);
+      }
+    });
+
+    if (uidsFaltantes.size === 0) return;
+
+    // Buscar cada UID en user_auth_lookup
+    uidsFaltantes.forEach(async (uid) => {
+      try {
+        const snap = await getDoc(doc(firestore, 'user_auth_lookup', uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          const nombreEncontrado = data.nombre || (data.email ? data.email.split('@')[0] : 'Operador');
+          setUsuariosExtra((prev) => ({
+            ...prev,
+            [uid]: {
+              nombre: nombreEncontrado,
+              email: data.email || '',
+              rol: data.rol || 'Operador',
+            },
+          }));
+          return;
+        }
+
+        // Si no está en lookup, intentar en usuarios raíz
+        const snapRoot = await getDoc(doc(firestore, 'usuarios', uid));
+        if (snapRoot.exists()) {
+          const dataRoot = snapRoot.data();
+          const nombreRoot = dataRoot.nombre || (dataRoot.email ? dataRoot.email.split('@')[0] : 'Operador');
+          setUsuariosExtra((prev) => ({
+            ...prev,
+            [uid]: {
+              nombre: nombreRoot,
+              email: dataRoot.email || '',
+              rol: dataRoot.rol || 'Operador',
+            },
+          }));
+        }
+      } catch (err) {
+        console.warn('No se pudo cargar información del usuario para auditoría:', uid);
+      }
+    });
+  }, [firestore, registrosRaw, mapaUsuarios, usuariosExtra, currentUser]);
+
+  // Función robusta para resolver nombre, correo y rol reales del usuario
+  // NUNCA devuelve un UID alfanumérico crudo como nombre
   const resolverUsuario = (reg: RegistroAuditoria) => {
-    const info = mapaUsuarios.get(reg.usuarioId);
-    const nombre = (reg.usuarioNombre && reg.usuarioNombre !== 'Usuario del sistema')
-      ? reg.usuarioNombre
-      : (info?.nombre || reg.usuarioEmail || reg.usuarioId || 'Usuario del sistema');
-    const email = reg.usuarioEmail || info?.email || '';
-    const rol = (reg.usuarioRol && reg.usuarioRol !== 'Operador')
-      ? reg.usuarioRol
-      : (info?.rol || 'Operador');
-    return { nombre, email, rol };
+    const esNombreValido = (nom?: string) => {
+      if (!nom) return false;
+      const t = nom.trim();
+      if (t === '' || t === 'Usuario del sistema' || t === 'desconocido') return false;
+      if (t === reg.usuarioId) return false;
+      // Descartar UIDs crudos de Firebase (ej: 22+ caracteres seguidos sin espacios ni arroba)
+      if (t.length >= 20 && !t.includes(' ') && !t.includes('@')) return false;
+      return true;
+    };
+
+    // 1. Si el registro guardó un nombre legible directamente
+    if (esNombreValido(reg.usuarioNombre)) {
+      return {
+        nombre: reg.usuarioNombre,
+        email: reg.usuarioEmail || '',
+        rol: reg.usuarioRol || 'Operador',
+      };
+    }
+
+    // 2. Si coincide con el usuario actualmente logueado en la sesión
+    if (currentUser && (currentUser.uid === reg.usuarioId || (reg.usuarioEmail && currentUser.email === reg.usuarioEmail))) {
+      const nombreActual = currentProfile?.nombre 
+        || currentUser.displayName 
+        || (currentUser.email ? currentUser.email.split('@')[0] : 'Administrador');
+      return {
+        nombre: nombreActual,
+        email: currentUser.email || reg.usuarioEmail || '',
+        rol: currentProfile?.rol || reg.usuarioRol || 'Administrador',
+      };
+    }
+
+    // 3. Buscar en el mapa de usuarios de la sucursal
+    const infoSucursal = mapaUsuarios.get(reg.usuarioId);
+    if (infoSucursal && esNombreValido(infoSucursal.nombre)) {
+      return {
+        nombre: infoSucursal.nombre,
+        email: reg.usuarioEmail || infoSucursal.email || '',
+        rol: reg.usuarioRol || infoSucursal.rol || 'Operador',
+      };
+    }
+
+    // 4. Buscar en usuarios extra cargados dinámicamente
+    const infoExtra = usuariosExtra[reg.usuarioId];
+    if (infoExtra && esNombreValido(infoExtra.nombre)) {
+      return {
+        nombre: infoExtra.nombre,
+        email: reg.usuarioEmail || infoExtra.email || '',
+        rol: reg.usuarioRol || infoExtra.rol || 'Operador',
+      };
+    }
+
+    // 5. Deducir desde el correo electrónico registrado
+    if (reg.usuarioEmail && reg.usuarioEmail.includes('@')) {
+      const parteCorreo = reg.usuarioEmail.split('@')[0];
+      const capitalizado = parteCorreo.charAt(0).toUpperCase() + parteCorreo.slice(1);
+      return {
+        nombre: capitalizado,
+        email: reg.usuarioEmail,
+        rol: reg.usuarioRol || 'Operador',
+      };
+    }
+
+    if (infoSucursal?.email && infoSucursal.email.includes('@')) {
+      const parteCorreo = infoSucursal.email.split('@')[0];
+      const capitalizado = parteCorreo.charAt(0).toUpperCase() + parteCorreo.slice(1);
+      return {
+        nombre: capitalizado,
+        email: infoSucursal.email,
+        rol: infoSucursal.rol || 'Operador',
+      };
+    }
+
+    // 6. En última instancia, mostrar un rótulo amigable y legible (NUNCA el ID crudo)
+    return {
+      nombre: 'Operador del sistema',
+      email: reg.usuarioEmail || '',
+      rol: reg.usuarioRol || 'Operador',
+    };
   };
 
   // Formateador de fecha
@@ -164,7 +336,7 @@ export default function PaginaAuditoria() {
     return dateObj.toLocaleDateString('es-GT');
   };
 
-  // Lista única de usuarios para el selector (combina usuarios de la sucursal y registros)
+  // Lista única de usuarios con nombres reales para el selector de filtro
   const listaUsuarios = useMemo(() => {
     const map = new Map<string, { id: string; nombre: string }>();
 
@@ -176,24 +348,27 @@ export default function PaginaAuditoria() {
       }
     });
 
-    // 2. Complementar con los registros de auditoría
+    // 2. Si el usuario actual no está, agregarlo
+    if (currentUser?.uid) {
+      const miNombre = currentProfile?.nombre || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Mi Usuario');
+      map.set(currentUser.uid, { id: currentUser.uid, nombre: `${miNombre} (Tú)` });
+    }
+
+    // 3. Complementar con los registros de auditoría
     (registrosRaw || []).forEach((reg) => {
       if (reg.usuarioId && !map.has(reg.usuarioId)) {
-        const info = mapaUsuarios.get(reg.usuarioId);
-        const resolvedName = (reg.usuarioNombre && reg.usuarioNombre !== 'Usuario del sistema')
-          ? reg.usuarioNombre
-          : (info?.nombre || reg.usuarioEmail || reg.usuarioId);
+        const u = resolverUsuario(reg);
         map.set(reg.usuarioId, {
           id: reg.usuarioId,
-          nombre: resolvedName,
+          nombre: u.nombre,
         });
       }
     });
 
     return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
-  }, [registrosRaw, usuariosRegistrados, mapaUsuarios]);
+  }, [registrosRaw, usuariosRegistrados, mapaUsuarios, usuariosExtra, currentUser, currentProfile]);
 
-  // Filtrado reactivo en cliente
+  // Filtrado reactivo en cliente (incluyendo búsqueda por nombre de equipo y nombre de usuario)
   const registrosFiltrados = useMemo(() => {
     if (!registrosRaw) return [];
 
@@ -219,7 +394,7 @@ export default function PaginaAuditoria() {
       if (filtroFecha === '7DIAS' && fechaMs < hace7Dias) return false;
       if (filtroFecha === '30DIAS' && fechaMs < hace30Dias) return false;
 
-      // 4. Filtro por texto de búsqueda
+      // 4. Filtro por texto de búsqueda (busca en título, descripción, usuario, email, acción y nombre de equipo)
       if (busqueda.trim() !== '') {
         const queryTerm = busqueda.toLowerCase().trim();
         const userResolved = resolverUsuario(reg);
@@ -227,6 +402,7 @@ export default function PaginaAuditoria() {
         const textoDesc = (reg.descripcion || '').toLowerCase();
         const textoUsuario = (userResolved.nombre || '').toLowerCase();
         const textoEmail = (userResolved.email || '').toLowerCase();
+        const textoEquipo = (reg.nombreEquipo || 'Terminal POS').toLowerCase();
         const textoAccion = (reg.accion || '').toLowerCase();
         const textoDetalles = JSON.stringify(reg.detalles || {}).toLowerCase();
 
@@ -235,6 +411,7 @@ export default function PaginaAuditoria() {
           textoDesc.includes(queryTerm) ||
           textoUsuario.includes(queryTerm) ||
           textoEmail.includes(queryTerm) ||
+          textoEquipo.includes(queryTerm) ||
           textoAccion.includes(queryTerm) ||
           textoDetalles.includes(queryTerm);
 
@@ -243,7 +420,7 @@ export default function PaginaAuditoria() {
 
       return true;
     });
-  }, [registrosRaw, categoriaSeleccionada, usuarioSeleccionado, filtroFecha, busqueda, mapaUsuarios]);
+  }, [registrosRaw, categoriaSeleccionada, usuarioSeleccionado, filtroFecha, busqueda, mapaUsuarios, usuariosExtra]);
 
   // Resumen de estadísticas
   const estadisticas = useMemo(() => {
@@ -270,16 +447,34 @@ export default function PaginaAuditoria() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <ShieldCheck className="h-7 w-7 text-primary" />
-            Auditoría de Usuarios
+            Auditoría de Operaciones
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Registro cronológico y trazabilidad completa de transacciones y operaciones en el sistema.
+            Registro cronológico y trazabilidad completa de transacciones, usuarios y equipos en el sistema.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Identificador interactivo de este equipo */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setInputNombreEquipo(nombreEquipoLocal);
+              setDialogoEquipoAbierto(true);
+            }}
+            className="h-8 gap-1.5 text-xs bg-card hover:bg-muted/60 border shadow-xs"
+            title="Haz clic para cambiar el nombre de este equipo/estación"
+          >
+            <Monitor className="h-3.5 w-3.5 text-primary shrink-0" />
+            <span>Este equipo: <strong className="text-foreground">{nombreEquipoLocal}</strong></span>
+            <Edit3 className="h-3 w-3 text-muted-foreground ml-0.5" />
+          </Button>
+
           <Badge variant="outline" className="px-3 py-1 text-xs text-muted-foreground bg-muted/40">
-            {registrosFiltrados.length} eventos mostrados
+            {registrosFiltrados.length} eventos
           </Badge>
+
           <Button
             variant="outline"
             size="sm"
@@ -287,7 +482,7 @@ export default function PaginaAuditoria() {
             className="text-xs gap-1.5"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            {limiteConsulta === 150 ? 'Cargar más (300)' : 'Ver estándar (150)'}
+            {limiteConsulta === 150 ? 'Cargar 300' : 'Ver 150'}
           </Button>
         </div>
       </div>
@@ -331,14 +526,14 @@ export default function PaginaAuditoria() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por usuario, acción, detalle..."
+              placeholder="Buscar por usuario, equipo, acción..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               className="pl-9 h-9 text-sm"
             />
           </div>
 
-          {/* Selector de Usuario */}
+          {/* Selector de Usuario con nombres reales */}
           <div>
             <Select value={usuarioSeleccionado} onValueChange={setUsuarioSeleccionado}>
               <SelectTrigger className="h-9 text-sm">
@@ -433,7 +628,7 @@ export default function PaginaAuditoria() {
         {isLoadingRegistros ? (
           <div className="flex flex-col items-center justify-center p-12 bg-card rounded-lg border">
             <Loader className="h-8 w-8 animate-spin text-primary mb-2" />
-            <p className="text-sm text-muted-foreground">Cargando registros de auditoría...</p>
+            <p className="text-sm text-muted-foreground">Cargando bitácora de auditoría...</p>
           </div>
         ) : registrosFiltrados.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 bg-card rounded-lg border text-center">
@@ -453,12 +648,13 @@ export default function PaginaAuditoria() {
             };
             const IconComponent = catConfig.icon;
             const userInfo = resolverUsuario(registro);
+            const equipoNombre = registro.nombreEquipo || 'Terminal POS';
 
             return (
               <div
                 key={registro.id}
                 onClick={() => setRegistroDetalle(registro)}
-                className="group p-4 bg-card hover:bg-muted/40 transition-colors border rounded-lg shadow-sm cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="group p-4 bg-card hover:bg-muted/40 transition-colors border rounded-lg shadow-xs cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   {/* Ícono de categoría */}
@@ -484,16 +680,26 @@ export default function PaginaAuditoria() {
                       {registro.descripcion}
                     </p>
 
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground/80 pt-0.5">
-                      <span className="font-medium text-foreground/90 flex items-center gap-1">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground/80 pt-0.5">
+                      {/* Usuario con nombre real */}
+                      <span className="font-medium text-foreground/90 flex items-center gap-1.5">
                         <User className="h-3 w-3 text-muted-foreground" />
                         {userInfo.nombre}
                       </span>
+
+                      {/* Rol */}
                       {userInfo.rol && (
                         <Badge variant="outline" className="text-[9px] px-1 py-0 h-3.5 text-muted-foreground">
                           {userInfo.rol}
                         </Badge>
                       )}
+
+                      {/* Nombre del equipo / estación */}
+                      <span className="flex items-center gap-1 text-muted-foreground font-medium bg-muted/30 px-1.5 py-0.5 rounded border border-border/50 text-[11px]">
+                        <Monitor className="h-2.5 w-2.5 text-primary/70 shrink-0" />
+                        {equipoNombre}
+                      </span>
+
                       <span>•</span>
                       <span>{formatearFechaHora(registro.fecha)}</span>
                     </div>
@@ -540,74 +746,161 @@ export default function PaginaAuditoria() {
 
           {registroDetalle && (() => {
             const modalUser = resolverUsuario(registroDetalle);
+            const equipoNombre = registroDetalle.nombreEquipo || 'Terminal POS';
             return (
               <div className="space-y-4 py-2 text-sm">
-                {/* Información del Usuario */}
-                <div className="bg-muted/30 p-3 rounded-lg border space-y-1.5">
-                  <span className="text-xs font-semibold text-muted-foreground tracking-wide">
-                    Operador Responsable
-                  </span>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-foreground">
-                      {modalUser.nombre}
+                {/* Cuadro de Información: Operador y Equipo */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {/* Operador Responsable */}
+                  <div className="bg-muted/30 p-3 rounded-lg border space-y-1">
+                    <span className="text-[11px] font-semibold text-muted-foreground tracking-wide flex items-center gap-1">
+                      <User className="h-3 w-3 text-primary" />
+                      Operador Responsable
                     </span>
-                    <Badge variant="outline" className="text-[10px]">
-                      {modalUser.rol}
-                    </Badge>
+                    <div className="flex items-center justify-between pt-0.5">
+                      <span className="font-semibold text-foreground text-sm">
+                        {modalUser.nombre}
+                      </span>
+                      <Badge variant="outline" className="text-[10px]">
+                        {modalUser.rol}
+                      </Badge>
+                    </div>
+                    {modalUser.email && (
+                      <p className="text-xs text-muted-foreground">{modalUser.email}</p>
+                    )}
+                    <p className="text-[10px] text-muted-foreground/70 font-mono pt-0.5">
+                      ID: {registroDetalle.usuarioId}
+                    </p>
                   </div>
-                  {modalUser.email && (
-                    <p className="text-xs text-muted-foreground">{modalUser.email}</p>
-                  )}
-                  <p className="text-[11px] text-muted-foreground">
-                    UID: <code className="font-mono text-[10px]">{registroDetalle.usuarioId}</code>
+
+                  {/* Equipo / Terminal de Trabajo */}
+                  <div className="bg-muted/30 p-3 rounded-lg border space-y-1">
+                    <span className="text-[11px] font-semibold text-muted-foreground tracking-wide flex items-center gap-1">
+                      <Monitor className="h-3 w-3 text-primary" />
+                      Equipo / Estación
+                    </span>
+                    <div className="pt-0.5">
+                      <span className="font-semibold text-foreground text-sm flex items-center gap-1.5">
+                        {equipoNombre}
+                      </span>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Dispositivo donde se realizó la operación
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Fecha y Hora Exacta */}
+                <div className="flex items-center justify-between px-1 text-xs">
+                  <span className="text-muted-foreground flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" /> Marca de tiempo exacta
+                  </span>
+                  <span className="font-medium text-foreground">
+                    {formatearFechaHora(registroDetalle.fecha)}
+                  </span>
+                </div>
+
+                <Separator />
+
+                {/* Descripción */}
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-muted-foreground tracking-wide">
+                    Descripción
+                  </span>
+                  <p className="text-xs text-foreground bg-muted/20 p-2.5 rounded border leading-relaxed">
+                    {registroDetalle.descripcion}
                   </p>
                 </div>
 
-              {/* Fecha y Hora Exacta */}
-              <div className="flex items-center justify-between px-1 text-xs">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" /> Marca de tiempo exacta
-                </span>
-                <span className="font-medium text-foreground">
-                  {formatearFechaHora(registroDetalle.fecha)}
-                </span>
+                {/* Metadatos y Detalles Técnicos */}
+                {registroDetalle.detalles && Object.keys(registroDetalle.detalles).length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-semibold text-muted-foreground tracking-wide">
+                      Detalles Estructurados
+                    </span>
+                    <ScrollArea className="max-h-48 rounded border bg-muted/10 p-3">
+                      <div className="space-y-1.5">
+                        {Object.entries(registroDetalle.detalles).map(([clave, valor]) => (
+                          <div key={clave} className="flex flex-col text-xs pb-1 border-b border-muted/30 last:border-b-0">
+                            <span className="font-mono text-[11px] text-muted-foreground">{clave}:</span>
+                            <span className="font-mono text-[11px] text-foreground font-medium break-all">
+                              {typeof valor === 'object' ? JSON.stringify(valor, null, 2) : String(valor)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
               </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
-              <Separator />
+      {/* Modal para Renombrar e Identificar este Equipo */}
+      <Dialog open={dialogoEquipoAbierto} onOpenChange={setDialogoEquipoAbierto}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold flex items-center gap-2">
+              <Monitor className="h-5 w-5 text-primary" />
+              Identificar este Equipo / Terminal
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Asigna un nombre descriptivo a esta computadora o terminal (por ejemplo: &quot;Caja Principal&quot;, &quot;Barra&quot;, &quot;Caja 2&quot;). Este nombre quedará grabado en todas las transacciones y auditorías que se efectúen desde este dispositivo.
+            </DialogDescription>
+          </DialogHeader>
 
-              {/* Descripción */}
-              <div className="space-y-1">
-                <span className="text-xs font-semibold text-muted-foreground tracking-wide">
-                  Descripción
-                </span>
-                <p className="text-xs text-foreground bg-muted/20 p-2.5 rounded border leading-relaxed">
-                  {registroDetalle.descripcion}
-                </p>
-              </div>
-
-              {/* Metadatos y Detalles Técnicos */}
-              {registroDetalle.detalles && Object.keys(registroDetalle.detalles).length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-xs font-semibold text-muted-foreground tracking-wide">
-                    Detalles Estructurados
-                  </span>
-                  <ScrollArea className="max-h-48 rounded border bg-muted/10 p-3">
-                    <div className="space-y-1.5">
-                      {Object.entries(registroDetalle.detalles).map(([clave, valor]) => (
-                        <div key={clave} className="flex flex-col text-xs pb-1 border-b border-muted/30 last:border-b-0">
-                          <span className="font-mono text-[11px] text-muted-foreground">{clave}:</span>
-                          <span className="font-mono text-[11px] text-foreground font-medium break-all">
-                            {typeof valor === 'object' ? JSON.stringify(valor, null, 2) : String(valor)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-              )}
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground">
+                Nombre de esta estación de trabajo
+              </label>
+              <Input
+                placeholder="Ej. Caja Principal, Barra, Mostrador..."
+                value={inputNombreEquipo}
+                onChange={(e) => setInputNombreEquipo(e.target.value)}
+                className="text-sm h-9"
+              />
             </div>
-          );
-        })()}
+
+            <div className="space-y-1.5">
+              <span className="text-xs text-muted-foreground">Sugerencias rápidas:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {SUGERENCIAS_EQUIPOS.map((sug) => (
+                  <Button
+                    key={sug}
+                    type="button"
+                    variant={inputNombreEquipo === sug ? 'secondary' : 'outline'}
+                    size="sm"
+                    className="h-7 text-xs font-normal"
+                    onClick={() => setInputNombreEquipo(sug)}
+                  >
+                    {sug}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setDialogoEquipoAbierto(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => handleGuardarNombreEquipo()}
+              disabled={!inputNombreEquipo.trim()}
+              className="gap-1.5"
+            >
+              <Check className="h-4 w-4" />
+              Guardar Identificador
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

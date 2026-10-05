@@ -105,10 +105,16 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
                 }
                 
                 setProfile(userProfileData);
+                const nombreDeducido = userProfileData?.nombre 
+                    || firebaseUser.displayName 
+                    || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Operador');
+                const rolDeducido = userProfileData?.rol 
+                    || (idTokenResult.claims?.admin ? 'Administrador' : 'Operador');
+
                 registrarCacheUsuario(firebaseUser.uid, {
-                    nombre: userProfileData?.nombre || firebaseUser.displayName || firebaseUser.email || 'Operador',
+                    nombre: nombreDeducido,
                     email: firebaseUser.email || '',
-                    rol: userProfileData?.rol || 'Operador',
+                    rol: rolDeducido,
                 });
                 setUserAuthState({ 
                     user: firebaseUser, 

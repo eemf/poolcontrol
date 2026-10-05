@@ -446,6 +446,7 @@ export interface RegistroAuditoria {
   usuarioNombre: string;
   usuarioEmail?: string;
   usuarioRol?: string;
+  nombreEquipo?: string;
   categoria: CategoriaAuditoria;
   accion: AccionAuditoria;
   titulo: string;
