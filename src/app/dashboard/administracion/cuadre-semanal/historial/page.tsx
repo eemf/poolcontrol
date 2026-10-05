@@ -67,16 +67,16 @@ const DetalleRegistrosProcesados = ({ ids, firestore, sucursalId, tipo, titulo }
             : (
                 <div className="space-y-2">
                     {detalles.map(item => (
-                        <div key={item.id} className="flex justify-between items-center text-xs p-2 bg-muted/50 rounded-md">
+                        <div key={item.id} className="flex justify-between items-center text-xs p-2.5 !bg-[#1d283a] rounded-lg border !border-[#324157]">
                             <div>
-                                <p className="font-medium truncate max-w-40">
+                                <p className="font-semibold text-foreground truncate max-w-40">
                                     {tipo === 'movimiento' ? `Cierre Caja #${item.idCuadre}` : 
                                      tipo === 'tragamonedas' ? `Cierre Tragamonedas #${item.idCuadre}` :
                                      item.descripcion || item.proveedorNombre || `ID: ${item.id}`}
                                 </p>
-                                <p className="text-muted-foreground">{format(item.fecha.toDate(), "dd/MM/yy hh:mm a", { locale: es })}</p>
+                                <p className="text-muted-foreground text-[11px]">{format(item.fecha.toDate(), "dd/MM/yy hh:mm a", { locale: es })}</p>
                             </div>
-                            <p className="font-semibold">Q{((item.totalLiquidado ?? item.pagosTarjeta ?? item.monto ?? item.montoTotal ?? item.gananciaATrasladar) ?? 0).toFixed(2)}</p>
+                            <p className="font-bold text-foreground">Q{((item.totalLiquidado ?? item.pagosTarjeta ?? item.monto ?? item.montoTotal ?? item.gananciaATrasladar) ?? 0).toFixed(2)}</p>
                         </div>
                     ))}
                 </div>
@@ -162,20 +162,23 @@ export default function HistorialCuadresSemanalesPage() {
                 </Button>
             </div>
 
-            <Card className="shadow-sm border-muted/60 overflow-hidden">
-                <CardHeader className="p-4 bg-muted/5 border-b">
+            <Card 
+                className="shadow-sm overflow-hidden font-body !bg-[#1d283a] border !border-[#324157]"
+                style={{ backgroundColor: '#1d283a', borderColor: '#324157' }}
+            >
+                <CardHeader className="p-4 bg-transparent border-b !border-[#324157]">
                     <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
                         <div className="relative flex-1 w-full">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input 
                                 placeholder="Buscar por ID..."
-                                className="pl-9 rounded-full h-10"
+                                className="pl-9 rounded-full h-10 border-[#324157] bg-[#283244] text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                                 value={filtro}
                                 onChange={(e) => setFiltro(e.target.value)}
                             />
                         </div>
                         
-                        <div className="flex items-center justify-center gap-3 px-4 h-10 border rounded-full bg-background shrink-0 w-full sm:w-auto">
+                        <div className="flex items-center justify-center gap-3 px-4 h-10 border !border-[#324157] rounded-full bg-[#283244] shrink-0 w-full sm:w-auto">
                             <span className={cn("text-[11px] font-bold transition-colors", !mostrarTodos ? "text-primary" : "text-muted-foreground")}>Pendientes</span>
                             <Switch
                                 id="mostrar-todos-switch"
@@ -190,32 +193,37 @@ export default function HistorialCuadresSemanalesPage() {
                     {cargando ? (
                         <div className="flex justify-center items-center h-64"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
                     ) : cuadresPaginados.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-64 border-2 border-dashed rounded-lg bg-muted/5">
-                            <FileText className="h-12 w-12 mb-4 text-primary/20" />
-                            <p className="font-semibold text-lg">{filtro ? "No se encontraron registros" : (mostrarTodos ? "No hay cuadres registrados" : "No hay cuadres pendientes")}</p>
+                        <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-64 border-2 border-dashed !border-[#324157] rounded-xl bg-[#283244]/40">
+                            <FileText className="h-12 w-12 mb-4 text-primary/30" />
+                            <p className="font-semibold text-lg text-foreground">{filtro ? "No se encontraron registros" : (mostrarTodos ? "No hay cuadres registrados" : "No hay cuadres pendientes")}</p>
                         </div>
                     ) : (
                         <Accordion type="single" collapsible className="w-full space-y-3" onValueChange={(value) => setOpenAccordionId(value || null)}>
                              {cuadresPaginados.map(cuadre => (
-                                <AccordionItem value={cuadre.id} key={cuadre.id} className="border rounded-xl bg-card overflow-hidden shadow-sm border-muted/40 transition-all hover:border-primary/30">
-                                    <AccordionTrigger className="p-4 hover:no-underline transition-colors data-[state=open]:bg-primary/[0.02]">
+                                <AccordionItem 
+                                    value={cuadre.id} 
+                                    key={cuadre.id} 
+                                    style={{ backgroundColor: '#283244', borderColor: '#324157' }}
+                                    className="border !border-[#324157] rounded-xl !bg-[#283244] overflow-hidden shadow-sm transition-all hover:brightness-105"
+                                >
+                                    <AccordionTrigger className="p-4 hover:no-underline transition-colors">
                                         <div className="flex flex-1 items-center justify-between w-full pr-2">
                                             <div className="flex flex-col text-left min-w-0">
                                                 <p className="font-bold text-sm sm:text-base text-foreground leading-tight">
                                                     #{cuadre.idCuadreSemanal}. {format(cuadre.fecha.toDate(), "dd 'de' LLLL, yyyy", { locale: es })}
                                                 </p>
                                                 <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-tight">
+                                                    <span className="text-[10px] font-medium text-muted-foreground tracking-tight">
                                                         {format(cuadre.fecha.toDate(), "hh:mm a", { locale: es })}
                                                     </span>
                                                     <span className="text-muted-foreground/30">•</span>
                                                     <Badge className={cn(
-                                                        "rounded-full border-0 px-2 h-4 text-[9px] font-bold uppercase",
+                                                        "rounded-full border-0 px-2 h-4 text-[9px] font-bold",
                                                         cuadre.estadoMensual === 'procesado' 
-                                                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
-                                                            : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" 
+                                                            : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
                                                     )}>
-                                                        {cuadre.estadoMensual}
+                                                        {cuadre.estadoMensual === 'procesado' ? 'Procesado' : 'Pendiente'}
                                                     </Badge>
                                                 </div>
                                             </div>
@@ -223,49 +231,49 @@ export default function HistorialCuadresSemanalesPage() {
                                                 <p className="text-base sm:text-xl font-bold text-primary leading-none">
                                                     Q{cuadre.resumen.balanceLiquidado.toFixed(2)}
                                                 </p>
-                                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Balance Liquidado</p>
+                                                <p className="text-[9px] text-muted-foreground font-semibold tracking-wider mt-1">Balance Liquidado</p>
                                             </div>
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent className="p-4 pt-0">
-                                        <div className="border-t pt-6 space-y-6">
+                                        <div className="border-t !border-[#324157] pt-6 space-y-6">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <Card className="text-center bg-muted/10 border-muted/40">
-                                                    <CardHeader className="pb-2"><p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Balance Neto</p></CardHeader>
-                                                    <CardContent><p className="text-2xl font-bold">Q{cuadre.resumen.balanceNetoCalculado.toFixed(2)}</p></CardContent>
+                                                <Card className="text-center !bg-[#1d283a]/80 !border-[#324157]">
+                                                    <CardHeader className="pb-2"><p className="text-[10px] font-bold text-muted-foreground tracking-wide">Balance Neto</p></CardHeader>
+                                                    <CardContent><p className="text-2xl font-bold text-foreground">Q{cuadre.resumen.balanceNetoCalculado.toFixed(2)}</p></CardContent>
                                                 </Card>
-                                                <Card className="text-center bg-primary/5 border-primary/20">
-                                                    <CardHeader className="pb-2"><p className="text-[10px] font-bold text-primary uppercase tracking-widest">Balance Liquidado</p></CardHeader>
+                                                <Card className="text-center !bg-[#1d283a]/80 !border-primary/40">
+                                                    <CardHeader className="pb-2"><p className="text-[10px] font-bold text-primary tracking-wide">Balance Liquidado</p></CardHeader>
                                                     <CardContent><p className="text-2xl font-bold text-primary">Q{cuadre.resumen.balanceLiquidado.toFixed(2)}</p></CardContent>
                                                 </Card>
                                             </div>
-                                            <div className="flex items-center justify-center gap-4 text-center p-4 border rounded-xl bg-background shadow-sm border-muted/40">
+                                            <div className="flex items-center justify-center gap-4 text-center p-4 border !border-[#324157] rounded-xl !bg-[#1d283a]/80 shadow-sm">
                                                 <div className="flex-1">
-                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">Origen</p>
-                                                    <p className="font-semibold text-sm">{cuadre.cuentas.origenNombre}</p>
+                                                    <p className="text-[10px] font-bold text-muted-foreground tracking-tight">Origen</p>
+                                                    <p className="font-semibold text-sm text-foreground">{cuadre.cuentas.origenNombre}</p>
                                                 </div>
                                                 <ArrowRight className="h-5 w-5 text-muted-foreground/40 shrink-0"/>
                                                 <div className="flex-1">
-                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">Destino</p>
-                                                    <p className="font-semibold text-sm">{cuadre.cuentas.destinoNombre}</p>
+                                                    <p className="text-[10px] font-bold text-muted-foreground tracking-tight">Destino</p>
+                                                    <p className="font-semibold text-sm text-foreground">{cuadre.cuentas.destinoNombre}</p>
                                                 </div>
                                             </div>
 
                                             {openAccordionId === cuadre.id && firestore && (
-                                                <Card className="border-muted/40 shadow-none bg-transparent">
-                                                    <CardHeader className="px-0"><p className="text-sm font-bold font-headline">Registros Procesados</p></CardHeader>
-                                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 px-0">
+                                                <Card className="!border-[#324157] shadow-none !bg-[#1d283a]/50 p-4 rounded-xl">
+                                                    <CardHeader className="p-0 pb-3"><p className="text-sm font-bold font-headline text-foreground">Registros Procesados</p></CardHeader>
+                                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 p-0">
                                                         <div className="space-y-4">
-                                                            <h4 className="text-[11px] font-bold text-green-600 flex items-center gap-2 uppercase tracking-wider"><ArrowUp size={14}/>Ingresos (Q{(cuadre.resumen.totalIngresosEfectivo + cuadre.resumen.totalIngresosTarjeta + (cuadre.resumen.totalIngresosTragamonedas || 0)).toFixed(2)})</h4>
-                                                            <div className="space-y-4 border-l-2 border-green-100 pl-4 ml-1">
+                                                            <h4 className="text-[11px] font-bold text-emerald-400 flex items-center gap-2 tracking-wide"><ArrowUp size={14}/>Ingresos (Q{(cuadre.resumen.totalIngresosEfectivo + cuadre.resumen.totalIngresosTarjeta + (cuadre.resumen.totalIngresosTragamonedas || 0)).toFixed(2)})</h4>
+                                                            <div className="space-y-4 border-l-2 !border-emerald-500/30 pl-4 ml-1">
                                                                 <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosEfectivo} firestore={firestore} sucursalId={sucursalId} tipo="movimiento" titulo="Cajas (Efectivo)" />
                                                                 <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTarjeta} firestore={firestore} sucursalId={sucursalId} tipo="movimiento" titulo="Cajas (Tarjeta)" />
                                                                 <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTragamonedas || []} firestore={firestore} sucursalId={sucursalId} tipo="tragamonedas" titulo="Tragamonedas" />
                                                             </div>
                                                         </div>
                                                         <div className="space-y-4">
-                                                            <h4 className="text-[11px] font-bold text-destructive flex items-center gap-2 uppercase tracking-wider"><ArrowDown size={14}/>Egresos (-Q{(cuadre.resumen.totalCompras + cuadre.resumen.totalGastos).toFixed(2)})</h4>
-                                                            <div className="space-y-4 border-l-2 border-red-500/10 pl-4 ml-1">
+                                                            <h4 className="text-[11px] font-bold text-rose-400 flex items-center gap-2 tracking-wide"><ArrowDown size={14}/>Egresos (-Q{(cuadre.resumen.totalCompras + cuadre.resumen.totalGastos).toFixed(2)})</h4>
+                                                            <div className="space-y-4 border-l-2 !border-rose-500/30 pl-4 ml-1">
                                                                 <DetalleRegistrosProcesados ids={cuadre.idsProcesados.compras} firestore={firestore} sucursalId={sucursalId} tipo="compra" titulo="Compras Pagadas"/>
                                                                 <DetalleRegistrosProcesados ids={cuadre.idsProcesados.gastos} firestore={firestore} sucursalId={sucursalId} tipo="gasto" titulo="Gastos Pagados" />
                                                             </div>
@@ -276,8 +284,8 @@ export default function HistorialCuadresSemanalesPage() {
 
                                             {cuadre.observaciones && (
                                                 <div className="mt-4">
-                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Observaciones:</p>
-                                                    <div className="bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/20 italic text-xs text-muted-foreground leading-relaxed">
+                                                    <p className="text-[10px] font-bold text-muted-foreground tracking-wider mb-2">Observaciones:</p>
+                                                    <div className="!bg-[#1d283a]/60 p-3 rounded-lg border border-dashed !border-[#324157] italic text-xs text-muted-foreground leading-relaxed">
                                                         "{cuadre.observaciones}"
                                                     </div>
                                                 </div>
@@ -290,7 +298,7 @@ export default function HistorialCuadresSemanalesPage() {
                     )}
                 </CardContent>
                 {totalPages > 1 && (
-                <CardFooter className="flex flex-col items-center gap-4 border-t p-4 sm:flex-row sm:justify-between bg-muted/5">
+                <CardFooter className="flex flex-col items-center gap-4 border-t !border-[#324157] p-4 sm:flex-row sm:justify-between bg-transparent">
                     <div className="flex items-center space-x-2">
                         <p className="text-[11px] sm:text-xs font-medium text-muted-foreground">Filas por página</p>
                         <Select

@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 275,
+    build: 276,
     fecha: "2026-10-05",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b276",
+    descripcion: "Paleta visual unificada del POS aplicada a historiales de cuadre semanal y mensual.",
+    cambios: [
+      "Aplicación de colores del POS de venta (#1d283a en contenedor principal, #283244 en acordeones y tarjetas, #324157 en líneas y bordes).",
+      "Actualización de filtros de búsqueda, tarjetas de métricas internas y detalles de registros al tema oscuro del POS.",
+      "Eliminación de estilos en mayúsculas forzadas (uppercase) preservando la tipografía natural del sistema."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 275,
+    fecha: "2026-10-05",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b275",
     descripcion: "Disponibilidad permanente de botones de Historial en Cuadre Semanal y Cuadre Mensual.",
@@ -306,9 +320,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 275,
+  build: 276,
   date: "2026-10-05",
-  publicadaActual: releaseHistory[0], // Build 275
-  publicadaAnterior: releaseHistory[1], // Build 274
+  publicadaActual: releaseHistory[0], // Build 276
+  publicadaAnterior: releaseHistory[1], // Build 275
   historial: releaseHistory
 };

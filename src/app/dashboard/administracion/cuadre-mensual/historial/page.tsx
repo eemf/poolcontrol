@@ -57,12 +57,12 @@ const DetalleCuadresSemanalesProcesados = ({ ids, firestore, sucursalId }: { ids
             : (
                 <div className="space-y-2">
                     {detalles.map(item => (
-                        <div key={item.id} className="flex justify-between items-center text-xs p-2 bg-muted/50 rounded-md">
+                        <div key={item.id} className="flex justify-between items-center text-xs p-2.5 !bg-[#1d283a] rounded-lg border !border-[#324157]">
                             <div>
-                                <p className="font-medium truncate max-w-40">Cuadre Semanal #{item.idCuadreSemanal}</p>
-                                <p className="text-muted-foreground">{format(item.fecha.toDate(), "dd/MM/yy hh:mm a", { locale: es })}</p>
+                                <p className="font-semibold text-foreground truncate max-w-40">Cuadre Semanal #{item.idCuadreSemanal}</p>
+                                <p className="text-muted-foreground text-[11px]">{format(item.fecha.toDate(), "dd/MM/yy hh:mm a", { locale: es })}</p>
                             </div>
-                            <p className="font-semibold">Q{(item.resumen.balanceLiquidado ?? 0).toFixed(2)}</p>
+                            <p className="font-bold text-foreground">Q{(item.resumen.balanceLiquidado ?? 0).toFixed(2)}</p>
                         </div>
                     ))}
                 </div>
@@ -134,36 +134,44 @@ export default function HistorialCuadresMensualesPage() {
                 </Button>
             </div>
 
-            <Card>
-                <CardHeader>
+            <Card 
+                className="shadow-sm overflow-hidden font-body !bg-[#1d283a] border !border-[#324157]"
+                style={{ backgroundColor: '#1d283a', borderColor: '#324157' }}
+            >
+                <CardHeader className="p-4 bg-transparent border-b !border-[#324157]">
                      <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input 
                             placeholder="Buscar por ID de cuadre u observación..."
-                            className="pl-9 rounded-full h-10"
+                            className="pl-9 rounded-full h-10 border-[#324157] bg-[#283244] text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                             value={filtro}
                             onChange={(e) => setFiltro(e.target.value)}
                         />
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4">
                     {cuadresPaginados.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-64 border-2 border-dashed rounded-lg">
-                            <FileText className="h-12 w-12 mb-4 text-primary/50" />
-                            <p className="font-semibold text-lg">{filtro ? "No se encontraron registros" : "No hay cuadres mensuales registrados"}</p>
-                            <p className="text-sm">{filtro ? "Intenta con otra búsqueda." : "Los cuadres completados aparecerán aquí."}</p>
+                        <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-64 border-2 border-dashed !border-[#324157] rounded-xl bg-[#283244]/40">
+                            <FileText className="h-12 w-12 mb-4 text-primary/30" />
+                            <p className="font-semibold text-lg text-foreground">{filtro ? "No se encontraron registros" : "No hay cuadres mensuales registrados"}</p>
+                            <p className="text-sm text-muted-foreground">{filtro ? "Intenta con otra búsqueda." : "Los cuadres completados aparecerán aquí."}</p>
                         </div>
                     ) : (
                         <Accordion type="single" collapsible className="w-full space-y-3" onValueChange={(value) => setOpenAccordionId(value || null)}>
                              {cuadresPaginados.map(cuadre => (
-                                <AccordionItem value={cuadre.id} key={cuadre.id} className="border rounded-xl bg-card overflow-hidden shadow-sm border-muted/40 transition-all hover:border-primary/30">
-                                    <AccordionTrigger className="p-4 hover:no-underline transition-colors data-[state=open]:bg-primary/[0.02]">
+                                <AccordionItem 
+                                    value={cuadre.id} 
+                                    key={cuadre.id} 
+                                    style={{ backgroundColor: '#283244', borderColor: '#324157' }}
+                                    className="border !border-[#324157] rounded-xl !bg-[#283244] overflow-hidden shadow-sm transition-all hover:brightness-105"
+                                >
+                                    <AccordionTrigger className="p-4 hover:no-underline transition-colors">
                                         <div className="flex flex-1 items-center justify-between w-full pr-2">
                                             <div className="flex flex-col text-left min-w-0">
                                                 <p className="font-bold text-sm sm:text-base text-foreground leading-tight">
                                                     #{cuadre.idCuadreMensual}. {format(cuadre.fecha.toDate(), "dd 'de' MMMM, yyyy", { locale: es })}
                                                 </p>
-                                                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-tight mt-1">
+                                                <p className="text-[10px] font-medium text-muted-foreground tracking-tight mt-1">
                                                     {format(cuadre.fecha.toDate(), "hh:mm a", { locale: es })}
                                                 </p>
                                             </div>
@@ -171,38 +179,38 @@ export default function HistorialCuadresMensualesPage() {
                                                 <p className="text-base sm:text-xl font-bold text-primary leading-none">
                                                     Q{cuadre.resumen.balanceLiquidado.toFixed(2)}
                                                 </p>
-                                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Balance Liquidado</p>
+                                                <p className="text-[9px] text-muted-foreground font-semibold tracking-wider mt-1">Balance Liquidado</p>
                                             </div>
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent className="p-4 pt-0">
-                                        <div className="border-t pt-6 space-y-6">
+                                        <div className="border-t !border-[#324157] pt-6 space-y-6">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <Card className="text-center bg-muted/10 border-muted/40 shadow-none">
-                                                    <CardHeader className="pb-2"><p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Balance Neto</p></CardHeader>
-                                                    <CardContent><p className="text-2xl font-bold">Q{cuadre.resumen.balanceNetoCalculado.toFixed(2)}</p></CardContent>
+                                                <Card className="text-center !bg-[#1d283a]/80 !border-[#324157] shadow-none">
+                                                    <CardHeader className="pb-2"><p className="text-[10px] font-bold text-muted-foreground tracking-wide">Balance Neto</p></CardHeader>
+                                                    <CardContent><p className="text-2xl font-bold text-foreground">Q{cuadre.resumen.balanceNetoCalculado.toFixed(2)}</p></CardContent>
                                                 </Card>
-                                                <Card className="text-center bg-primary/5 border-primary/20 shadow-none">
-                                                    <CardHeader className="pb-2"><p className="text-[10px] font-bold text-primary uppercase tracking-widest">Balance Liquidado</p></CardHeader>
+                                                <Card className="text-center !bg-[#1d283a]/80 !border-primary/40 shadow-none">
+                                                    <CardHeader className="pb-2"><p className="text-[10px] font-bold text-primary tracking-wide">Balance Liquidado</p></CardHeader>
                                                     <CardContent><p className="text-2xl font-bold text-primary">Q{cuadre.resumen.balanceLiquidado.toFixed(2)}</p></CardContent>
                                                 </Card>
                                             </div>
-                                            <div className="flex items-center justify-center gap-4 text-center p-4 border rounded-xl bg-background shadow-sm border-muted/40">
+                                            <div className="flex items-center justify-center gap-4 text-center p-4 border !border-[#324157] rounded-xl !bg-[#1d283a]/80 shadow-sm">
                                                 <div className="flex-1">
-                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">Origen</p>
-                                                    <p className="font-semibold text-sm">{cuadre.cuentas.origenNombre}</p>
+                                                    <p className="text-[10px] font-bold text-muted-foreground tracking-tight">Origen</p>
+                                                    <p className="font-semibold text-sm text-foreground">{cuadre.cuentas.origenNombre}</p>
                                                 </div>
                                                 <ArrowRight className="h-5 w-5 text-muted-foreground/40 shrink-0"/>
                                                 <div className="flex-1">
-                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">Destino</p>
-                                                    <p className="font-semibold text-sm">{cuadre.cuentas.destinoNombre}</p>
+                                                    <p className="text-[10px] font-bold text-muted-foreground tracking-tight">Destino</p>
+                                                    <p className="font-semibold text-sm text-foreground">{cuadre.cuentas.destinoNombre}</p>
                                                 </div>
                                             </div>
 
                                             {openAccordionId === cuadre.id && firestore && (
-                                                <Card className="border-muted/40 shadow-none bg-transparent">
-                                                    <CardHeader className="px-0"><p className="text-sm font-bold font-headline">Desglose de Cuadres Semanales</p></CardHeader>
-                                                    <CardContent className="px-0">
+                                                <Card className="!border-[#324157] shadow-none !bg-[#1d283a]/50 p-4 rounded-xl">
+                                                    <CardHeader className="p-0 pb-3"><p className="text-sm font-bold font-headline text-foreground">Desglose de Cuadres Semanales</p></CardHeader>
+                                                    <CardContent className="p-0">
                                                         <DetalleCuadresSemanalesProcesados ids={cuadre.idsCuadresProcesados} firestore={firestore} sucursalId={sucursalId}/>
                                                     </CardContent>
                                                 </Card>
@@ -210,8 +218,8 @@ export default function HistorialCuadresMensualesPage() {
 
                                             {cuadre.observaciones && (
                                                 <div className="mt-4">
-                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Observaciones:</p>
-                                                    <div className="bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/20 italic text-xs text-muted-foreground leading-relaxed">
+                                                    <p className="text-[10px] font-bold text-muted-foreground tracking-wider mb-2">Observaciones:</p>
+                                                    <div className="!bg-[#1d283a]/60 p-3 rounded-lg border border-dashed !border-[#324157] italic text-xs text-muted-foreground leading-relaxed">
                                                         "{cuadre.observaciones}"
                                                     </div>
                                                 </div>
@@ -224,7 +232,7 @@ export default function HistorialCuadresMensualesPage() {
                     )}
                 </CardContent>
                 {totalPages > 1 && (
-                <CardFooter className="flex flex-col items-center gap-4 border-t p-4 sm:flex-row sm:justify-between bg-muted/5">
+                <CardFooter className="flex flex-col items-center gap-4 border-t !border-[#324157] p-4 sm:flex-row sm:justify-between bg-transparent">
                     <div className="flex items-center space-x-2">
                         <p className="text-[11px] sm:text-xs font-medium text-muted-foreground">Filas por página</p>
                         <Select
