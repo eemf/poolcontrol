@@ -147,12 +147,23 @@ export async function guardarVentaYActualizarStock(
         transaction.set(correlativoDetalleRef, { correlativo: siguienteIdDetalle - 1 }, { merge: true });
         transaction.set(correlativoHistorialRef, { correlativo: siguienteIdHistorial - 1 }, { merge: true });
 
+        const itemsAgregados = ventaExistente 
+            ? ventaData.detalles.filter(d => d.idDetalle === 0) 
+            : ventaData.detalles;
+
+        const itemsParaMostrar = itemsAgregados.length > 0 ? itemsAgregados : ventaData.detalles;
+        const resumenProductos = itemsParaMostrar
+            .map(d => `${d.cantidad}x ${d.nombreProducto || 'Producto'} (Q${(d.subtotal || (d.cantidad * d.precioUnitario)).toFixed(2)})`)
+            .join(', ');
+
+        const descCompleta = `${ventaData.nombreCliente || 'Cliente'} - Total: Q${totalVenta.toFixed(2)}${resumenProductos ? ` • ${ventaExistente ? 'Agregó' : 'Productos'}: ${resumenProductos}` : ''}`;
+
         registrarAuditoria(firestore, sid, {
             usuarioId,
             categoria: 'VENTAS',
             accion: ventaExistente ? 'VENTA_EDITAR' : 'VENTA_CREAR',
             titulo: ventaExistente ? `Edición de venta #${idVentaFinal}` : `Nueva venta #${idVentaFinal}`,
-            descripcion: `${ventaData.nombreCliente || 'Cliente'} - Total: Q${totalVenta.toFixed(2)} (${itemsNuevos.length} nuevos ítems)`,
+            descripcion: descCompleta,
             detalles: {
                 idVenta: idVentaFinal,
                 clienteId: ventaData.clienteId,
@@ -160,6 +171,12 @@ export async function guardarVentaYActualizarStock(
                 total: totalVenta,
                 saldo: saldoVenta,
                 estado: estadoVenta,
+                itemsAgregados: itemsParaMostrar.map(d => ({
+                    nombre: d.nombreProducto || 'Producto',
+                    cantidad: d.cantidad,
+                    precioUnitario: d.precioUnitario,
+                    subtotal: d.subtotal || (d.cantidad * d.precioUnitario)
+                })),
                 cantidadItemsTotal: detallesProcesados.length
             }
         }, transaction);
@@ -240,12 +257,16 @@ export async function cancelarVentaYDevolverStock(firestore: Firestore, sucursal
             transaction.delete(ventaRef);
         }
 
+        const resumenDevueltos = itemsADevolver
+            .map(i => `${i.cantidad}x ${i.nombreProducto}`)
+            .join(', ');
+
         registrarAuditoria(firestore, sid, {
             usuarioId,
             categoria: 'VENTAS',
             accion: 'VENTA_ANULAR',
             titulo: `Anulación de venta #${ventaId || 'desconocida'}`,
-            descripcion: `Devolución de ${itemsADevolver.length} ítems al inventario`,
+            descripcion: `Devolución al inventario: ${resumenDevueltos || `${itemsADevolver.length} ítems`}`,
             detalles: {
                 ventaId,
                 itemsDevueltos: itemsADevolver.map(i => ({ nombre: i.nombreProducto, cantidad: i.cantidad }))

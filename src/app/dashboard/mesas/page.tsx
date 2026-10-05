@@ -323,6 +323,10 @@ export default function PaginaMesas() {
     try {
       await updateDoc(doc(firestore, `sucursales/${sucursalId}/mesas_de_billar`, mesaParaConsumo.id), { consumos: carritoConsumoTemporal });
       
+      const resumenConsumos = carritoConsumoTemporal
+        .map((c: any) => `${c.cantidad}x ${c.nombreProducto || 'Producto'} (Q${(c.total || 0).toFixed(2)})`)
+        .join(', ');
+
       await registrarAuditoria(firestore, sucursalId, {
         usuarioId: user?.uid || 'desconocido',
         usuarioNombre: user?.displayName || user?.email || 'Usuario',
@@ -330,7 +334,7 @@ export default function PaginaMesas() {
         categoria: 'MESAS',
         accion: 'MESA_AGREGAR_CONSUMO',
         titulo: `Consumo actualizado Mesa #${mesaParaConsumo.numeroMesa}`,
-        descripcion: `${carritoConsumoTemporal.length} consumos guardados en mesa`,
+        descripcion: `Mesa #${mesaParaConsumo.numeroMesa} • Consumos: ${resumenConsumos || `${carritoConsumoTemporal.length} ítems`}`,
         detalles: {
           mesaId: mesaParaConsumo.id,
           numeroMesa: mesaParaConsumo.numeroMesa,

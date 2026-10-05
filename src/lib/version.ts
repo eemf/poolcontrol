@@ -12,9 +12,25 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 271,
+    build: 272,
     fecha: "2026-10-04",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b272",
+    descripcion: "Desglose visual de artículos, cantidades y precios en auditoría con recuperación retroactiva.",
+    cambios: [
+      "Registro explícito de artículos, cantidades agregadas y montos en cada operación de venta y edición.",
+      "Visualización inmediata de productos involucrados mediante distintivos en las tarjetas del feed de auditoría.",
+      "Sección dedicada 'Artículos y Cantidades Involucradas' en el modal de inspección con cantidades, nombres y precios.",
+      "Recuperación retroactiva automática de productos desde la venta o historial para registros de auditoría anteriores.",
+      "Trazabilidad detallada para consumos en mesas de juego, compras y movimientos de inventario."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 271,
+    fecha: "2026-10-04",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b271",
     descripcion: "Detección avanzada y trazabilidad de Computadoras, Tablets y Teléfonos en auditoría.",
@@ -249,9 +265,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 268,
+  build: 272,
   date: "2026-10-04",
-  publicadaActual: releaseHistory[0], // Build 268
-  publicadaAnterior: releaseHistory[1], // Build 267
+  publicadaActual: releaseHistory[0], // Build 272
+  publicadaAnterior: releaseHistory[1], // Build 271
   historial: releaseHistory
 };

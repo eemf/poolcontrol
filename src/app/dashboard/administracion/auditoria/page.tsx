@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useFirebase, useUser, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
-import { collection, query, orderBy, limit, doc, getDoc, where, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, limit, doc, getDoc, getDocs, where, Timestamp } from 'firebase/firestore';
 import type { RegistroAuditoria, CategoriaAuditoria, UsuarioSucursal, Generales, CierreCaja } from '@/lib/tipos';
 import { toDate } from '@/lib/firebase/servicios/utils';
 import { 
@@ -130,6 +130,96 @@ export function resolverMetaDispositivo(tipo?: string, nombre?: string, so?: str
   };
 }
 
+export interface ItemAuditoriaVisual {
+  nombre: string;
+  cantidad: number;
+  precioUnitario?: number;
+  subtotal?: number;
+  tipo?: 'agregado' | 'devuelto' | 'pagado' | 'ajustado' | 'info';
+}
+
+/**
+ * Extrae los artículos, cantidades y precios involucrados en un registro de auditoría
+ */
+export function extraerArticulosDeRegistro(reg?: RegistroAuditoria | null): ItemAuditoriaVisual[] {
+  if (!reg || !reg.detalles) return [];
+  const d = reg.detalles;
+
+  // 1. itemsAgregados (nuevo formato estructurado en ventas y cobros)
+  if (Array.isArray(d.itemsAgregados) && d.itemsAgregados.length > 0) {
+    return d.itemsAgregados.map((it: any) => ({
+      nombre: it.nombre || it.nombreProducto || 'Producto',
+      cantidad: Number(it.cantidad) || 1,
+      precioUnitario: it.precioUnitario ? Number(it.precioUnitario) : undefined,
+      subtotal: it.subtotal ? Number(it.subtotal) : ((Number(it.cantidad) || 1) * (Number(it.precioUnitario) || 0)),
+      tipo: 'agregado' as const,
+    }));
+  }
+
+  // 2. itemsDevueltos / itemsRevertidos (anulaciones de venta o devoluciones)
+  const itemsDev = d.itemsDevueltos || d.itemsRevertidos;
+  if (Array.isArray(itemsDev) && itemsDev.length > 0) {
+    return itemsDev.map((it: any) => ({
+      nombre: it.nombre || it.nombreProducto || 'Producto',
+      cantidad: Number(it.cantidad) || 1,
+      tipo: 'devuelto' as const,
+    }));
+  }
+
+  // 3. items (usado en compras o consumos)
+  if (Array.isArray(d.items) && d.items.length > 0) {
+    return d.items.map((it: any) => ({
+      nombre: it.nombre || it.nombreProducto || 'Producto',
+      cantidad: Number(it.cantidad) || 1,
+      precioUnitario: it.precioUnitario ? Number(it.precioUnitario) : (it.costoUnitario ? Number(it.costoUnitario) : undefined),
+      subtotal: it.subtotal ? Number(it.subtotal) : ((Number(it.cantidad) || 1) * (Number(it.precioUnitario || it.costoUnitario) || 0)),
+      tipo: 'info' as const,
+    }));
+  }
+
+  // 4. consumos (sala de mesas)
+  if (Array.isArray(d.consumos) && d.consumos.length > 0) {
+    return d.consumos.map((it: any) => ({
+      nombre: it.nombreProducto || it.nombre || 'Consumo',
+      cantidad: Number(it.cantidad) || 1,
+      subtotal: it.total ? Number(it.total) : (it.subtotal ? Number(it.subtotal) : undefined),
+      precioUnitario: it.precioUnitario ? Number(it.precioUnitario) : undefined,
+      tipo: 'agregado' as const,
+    }));
+  }
+
+  // 5. productosAjustados (inventario)
+  if (Array.isArray(d.productosAjustados) && d.productosAjustados.length > 0) {
+    return d.productosAjustados.map((it: any) => ({
+      nombre: it.nombre || it.nombreProducto || 'Producto',
+      cantidad: Number(it.diferencia) || Number(it.cantidad) || 0,
+      tipo: 'ajustado' as const,
+    }));
+  }
+
+  // 6. itemsPagados (liquidación / cobro)
+  if (Array.isArray(d.itemsPagados) && d.itemsPagados.length > 0) {
+    return d.itemsPagados.map((it: any) => ({
+      nombre: it.nombre || it.nombreProducto || 'Ítem pagado',
+      cantidad: 1,
+      subtotal: it.monto ? Number(it.monto) : undefined,
+      tipo: 'pagado' as const,
+    }));
+  }
+
+  // 7. producto + cantidad (venta rápida)
+  if (d.producto && d.cantidad) {
+    return [{
+      nombre: String(d.producto),
+      cantidad: Number(d.cantidad),
+      subtotal: d.total ? Number(d.total) : undefined,
+      tipo: 'agregado' as const,
+    }];
+  }
+
+  return [];
+}
+
 export default function PaginaAuditoria() {
   const { firestore } = useFirebase();
   const { user: currentUser, profile: currentProfile } = useUser();
@@ -147,6 +237,10 @@ export default function PaginaAuditoria() {
 
   // Modal de detalles de registro
   const [registroDetalle, setRegistroDetalle] = useState<RegistroAuditoria | null>(null);
+
+  // Artículos recuperados dinámicamente si el registro antiguo no los traía en detalles
+  const [articulosRecuperados, setArticulosRecuperados] = useState<ItemAuditoriaVisual[] | null>(null);
+  const [cargandoArticulos, setCargandoArticulos] = useState<boolean>(false);
 
   // Gestión e Información del Dispositivo Local Actual
   const [infoDispositivoLocal, setInfoDispositivoLocal] = useState<InfoDispositivo>({
@@ -183,6 +277,119 @@ export default function PaginaAuditoria() {
       window.removeEventListener(EVENTO_EQUIPO_CAMBIADO, handleCambioEquipo);
     };
   }, []);
+
+  // Efecto para recuperar artículos de una venta si el registro de auditoría es antiguo y no los tiene en detalles
+  useEffect(() => {
+    if (!registroDetalle || !firestore || !sucursalId) {
+      setArticulosRecuperados(null);
+      setCargandoArticulos(false);
+      return;
+    }
+
+    const itemsExistentes = extraerArticulosDeRegistro(registroDetalle);
+    if (itemsExistentes.length > 0) {
+      setArticulosRecuperados(null);
+      setCargandoArticulos(false);
+      return;
+    }
+
+    // Buscar si hay referencia a venta
+    const idVenta = registroDetalle.detalles?.idVenta || registroDetalle.detalles?.ventaId;
+    const matchTitulo = (registroDetalle.titulo || '').match(/#(\d+)/);
+    const idVentaFinal = idVenta ? String(idVenta) : (matchTitulo ? matchTitulo[1] : null);
+
+    if (!idVentaFinal || (registroDetalle.categoria !== 'VENTAS' && registroDetalle.categoria !== 'MESAS')) {
+      setArticulosRecuperados(null);
+      setCargandoArticulos(false);
+      return;
+    }
+
+    setCargandoArticulos(true);
+    let activo = true;
+
+    const buscarVentaOProductos = async () => {
+      try {
+        // 1. Probar por ID de documento directo
+        const docDirecto = await getDoc(doc(firestore, `sucursales/${sucursalId}/ventas`, idVentaFinal));
+        if (activo && docDirecto.exists()) {
+          const data = docDirecto.data();
+          if (Array.isArray(data.detalles) && data.detalles.length > 0) {
+            setArticulosRecuperados(data.detalles.map((d: any) => ({
+              nombre: d.nombreProducto || 'Producto',
+              cantidad: Number(d.cantidad) || 1,
+              precioUnitario: d.precioUnitario ? Number(d.precioUnitario) : undefined,
+              subtotal: d.subtotal ? Number(d.subtotal) : ((Number(d.cantidad) || 1) * (Number(d.precioUnitario) || 0)),
+              tipo: 'agregado' as const,
+            })));
+            setCargandoArticulos(false);
+            return;
+          }
+        }
+
+        // 2. Probar por campo numérico idVenta
+        const num = parseInt(idVentaFinal, 10);
+        if (!isNaN(num)) {
+          const q = query(
+            collection(firestore, `sucursales/${sucursalId}/ventas`),
+            where('idVenta', '==', num),
+            limit(1)
+          );
+          const snap = await getDocs(q);
+          if (activo && !snap.empty) {
+            const data = snap.docs[0].data();
+            if (Array.isArray(data.detalles) && data.detalles.length > 0) {
+              setArticulosRecuperados(data.detalles.map((d: any) => ({
+                nombre: d.nombreProducto || 'Producto',
+                cantidad: Number(d.cantidad) || 1,
+                precioUnitario: d.precioUnitario ? Number(d.precioUnitario) : undefined,
+                subtotal: d.subtotal ? Number(d.subtotal) : ((Number(d.cantidad) || 1) * (Number(d.precioUnitario) || 0)),
+                tipo: 'agregado' as const,
+              })));
+              setCargandoArticulos(false);
+              return;
+            }
+          }
+        }
+
+        // 3. Buscar en historial_inventario si hay registros de esa venta
+        const qHist = query(
+          collection(firestore, `sucursales/${sucursalId}/historial_inventario`),
+          where('referencia', '==', `Venta #${idVentaFinal}`),
+          limit(20)
+        );
+        const snapHist = await getDocs(qHist);
+        if (activo && !snapHist.empty) {
+          setArticulosRecuperados(snapHist.docs.map((d: any) => {
+            const hist = d.data();
+            return {
+              nombre: hist.nombreProducto || 'Producto',
+              cantidad: Math.abs(Number(hist.cantidad) || 1),
+              tipo: 'agregado' as const,
+            };
+          }));
+          setCargandoArticulos(false);
+          return;
+        }
+
+        if (activo) {
+          setArticulosRecuperados(null);
+          setCargandoArticulos(false);
+        }
+      } catch (err) {
+        console.warn('Error al recuperar artículos de auditoría:', err);
+        if (activo) {
+          setArticulosRecuperados(null);
+          setCargandoArticulos(false);
+        }
+      }
+    };
+
+    buscarVentaOProductos();
+
+    return () => {
+      activo = false;
+    };
+  }, [registroDetalle, firestore, sucursalId]);
 
   // Guardar cambio de nombre del equipo
   const handleGuardarNombreEquipo = (nombreAGuardar?: string) => {
@@ -959,6 +1166,35 @@ export default function PaginaAuditoria() {
                       {registro.descripcion}
                     </p>
 
+                    {/* Chips de productos y cantidades involucrados */}
+                    {(() => {
+                      const itemsCard = extraerArticulosDeRegistro(registro);
+                      if (itemsCard.length === 0) return null;
+                      return (
+                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                          {itemsCard.slice(0, 3).map((it, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-muted/70 text-foreground font-medium border border-border/70"
+                            >
+                              <span className="text-primary font-bold">{it.cantidad > 0 ? `${it.cantidad}x` : `${it.cantidad}`}</span>
+                              <span className="truncate max-w-[150px]">{it.nombre}</span>
+                              {it.subtotal !== undefined && it.subtotal > 0 ? (
+                                <span className="text-muted-foreground font-mono text-[10px]">
+                                  (Q{it.subtotal.toFixed(2)})
+                                </span>
+                              ) : null}
+                            </span>
+                          ))}
+                          {itemsCard.length > 3 && (
+                            <span className="text-[10px] text-muted-foreground self-center font-medium">
+                              +{itemsCard.length - 3} más
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground/80 pt-0.5">
                       {/* Usuario con nombre real */}
                       <span className="font-medium text-foreground/90 flex items-center gap-1.5">
@@ -1102,6 +1338,80 @@ export default function PaginaAuditoria() {
                 </div>
 
                 <Separator />
+
+                {/* Sección de Artículos y Cantidades Involucradas */}
+                {(() => {
+                  const itemsDirectos = extraerArticulosDeRegistro(registroDetalle);
+                  const itemsAVisualizar = itemsDirectos.length > 0 ? itemsDirectos : (articulosRecuperados || []);
+                  const esRecuperado = itemsDirectos.length === 0 && (articulosRecuperados || []).length > 0;
+                  const matchTituloVenta = (registroDetalle.titulo || '').match(/#(\d+)/);
+                  const idVentaRef = registroDetalle.detalles?.idVenta || (matchTituloVenta ? matchTituloVenta[1] : '');
+
+                  if (itemsAVisualizar.length === 0 && !cargandoArticulos) return null;
+
+                  return (
+                    <div className="space-y-2 rounded-lg border bg-card p-3 shadow-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                          <Package className="h-4 w-4 text-primary" />
+                          Artículos y Cantidades Involucradas ({itemsAVisualizar.length})
+                        </span>
+                        {esRecuperado && idVentaRef && (
+                          <Badge variant="outline" className="text-[10px] text-primary border-primary/30 bg-primary/5">
+                            Recuperado de la venta #{idVentaRef}
+                          </Badge>
+                        )}
+                      </div>
+
+                      {cargandoArticulos ? (
+                        <div className="flex items-center justify-center py-4 gap-2 text-xs text-muted-foreground">
+                          <Loader className="h-4 w-4 animate-spin text-primary" />
+                          Consultando artículos de la transacción...
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5 pt-1">
+                          {itemsAVisualizar.map((it, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between p-2 rounded-md bg-muted/40 border border-border/50 text-xs"
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="font-bold text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 shrink-0">
+                                  {it.cantidad > 0 ? `${it.cantidad}x` : `${it.cantidad}`}
+                                </span>
+                                <span className="font-semibold text-foreground truncate">
+                                  {it.nombre}
+                                </span>
+                                {it.tipo === 'devuelto' && (
+                                  <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 border-amber-400 text-amber-500">
+                                    Devuelto
+                                  </Badge>
+                                )}
+                              </div>
+
+                              <div className="text-right shrink-0">
+                                {it.subtotal !== undefined && it.subtotal > 0 ? (
+                                  <span className="font-mono font-bold text-foreground">
+                                    Q{it.subtotal.toFixed(2)}
+                                    {it.precioUnitario && it.cantidad > 1 && (
+                                      <span className="text-[10px] text-muted-foreground block font-normal">
+                                        Q{it.precioUnitario.toFixed(2)} c/u
+                                      </span>
+                                    )}
+                                  </span>
+                                ) : it.precioUnitario !== undefined && it.precioUnitario > 0 ? (
+                                  <span className="font-mono font-bold text-foreground">
+                                    Q{(it.precioUnitario * (it.cantidad || 1)).toFixed(2)}
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Descripción */}
                 <div className="space-y-1">
