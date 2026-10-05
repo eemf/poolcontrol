@@ -11,7 +11,7 @@ import {
   ShoppingCart, Gamepad2, Scale, Package, Boxes, Truck, 
   Clock, ArrowUpDown, ChevronRight, RefreshCw, Eye,
   Monitor, Laptop, Tablet, Smartphone, Edit3, Check, CheckCircle2, History,
-  CalendarRange, Sparkles, ArrowLeft
+  Sparkles
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -813,15 +813,7 @@ export default function PaginaAuditoria() {
     });
   }, [registrosRaw, categoriaSeleccionada, usuarioSeleccionado, filtroFecha, periodoSeleccionado, busqueda, mapaUsuarios, usuariosExtra]);
 
-  // Resumen de estadísticas
-  const estadisticas = useMemo(() => {
-    const total = registrosFiltrados.length;
-    const ventas = registrosFiltrados.filter((r) => r.categoria === 'VENTAS').length;
-    const mesas = registrosFiltrados.filter((r) => r.categoria === 'MESAS').length;
-    const caja = registrosFiltrados.filter((r) => r.categoria === 'CAJA').length;
-    const otros = total - ventas - mesas - caja;
-    return { total, ventas, mesas, caja, otros };
-  }, [registrosFiltrados]);
+
 
   // Resolver metadata visual del dispositivo local actual
   const metaDispositivoLocal = useMemo(() => {
@@ -892,84 +884,7 @@ export default function PaginaAuditoria() {
         </div>
       </div>
 
-      {/* Banner de Estado del Período Consultado */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 rounded-lg border bg-card/70 backdrop-blur-sm shadow-xs">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="font-semibold text-foreground flex items-center gap-1.5">
-            <CalendarRange className="h-4 w-4 text-primary" />
-            Período visualizado:
-          </span>
 
-          {periodoSeleccionado === 'abierto' ? (
-            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800 gap-1.5 font-medium py-0.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Período Abierto (En curso)
-            </Badge>
-          ) : periodoSeleccionado === 'todos' ? (
-            <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-800 font-medium py-0.5">
-              Historial Completo
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-800 font-medium py-0.5">
-              {infoPeriodo.label} (Cerrado)
-            </Badge>
-          )}
-
-          <span className="text-muted-foreground text-xs">
-            {periodoSeleccionado === 'abierto'
-              ? (infoPeriodo.inicio 
-                  ? `Iniciado el ${formatearFechaHora(infoPeriodo.inicio)} (operaciones en tiempo real)` 
-                  : 'Turno activo actualmente')
-              : infoPeriodo.inicio && infoPeriodo.fin
-              ? `Del ${formatearFechaHora(infoPeriodo.inicio)} al ${formatearFechaHora(infoPeriodo.fin)}`
-              : 'Todos los registros almacenados'}
-          </span>
-        </div>
-
-        {periodoSeleccionado !== 'abierto' && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setPeriodoSeleccionado('abierto')}
-            className="h-7 text-xs text-primary hover:text-primary gap-1 self-start sm:self-auto px-2"
-          >
-            <ArrowLeft className="h-3 w-3" />
-            Volver al período abierto
-          </Button>
-        )}
-      </div>
-
-      {/* Tarjetas de Métricas Rápidas del Período */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Total Eventos</span>
-            <ShieldCheck className="h-4 w-4 text-primary" />
-          </div>
-          <div className="text-2xl font-bold mt-1 text-foreground">{estadisticas.total}</div>
-        </Card>
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Ventas y Cobros</span>
-            <ShoppingCart className="h-4 w-4 text-blue-500" />
-          </div>
-          <div className="text-2xl font-bold mt-1 text-blue-600 dark:text-blue-400">{estadisticas.ventas}</div>
-        </Card>
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Sala de Juegos</span>
-            <Gamepad2 className="h-4 w-4 text-emerald-500" />
-          </div>
-          <div className="text-2xl font-bold mt-1 text-emerald-600 dark:text-emerald-400">{estadisticas.mesas}</div>
-        </Card>
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Caja y Turnos</span>
-            <Scale className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="text-2xl font-bold mt-1 text-amber-600 dark:text-amber-400">{estadisticas.caja}</div>
-        </Card>
-      </div>
 
       {/* Barra de Filtros, Selector de Período y Búsqueda */}
       <Card className="p-4 bg-card/80 border shadow-xs space-y-3">

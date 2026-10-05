@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 272,
+    build: 273,
     fecha: "2026-10-04",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b273",
+    descripcion: "Simplificación visual de auditoría: remoción de banner de período y tarjetas de métricas.",
+    cambios: [
+      "Eliminación del banner de período visualizado y las 4 tarjetas de métricas rápidas de auditoría.",
+      "Interfaz más limpia y directa con acceso inmediato a los filtros, períodos y bitácora de eventos.",
+      "Optimización del espacio vertical en pantalla tanto en computadoras como en tablets y móviles."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 272,
+    fecha: "2026-10-04",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b272",
     descripcion: "Desglose visual de artículos, cantidades y precios en auditoría con recuperación retroactiva.",
@@ -265,9 +279,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 272,
+  build: 273,
   date: "2026-10-04",
-  publicadaActual: releaseHistory[0], // Build 272
-  publicadaAnterior: releaseHistory[1], // Build 271
+  publicadaActual: releaseHistory[0], // Build 273
+  publicadaAnterior: releaseHistory[1], // Build 272
   historial: releaseHistory
 };
