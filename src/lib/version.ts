@@ -12,9 +12,24 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 276,
+    build: 277,
     fecha: "2026-10-05",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b277",
+    descripcion: "Corrección cronológica del rendimiento mensual en dashboard para fechas corridas del siguiente mes.",
+    cambios: [
+      "Ajuste en la gráfica de rendimiento mensual del dashboard para asignar correctamente los cuadres ejecutados en fechas corridas del siguiente mes al mes que les corresponde cronológicamente (ej. cierre de septiembre realizado los primeros días de octubre).",
+      "Persistencia de los campos 'mesCorrespondiente' y 'fechaPeriodo' al procesar nuevos cuadres mensuales a partir de los cuadres semanales seleccionados.",
+      "Visualización de insignia con el período mensual correspondiente en los registros del historial de cuadre mensual.",
+      "Ajuste de estilos en tooltips eliminando mayúsculas forzadas (uppercase)."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 276,
+    fecha: "2026-10-05",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b276",
     descripcion: "Paleta visual unificada del POS aplicada a historiales de cuadre semanal y mensual.",
@@ -320,9 +335,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 276,
+  build: 277,
   date: "2026-10-05",
-  publicadaActual: releaseHistory[0], // Build 276
-  publicadaAnterior: releaseHistory[1], // Build 275
+  publicadaActual: releaseHistory[0], // Build 277
+  publicadaAnterior: releaseHistory[1], // Build 276
   historial: releaseHistory
 };

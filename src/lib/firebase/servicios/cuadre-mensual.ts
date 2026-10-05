@@ -20,6 +20,8 @@ export interface CuadreMensualData {
   };
   idsCuadresProcesados: string[];
   observaciones: string;
+  mesCorrespondiente?: string;
+  fechaPeriodo?: Timestamp;
 }
 
 export async function realizarCuadreMensual(
@@ -61,6 +63,8 @@ export async function realizarCuadreMensual(
       },
       idsCuadresProcesados: data.idsCuadresProcesados,
       observaciones: data.observaciones,
+      mesCorrespondiente: data.mesCorrespondiente,
+      fechaPeriodo: data.fechaPeriodo,
     };
 
     // --- 3. Fase de Escritura ---

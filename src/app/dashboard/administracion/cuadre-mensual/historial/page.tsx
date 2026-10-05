@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { History, Search, Loader2, ChevronLeft, ChevronRight, FileText, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { format } from 'date-fns';
+import { format, subMonths, startOfMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
 import { useSucursal } from '@/hooks/use-sucursal';
@@ -158,7 +158,28 @@ export default function HistorialCuadresMensualesPage() {
                         </div>
                     ) : (
                         <Accordion type="single" collapsible className="w-full space-y-3" onValueChange={(value) => setOpenAccordionId(value || null)}>
-                             {cuadresPaginados.map(cuadre => (
+                             {cuadresPaginados.map(cuadre => {
+                                const getPeriodoTexto = () => {
+                                    if (cuadre.fechaPeriodo) {
+                                        return format(cuadre.fechaPeriodo.toDate(), "MMMM yyyy", { locale: es });
+                                    }
+                                    if (cuadre.mesCorrespondiente) {
+                                        const parts = cuadre.mesCorrespondiente.split('-');
+                                        if (parts.length === 2) {
+                                            const y = parseInt(parts[0], 10);
+                                            const m = parseInt(parts[1], 10) - 1;
+                                            if (!isNaN(y) && !isNaN(m)) {
+                                                return format(new Date(y, m, 1), "MMMM yyyy", { locale: es });
+                                            }
+                                        }
+                                    }
+                                    const fechaOriginal = cuadre.fecha.toDate();
+                                    const fechaAjustada = new Date(fechaOriginal.getTime() - (5 * 60 * 60 * 1000));
+                                    const fechaMes = fechaAjustada.getDate() <= 20 ? subMonths(fechaAjustada, 1) : fechaAjustada;
+                                    return format(fechaMes, "MMMM yyyy", { locale: es });
+                                };
+
+                                return (
                                 <AccordionItem 
                                     value={cuadre.id} 
                                     key={cuadre.id} 
@@ -168,9 +189,14 @@ export default function HistorialCuadresMensualesPage() {
                                     <AccordionTrigger className="p-4 hover:no-underline transition-colors">
                                         <div className="flex flex-1 items-center justify-between w-full pr-2">
                                             <div className="flex flex-col text-left min-w-0">
-                                                <p className="font-bold text-sm sm:text-base text-foreground leading-tight">
-                                                    #{cuadre.idCuadreMensual}. {format(cuadre.fecha.toDate(), "dd 'de' MMMM, yyyy", { locale: es })}
-                                                </p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p className="font-bold text-sm sm:text-base text-foreground leading-tight">
+                                                        #{cuadre.idCuadreMensual}. {format(cuadre.fecha.toDate(), "dd 'de' MMMM, yyyy", { locale: es })}
+                                                    </p>
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-primary/10 text-primary border border-primary/30 capitalize">
+                                                        Período: {getPeriodoTexto()}
+                                                    </span>
+                                                </div>
                                                 <p className="text-[10px] font-medium text-muted-foreground tracking-tight mt-1">
                                                     {format(cuadre.fecha.toDate(), "hh:mm a", { locale: es })}
                                                 </p>
@@ -227,7 +253,8 @@ export default function HistorialCuadresMensualesPage() {
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
-                             ))}
+                            );
+                            })}
                         </Accordion>
                     )}
                 </CardContent>

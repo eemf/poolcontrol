@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
   // Memos estables para fechas
   const hace7Dias = useMemo(() => startOfDay(subDays(new Date(), 6)), []);
-  const hace6Meses = useMemo(() => startOfMonth(subMonths(new Date(), 5)), []);
+  const hace7Meses = useMemo(() => startOfMonth(subMonths(new Date(), 6)), []);
   const inicioMes = useMemo(() => startOfMonth(new Date()), []);
 
   // --- CONSULTAS ---
@@ -108,10 +108,10 @@ export default function DashboardPage() {
   const cierresMensualesQuery = useMemoFirebase(() => 
     (firestore && sucursalId) ? query(
       collection(firestore, `sucursales/${sucursalId}/cuadre_mensual`),
-      where('fecha', '>=', Timestamp.fromDate(hace6Meses)),
+      where('fecha', '>=', Timestamp.fromDate(hace7Meses)),
       orderBy('fecha', 'asc')
     ) : null
-  , [firestore, sucursalId, hace6Meses]);
+  , [firestore, sucursalId, hace7Meses]);
   const { data: cierresMensuales } = useCollection<CuadreMensual>(cierresMensualesQuery);
 
   const generalesRef = useMemoFirebase(() => 
@@ -253,13 +253,40 @@ export default function DashboardPage() {
 
     if (!cierresMensuales) return meses;
 
-    cierresMensuales.forEach(c => {
+    // Determina el mes que representa cada cuadre mensual respetando el orden cronológico
+    // y contemplando que los cierres pueden realizarse en una fecha corrida del siguiente mes.
+    const getMesCorrespondiente = (c: CuadreMensual): Date => {
+      if (c.fechaPeriodo) {
+        return startOfMonth(toDate(c.fechaPeriodo));
+      }
+      if (c.mesCorrespondiente) {
+        const parts = c.mesCorrespondiente.split('-');
+        if (parts.length === 2) {
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          if (!isNaN(y) && !isNaN(m)) {
+            return new Date(y, m, 1);
+          }
+        }
+      }
+
       const fechaCierreOriginal = toDate(c.fecha);
       const fechaAjustada = new Date(fechaCierreOriginal.getTime() - (5 * 60 * 60 * 1000));
       
+      // Si el cuadre se ejecutó en los primeros 20 días del mes,
+      // corresponde al mes anterior (ej. cierre de septiembre realizado los primeros días de octubre).
+      if (fechaAjustada.getDate() <= 20) {
+        return startOfMonth(subMonths(fechaAjustada, 1));
+      }
+      return startOfMonth(fechaAjustada);
+    };
+
+    cierresMensuales.forEach(c => {
+      const mesTarget = getMesCorrespondiente(c);
+      
       const mesEncontrado = meses.find(m => 
-        m.fecha.getMonth() === fechaAjustada.getMonth() && 
-        m.fecha.getFullYear() === fechaAjustada.getFullYear()
+        m.fecha.getMonth() === mesTarget.getMonth() && 
+        m.fecha.getFullYear() === mesTarget.getFullYear()
       );
       if (mesEncontrado) {
         const totalTarjeta = c.resumen?.totalIngresosTarjeta || 0;
@@ -425,7 +452,7 @@ export default function DashboardPage() {
                         const data = payload[0].payload;
                         return (
                           <div className="bg-background border rounded-lg shadow-xl p-2 sm:p-3 space-y-1.5 font-body">
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b pb-1">{format(data.fecha, 'dd MMMM', { locale: es })}</p>
+                            <p className="text-[10px] font-bold text-muted-foreground capitalize border-b pb-1">{format(data.fecha, 'dd MMMM', { locale: es })}</p>
                             <div className="space-y-1 pt-1">
                               <div className="flex justify-between gap-4 text-[10px]">
                                 <span className="font-medium text-muted-foreground">Efectivo:</span>
@@ -623,7 +650,7 @@ export default function DashboardPage() {
                       const data = payload[0].payload;
                       return (
                         <div className="bg-background border rounded-lg shadow-xl p-2 space-y-1 font-body">
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase border-b pb-1">{format(data.fecha, 'MMMM yyyy', { locale: es })}</p>
+                          <p className="text-[10px] font-bold text-muted-foreground capitalize border-b pb-1">{format(data.fecha, 'MMMM yyyy', { locale: es })}</p>
                           <div className="space-y-1 pt-1">
                             <div className="flex justify-between gap-4 text-[9px]">
                                 <span className="font-medium text-muted-foreground">Efectivo:</span>

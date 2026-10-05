@@ -411,6 +411,8 @@ export interface CuadreMensual {
   };
   idsCuadresProcesados: string[];
   observaciones: string;
+  mesCorrespondiente?: string; // ej: "2026-09"
+  fechaPeriodo?: Timestamp;
 }
 
 export interface HistorialInventario {

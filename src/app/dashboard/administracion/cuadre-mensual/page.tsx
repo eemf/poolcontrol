@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react';
-import { collection, query, orderBy, where } from 'firebase/firestore';
+import { collection, query, orderBy, where, Timestamp } from 'firebase/firestore';
 import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
 import type { CuadreSemanal, Cuenta } from '@/lib/tipos';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Loader2, FileSignature, ArrowRight, History } from "lucide-react";
-import { format } from 'date-fns';
+import { format, subMonths, startOfMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
 import { InputNumero } from '@/components/ui/input-numero';
@@ -128,6 +128,16 @@ export default function CuadreMensualPage() {
 
     setIsProcessing(true);
 
+    const seleccionados = cuadresSemanales ? cuadresSemanales.filter(c => selectedCuadres.has(c.id)) : [];
+    let fechaPeriodoDate = new Date();
+    if (seleccionados.length > 0) {
+      fechaPeriodoDate = seleccionados[0].fecha.toDate();
+    } else {
+      const hoy = new Date();
+      fechaPeriodoDate = hoy.getDate() <= 20 ? subMonths(hoy, 1) : hoy;
+    }
+    const mesCorrespondiente = format(fechaPeriodoDate, 'yyyy-MM');
+
     const data: CuadreMensualData = {
       usuarioId: user.uid,
       resumen: {
@@ -144,6 +154,8 @@ export default function CuadreMensualPage() {
       },
       idsCuadresProcesados: Array.from(selectedCuadres),
       observaciones,
+      mesCorrespondiente,
+      fechaPeriodo: Timestamp.fromDate(startOfMonth(fechaPeriodoDate)),
     };
 
     try {
