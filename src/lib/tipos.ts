@@ -425,3 +425,27 @@ export interface HistorialInventario {
   usuarioId: string;
   verificado?: boolean; // Nuevo campo para auditoría visual de éxito
 }
+
+export type CategoriaAuditoria = 'ventas' | 'mesas' | 'caja' | 'compras' | 'inventario' | 'catalogo';
+
+export type AccionAuditoria = 
+  | 'venta_guardada' | 'venta_anulada' | 'producto_agregado' | 'producto_eliminado'
+  | 'pago_recibido' | 'abono_registrado' | 'credito_otorgado'
+  | 'mesa_iniciada' | 'mesa_cobrada' | 'mesa_trasladada' | 'mesa_tiempo_ajustado' | 'mesa_consumo_agregado' | 'mesa_consumo_eliminado'
+  | 'cierre_caja' | 'apertura_caja' | 'compra_registrada'
+  | 'ajuste_inventario' | 'producto_creado' | 'producto_editado' | 'producto_eliminado_catalogo';
+
+export interface RegistroAuditoria {
+  id?: string;
+  sucursalId: string;
+  fecha: Timestamp | Date;
+  usuarioId: string;
+  usuarioNombre: string;
+  usuarioEmail?: string;
+  usuarioRol?: string;
+  categoria: CategoriaAuditoria;
+  accion: AccionAuditoria;
+  titulo: string;
+  descripcion: string;
+  detalles?: Record<string, any>;
+}

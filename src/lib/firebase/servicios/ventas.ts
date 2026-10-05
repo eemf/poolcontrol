@@ -3,6 +3,7 @@ import { doc, runTransaction, Timestamp, Firestore, collection, query, where, ge
 import type { Venta, DetalleVenta, Pago, Producto, ProductoVirtual } from '@/lib/tipos';
 import { getFullGenerales, validarSucursal } from './utils';
 import { registrarMovimientoInventario } from './historial-inventario';
+import { registrarAuditoria } from './auditoria';
 import { analizarComando, type ComandoAnalizado } from '@/lib/utils/analizar-comando';
 
 /**
@@ -146,6 +147,23 @@ export async function guardarVentaYActualizarStock(
         transaction.set(correlativoDetalleRef, { correlativo: siguienteIdDetalle - 1 }, { merge: true });
         transaction.set(correlativoHistorialRef, { correlativo: siguienteIdHistorial - 1 }, { merge: true });
 
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'VENTAS',
+            accion: ventaExistente ? 'VENTA_EDITAR' : 'VENTA_CREAR',
+            titulo: ventaExistente ? `Edición de venta #${idVentaFinal}` : `Nueva venta #${idVentaFinal}`,
+            descripcion: `${ventaData.nombreCliente || 'Cliente'} - Total: Q${totalVenta.toFixed(2)} (${itemsNuevos.length} nuevos ítems)`,
+            detalles: {
+                idVenta: idVentaFinal,
+                clienteId: ventaData.clienteId,
+                nombreCliente: ventaData.nombreCliente,
+                total: totalVenta,
+                saldo: saldoVenta,
+                estado: estadoVenta,
+                cantidadItemsTotal: detallesProcesados.length
+            }
+        }, transaction);
+
         return { ventaId: docIdFinal, idVenta: idVentaFinal };
     });
 }
@@ -221,6 +239,18 @@ export async function cancelarVentaYDevolverStock(firestore: Firestore, sucursal
             const ventaRef = doc(firestore, `sucursales/${sid}/ventas`, ventaId);
             transaction.delete(ventaRef);
         }
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'VENTAS',
+            accion: 'VENTA_ANULAR',
+            titulo: `Anulación de venta #${ventaId || 'desconocida'}`,
+            descripcion: `Devolución de ${itemsADevolver.length} ítems al inventario`,
+            detalles: {
+                ventaId,
+                itemsDevueltos: itemsADevolver.map(i => ({ nombre: i.nombreProducto, cantidad: i.cantidad }))
+            }
+        }, transaction);
     });
 }
 
@@ -387,6 +417,22 @@ export async function procesarVentaRapidaConId(
         transaction.set(doc(firestore, `sucursales/${sid}/correlativos`, 'pagos'), { correlativo: nuevoIdPago }, { merge: true });
         transaction.set(doc(firestore, `sucursales/${sid}/correlativos`, 'ventas_detalles'), { correlativo: nuevoIdDetalle }, { merge: true });
         transaction.set(doc(firestore, `sucursales/${sid}/correlativos`, 'historial_inventario'), { correlativo: siguienteIdHistorial - 1 }, { merge: true });
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'VENTAS',
+            accion: 'VENTA_RAPIDA',
+            titulo: `Venta Rápida #${nuevoIdVenta}`,
+            descripcion: `${comando.cantidad}x ${nombreVenta} - Q${totalVenta.toFixed(2)} (Efectivo)`,
+            detalles: {
+                idVenta: nuevoIdVenta,
+                idPago: nuevoIdPago,
+                producto: nombreVenta,
+                cantidad: comando.cantidad,
+                total: totalVenta,
+                esVirtual
+            }
+        }, transaction);
 
         return { nombreProducto: nombreVenta, cantidad: comando.cantidad, totalVenta, stockInfo };
     });

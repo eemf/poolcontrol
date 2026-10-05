@@ -12,9 +12,27 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 266,
+    build: 267,
     fecha: "2026-10-04",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b267",
+    descripcion: "Sistema integral de auditoría de usuarios y trazabilidad de operaciones en tiempo real.",
+    cambios: [
+      "Módulo de auditoría de usuarios en Administración (/dashboard/administracion/auditoria).",
+      "Registro transaccional de quién realizó cada acción y fecha/hora exacta.",
+      "Trazabilidad en Ventas, Cobros, Abonos, Créditos y Ventas Rápidas.",
+      "Trazabilidad en Sala de Juegos (inicios, tiempos adicionales, cobros, traslados, consumos agregados y eliminados).",
+      "Trazabilidad en Cierres de Caja, Ajustes de Inventario, Compras y Catálogo de Productos.",
+      "Filtros avanzados por usuario, rango de fecha, categoría operativa y búsqueda en tiempo real.",
+      "Modal de inspección de metadatos estructurados por cada evento auditado."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 266,
+    fecha: "2026-10-04",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b266",
     descripcion: "Organización de productos por ubicación (estantes, refrigeradores, congeladores, mostrador).",
@@ -171,9 +189,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 266,
+  build: 267,
   date: "2026-10-04",
-  publicadaActual: releaseHistory[0], // Build 266
-  publicadaAnterior: releaseHistory[1], // Build 265
+  publicadaActual: releaseHistory[0], // Build 267
+  publicadaAnterior: releaseHistory[1], // Build 266
   historial: releaseHistory
 };

@@ -50,6 +50,7 @@ export const PERMISSIONS_GROUPS: PermissionGroup[] = [
       { key: 'cuadre.mensual', label: 'Cuadre Mensual', description: 'Permite generar el cierre consolidado del mes.' },
       { key: 'inventario.revisar', label: 'Hacer Revisión Inventario', description: 'Permite realizar el conteo físico y ajustes de stock.' },
       { key: 'ventas.eliminar_rango', label: 'Mantenimiento de Ventas', description: 'Permite eliminar registros de ventas por rango (Admin).' },
+      { key: 'admin.auditoria', label: 'Auditoría de Usuarios', description: 'Permite consultar la bitácora completa de acciones y transacciones por usuario.' },
       { key: 'sucursales.saltar', label: 'Navegación Multisucursal', description: 'Permite cambiar de sucursal rápidamente (Gerencia Global).' },
     ]
   },

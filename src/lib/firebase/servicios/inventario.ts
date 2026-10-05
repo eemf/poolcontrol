@@ -1,6 +1,7 @@
 import { doc, runTransaction, Timestamp, Firestore, collection } from 'firebase/firestore';
 import type { AjusteInventario, DetalleAjusteInventario } from '@/lib/tipos';
 import { registrarMovimientoInventario } from './historial-inventario';
+import { registrarAuditoria } from './auditoria';
 
 interface AjusteInventarioData {
   fecha: Date;
@@ -65,5 +66,23 @@ export async function realizarAjusteInventario(
     if (data.detalles.length > 0) {
       transaction.set(correlativoHistorialRef, { correlativo: siguienteIdHistorial - 1 }, { merge: true });
     }
+
+    registrarAuditoria(firestore, sucursalId, {
+      usuarioId: data.usuarioId,
+      categoria: 'INVENTARIO',
+      accion: 'INVENTARIO_AJUSTE',
+      titulo: `Ajuste de inventario #${nuevoIdAjuste}`,
+      descripcion: `${data.detalles.length} productos ajustados. Obs: ${data.observaciones || 'Sin observaciones'}`,
+      detalles: {
+        idAjuste: nuevoIdAjuste,
+        observaciones: data.observaciones,
+        productosAjustados: data.detalles.map(d => ({
+          nombre: d.nombreProducto,
+          diferencia: d.diferencia,
+          existenciaFisica: d.existenciaFisica
+        }))
+      }
+    }, transaction);
   });
 }
+

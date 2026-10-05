@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import type { Mesa, Tarifa, Generales, Venta, DetalleVenta, Pago, Cliente } from '@/lib/tipos';
 import { toDate, validarSucursal } from './utils';
+import { registrarAuditoria } from './auditoria';
 
 /**
  * Formatea milisegundos en HH:MM:SS de forma segura, evitando valores negativos.
@@ -203,6 +204,21 @@ export async function iniciarSesion({ firestore, sucursalId, usuarioId, mesaId, 
         }
 
         transaction.update(mesaRef, datosInicio);
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'MESAS',
+            accion: 'MESA_INICIAR',
+            titulo: `Inicio de sesión Mesa #${numeroMesa}`,
+            descripcion: `Modo: ${modoJuego}${modoJuego === 'definido' ? ` (${duracionDefinida} min - ${pagadoDeContado ? 'Prepagado' : 'Pendiente'})` : ' (Libre)'}`,
+            detalles: {
+                mesaId,
+                numeroMesa,
+                modoJuego,
+                duracionDefinida: modoJuego === 'definido' ? duracionDefinida : null,
+                pagadoDeContado
+            }
+        }, transaction);
     });
 }
 
@@ -286,6 +302,21 @@ export async function ajustarTiempoDefinido(firestore: Firestore, sucursalId: st
             ajustesDeTiempo: [...ajustesActuales, ajuste],
             alarmaAck: false // IMPORTANTE: Resetear para que la alarma vuelva a sonar al terminar el nuevo tiempo
         });
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'MESAS',
+            accion: 'MESA_AJUSTE_TIEMPO',
+            titulo: `Tiempo adicional Mesa #${mesaData.numeroMesa}`,
+            descripcion: `+${minutosParaAnadir} minutos (${pagadoDeContado ? 'Contado' : 'A la cuenta'}) - Costo: Q${costoAdicional.toFixed(2)}`,
+            detalles: {
+                mesaId,
+                numeroMesa: mesaData.numeroMesa,
+                minutosAgregados: minutosParaAnadir,
+                costoAdicional,
+                pagadoDeContado
+            }
+        }, transaction);
     });
 }
 
@@ -359,6 +390,23 @@ export async function pasarACuenta(firestore: Firestore, sucursalId: string, usu
         
         transaction.set(corrDetalleDoc.ref, { correlativo: siguienteIdDetalle - 1 }, { merge: true });
         transaction.update(mesaRef, { estado: 'disponible', horaInicio: null, horaFin: null, modoJuego: null, tiempoDefinido: null, alquilerPagado: false, montoACobrar: null, clienteId: null, nombreCliente: null, consumos: [], ajustesDeTiempo: [], alarmaAck: false, numControles: 0, idVentaPrepagada: null });
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'MESAS',
+            accion: 'MESA_PASAR_CUENTA',
+            titulo: `Mesa #${mesa.numeroMesa} pasada a cuenta`,
+            descripcion: `Cliente: ${nombreCliente} - Alquiler: Q${costoAlquilerFinal.toFixed(2)}, Consumos: Q${costoConsumoFinal.toFixed(2)}`,
+            detalles: {
+                mesaId: mesa.id,
+                numeroMesa: mesa.numeroMesa,
+                clienteId,
+                nombreCliente,
+                costoAlquiler: costoAlquilerFinal,
+                costoConsumo: costoConsumoFinal,
+                total: costoAlquilerFinal + costoConsumoFinal
+            }
+        }, transaction);
     });
 }
 
@@ -465,6 +513,21 @@ export async function procesarVentaTiempoDeMesa(firestore: Firestore, sucursalId
 
                 transaction.set(corrDetalleRef, { correlativo: idD - 1 }, { merge: true });
                 transaction.update(mesaRef, { estado: 'disponible', horaInicio: null, modoJuego: null, tiempoDefinido: null, alquilerPagado: false, montoACobrar: null, ajustesDeTiempo: [], alarmaAck: false, numControles: 0, idVentaPrepagada: null });
+
+                registrarAuditoria(firestore, sid, {
+                    usuarioId,
+                    categoria: 'MESAS',
+                    accion: 'MESA_COBRAR',
+                    titulo: `Cobro prepagado finalizado Mesa #${mesa.numeroMesa}`,
+                    descripcion: `Total extra/consumos: Q${montoExtra.toFixed(2)} (${metodoDePago})`,
+                    detalles: {
+                        mesaId: mesa.id,
+                        numeroMesa: mesa.numeroMesa,
+                        montoExtra,
+                        metodoDePago
+                    }
+                }, transaction);
+
                 return;
             }
         }
@@ -535,10 +598,25 @@ export async function procesarVentaTiempoDeMesa(firestore: Firestore, sucursalId
         transaction.set(doc(firestore, `sucursales/${sid}/correlativos`, 'ventas'), { correlativo: idV }, { merge: true }); 
         transaction.set(doc(firestore, `sucursales/${sid}/correlativos`, 'pagos'), { correlativo: idP }, { merge: true }); 
         transaction.set(doc(firestore, `sucursales/${sid}/correlativos`, 'ventas_detalles'), { correlativo: idD - 1 }, { merge: true });
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'MESAS',
+            accion: 'MESA_COBRAR',
+            titulo: `Cobro Mesa #${mesa.numeroMesa}`,
+            descripcion: `Total cobrado: Q${total.toFixed(2)} (${metodoDePago})`,
+            detalles: {
+                mesaId: mesa.id,
+                numeroMesa: mesa.numeroMesa,
+                costoAlquiler,
+                total,
+                metodoDePago
+            }
+        }, transaction);
     });
 }
 
-export async function trasladarMesa(firestore: Firestore, sucursalId: string, mesaOrigenId: string, mesaDestinoId: string) {
+export async function trasladarMesa(firestore: Firestore, sucursalId: string, mesaOrigenId: string, mesaDestinoId: string, usuarioId?: string) {
   const sid = validarSucursal(sucursalId);
   return runTransaction(firestore, async (transaction) => {
     const oR = doc(firestore, `sucursales/${sid}/mesas_de_billar`, mesaOrigenId);
@@ -552,6 +630,20 @@ export async function trasladarMesa(firestore: Firestore, sucursalId: string, me
 
     transaction.update(dR, { estado: 'ocupado', horaInicio: oData.horaInicio, horaFin: oData.horaFin, modoJuego: oData.modoJuego, tiempoDefinido: oData.tiempoDefinido, alquilerPagado: oData.alquilerPagado, montoACobrar: oData.montoACobrar, clienteId: oData.clienteId, nombreCliente: oData.nombreCliente, consumos: oData.consumos || [], ajustesDeTiempo: oData.ajustesDeTiempo || [], alarmaAck: oData.alarmaAck || false, numControles: oData.numControles || 0, idVentaPrepagada: oData.idVentaPrepagada || null });
     transaction.update(oR, { estado: 'disponible', horaInicio: null, horaFin: null, modoJuego: null, tiempoDefinido: null, alquilerPagado: false, montoACobrar: null, clienteId: null, nombreCliente: null, consumos: [], ajustesDeTiempo: [], alarmaAck: false, numControles: 0, idVentaPrepagada: null });
+
+    registrarAuditoria(firestore, sid, {
+        usuarioId: usuarioId || 'sistema',
+        categoria: 'MESAS',
+        accion: 'MESA_TRASLADAR',
+        titulo: `Traslado de Mesa #${oData.numeroMesa} a Mesa #${(dD.data() as Mesa).numeroMesa}`,
+        descripcion: `Sesión activa trasladada exitosamente`,
+        detalles: {
+            mesaOrigenId,
+            mesaDestinoId,
+            numeroOrigen: oData.numeroMesa,
+            numeroDestino: (dD.data() as Mesa).numeroMesa
+        }
+    }, transaction);
   });
 }
 
@@ -671,7 +763,7 @@ export async function procesarPagoDivision(
     });
 }
 
-export async function eliminarConsumoMesa(firestore: Firestore, sucursalId: string, mesaId: string, consumoId: string) {
+export async function eliminarConsumoMesa(firestore: Firestore, sucursalId: string, mesaId: string, consumoId: string, usuarioId?: string) {
     const sid = validarSucursal(sucursalId);
     return runTransaction(firestore, async (transaction) => {
         const mR = doc(firestore, `sucursales/${sid}/mesas_de_billar`, mesaId);
@@ -689,5 +781,19 @@ export async function eliminarConsumoMesa(firestore: Firestore, sucursalId: stri
             }
         }
         transaction.update(mR, { consumos: cons.filter((c: any) => c.id !== consumoId) });
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId: usuarioId || 'sistema',
+            categoria: 'MESAS',
+            accion: 'MESA_ELIMINAR_CONSUMO',
+            titulo: `Consumo eliminado de Mesa #${mD.data()?.numeroMesa || ''}`,
+            descripcion: `${item.nombreProducto} (Cant: ${item.cantidad}) devuelto a stock`,
+            detalles: {
+                mesaId,
+                consumoId,
+                producto: item.nombreProducto,
+                cantidad: item.cantidad
+            }
+        }, transaction);
     });
 }

@@ -6,6 +6,7 @@ import { collection, doc, setDoc, deleteDoc, query, runTransaction, orderBy } fr
 import { useSucursal } from "@/hooks/use-sucursal"
 import { useToast } from "@/hooks/use-toast"
 import type { Producto, Preparacion } from "@/lib/tipos"
+import { registrarAuditoria } from "@/lib/firebase/servicios"
 
 // Componentes Refactorizados
 import { EncabezadoProductos } from "./_components/EncabezadoProductos"
@@ -143,6 +144,22 @@ export default function PaginaCatalogoProductos() {
     try {
       if (editingProduct) {
         await setDoc(doc(firestore, `sucursales/${sucursalId}/productos`, editingProduct.docId), dataToSave, { merge: true });
+        await registrarAuditoria(firestore, sucursalId, {
+          usuarioId: user.uid,
+          usuarioNombre: user.displayName || user.email || 'Usuario',
+          usuarioEmail: user.email || '',
+          categoria: 'CATALOGO',
+          accion: 'PRODUCTO_EDITAR',
+          titulo: `Producto editado: ${nombre}`,
+          descripcion: `Precio venta: Q${Number(precioVenta).toFixed(2)}, Existencia: ${existencia}, Ubicación: ${ubicacion || 'Ninguna'}`,
+          detalles: {
+            productoId: editingProduct.docId,
+            nombre,
+            precioVenta: Number(precioVenta),
+            existencia: Number(existencia),
+            ubicacion: ubicacion || null
+          }
+        });
       } else {
         await runTransaction(firestore, async (transaction) => {
           const corrRef = doc(firestore, `sucursales/${sucursalId}/correlativos`, "productos");
@@ -150,6 +167,23 @@ export default function PaginaCatalogoProductos() {
           const nuevoId = (corrSnap.data()?.correlativo || 0) + 1;
           transaction.set(doc(firestore, `sucursales/${sucursalId}/productos`, nuevoId.toString()), { ...dataToSave, idProducto: nuevoId });
           transaction.set(corrRef, { correlativo: nuevoId }, { merge: true });
+
+          registrarAuditoria(firestore, sucursalId, {
+            usuarioId: user.uid,
+            usuarioNombre: user.displayName || user.email || 'Usuario',
+            usuarioEmail: user.email || '',
+            categoria: 'CATALOGO',
+            accion: 'PRODUCTO_CREAR',
+            titulo: `Nuevo producto: ${nombre}`,
+            descripcion: `Precio venta: Q${Number(precioVenta).toFixed(2)}, Existencia inicial: ${existencia}`,
+            detalles: {
+              idProducto: nuevoId,
+              nombre,
+              precioVenta: Number(precioVenta),
+              existencia: Number(existencia),
+              ubicacion: ubicacion || null
+            }
+          }, transaction);
         });
       }
       toast({ title: "Éxito", description: "Catálogo actualizado." });
@@ -163,10 +197,23 @@ export default function PaginaCatalogoProductos() {
   };
 
   const handleDelete = async () => {
-    if (!firestore || !productToDelete || !sucursalId) return;
+    if (!firestore || !productToDelete || !sucursalId || !user) return;
     setLoading(true);
     try {
       await deleteDoc(doc(firestore, `sucursales/${sucursalId}/productos`, productToDelete.docId));
+      await registrarAuditoria(firestore, sucursalId, {
+        usuarioId: user.uid,
+        usuarioNombre: user.displayName || user.email || 'Usuario',
+        usuarioEmail: user.email || '',
+        categoria: 'CATALOGO',
+        accion: 'PRODUCTO_ELIMINAR',
+        titulo: `Producto eliminado: ${productToDelete.nombre}`,
+        descripcion: `Producto eliminado del catálogo`,
+        detalles: {
+          productoId: productToDelete.docId,
+          nombre: productToDelete.nombre
+        }
+      });
       toast({ title: "Éxito", description: "Producto eliminado." });
       setProductToDelete(null);
     } catch (error: any) {

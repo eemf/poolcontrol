@@ -2,6 +2,7 @@
 import { doc, runTransaction, Timestamp, Firestore, increment, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import type { Venta, DetalleVenta, Pago, Cliente, Generales } from '@/lib/tipos';
 import { validarSucursal } from './utils';
+import { registrarAuditoria } from './auditoria';
 
 /**
  * Helper para identificar si un producto es tiempo de mesa o consola.
@@ -143,6 +144,22 @@ export async function registrarAbonoACuenta(
         };
         transaction.set(doc(firestore, `sucursales/${sucursalId}/pagos`, nuevoIdPago.toString()), pagoData);
         transaction.set(correlativoPagosRef, { correlativo: nuevoIdPago }, { merge: true });
+
+        registrarAuditoria(firestore, sucursalId, {
+            usuarioId,
+            categoria: 'VENTAS',
+            accion: 'VENTA_ABONAR',
+            titulo: `Abono a cuenta #${venta.idVenta}`,
+            descripcion: `${venta.nombreCliente} - Abono de Q${montoAbono.toFixed(2)} (Saldo rest: Q${(venta.saldo - montoAbono).toFixed(2)})`,
+            detalles: {
+                idVenta: venta.idVenta,
+                ventaDocId: ventaId,
+                cliente: venta.nombreCliente,
+                montoAbonado: montoAbono,
+                saldoAnterior: venta.saldo,
+                saldoRestante: venta.saldo - montoAbono,
+            }
+        }, transaction);
     });
 }
 
@@ -261,6 +278,22 @@ export async function procesarPagoVenta(
             };
             transaction.set(doc(firestore, `sucursales/${sucursalId}/pagos`, siguienteIdPago.toString()), pagoData);
             transaction.set(correlativoPagosRef, { correlativo: siguienteIdPago }, { merge: true });
+
+            registrarAuditoria(firestore, sucursalId, {
+                usuarioId,
+                categoria: 'VENTAS',
+                accion: 'VENTA_PAGAR',
+                titulo: `Pago en venta #${ventaActual.idVenta}`,
+                descripcion: `${ventaActual.nombreCliente} - Pago de Q${totalPagadoGlobal.toFixed(2)} (${metodoDePago})`,
+                detalles: {
+                    idVenta: ventaActual.idVenta,
+                    ventaDocId: ventaId,
+                    cliente: ventaActual.nombreCliente,
+                    montoPagado: totalPagadoGlobal,
+                    metodoPago: metodoDePago,
+                    itemsPagados: resumenSaldados.map(i => ({ nombre: i.nombreProducto, monto: i.montoAplicado }))
+                }
+            }, transaction);
         }
     });
 }
@@ -282,12 +315,21 @@ export async function liquidarComoConsumoInterno(
     saldo: 0, 
     metodoPago: 'Consumo Interno' 
   });
+
+  await registrarAuditoria(firestore, sid, {
+    usuarioId,
+    categoria: 'VENTAS',
+    accion: 'VENTA_PAGAR',
+    titulo: `Liquidado como Consumo Interno`,
+    descripcion: `Venta ID ${ventaDocId} liquidada como cortesía / consumo interno`,
+    detalles: { ventaDocId, metodoPago: 'Consumo Interno' }
+  });
 }
 
 /**
  * Pasa una venta pendiente al estado de crédito y actualiza el balance global de monedas si corresponde.
  */
-export async function pasarVentaACredito(firestore: Firestore, sucursalId: string, ventaId: string) {
+export async function pasarVentaACredito(firestore: Firestore, sucursalId: string, ventaId: string, usuarioId?: string) {
     const sid = validarSucursal(sucursalId);
     return runTransaction(firestore, async (transaction) => {
         const ventaRef = doc(firestore, `sucursales/${sid}/ventas`, ventaId);
@@ -313,6 +355,20 @@ export async function pasarVentaACredito(firestore: Firestore, sucursalId: strin
           estado: 'credito',
           fueCredito: true // Marcador persistente para el historial
         });
+
+        registrarAuditoria(firestore, sid, {
+          usuarioId: usuarioId || 'sistema',
+          categoria: 'VENTAS',
+          accion: 'VENTA_CREDITO',
+          titulo: `Venta #${venta.idVenta} trasladada a crédito`,
+          descripcion: `${venta.nombreCliente} - Saldo a crédito: Q${venta.saldo.toFixed(2)}`,
+          detalles: {
+            idVenta: venta.idVenta,
+            ventaDocId: ventaId,
+            cliente: venta.nombreCliente,
+            saldoCredito: venta.saldo,
+          }
+        }, transaction);
     });
 }
 
@@ -386,6 +442,20 @@ export async function liquidarVentaACredito(firestore: Firestore, sucursalId: st
 
         transaction.set(doc(firestore, `sucursales/${sid}/pagos`, siguienteIdPago.toString()), pagoData);
         transaction.set(correlativoPagosRef, { correlativo: siguienteIdPago }, { merge: true });
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'VENTAS',
+            accion: 'VENTA_PAGAR',
+            titulo: `Liquidación total de crédito #${venta.idVenta}`,
+            descripcion: `${venta.nombreCliente} - Liquidación de deuda por Q${totalALiquidar.toFixed(2)}`,
+            detalles: {
+                idVenta: venta.idVenta,
+                ventaDocId: ventaId,
+                cliente: venta.nombreCliente,
+                totalLiquidado: totalALiquidar
+            }
+        }, transaction);
 
         return { success: true };
     });
@@ -539,6 +609,21 @@ export async function procesarPagoUnificado(
         }
 
         transaction.set(corrPagosRef, { correlativo: siguienteIdPago - 1 }, { merge: true });
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'VENTAS',
+            accion: 'VENTA_PAGAR',
+            titulo: `Pago unificado venta #${ventaPrincipal.idVenta}`,
+            descripcion: `${ventaPrincipal.nombreCliente} - Total pagado: Q${(totalPagadoPrincipal + (tarConsumo + efeConsumo + tarMesas + efeMesas + tarMonedas + efeMonedas)).toFixed(2)} (${metodoDePago})`,
+            detalles: {
+                ventaPrincipalId,
+                clienteId,
+                metodoDePago,
+                totalPagadoPrincipal,
+                ventasCreditoAfectadas: ventasCreditoDocs.length
+            }
+        }, transaction);
     });
 }
 
@@ -768,6 +853,20 @@ export async function registrarAbonoGeneral(
         }
 
         transaction.set(corrPagosRef, { correlativo: siguienteIdPago - 1 }, { merge: true });
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'VENTAS',
+            accion: 'VENTA_ABONAR',
+            titulo: `Abono general a cuenta`,
+            descripcion: `Cliente ID ${clienteId} - Abono en cascada de Q${montoAbono.toFixed(2)} (${metodoDePago})`,
+            detalles: {
+                clienteId,
+                montoAbono,
+                metodoDePago,
+                ventaPrincipalId: ventaPrincipalId || null,
+            }
+        }, transaction);
 
         return { success: true, montoAbonado: montoAbono };
     });

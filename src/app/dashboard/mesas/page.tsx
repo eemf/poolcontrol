@@ -7,7 +7,7 @@ import { collection, doc, Timestamp, query, updateDoc, orderBy, getDocs, where, 
 import { useFirebase, useUser, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { iniciarSesion, pasarACuenta, procesarVentaTiempoDeMesa, trasladarMesa, ajustarTiempoDefinido, procesarPagoDivision, eliminarConsumoMesa } from '@/lib/firebase/servicios/mesas';
-import { guardarCliente, descontarStockTemporal, devolverStockTemporal, descontarStockVirtualTemporal, devolverStockVirtualTemporal } from '@/lib/firebase/servicios';
+import { guardarCliente, descontarStockTemporal, devolverStockTemporal, descontarStockVirtualTemporal, devolverStockVirtualTemporal, registrarAuditoria } from '@/lib/firebase/servicios';
 import { toDate, validarSucursal } from '@/lib/firebase/servicios/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -311,12 +311,29 @@ export default function PaginaMesas() {
     setProcessingConsumption(true);
     try {
       await updateDoc(doc(firestore, `sucursales/${sucursalId}/mesas_de_billar`, mesaParaConsumo.id), { consumos: carritoConsumoTemporal });
+      
+      await registrarAuditoria(firestore, sucursalId, {
+        usuarioId: user?.uid || 'desconocido',
+        usuarioNombre: user?.displayName || user?.email || 'Usuario',
+        usuarioEmail: user?.email || '',
+        categoria: 'MESAS',
+        accion: 'MESA_AGREGAR_CONSUMO',
+        titulo: `Consumo actualizado Mesa #${mesaParaConsumo.numeroMesa}`,
+        descripcion: `${carritoConsumoTemporal.length} consumos guardados en mesa`,
+        detalles: {
+          mesaId: mesaParaConsumo.id,
+          numeroMesa: mesaParaConsumo.numeroMesa,
+          totalConsumos: carritoConsumoTemporal.reduce((acc: number, c: any) => acc + (c.total || 0), 0),
+          items: carritoConsumoTemporal.map((c: any) => ({ nombre: c.nombreProducto, cantidad: c.cantidad, total: c.total }))
+        }
+      });
+
       toast({ title: 'Éxito', description: 'Consumo guardado correctamente.' });
       setHasSavedConsumo(true);
       setIsConsumoModalOpen(false);
     } catch (e: any) { toast({ title: "Error", description: e.message, variant: 'destructive' }); }
     finally { setProcessingConsumption(false); }
-  }, [mesaParaConsumo, firestore, sucursalId, carritoConsumoTemporal, processingConsumption, toast]);
+  }, [mesaParaConsumo, firestore, sucursalId, carritoConsumoTemporal, processingConsumption, toast, user]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -501,7 +518,7 @@ export default function PaginaMesas() {
     if (!mesaParaTraslado || !mesaDestinoId || !sucursalId) return;
     setProcessingTraslado(true);
     try {
-      await trasladarMesa(firestore!, sucursalId, mesaParaTraslado.id, mesaDestinoId);
+      await trasladarMesa(firestore!, sucursalId, mesaParaTraslado.id, mesaDestinoId, user?.uid);
       toast({ title: "éxito", description: `${mesaParaTraslado.tipoDeMesa === 'Consola' ? 'consola' : 'mesa'} trasladada.` });
       setIsTrasladoModalOpen(false);
     } catch (e: any) { toast({ title: "Error", description: e.message, variant: "destructive" }); }
@@ -552,7 +569,7 @@ export default function PaginaMesas() {
     if (!confirmarEliminarConsumo || !firestore || !sucursalId) return;
     setProcesandoEliminacionConsumo(true);
     try {
-        await eliminarConsumoMesa(firestore, sucursalId, confirmarEliminarConsumo.mesaId, confirmarEliminarConsumo.consumoId);
+        await eliminarConsumoMesa(firestore, sucursalId, confirmarEliminarConsumo.mesaId, confirmarEliminarConsumo.consumoId, user?.uid);
         toast({ title: "éxito", description: `${confirmarEliminarConsumo.nombre} eliminado.` });
         setConfirmarEliminarConsumo(null);
     } catch (e: any) {

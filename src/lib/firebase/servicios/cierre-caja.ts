@@ -14,6 +14,7 @@ import {
   increment,
 } from 'firebase/firestore';
 import type { CierreCaja, Generales } from '@/lib/tipos';
+import { registrarAuditoria } from './auditoria';
 
 /**
  * Inicializa la caja por primera vez en una sucursal nueva.
@@ -161,5 +162,23 @@ export async function realizarCierreDeCaja(
         if (totalLiquidado !== 0) {
             transaction.update(cuentaDestinoRef, { saldo: increment(totalLiquidado) });
         }
+
+        registrarAuditoria(firestore, sucursalId, {
+            usuarioId: cierreData.usuarioId || 'desconocido',
+            categoria: 'CAJA',
+            accion: 'CAJA_CIERRE',
+            titulo: `Cierre de Caja #${nuevoIdCuadre}`,
+            descripcion: `Efectivo contado: Q${cierreData.efectivoFinalContado.toFixed(2)}, Liquidado: Q${totalLiquidado.toFixed(2)}, Prox. Turno: Q${cierreData.cajaSiguienteTurno.toFixed(2)}`,
+            detalles: {
+                idCuadre: nuevoIdCuadre,
+                efectivoContado: cierreData.efectivoFinalContado,
+                totalLiquidado,
+                cajaSiguienteTurno: cierreData.cajaSiguienteTurno,
+                pagosTarjeta: cierreData.pagosTarjeta,
+                totalVentaConsumo: generalesActual?.totalEfectivo || 0,
+                cuentaDestinoId: cierreData.cuentaDestinoId
+            }
+        }, transaction);
     });
 }
+

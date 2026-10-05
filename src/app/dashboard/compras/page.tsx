@@ -12,7 +12,7 @@ import { PurchaseHeader } from "./_components/purchase-header"
 import { PurchaseList } from "./_components/purchase-list"
 import { PurchaseModal } from "./_components/purchase-modal"
 import { DeleteConfirmDialog } from "./_components/delete-confirm-dialog"
-import { guardarCliente, registrarMovimientoInventario } from "@/lib/firebase/servicios"
+import { guardarCliente, registrarMovimientoInventario, registrarAuditoria } from "@/lib/firebase/servicios"
 
 type ProductoConDocId = Producto & { docId: string };
 type ClienteConDocId = Cliente & { docId: string };
@@ -198,6 +198,22 @@ export default function PaginaCompras() {
         if (siguienteIdHistorial > ((corrHistorialSnap.data()?.correlativo || 0) + 1)) {
             transaction.set(corrHistorialRef, { correlativo: siguienteIdHistorial - 1 }, { merge: true });
         }
+
+        registrarAuditoria(firestore, sid, {
+          usuarioId: user.uid,
+          usuarioNombre: user.displayName || user.email || 'Usuario',
+          usuarioEmail: user.email || '',
+          categoria: 'COMPRAS',
+          accion: editingCompra ? 'COMPRA_EDITAR' : 'COMPRA_CREAR',
+          titulo: `${editingCompra ? 'Edición de compra' : 'Nueva compra'} #${idFinal}`,
+          descripcion: `Proveedor: ${proveedor?.nombre ?? 'Varios'} - Total: Q${total.toFixed(2)} (${itemsEnCompra.length} ítems)`,
+          detalles: {
+            idCompra: idFinal,
+            proveedor: proveedor?.nombre ?? 'Varios',
+            total,
+            items: itemsEnCompra.map(i => ({ nombre: i.nombre, cantidad: i.cantidad, costoUnitario: i.costoUnitario }))
+          }
+        }, transaction);
       });
 
       toast({ title: "Éxito", description: `Compra ${editingCompra ? 'actualizada' : 'registrada'} correctamente.` });
@@ -254,6 +270,21 @@ export default function PaginaCompras() {
           
           transaction.delete(ref);
           transaction.set(corrHistorialRef, { correlativo: siguienteIdHistorial - 1 }, { merge: true });
+
+          registrarAuditoria(firestore, sid, {
+            usuarioId: user.uid,
+            usuarioNombre: user.displayName || user.email || 'Usuario',
+            usuarioEmail: user.email || '',
+            categoria: 'COMPRAS',
+            accion: 'COMPRA_ANULAR',
+            titulo: `Anulación de compra #${data.idCompra}`,
+            descripcion: `Compra por Q${data.montoTotal.toFixed(2)} anulada y stock revertido`,
+            detalles: {
+              idCompra: data.idCompra,
+              montoTotal: data.montoTotal,
+              itemsRevertidos: data.items.map(i => ({ nombre: i.nombre, cantidad: i.cantidad }))
+            }
+          }, transaction);
         }
       });
       toast({ title: "Éxito", description: "Compra eliminada." });

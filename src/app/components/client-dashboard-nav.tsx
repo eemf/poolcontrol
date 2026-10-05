@@ -61,7 +61,7 @@ export const navItems: NavItemType[] = [
   {
     label: 'Administración',
     icon: Landmark,
-    anyPermission: ['admin.monitoreo', 'admin.movimientos', 'compras.gestionar', 'gastos.gestionar', 'tragamonedas.cuadre', 'cuadre.semanal', 'cuadre.mensual', 'ventas.eliminar_rango'],
+    anyPermission: ['admin.monitoreo', 'admin.movimientos', 'compras.gestionar', 'gastos.gestionar', 'tragamonedas.cuadre', 'cuadre.semanal', 'cuadre.mensual', 'ventas.eliminar_rango', 'admin.auditoria'],
     items: [
         { href: '/dashboard/administracion/monitoreo-integral', label: 'Monitoreo Integral', icon: MonitorCheck, permission: 'admin.monitoreo' },
         { href: '/dashboard/administracion/monitoreo-periodo', label: 'Monitoreo Período', icon: MonitorCheck, permission: 'admin.monitoreo', feature: 'adminMonitoreo' },
@@ -71,6 +71,7 @@ export const navItems: NavItemType[] = [
         { href: '/dashboard/administracion/cuadre-tragamonedas', label: 'Cuadre Tragamonedas', icon: PiggyBank, permission: 'tragamonedas.cuadre', feature: 'adminCuadreTraga' },
         { href: '/dashboard/administracion/cuadre-semanal', label: 'Cuadre Semanal', icon: CalendarDays, permission: 'cuadre.semanal', feature: 'adminCuadreSemanal' },
         { href: '/dashboard/administracion/cuadre-mensual', label: 'Cuadre Mensual', icon: Calendar, permission: 'cuadre.mensual', feature: 'adminCuadreMensual' },
+        { href: '/dashboard/administracion/auditoria', label: 'Auditoría', icon: ShieldCheck, permission: 'admin.auditoria' },
         { href: '/dashboard/administracion/eliminacion-ventas', label: 'Eliminar por Rango', icon: Eraser, permission: 'ventas.eliminar_rango' },
     ]
   },
