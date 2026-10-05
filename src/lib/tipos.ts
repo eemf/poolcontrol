@@ -199,7 +199,10 @@ export interface CierreCaja {
         existenciaAlInicio: number;
         totalMonedasNetoPeriodo: number;
         efectivoAcumulado: number;
-    }
+    };
+    usuarioId?: string;
+    usuarioNombre?: string;
+    usuarioEmail?: string;
 }
 
 export interface Gasto {

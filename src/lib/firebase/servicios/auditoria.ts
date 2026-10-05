@@ -24,6 +24,19 @@ export interface RegistrarAuditoriaParams {
   fecha?: Date | Timestamp;
 }
 
+// Cache en memoria para resolver nombres de usuario en transacciones donde no se pueden hacer lecturas
+export const cacheUsuariosAuditoria = new Map<string, { nombre: string; email?: string; rol?: string }>();
+
+export function registrarCacheUsuario(uid: string, info: { nombre?: string; email?: string; rol?: string }) {
+  if (uid && info?.nombre) {
+    cacheUsuariosAuditoria.set(uid, {
+      nombre: info.nombre,
+      email: info.email || '',
+      rol: info.rol || 'Operador',
+    });
+  }
+}
+
 /**
  * Registra un evento en la bitácora de auditoría de la sucursal.
  * Soporta ejecución independiente o dentro de una transacción activa.
@@ -38,6 +51,25 @@ export async function registrarAuditoria(
     const sid = validarSucursal(sucursalId);
     const auditoriaCol = collection(firestore, `sucursales/${sid}/auditoria`);
     
+    // Si viene información de usuario válida, guardarla en el caché
+    if (params.usuarioId && params.usuarioNombre && params.usuarioNombre !== 'Usuario del sistema') {
+      cacheUsuariosAuditoria.set(params.usuarioId, {
+        nombre: params.usuarioNombre,
+        email: params.usuarioEmail || '',
+        rol: params.usuarioRol || 'Operador',
+      });
+    }
+
+    // Si no viene nombre de usuario pero está en el caché, resolverlo
+    const usuarioEnCache = params.usuarioId ? cacheUsuariosAuditoria.get(params.usuarioId) : undefined;
+    const finalUsuarioNombre = (params.usuarioNombre && params.usuarioNombre !== 'Usuario del sistema')
+      ? params.usuarioNombre
+      : (usuarioEnCache?.nombre || 'Usuario del sistema');
+    const finalUsuarioEmail = params.usuarioEmail || usuarioEnCache?.email || '';
+    const finalUsuarioRol = (params.usuarioRol && params.usuarioRol !== 'Operador')
+      ? params.usuarioRol
+      : (usuarioEnCache?.rol || 'Operador');
+
     // Sanitizar detalles para que no contengan valores undefined (incompatibles con Firestore)
     const detallesSanitizados: Record<string, any> = {};
     if (params.detalles) {
@@ -52,9 +84,9 @@ export async function registrarAuditoria(
       sucursalId: sid,
       fecha: params.fecha instanceof Timestamp ? params.fecha : (params.fecha instanceof Date ? Timestamp.fromDate(params.fecha) : Timestamp.now()),
       usuarioId: params.usuarioId || 'desconocido',
-      usuarioNombre: params.usuarioNombre || 'Usuario del sistema',
-      usuarioEmail: params.usuarioEmail || '',
-      usuarioRol: params.usuarioRol || 'Operador',
+      usuarioNombre: finalUsuarioNombre,
+      usuarioEmail: finalUsuarioEmail,
+      usuarioRol: finalUsuarioRol,
       categoria: params.categoria,
       accion: params.accion,
       titulo: params.titulo,

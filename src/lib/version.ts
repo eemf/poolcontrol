@@ -12,9 +12,24 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 267,
+    build: 268,
     fecha: "2026-10-04",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b268",
+    descripcion: "Resolución automática y visualización del nombre real del operador en auditoría.",
+    cambios: [
+      "Mapeo automático de nombres reales de usuario desde la colección de usuarios y user_auth_lookup.",
+      "Resolución retroactiva para registros de auditoría existentes con 'Usuario del sistema'.",
+      "Sincronización global del perfil del usuario en caché de auditoría en todas las transacciones.",
+      "Inclusión de nombre real y rol en tarjetas y modal de detalles de auditoría."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 267,
+    fecha: "2026-10-04",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b267",
     descripcion: "Sistema integral de auditoría de usuarios y trazabilidad de operaciones en tiempo real.",
@@ -189,9 +204,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 267,
+  build: 268,
   date: "2026-10-04",
-  publicadaActual: releaseHistory[0], // Build 267
-  publicadaAnterior: releaseHistory[1], // Build 266
+  publicadaActual: releaseHistory[0], // Build 268
+  publicadaAnterior: releaseHistory[1], // Build 267
   historial: releaseHistory
 };

@@ -21,7 +21,8 @@ import {
   devolverStockVirtualTemporal,
   sincronizarContadorCredito,
   procesarPagoUnificado,
-  registrarAbonoGeneral
+  registrarAbonoGeneral,
+  registrarCacheUsuario
 } from '@/lib/firebase/servicios';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSucursal } from '@/hooks/use-sucursal';
@@ -50,8 +51,19 @@ export default function PaginaVentasPOS() {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { firestore } = useFirebase();
-  const { user } = useUser();
+  const { user, profile } = useUser();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
+
+  // Asegurar registro de identidad del operador en el caché de auditoría
+  useEffect(() => {
+    if (user) {
+      registrarCacheUsuario(user.uid, {
+        nombre: profile?.nombre || user.displayName || user.email || 'Operador',
+        email: user.email || '',
+        rol: profile?.rol || 'Operador',
+      });
+    }
+  }, [user, profile]);
 
   // Estados de datos
   const [productos, setProductos] = useState<Producto[]>([]);

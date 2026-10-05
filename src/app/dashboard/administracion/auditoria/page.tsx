@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
-import type { RegistroAuditoria, CategoriaAuditoria } from '@/lib/tipos';
+import type { RegistroAuditoria, CategoriaAuditoria, UsuarioSucursal } from '@/lib/tipos';
 import { 
   ShieldCheck, Search, Filter, Calendar, User, 
   ShoppingCart, Gamepad2, Scale, Package, Boxes, Truck, 
@@ -100,6 +100,43 @@ export default function PaginaAuditoria() {
 
   const { data: registrosRaw, isLoading: isLoadingRegistros } = useCollection<RegistroAuditoria>(auditoriaQuery);
 
+  // Consulta de usuarios registrados en la sucursal para enriquecer la bitácora
+  const usuariosQuery = useMemoFirebase(() => {
+    if (!firestore || !sucursalId) return null;
+    return query(collection(firestore, `sucursales/${sucursalId}/usuarios`));
+  }, [firestore, sucursalId]);
+
+  const { data: usuariosRegistrados } = useCollection<UsuarioSucursal>(usuariosQuery);
+
+  // Mapa de resolución rápida de usuario por UID
+  const mapaUsuarios = useMemo(() => {
+    const map = new Map<string, { nombre: string; email: string; rol: string }>();
+    (usuariosRegistrados || []).forEach((u: any) => {
+      const uid = u.authUid || u.id;
+      if (uid) {
+        map.set(uid, {
+          nombre: u.nombre || 'Usuario',
+          email: u.email || '',
+          rol: u.rol || 'Operador',
+        });
+      }
+    });
+    return map;
+  }, [usuariosRegistrados]);
+
+  // Función para resolver nombre, correo y rol reales del usuario
+  const resolverUsuario = (reg: RegistroAuditoria) => {
+    const info = mapaUsuarios.get(reg.usuarioId);
+    const nombre = (reg.usuarioNombre && reg.usuarioNombre !== 'Usuario del sistema')
+      ? reg.usuarioNombre
+      : (info?.nombre || reg.usuarioEmail || reg.usuarioId || 'Usuario del sistema');
+    const email = reg.usuarioEmail || info?.email || '';
+    const rol = (reg.usuarioRol && reg.usuarioRol !== 'Operador')
+      ? reg.usuarioRol
+      : (info?.rol || 'Operador');
+    return { nombre, email, rol };
+  };
+
   // Formateador de fecha
   const formatearFechaHora = (fecha: any) => {
     if (!fecha) return 'Fecha no disponible';
@@ -127,20 +164,34 @@ export default function PaginaAuditoria() {
     return dateObj.toLocaleDateString('es-GT');
   };
 
-  // Lista única de usuarios extraída de los registros para el selector
+  // Lista única de usuarios para el selector (combina usuarios de la sucursal y registros)
   const listaUsuarios = useMemo(() => {
-    if (!registrosRaw) return [];
     const map = new Map<string, { id: string; nombre: string }>();
-    registrosRaw.forEach((reg) => {
+
+    // 1. Agregar usuarios registrados en la sucursal
+    (usuariosRegistrados || []).forEach((u: any) => {
+      const uid = u.authUid || u.id;
+      if (uid && u.nombre) {
+        map.set(uid, { id: uid, nombre: u.nombre });
+      }
+    });
+
+    // 2. Complementar con los registros de auditoría
+    (registrosRaw || []).forEach((reg) => {
       if (reg.usuarioId && !map.has(reg.usuarioId)) {
+        const info = mapaUsuarios.get(reg.usuarioId);
+        const resolvedName = (reg.usuarioNombre && reg.usuarioNombre !== 'Usuario del sistema')
+          ? reg.usuarioNombre
+          : (info?.nombre || reg.usuarioEmail || reg.usuarioId);
         map.set(reg.usuarioId, {
           id: reg.usuarioId,
-          nombre: reg.usuarioNombre || reg.usuarioEmail || reg.usuarioId,
+          nombre: resolvedName,
         });
       }
     });
-    return Array.from(map.values());
-  }, [registrosRaw]);
+
+    return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }, [registrosRaw, usuariosRegistrados, mapaUsuarios]);
 
   // Filtrado reactivo en cliente
   const registrosFiltrados = useMemo(() => {
@@ -171,10 +222,11 @@ export default function PaginaAuditoria() {
       // 4. Filtro por texto de búsqueda
       if (busqueda.trim() !== '') {
         const queryTerm = busqueda.toLowerCase().trim();
+        const userResolved = resolverUsuario(reg);
         const textoTitulo = (reg.titulo || '').toLowerCase();
         const textoDesc = (reg.descripcion || '').toLowerCase();
-        const textoUsuario = (reg.usuarioNombre || '').toLowerCase();
-        const textoEmail = (reg.usuarioEmail || '').toLowerCase();
+        const textoUsuario = (userResolved.nombre || '').toLowerCase();
+        const textoEmail = (userResolved.email || '').toLowerCase();
         const textoAccion = (reg.accion || '').toLowerCase();
         const textoDetalles = JSON.stringify(reg.detalles || {}).toLowerCase();
 
@@ -191,7 +243,7 @@ export default function PaginaAuditoria() {
 
       return true;
     });
-  }, [registrosRaw, categoriaSeleccionada, usuarioSeleccionado, filtroFecha, busqueda]);
+  }, [registrosRaw, categoriaSeleccionada, usuarioSeleccionado, filtroFecha, busqueda, mapaUsuarios]);
 
   // Resumen de estadísticas
   const estadisticas = useMemo(() => {
@@ -400,6 +452,7 @@ export default function PaginaAuditoria() {
               icon: ShieldCheck,
             };
             const IconComponent = catConfig.icon;
+            const userInfo = resolverUsuario(registro);
 
             return (
               <div
@@ -434,8 +487,13 @@ export default function PaginaAuditoria() {
                     <div className="flex items-center gap-2 text-xs text-muted-foreground/80 pt-0.5">
                       <span className="font-medium text-foreground/90 flex items-center gap-1">
                         <User className="h-3 w-3 text-muted-foreground" />
-                        {registro.usuarioNombre || registro.usuarioEmail || 'Usuario'}
+                        {userInfo.nombre}
                       </span>
+                      {userInfo.rol && (
+                        <Badge variant="outline" className="text-[9px] px-1 py-0 h-3.5 text-muted-foreground">
+                          {userInfo.rol}
+                        </Badge>
+                      )}
                       <span>•</span>
                       <span>{formatearFechaHora(registro.fecha)}</span>
                     </div>
@@ -480,28 +538,30 @@ export default function PaginaAuditoria() {
             </DialogDescription>
           </DialogHeader>
 
-          {registroDetalle && (
-            <div className="space-y-4 py-2 text-sm">
-              {/* Información del Usuario */}
-              <div className="bg-muted/30 p-3 rounded-lg border space-y-1.5">
-                <span className="text-xs font-semibold text-muted-foreground tracking-wide">
-                  Operador Responsable
-                </span>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-foreground">
-                    {registroDetalle.usuarioNombre || 'No especificado'}
+          {registroDetalle && (() => {
+            const modalUser = resolverUsuario(registroDetalle);
+            return (
+              <div className="space-y-4 py-2 text-sm">
+                {/* Información del Usuario */}
+                <div className="bg-muted/30 p-3 rounded-lg border space-y-1.5">
+                  <span className="text-xs font-semibold text-muted-foreground tracking-wide">
+                    Operador Responsable
                   </span>
-                  <Badge variant="outline" className="text-[10px]">
-                    {registroDetalle.usuarioRol || 'Operador'}
-                  </Badge>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-foreground">
+                      {modalUser.nombre}
+                    </span>
+                    <Badge variant="outline" className="text-[10px]">
+                      {modalUser.rol}
+                    </Badge>
+                  </div>
+                  {modalUser.email && (
+                    <p className="text-xs text-muted-foreground">{modalUser.email}</p>
+                  )}
+                  <p className="text-[11px] text-muted-foreground">
+                    UID: <code className="font-mono text-[10px]">{registroDetalle.usuarioId}</code>
+                  </p>
                 </div>
-                {registroDetalle.usuarioEmail && (
-                  <p className="text-xs text-muted-foreground">{registroDetalle.usuarioEmail}</p>
-                )}
-                <p className="text-[11px] text-muted-foreground">
-                  UID: <code className="font-mono text-[10px]">{registroDetalle.usuarioId}</code>
-                </p>
-              </div>
 
               {/* Fecha y Hora Exacta */}
               <div className="flex items-center justify-between px-1 text-xs">
@@ -546,7 +606,8 @@ export default function PaginaAuditoria() {
                 </div>
               )}
             </div>
-          )}
+          );
+        })()}
         </DialogContent>
       </Dialog>
     </div>

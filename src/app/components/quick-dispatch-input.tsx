@@ -2,7 +2,7 @@
 
 import { useState, useRef, useMemo } from 'react';
 import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
-import { procesarVentaRapidaConId } from '@/lib/firebase/servicios';
+import { procesarVentaRapidaConId, registrarCacheUsuario } from '@/lib/firebase/servicios';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,16 +12,26 @@ import type { Producto, ProductoVirtual } from '@/lib/tipos';
 import { analizarComando, type ComandoAnalizado } from '@/lib/utils/analizar-comando';
 import { collection } from 'firebase/firestore';
 import { useSucursal } from '@/hooks/use-sucursal';
-
+import { useEffect } from 'react';
 
 export default function QuickDispatchInput() {
     const { firestore } = useFirebase();
-    const { user } = useUser();
+    const { user, profile } = useUser();
     const { toast } = useToast();
     const [inputValue, setInputValue] = useState('');
     const [loading, setLoading] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
+
+    useEffect(() => {
+        if (user) {
+            registrarCacheUsuario(user.uid, {
+                nombre: profile?.nombre || user.displayName || user.email || 'Operador',
+                email: user.email || '',
+                rol: profile?.rol || 'Operador',
+            });
+        }
+    }, [user, profile]);
 
     // Cargar todos los productos (físicos y virtuales) una vez
     const productosFisicosQuery = useMemoFirebase(() => 

@@ -165,6 +165,8 @@ export async function realizarCierreDeCaja(
 
         registrarAuditoria(firestore, sucursalId, {
             usuarioId: cierreData.usuarioId || 'desconocido',
+            usuarioNombre: cierreData.usuarioNombre,
+            usuarioEmail: cierreData.usuarioEmail,
             categoria: 'CAJA',
             accion: 'CAJA_CIERRE',
             titulo: `Cierre de Caja #${nuevoIdCuadre}`,

@@ -7,7 +7,7 @@ import { collection, doc, Timestamp, query, updateDoc, orderBy, getDocs, where, 
 import { useFirebase, useUser, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { iniciarSesion, pasarACuenta, procesarVentaTiempoDeMesa, trasladarMesa, ajustarTiempoDefinido, procesarPagoDivision, eliminarConsumoMesa } from '@/lib/firebase/servicios/mesas';
-import { guardarCliente, descontarStockTemporal, devolverStockTemporal, descontarStockVirtualTemporal, devolverStockVirtualTemporal, registrarAuditoria } from '@/lib/firebase/servicios';
+import { guardarCliente, descontarStockTemporal, devolverStockTemporal, descontarStockVirtualTemporal, devolverStockVirtualTemporal, registrarAuditoria, registrarCacheUsuario } from '@/lib/firebase/servicios';
 import { toDate, validarSucursal } from '@/lib/firebase/servicios/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -32,8 +32,19 @@ export default function PaginaMesas() {
   const { toast } = useToast();
   const iMobile = useIsMobile();
   const { firestore } = useFirebase();
-  const { user } = useUser();
+  const { user, profile } = useUser();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
+
+  // Asegurar registro de identidad del operador en el caché de auditoría
+  useEffect(() => {
+    if (user) {
+      registrarCacheUsuario(user.uid, {
+        nombre: profile?.nombre || user.displayName || user.email || 'Operador',
+        email: user.email || '',
+        rol: profile?.rol || 'Operador',
+      });
+    }
+  }, [user, profile]);
 
   // --- ESTADOS LÓGICA ---
   const [costos, setCostos] = useState<{[key: string]: number}>({});

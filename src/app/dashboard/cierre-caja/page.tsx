@@ -412,7 +412,7 @@ const HistorialMonedas = ({ fechaInicioPeriodo, onCerrar, sucursalId }: { fechaI
 // --- Componente Principal ---
 export default function PaginaCierreCaja() {
     const { toast } = useToast();
-    const { firestore } = useFirebase();
+    const { firestore, user, profile } = useFirebase();
     const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
     const efectivoFinalInputRef = useRef<HTMLInputElement>(null);
 
@@ -539,7 +539,10 @@ export default function PaginaCierreCaja() {
                 diferencia: diferencia,
                 cajaSiguienteTurno: cajaSiguienteTurno,
                 observaciones,
-                cuentaDestinoId: cuentaDestinoId
+                cuentaDestinoId: cuentaDestinoId,
+                usuarioId: user?.uid || 'desconocido',
+                usuarioNombre: profile?.nombre || user?.displayName || user?.email || 'Usuario',
+                usuarioEmail: user?.email || '',
             });
             
             toast({ title: 'Éxito', description: 'El cierre de caja se realizó correctamente. Se ha iniciado un nuevo período.' });

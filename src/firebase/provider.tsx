@@ -6,6 +6,7 @@ import { Firestore, doc, getDoc, setDoc, getDocs, collectionGroup, query, where,
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 import type { UserAuthLookup } from '@/lib/tipos';
+import { registrarCacheUsuario } from '@/lib/firebase/servicios/auditoria';
 
 // Internal state for user authentication
 interface UserAuthState {
@@ -104,6 +105,11 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
                 }
                 
                 setProfile(userProfileData);
+                registrarCacheUsuario(firebaseUser.uid, {
+                    nombre: userProfileData?.nombre || firebaseUser.displayName || firebaseUser.email || 'Operador',
+                    email: firebaseUser.email || '',
+                    rol: userProfileData?.rol || 'Operador',
+                });
                 setUserAuthState({ 
                     user: firebaseUser, 
                     isUserLoading: false, 
