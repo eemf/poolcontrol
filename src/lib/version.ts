@@ -12,9 +12,26 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 278,
+    fecha: "2026-10-07",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b278",
+    descripcion: "Asistente de voz inteligente para control de mesas, despacho de consumos y asistencia interactiva.",
+    cambios: [
+      "Integración de reconocimiento de voz (Speech-to-Text) y síntesis vocal (Text-to-Speech) en español.",
+      "Procesamiento inteligente de comandos con IA (Gemini 2.5 Flash / Genkit) para interpretar lenguaje natural.",
+      "Comandos de voz para iniciar tiempo libre o definido en mesas de billar y consolas.",
+      "Despacho directo por voz de consumos hacia mesas ocupadas o a cuentas abiertas de clientes.",
+      "Consultas en tiempo real sobre el estado de mesas, consumos y asistencia interactiva para dudas del sistema.",
+      "Acceso global desde el encabezado con confirmación visual de acciones y botón de deshacer."
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 277,
     fecha: "2026-10-05",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b277",
     descripcion: "Corrección cronológica del rendimiento mensual en dashboard para fechas corridas del siguiente mes.",
@@ -335,9 +352,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 277,
-  date: "2026-10-05",
-  publicadaActual: releaseHistory[0], // Build 277
-  publicadaAnterior: releaseHistory[1], // Build 276
+  build: 278,
+  date: "2026-10-07",
+  publicadaActual: releaseHistory[0], // Build 278
+  publicadaAnterior: releaseHistory[1], // Build 277
   historial: releaseHistory
 };

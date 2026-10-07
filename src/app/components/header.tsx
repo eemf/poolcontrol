@@ -1,13 +1,14 @@
 'use client'
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { useFirebase, useDoc, useMemoFirebase, useCollection, useUser } from '@/firebase'
 import { collection, doc, query, where, orderBy } from 'firebase/firestore'
-import type { Generales, ProductoVirtual, GeneralesTragamonedas, Sucursal } from '@/lib/tipos'
-import { Coins, CreditCard, Banknote, Dices, Menu, LogOut, Building2, ChevronDown } from 'lucide-react'
+import type { Generales, ProductoVirtual, GeneralesTragamonedas, Sucursal, Mesa, Tarifa, Producto, Cliente } from '@/lib/tipos'
+import { Coins, CreditCard, Banknote, Dices, Menu, LogOut, Building2, ChevronDown, Mic, Sparkles } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import QuickDispatchInput from './quick-dispatch-input'
+import VoiceAssistantDialog from './voice-assistant-dialog'
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -149,12 +150,37 @@ export function Header() {
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
   const { isAdmin } = useUser();
   const router = useRouter();
+  const [voiceDialogOpen, setVoiceDialogOpen] = useState(false);
 
   const sucursalRef = useMemoFirebase(() => 
     (firestore && sucursalId) ? doc(firestore, 'sucursales', sucursalId) : null,
     [firestore, sucursalId]
   );
   const { data: sucursalData, isLoading: isLoadingSucursalData } = useDoc<Sucursal>(sucursalRef);
+
+  const mesasQuery = useMemoFirebase(() => 
+    (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/mesas_de_billar`) : null,
+    [firestore, sucursalId]
+  );
+  const { data: mesasData } = useCollection<Mesa>(mesasQuery);
+
+  const productosQuery = useMemoFirebase(() => 
+    (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/productos`) : null,
+    [firestore, sucursalId]
+  );
+  const { data: productosData } = useCollection<Producto>(productosQuery);
+
+  const tarifasQuery = useMemoFirebase(() => 
+    (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/tarifas`) : null,
+    [firestore, sucursalId]
+  );
+  const { data: tarifasData } = useCollection<Tarifa>(tarifasQuery);
+
+  const clientesQuery = useMemoFirebase(() => 
+    (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/clientes`) : null,
+    [firestore, sucursalId]
+  );
+  const { data: clientesData } = useCollection<Cliente>(clientesQuery);
   
   const showQuickDispatch = !isLoadingSucursalData && sucursalData?.features?.ventasRapidas !== false;
 
@@ -197,6 +223,26 @@ export function Header() {
 
       <div className="hidden md:flex items-center gap-2">
         {showQuickDispatch && <QuickDispatchInput />}
+
+        {sucursalId && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setVoiceDialogOpen(true)}
+                  className="h-8 w-8 rounded-full border-blue-500/30 hover:border-blue-400 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 shrink-0 aspect-square shadow-sm cursor-pointer"
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Asistente de Voz Inteligente</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
         
         <div className="flex items-center gap-2 ml-2">
             <UserNav />
@@ -241,6 +287,16 @@ export function Header() {
           <div className='flex-grow'>
               {showQuickDispatch && <QuickDispatchInput />}
           </div>
+          {sucursalId && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setVoiceDialogOpen(true)}
+              className="h-8 w-8 rounded-full border-blue-500/30 hover:border-blue-400 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 shrink-0 aspect-square cursor-pointer"
+            >
+              <Mic className="h-4 w-4" />
+            </Button>
+          )}
           <UserNav />
            {isAdmin && sucursalId && (
             <TooltipProvider>
@@ -263,6 +319,16 @@ export function Header() {
           )}
         </div>
       </div>
+
+      {/* Diálogo del Asistente de Voz */}
+      <VoiceAssistantDialog
+        open={voiceDialogOpen}
+        onOpenChange={setVoiceDialogOpen}
+        mesas={mesasData || []}
+        productos={productosData || []}
+        tarifas={tarifasData || []}
+        clientes={clientesData?.map(c => c.nombre) || []}
+      />
     </header>
   )
 }
