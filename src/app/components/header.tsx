@@ -181,6 +181,12 @@ export function Header() {
     [firestore, sucursalId]
   );
   const { data: clientesData } = useCollection<Cliente>(clientesQuery);
+
+  const maquinasQuery = useMemoFirebase(() => 
+    (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/generales_tragamonedas`) : null,
+    [firestore, sucursalId]
+  );
+  const { data: maquinasData } = useCollection<GeneralesTragamonedas>(maquinasQuery);
   
   const showQuickDispatch = !isLoadingSucursalData && sucursalData?.features?.ventasRapidas !== false;
 
@@ -328,7 +334,7 @@ export function Header() {
         productos={productosData || []}
         tarifas={tarifasData || []}
         clientes={clientesData?.map(c => c.nombre) || []}
-        maquinas={generalesTragamonedas || []}
+        maquinas={maquinasData || []}
       />
     </header>
   )

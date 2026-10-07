@@ -12,9 +12,22 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 282,
+    build: 283,
     fecha: "2026-10-07",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b283",
+    descripcion: "Corrección de referencia de ámbito en Header para generalesTragamonedas.",
+    cambios: [
+      "Declaración explícita de maquinasQuery y maquinasData en el componente principal Header.",
+      "Resolución del error en tiempo de ejecución (ReferenceError: generalesTragamonedas is not defined)."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 282,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b282",
     descripcion: "Control de comandos de voz por sucursal, soporte móvil/tablet y cobertura integral de Mesas, POS y Tragamonedas.",
@@ -411,9 +424,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 282,
+  build: 283,
   date: "2026-10-07",
-  publicadaActual: releaseHistory[0], // Build 282
-  publicadaAnterior: releaseHistory[1], // Build 281
+  publicadaActual: releaseHistory[0], // Build 283
+  publicadaAnterior: releaseHistory[1], // Build 282
   historial: releaseHistory
 };
