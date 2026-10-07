@@ -12,9 +12,22 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 278,
+    build: 279,
     fecha: "2026-10-07",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b279",
+    descripcion: "Actualización de modelo de IA a Gemini 3.8 Flash para el asistente de voz inteligente.",
+    cambios: [
+      "Migración del modelo de Genkit a 'googleai/gemini-3.8-flash' resolviendo deprecación y error 404 del modelo anterior.",
+      "Optimización en la velocidad de inferencia y precisión para comandos de voz y preguntas del sistema."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 278,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b278",
     descripcion: "Asistente de voz inteligente para control de mesas, despacho de consumos y asistencia interactiva.",
@@ -352,9 +365,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 278,
+  build: 279,
   date: "2026-10-07",
-  publicadaActual: releaseHistory[0], // Build 278
-  publicadaAnterior: releaseHistory[1], // Build 277
+  publicadaActual: releaseHistory[0], // Build 279
+  publicadaAnterior: releaseHistory[1], // Build 278
   historial: releaseHistory
 };
