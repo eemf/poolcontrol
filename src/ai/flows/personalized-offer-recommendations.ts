@@ -35,6 +35,12 @@
       ): Promise<RecomendacionesOfertasPersonalizadasOutput> {
         return recomendacionesOfertasPersonalizadasFlow(input);
       }
+
+      export async function getPersonalizedOfferRecommendations(
+        input: RecomendacionesOfertasPersonalizadasInput
+      ): Promise<RecomendacionesOfertasPersonalizadasOutput> {
+        return recomendacionesOfertasPersonalizadasFlow(input);
+      }
       
       const prompt = ai.definePrompt({
         name: 'personalizedOfferRecommendationsPrompt',

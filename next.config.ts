@@ -1,18 +1,14 @@
 import type {NextConfig} from 'next';
+import path from 'path';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  outputFileTracingRoot: path.join(__dirname),
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
-  },
-  experimental: {
-    allowedDevOrigins: [
-      '9000-firebase-studio-1767164331308.cluster-lr6dwlc2lzbcctqhqorax5zmro.cloudworkstations.dev',
-      '9002-firebase-studio-1767164331308.cluster-lr6dwlc2lzbcctqhqorax5zmro.cloudworkstations.dev'
-    ]
   },
   images: {
     remotePatterns: [

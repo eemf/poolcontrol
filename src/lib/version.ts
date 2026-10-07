@@ -12,9 +12,24 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 280,
+    build: 281,
     fecha: "2026-10-07",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b281",
+    descripcion: "Estabilización de captura continua de voz con medidor acústico en tiempo real y compatibilidad Windows.",
+    cambios: [
+      "Escucha continua con buffer acumulador que evita cortes prematuros por pausas naturales al hablar.",
+      "Medidor de nivel acústico en tiempo real (AudioContext y AnalyserNode) con animación de ondas reactivas a la voz.",
+      "Detección y despacho automático tras pausa prolongada (1.5s) y envío instantáneo al cerrar o pausar el micrófono.",
+      "Corrección de export en flujo de recomendaciones personalizadas y delimitación de raíz de compilación en Next.js."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 280,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b280",
     descripcion: "Arquitectura híbrida con motor local NLP de respaldo ante agotamiento de saldo en Google AI.",
@@ -379,9 +394,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 280,
+  build: 281,
   date: "2026-10-07",
-  publicadaActual: releaseHistory[0], // Build 280
-  publicadaAnterior: releaseHistory[1], // Build 279
+  publicadaActual: releaseHistory[0], // Build 281
+  publicadaAnterior: releaseHistory[1], // Build 280
   historial: releaseHistory
 };

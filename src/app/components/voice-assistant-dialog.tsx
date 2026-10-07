@@ -51,6 +51,7 @@ export default function VoiceAssistantDialog({
     isListening,
     isProcessing,
     isSpeaking,
+    audioLevel,
     transcript,
     interimTranscript,
     lastAction,
@@ -107,7 +108,7 @@ export default function VoiceAssistantDialog({
             )}
             {isProcessing && (
               <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-xs">
-                Procesando con IA...
+                Procesando...
               </Badge>
             )}
             {isSpeaking && (
@@ -124,11 +125,17 @@ export default function VoiceAssistantDialog({
         </div>
 
         {/* Cuerpo Principal */}
-        <div className="p-6 flex flex-col items-center justify-center space-y-5">
-          {/* Botón Principal de Micrófono */}
-          <div className="relative flex items-center justify-center">
+        <div className="p-6 flex flex-col items-center justify-center space-y-4">
+          {/* Botón Principal de Micrófono con Onda Sensible al Sonido */}
+          <div className="relative flex items-center justify-center py-2">
             {isListening && (
-              <div className="absolute w-28 h-28 rounded-full bg-blue-500/20 animate-ping" />
+              <div 
+                className="absolute rounded-full bg-red-500/20 transition-all duration-75 pointer-events-none"
+                style={{
+                  width: `${110 + audioLevel * 0.9}px`,
+                  height: `${110 + audioLevel * 0.9}px`,
+                }}
+              />
             )}
             {isSpeaking && (
               <div className="absolute w-28 h-28 rounded-full bg-emerald-500/20 animate-pulse" />
@@ -158,14 +165,32 @@ export default function VoiceAssistantDialog({
             </button>
           </div>
 
+          {/* Indicador de entrada de sonido en vivo */}
+          {isListening && (
+            <div className="w-48 flex flex-col items-center gap-1">
+              <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                <div 
+                  className={cn(
+                    'h-full transition-all duration-75 rounded-full',
+                    audioLevel > 15 ? 'bg-emerald-400' : 'bg-blue-400'
+                  )}
+                  style={{ width: `${Math.max(5, audioLevel)}%` }}
+                />
+              </div>
+              <span className="text-[10px] text-slate-400">
+                {audioLevel > 10 ? 'Voz detectada' : 'Esperando sonido...'}
+              </span>
+            </div>
+          )}
+
           <p className="text-xs text-center text-slate-300 max-w-xs font-medium">
             {isListening
-              ? 'Te escucho... habla con naturalidad.'
+              ? 'Habla ahora... detecta tu voz en vivo.'
               : isProcessing
-              ? 'Interpretando comando con Gemini...'
+              ? 'Procesando solicitud...'
               : isSpeaking
               ? 'Hablando respuesta...'
-              : 'Presiona el micrófono para dar una orden o hacer una pregunta.'}
+              : 'Presiona el micrófono para hablar o dar una instrucción.'}
           </p>
 
           {/* Visualización de Transcripción */}
