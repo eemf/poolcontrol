@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, FormEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { Loader2, Save, Trash2, Edit, PlusCircle, Building, Search, LogIn, SlidersHorizontal, LayoutGrid, ShoppingCart, Dices, Truck, Scale, Zap, MonitorCheck, Boxes, History, DollarSign, PiggyBank, BookUser, CalendarDays, Calendar, Settings, Contact, Package, Ghost, ShieldCheck, HandCoins, ExternalLink } from "lucide-react"
+import { Loader2, Save, Trash2, Edit, PlusCircle, Building, Search, LogIn, SlidersHorizontal, LayoutGrid, ShoppingCart, Dices, Truck, Scale, Zap, MonitorCheck, Boxes, History, DollarSign, PiggyBank, BookUser, CalendarDays, Calendar, Settings, Contact, Package, Ghost, ShieldCheck, HandCoins, ExternalLink, Mic } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -23,6 +23,7 @@ const FEATURE_GROUPS = [
             { id: 'mesas', label: 'Control de Mesas', icon: LayoutGrid },
             { id: 'ventas', label: 'Punto de Venta', icon: ShoppingCart },
             { id: 'ventasRapidas', label: 'Ventas Rápidas (Comandos)', icon: Zap },
+            { id: 'asistenteVoz', label: 'Comandos de Voz (Asistente)', icon: Mic },
             { id: 'cierreCaja', label: 'Cierre de Caja', icon: Scale },
             { id: 'compras', label: 'Compras', icon: Truck },
             { id: 'tragamonedas', label: 'Tragamonedas (Operación)', icon: Dices },

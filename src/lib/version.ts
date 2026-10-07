@@ -12,9 +12,26 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 281,
+    build: 282,
     fecha: "2026-10-07",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b282",
+    descripcion: "Control de comandos de voz por sucursal, soporte móvil/tablet y cobertura integral de Mesas, POS y Tragamonedas.",
+    cambios: [
+      "Opción en administración de sucursales para activar o desactivar los comandos de voz de forma granular por cada sucursal.",
+      "Compatibilidad y resiliencia en dispositivos móviles y tablets (Android e iOS), evitando el bloqueo exclusivo del hardware del micrófono.",
+      "Cobertura completa para Sala de Juegos: inicio libre o definido, ajuste/adición de tiempo, traslados entre mesas, cobro en efectivo/tarjeta, traspaso a cuentas y eliminación de consumos.",
+      "Cobertura completa para Punto de Venta (POS): despacho de venta rápida, cargos a cuentas de clientes, cobro de cuentas y consulta de saldos.",
+      "Cobertura completa para Tragamonedas: recarga de base, extracción de monedas, registro de pago de premios y consulta de estado de máquinas.",
+      "Interfaz enriquecida en el diálogo de voz con selector de comandos categorizados por módulo y advertencia de red para móviles."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 281,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b281",
     descripcion: "Estabilización de captura continua de voz con medidor acústico en tiempo real y compatibilidad Windows.",
@@ -394,9 +411,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 281,
+  build: 282,
   date: "2026-10-07",
-  publicadaActual: releaseHistory[0], // Build 281
-  publicadaAnterior: releaseHistory[1], // Build 280
+  publicadaActual: releaseHistory[0], // Build 282
+  publicadaAnterior: releaseHistory[1], // Build 281
   historial: releaseHistory
 };

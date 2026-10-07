@@ -224,7 +224,7 @@ export function Header() {
       <div className="hidden md:flex items-center gap-2">
         {showQuickDispatch && <QuickDispatchInput />}
 
-        {sucursalId && (
+        {sucursalId && sucursalData?.features?.asistenteVoz !== false && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -287,7 +287,7 @@ export function Header() {
           <div className='flex-grow'>
               {showQuickDispatch && <QuickDispatchInput />}
           </div>
-          {sucursalId && (
+          {sucursalId && sucursalData?.features?.asistenteVoz !== false && (
             <Button
               variant="outline"
               size="icon"
@@ -328,6 +328,7 @@ export function Header() {
         productos={productosData || []}
         tarifas={tarifasData || []}
         clientes={clientesData?.map(c => c.nombre) || []}
+        maquinas={generalesTragamonedas || []}
       />
     </header>
   )

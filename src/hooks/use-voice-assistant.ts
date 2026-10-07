@@ -1,13 +1,14 @@
 'use client';
 
 /**
- * @fileOverview Hook de React para reconocimiento de voz resiliente, medición de volumen y orquestación con el Asistente de IA.
+ * @fileOverview Hook de React para reconocimiento de voz multi-dispositivo (Escritorio, Tablets y Móviles),
+ * medición de volumen acústico y orquestación integral con el Asistente de IA y Motor Local.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFirebase, useUser } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
-import type { Mesa, Producto, ProductoVirtual, Tarifa } from '@/lib/tipos';
+import type { Mesa, Producto, ProductoVirtual, Tarifa, GeneralesTragamonedas } from '@/lib/tipos';
 import { procesarComandoVoz, type AsistenteVozOutput } from '@/ai/flows/asistente-voz';
 import { ejecutarAccionVoz, type ResultadoEjecucionVoz } from '@/lib/firebase/servicios/asistente-voz-ejecutor';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +18,7 @@ export interface UseVoiceAssistantProps {
   productos?: (Producto | ProductoVirtual)[];
   tarifas?: Tarifa[];
   clientes?: string[];
+  maquinas?: GeneralesTragamonedas[];
 }
 
 export function useVoiceAssistant({
@@ -24,6 +26,7 @@ export function useVoiceAssistant({
   productos = [],
   tarifas = [],
   clientes = [],
+  maquinas = [],
 }: UseVoiceAssistantProps = {}) {
   const { firestore } = useFirebase();
   const { user } = useUser();
@@ -40,6 +43,8 @@ export function useVoiceAssistant({
   const [lastAction, setLastAction] = useState<AsistenteVozOutput | null>(null);
   const [lastResult, setLastResult] = useState<ResultadoEjecucionVoz | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSecureContext, setIsSecureContext] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Referencias para evitar Stale Closures
   const recognitionRef = useRef<any>(null);
@@ -52,6 +57,17 @@ export function useVoiceAssistant({
   const isProcessingRef = useRef<boolean>(false);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const handleProcessVoiceRef = useRef<(text: string) => Promise<void>>(() => Promise.resolve());
+
+  // Detección de dispositivo móvil/tablet
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mobileDetected = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+    setIsMobile(!!mobileDetected);
+
+    const secure = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    setIsSecureContext(!!secure);
+  }, []);
 
   // Función de síntesis de voz (Text-to-Speech)
   const speak = useCallback((text: string) => {
@@ -115,33 +131,43 @@ export function useVoiceAssistant({
         }));
 
         const productosNombres = productos.map(p => p.nombre);
+        const maquinasCtx = maquinas.map(m => ({
+          id: m.id,
+          nombre: m.nombre,
+          totalBase: m.totalBase || 0,
+          totalExtraccion: m.totalExtraccion || 0,
+          totalDeuda: m.totalDeuda || 0,
+        }));
 
-        // 1. Interpretar comando (IA o Motor Local integrado)
+        // 1. Interpretar comando (IA Gemini 3.8 Flash o Motor Local NLP integrado)
         const decisionIA = await procesarComandoVoz({
           transcripcion: textoLimpio,
           mesasContexto: mesasCtx,
-          productosNombres: productosNombres.slice(0, 150),
-          clientesNombres: clientes.slice(0, 50),
+          productosNombres,
+          clientesNombres: clientes,
+          maquinasContexto: maquinasCtx,
         });
 
         setLastAction(decisionIA);
 
-        // 2. Ejecutar la acción si requiere cambios transaccionales
+        // 2. Ejecutar acción de forma atómica en Firestore
         const resultado = await ejecutarAccionVoz(
           firestore,
           sucursalId,
-          user?.uid || 'asistente_voz',
+          user?.uid || 'operador',
           decisionIA,
           {
             mesas,
             productos,
             tarifas,
+            clientes,
+            maquinas,
           }
         );
 
         setLastResult(resultado);
 
-        // 3. Responder por voz
+        // 3. Respuesta por voz
         if (resultado.mensajeVoz) {
           speak(resultado.mensajeVoz);
         }
@@ -154,13 +180,13 @@ export function useVoiceAssistant({
           duration: 5000,
         });
       } catch (err: any) {
-        console.error('Error procesando comando de voz:', err);
-        const msjError = err.message || 'Error al procesar el comando.';
-        setError(msjError);
-        speak('Ocurrió un inconveniente al procesar la solicitud.');
+        console.error('Error al procesar comando de voz:', err);
+        const errMsg = err?.message || 'Error desconocido al procesar comando.';
+        setError(errMsg);
+        speak('Ocurrió un error al procesar tu solicitud.');
         toast({
-          title: 'Error de Asistente',
-          description: msjError,
+          title: 'Error del Asistente',
+          description: errMsg,
           variant: 'destructive',
           duration: 5000,
         });
@@ -169,15 +195,14 @@ export function useVoiceAssistant({
         setIsProcessing(false);
       }
     },
-    [firestore, sucursalId, user, mesas, productos, tarifas, clientes, speak, toast]
+    [firestore, sucursalId, user, mesas, productos, tarifas, clientes, maquinas, speak, toast]
   );
 
-  // Mantener referencia fresca a la función para evitar Stale Closure
   useEffect(() => {
     handleProcessVoiceRef.current = handleProcessVoice;
   }, [handleProcessVoice]);
 
-  // Medición de volumen en tiempo real del micrófono
+  // Medición de volumen para escritorio (en móviles se omite getUserMedia para no bloquear el hardware del micrófono)
   const stopAudioAnalyser = useCallback(() => {
     if (animFrameRef.current) {
       cancelAnimationFrame(animFrameRef.current);
@@ -239,7 +264,7 @@ export function useVoiceAssistant({
     }
   }, []);
 
-  // Inicializar Web Speech API en el cliente
+  // Inicializar Web Speech API con adaptación multiplataforma
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -249,10 +274,15 @@ export function useVoiceAssistant({
     if (SpeechRecognition) {
       setIsSupported(true);
       const recognition = new SpeechRecognition();
-      recognition.continuous = true; // Mantener escucha continua para no cortar pausas
+
+      // En móviles (Android/iOS), continuous = false es el estándar nativo para evitar cuelgues o cierres instantáneos
+      const mobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+
+      recognition.continuous = !mobileDevice;
       recognition.interimResults = true;
 
-      // Idioma detectado del navegador o español preferido
+      // Detección de idioma preferido (español)
       const userLang = navigator.language || 'es-GT';
       recognition.lang = userLang.startsWith('es') ? userLang : 'es-ES';
 
@@ -280,9 +310,14 @@ export function useVoiceAssistant({
         if (fullCaptured) {
           accumulatedTextRef.current = fullCaptured;
           setTranscript(fullCaptured);
+
+          // En móvil, animar ondas de volumen reactivas al texto
+          if (mobileDevice) {
+            setAudioLevel(Math.min(95, Math.max(30, fullCaptured.length * 6)));
+          }
         }
 
-        // Si se detecta silencio tras hablar algo, disparar procesamiento automático
+        // Si se detecta pausa tras hablar, disparar procesamiento automático
         if (fullCaptured.length > 2) {
           if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
           silenceTimerRef.current = setTimeout(() => {
@@ -291,7 +326,7 @@ export function useVoiceAssistant({
               stopListening();
               handleProcessVoiceRef.current(textToSend);
             }
-          }, 1500); // 1.5s de pausa tras hablar
+          }, 1400);
         }
       };
 
@@ -299,6 +334,8 @@ export function useVoiceAssistant({
         console.warn('Aviso de reconocimiento de voz:', event.error);
         if (event.error === 'not-allowed') {
           setError('Permiso de micrófono denegado. Permite el acceso en el navegador.');
+        } else if (event.error === 'audio-capture') {
+          setError('El micrófono no está disponible o está en uso por otra aplicación.');
         } else if (event.error !== 'no-speech') {
           setError(`Aviso de micrófono: ${event.error}`);
         }
@@ -308,7 +345,6 @@ export function useVoiceAssistant({
         setIsListening(false);
         stopAudioAnalyser();
 
-        // Si al terminar había texto acumulado que no se procesó, procesarlo
         const textoPendiente = accumulatedTextRef.current.trim();
         if (textoPendiente && !isProcessingRef.current) {
           handleProcessVoiceRef.current(textoPendiente);
@@ -353,8 +389,15 @@ export function useVoiceAssistant({
     accumulatedTextRef.current = '';
     setError(null);
 
-    // Iniciar medidor de ondas de audio
-    await startAudioAnalyser();
+    // En escritorio iniciamos analizador acústico; en móviles no para evitar bloqueo exclusivo del hardware
+    const mobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+
+    if (!mobileDevice) {
+      await startAudioAnalyser();
+    } else {
+      setAudioLevel(35);
+    }
 
     try {
       recognitionRef.current.start();
@@ -369,7 +412,7 @@ export function useVoiceAssistant({
     }
   }, [stopSpeaking, startAudioAnalyser, toast]);
 
-  // Detener escucha manualmente (y procesar si el usuario habló algo)
+  // Detener escucha manualmente y procesar
   const stopListening = useCallback(() => {
     if (silenceTimerRef.current) {
       clearTimeout(silenceTimerRef.current);
@@ -387,18 +430,27 @@ export function useVoiceAssistant({
     }
     setIsListening(false);
 
-    // Si el usuario presionó el botón para detener y había dicho algo, procesarlo inmediatamente
     const textoFinal = accumulatedTextRef.current.trim();
     if (textoFinal && !isProcessingRef.current) {
       handleProcessVoiceRef.current(textoFinal);
     }
   }, [stopAudioAnalyser]);
 
+  // Enviar comando directamente por texto
+  const processCustomText = useCallback(
+    async (customText: string) => {
+      await handleProcessVoice(customText);
+    },
+    [handleProcessVoice]
+  );
+
   return {
     isSupported,
     isListening,
     isProcessing,
     isSpeaking,
+    isSecureContext,
+    isMobile,
     audioLevel,
     transcript,
     interimTranscript,
@@ -407,8 +459,8 @@ export function useVoiceAssistant({
     error,
     startListening,
     stopListening,
-    speak,
     stopSpeaking,
-    processManualText: handleProcessVoice,
+    processCustomText,
+    processManualText: processCustomText,
   };
 }

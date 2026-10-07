@@ -21,11 +21,15 @@ import {
   CheckCircle2,
   AlertCircle,
   HelpCircle,
+  LayoutGrid,
+  ShoppingCart,
+  Dices,
+  Info,
+  ShieldAlert,
 } from 'lucide-react';
 import { useVoiceAssistant, type UseVoiceAssistantProps } from '@/hooks/use-voice-assistant';
 import { cn } from '@/lib/utils';
-
-import type { Mesa, Producto, ProductoVirtual, Tarifa } from '@/lib/tipos';
+import type { Mesa, Producto, ProductoVirtual, Tarifa, GeneralesTragamonedas } from '@/lib/tipos';
 
 export interface VoiceAssistantDialogProps {
   open: boolean;
@@ -34,7 +38,47 @@ export interface VoiceAssistantDialogProps {
   productos?: (Producto | ProductoVirtual)[];
   tarifas?: Tarifa[];
   clientes?: string[];
+  maquinas?: GeneralesTragamonedas[];
 }
+
+const CATEGORIAS_COMANDOS = [
+  { id: 'mesas', label: 'Mesas', icon: LayoutGrid },
+  { id: 'ventas', label: 'Ventas (POS)', icon: ShoppingCart },
+  { id: 'tragamonedas', label: 'Tragamonedas', icon: Dices },
+  { id: 'consultas', label: 'Consultas', icon: Info },
+] as const;
+
+const EJEMPLOS_POR_CATEGORIA: Record<string, string[]> = {
+  mesas: [
+    'Inicia tiempo libre en mesa 1',
+    'Inicia una hora en mesa 2',
+    'Agrega 30 minutos a mesa 1',
+    'Traslada mesa 1 a mesa 3',
+    'Cobra mesa 1 en efectivo',
+    'Pasa mesa 1 a la cuenta de Juan',
+    'Agrega una Coca Cola a mesa 2',
+    'Elimina una cerveza de mesa 1',
+  ],
+  ventas: [
+    'Vende una Coca Cola',
+    'Venta rápida 2 cervezas',
+    'Agrega un Casino a la cuenta de Juan',
+    'Cobra la cuenta de Juan en efectivo',
+    '¿Cuánto debe Juan?',
+  ],
+  tragamonedas: [
+    'Agrega 50 de base a la máquina 1',
+    'Extrae 100 de la máquina 2',
+    'Paga premio de 30 en la máquina 1',
+    'Estado de las máquinas tragamonedas',
+  ],
+  consultas: [
+    '¿Qué mesas están libres?',
+    '¿Cómo va la mesa 1?',
+    '¿Cuánto tiene la cuenta de Juan?',
+    '¿Cómo cierro la caja del turno?',
+  ],
+};
 
 export default function VoiceAssistantDialog({
   open,
@@ -43,29 +87,32 @@ export default function VoiceAssistantDialog({
   productos,
   tarifas,
   clientes,
+  maquinas,
 }: VoiceAssistantDialogProps) {
   const [manualText, setManualText] = useState('');
+  const [categoriaActiva, setCategoriaActiva] = useState<'mesas' | 'ventas' | 'tragamonedas' | 'consultas'>('mesas');
 
   const {
     isSupported,
     isListening,
     isProcessing,
     isSpeaking,
+    isSecureContext,
+    isMobile,
     audioLevel,
     transcript,
     interimTranscript,
-    lastAction,
     lastResult,
     error,
     startListening,
     stopListening,
-    stopSpeaking,
     processManualText,
   } = useVoiceAssistant({
     mesas,
     productos,
     tarifas,
     clientes,
+    maquinas,
   });
 
   const handleManualSubmit = (e: React.FormEvent) => {
@@ -85,7 +132,7 @@ export default function VoiceAssistantDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-[#1d283a] border-[#324157] text-slate-100 p-0 overflow-hidden shadow-2xl">
         {/* Cabecera */}
-        <div className="p-5 border-b border-[#324157] flex items-center justify-between bg-[#17202e]">
+        <div className="p-4 border-b border-[#324157] flex items-center justify-between bg-[#17202e]">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-sm">
               <Sparkles className="w-5 h-5" />
@@ -95,28 +142,22 @@ export default function VoiceAssistantDialog({
                 Asistente Inteligente
               </DialogTitle>
               <DialogDescription className="text-xs text-slate-400">
-                Control de mesas, consumos y consultas por voz
+                Mesas, POS de Ventas y Tragamonedas
               </DialogDescription>
             </div>
           </div>
-
-          <div>
+          <div className="flex items-center gap-1.5">
             {isListening && (
               <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/30 animate-pulse text-xs">
                 Escuchando...
               </Badge>
             )}
-            {isProcessing && (
-              <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-xs">
-                Procesando...
-              </Badge>
-            )}
             {isSpeaking && (
               <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs">
-                Respondiendo...
+                Hablando...
               </Badge>
             )}
-            {!isListening && !isProcessing && !isSpeaking && (
+            {!isListening && !isSpeaking && !isProcessing && (
               <Badge variant="outline" className="bg-slate-700/50 text-slate-300 border-slate-600 text-xs">
                 Listo
               </Badge>
@@ -124,21 +165,32 @@ export default function VoiceAssistantDialog({
           </div>
         </div>
 
+        {/* Aviso de HTTPS para móviles si se conecta por IP local */}
+        {!isSecureContext && isMobile && (
+          <div className="mx-4 mt-3 p-2.5 rounded-lg bg-amber-950/40 border border-amber-500/40 text-amber-200 text-[11px] flex items-start gap-2">
+            <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold block">Conexión local sin SSL detectada:</span>
+              Los navegadores móviles requieren HTTPS para habilitar el micrófono. Puedes escribir comandos en el campo de texto o pulsar las acciones sugeridas.
+            </div>
+          </div>
+        )}
+
         {/* Cuerpo Principal */}
-        <div className="p-6 flex flex-col items-center justify-center space-y-4">
+        <div className="p-5 flex flex-col items-center justify-center space-y-3.5">
           {/* Botón Principal de Micrófono con Onda Sensible al Sonido */}
-          <div className="relative flex items-center justify-center py-2">
+          <div className="relative flex items-center justify-center py-1">
             {isListening && (
               <div 
                 className="absolute rounded-full bg-red-500/20 transition-all duration-75 pointer-events-none"
                 style={{
-                  width: `${110 + audioLevel * 0.9}px`,
-                  height: `${110 + audioLevel * 0.9}px`,
+                  width: `${100 + audioLevel * 0.8}px`,
+                  height: `${100 + audioLevel * 0.8}px`,
                 }}
               />
             )}
             {isSpeaking && (
-              <div className="absolute w-28 h-28 rounded-full bg-emerald-500/20 animate-pulse" />
+              <div className="absolute w-24 h-24 rounded-full bg-emerald-500/20 animate-pulse" />
             )}
             <button
               type="button"
@@ -167,37 +219,37 @@ export default function VoiceAssistantDialog({
 
           {/* Indicador de entrada de sonido en vivo */}
           {isListening && (
-            <div className="w-48 flex flex-col items-center gap-1">
+            <div className="w-44 flex flex-col items-center gap-1">
               <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
                 <div 
                   className={cn(
                     'h-full transition-all duration-75 rounded-full',
                     audioLevel > 15 ? 'bg-emerald-400' : 'bg-blue-400'
                   )}
-                  style={{ width: `${Math.max(5, audioLevel)}%` }}
+                  style={{ width: `${Math.max(8, audioLevel)}%` }}
                 />
               </div>
               <span className="text-[10px] text-slate-400">
-                {audioLevel > 10 ? 'Voz detectada' : 'Esperando sonido...'}
+                {audioLevel > 10 ? 'Voz detectada' : 'Esperando voz...'}
               </span>
             </div>
           )}
 
           <p className="text-xs text-center text-slate-300 max-w-xs font-medium">
             {isListening
-              ? 'Habla ahora... detecta tu voz en vivo.'
+              ? 'Habla ahora... escuchando instrucción.'
               : isProcessing
-              ? 'Procesando solicitud...'
+              ? 'Procesando instrucción...'
               : isSpeaking
-              ? 'Hablando respuesta...'
-              : 'Presiona el micrófono para hablar o dar una instrucción.'}
+              ? 'Respondiendo...'
+              : 'Presiona el micrófono para hablar o escribe tu comando.'}
           </p>
 
           {/* Visualización de Transcripción */}
           {(transcript || interimTranscript) && (
-            <div className="w-full bg-[#283244] border border-[#324157] rounded-lg p-3 text-sm">
-              <span className="text-slate-400 text-xs block mb-1 font-medium">
-                Voz detectada:
+            <div className="w-full bg-[#283244] border border-[#324157] rounded-lg p-2.5 text-xs">
+              <span className="text-slate-400 text-[10px] block mb-0.5 font-medium">
+                Texto reconocido:
               </span>
               <p className="text-slate-100 font-medium italic">
                 "{interimTranscript || transcript}"
@@ -209,7 +261,7 @@ export default function VoiceAssistantDialog({
           {lastResult && (
             <div
               className={cn(
-                'w-full rounded-lg p-3.5 border text-xs space-y-1.5 transition-all',
+                'w-full rounded-lg p-3 border text-xs space-y-1 transition-all',
                 lastResult.exito
                   ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
                   : 'bg-amber-950/40 border-amber-500/40 text-amber-200'
@@ -229,14 +281,14 @@ export default function VoiceAssistantDialog({
 
           {/* Error de hardware o permisos */}
           {error && (
-            <div className="w-full bg-red-950/40 border border-red-500/40 rounded-lg p-3 text-xs text-red-200 flex items-center gap-2">
+            <div className="w-full bg-red-950/40 border border-red-500/40 rounded-lg p-2.5 text-xs text-red-200 flex items-center gap-2">
               <MicOff className="w-4 h-4 text-red-400 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Entrada de texto alternativa para pruebas o ambientes ruidosos */}
-          <form onSubmit={handleManualSubmit} className="w-full flex items-center gap-2 pt-1">
+          {/* Entrada de texto manual */}
+          <form onSubmit={handleManualSubmit} className="w-full flex items-center gap-2 pt-0.5">
             <Input
               type="text"
               placeholder="O escribe un comando aquí..."
@@ -255,25 +307,46 @@ export default function VoiceAssistantDialog({
             </Button>
           </form>
 
-          {/* Sugerencias Rápidas */}
+          {/* Selector de Categorías de Comandos Sugeridos */}
           <div className="w-full space-y-2 pt-2 border-t border-[#324157]/60">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-              <HelpCircle className="w-3.5 h-3.5 text-blue-400" />
-              <span>Comandos sugeridos para probar:</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                <HelpCircle className="w-3.5 h-3.5 text-blue-400" />
+                <span>Comandos por módulo:</span>
+              </div>
+              <div className="flex gap-1">
+                {CATEGORIAS_COMANDOS.map((cat) => {
+                  const Icon = cat.icon;
+                  const isActive = categoriaActiva === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setCategoriaActiva(cat.id as any)}
+                      className={cn(
+                        'flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer',
+                        isActive
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-[#283244] text-slate-400 hover:text-slate-200 hover:bg-[#324157]'
+                      )}
+                    >
+                      <Icon className="w-3 h-3" />
+                      <span>{cat.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {[
-                'Inicia tiempo libre en la Mesa 1',
-                'Agrega una Coca Cola a la Mesa 2',
-                'Cárgale un Casino a la cuenta de Juan',
-                '¿Cómo va la Mesa 1?',
-              ].map((ejemplo) => (
+
+            {/* Chips de ejemplos de la categoría activa */}
+            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+              {EJEMPLOS_POR_CATEGORIA[categoriaActiva].map((ejemplo) => (
                 <button
                   key={ejemplo}
                   type="button"
                   onClick={() => handleExampleClick(ejemplo)}
                   disabled={isProcessing}
-                  className="text-[11px] bg-[#283244] hover:bg-[#324157] text-slate-300 border border-[#324157] rounded-md px-2.5 py-1 text-left transition-colors cursor-pointer"
+                  className="text-[11px] bg-[#283244] hover:bg-[#324157] text-slate-300 border border-[#324157] rounded-md px-2 py-1 text-left transition-colors cursor-pointer"
                 >
                   "{ejemplo}"
                 </button>
