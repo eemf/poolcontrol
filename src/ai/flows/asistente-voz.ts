@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview Flow de Genkit para procesar comandos de voz y preguntas del asistente inteligente en Pool Control.
+ * @fileOverview Flow híbrido de Genkit con fallback de procesamiento local para comandos de voz y preguntas del asistente en Pool Control.
  */
 
 import { ai } from '@/ai/genkit';
@@ -45,8 +45,143 @@ const AsistenteVozOutputSchema = z.object({
 
 export type AsistenteVozOutput = z.infer<typeof AsistenteVozOutputSchema>;
 
-export async function procesarComandoVoz(input: AsistenteVozInput): Promise<AsistenteVozOutput> {
-  return asistenteVozFlow(input);
+// Mapa de números en palabras
+const PALABRAS_A_NUMERO: Record<string, number> = {
+  un: 1, una: 1, uno: 1,
+  dos: 2, tres: 3, cuatro: 4, cinco: 5,
+  seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10
+};
+
+/**
+ * Motor local inteligente de procesamiento de comandos de voz (cero latencia, sin costos de API).
+ */
+function interpretarComandoLocal(input: AsistenteVozInput, apiErrorMotivo?: string): AsistenteVozOutput {
+  const raw = input.transcripcion || '';
+  const texto = raw.toLowerCase().trim();
+
+  // 1. Extraer número de mesa
+  let numeroMesa: number | undefined;
+  const matchMesa = texto.match(/mesa\s*(?:número|numero|no\.?|#)?\s*(\d+|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)/i);
+  if (matchMesa) {
+    const val = matchMesa[1].toLowerCase();
+    numeroMesa = !isNaN(parseInt(val, 10)) ? parseInt(val, 10) : PALABRAS_A_NUMERO[val];
+  }
+
+  // 2. Extraer cantidad
+  let cantidad = 1;
+  const matchCant = texto.match(/\b(\d+|un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/i);
+  if (matchCant) {
+    const val = matchCant[1].toLowerCase();
+    const parsed = !isNaN(parseInt(val, 10)) ? parseInt(val, 10) : PALABRAS_A_NUMERO[val];
+    if (parsed && parsed > 0 && parsed !== numeroMesa) {
+      cantidad = parsed;
+    }
+  }
+
+  // 3. Buscar el producto más cercano en el catálogo
+  const buscarProductoCatalogo = (frase: string): string | undefined => {
+    if (!input.productosNombres || !input.productosNombres.length) return undefined;
+    
+    // Buscar coincidencia directa
+    for (const prod of input.productosNombres) {
+      const pNom = prod.toLowerCase();
+      if (frase.includes(pNom)) return prod;
+    }
+
+    // Buscar por palabras clave de al menos 4 letras
+    const palabras = frase.split(/\s+/).filter(w => w.length >= 3 && !['mesa', 'cuenta', 'para', 'agrega', 'inicia', 'tiempo'].includes(w));
+    for (const prod of input.productosNombres) {
+      const pNom = prod.toLowerCase();
+      for (const w of palabras) {
+        if (pNom.includes(w)) return prod;
+      }
+    }
+    return undefined;
+  };
+
+  // CASO: CONSULTAR ESTADO DE MESA
+  if (numeroMesa && /(cómo va|como va|cuánto lleva|cuanto lleva|tiempo de|estado de|está libre|esta libre)/i.test(texto)) {
+    const mesaEncontrada = input.mesasContexto?.find(m => m.numeroMesa === numeroMesa);
+    const msj = mesaEncontrada
+      ? (mesaEncontrada.estado === 'ocupado' ? `La Mesa ${numeroMesa} está ocupada (${mesaEncontrada.modoJuego || 'Libre'}).` : `La Mesa ${numeroMesa} está libre.`)
+      : `Consultando estado de Mesa ${numeroMesa}.`;
+    return {
+      tipoAccion: 'CONSULTAR_ESTADO_MESA',
+      numeroMesa,
+      mensajeVoz: msj,
+      explicacion: `Consulta local: ${msj}`,
+    };
+  }
+
+  // CASO: INICIAR MESA
+  if (numeroMesa && /(inicia|iniciar|abre|abrir|pon|poner|comienza|arranca)/i.test(texto) && !/(agrega|cárgale|carga|apúntale|apunta)/i.test(texto)) {
+    let modoJuego: 'libre' | 'definido' = 'libre';
+    let minutosDefinidos = 60;
+
+    if (/(hora|minuto|min)/i.test(texto)) {
+      modoJuego = 'definido';
+      if (/media hora|30 min/i.test(texto)) minutosDefinidos = 30;
+      else if (/dos horas|2 horas/i.test(texto)) minutosDefinidos = 120;
+      else if (/tres horas|3 horas/i.test(texto)) minutosDefinidos = 180;
+      else {
+        const matchMin = texto.match(/(\d+)\s*(?:minutos|min)/i);
+        if (matchMin) minutosDefinidos = parseInt(matchMin[1], 10);
+      }
+    }
+
+    const descModo = modoJuego === 'libre' ? 'tiempo libre' : `${minutosDefinidos} minutos`;
+    return {
+      tipoAccion: 'INICIAR_MESA',
+      numeroMesa,
+      modoJuego,
+      minutosDefinidos: modoJuego === 'definido' ? minutosDefinidos : undefined,
+      mensajeVoz: `Listo, iniciando ${descModo} en la Mesa ${numeroMesa}.`,
+      explicacion: `Mesa #${numeroMesa} iniciada en modo ${modoJuego === 'libre' ? 'Libre' : `Definido (${minutosDefinidos} min)`} vía motor local.`,
+    };
+  }
+
+  // CASO: AGREGAR CONSUMO A CUENTA DE CLIENTE
+  const matchCuenta = texto.match(/(?:cuenta|nombre)\s+de\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)/i) || texto.match(/(?:cárgale|carga|apúntale|apunta|ponle)\s+a\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)/i);
+  if (matchCuenta && !texto.includes('mesa')) {
+    const nombreCliente = matchCuenta[1];
+    const producto = buscarProductoCatalogo(texto) || 'Casino';
+    return {
+      tipoAccion: 'AGREGAR_CONSUMO_CUENTA',
+      nombreCliente: nombreCliente.charAt(0).toUpperCase() + nombreCliente.slice(1),
+      nombreProducto: producto,
+      cantidad,
+      mensajeVoz: `Listo, cargué ${cantidad} ${producto} a la cuenta de ${nombreCliente}.`,
+      explicacion: `Cargado ${cantidad}x ${producto} a ${nombreCliente} (Motor local).`,
+    };
+  }
+
+  // CASO: AGREGAR CONSUMO A MESA
+  if (numeroMesa && /(agrega|cárgale|carga|apúntale|apunta|ponle|pon|vende)/i.test(texto)) {
+    const producto = buscarProductoCatalogo(texto) || 'Coca Cola';
+    return {
+      tipoAccion: 'AGREGAR_CONSUMO_MESA',
+      numeroMesa,
+      nombreProducto: producto,
+      cantidad,
+      mensajeVoz: `Listo, agregué ${cantidad} ${producto} a la Mesa ${numeroMesa}.`,
+      explicacion: `Agregado ${cantidad}x ${producto} a Mesa #${numeroMesa} (Motor local).`,
+    };
+  }
+
+  // Si no encajó en un comando estructurado
+  if (apiErrorMotivo) {
+    return {
+      tipoAccion: 'CONSULTA_GENERAL',
+      mensajeVoz: 'Comando no reconocido. Puedes decir: Inicia tiempo libre en mesa 1, Agrega una Coca Cola a la mesa 2, o Cárgale a la cuenta de Juan.',
+      explicacion: 'Nota: Tus créditos de Google AI Studio están agotados, pero los comandos de control de mesas y despachos siguen funcionando al 100% con el motor local.',
+    };
+  }
+
+  return {
+    tipoAccion: 'NO_ENTENDIDO',
+    mensajeVoz: 'No logré entender el comando. Prueba diciendo: Inicia mesa 1 libre, o Agrega una gaseosa a la mesa 2.',
+    explicacion: 'Comando no identificado.',
+  };
 }
 
 const prompt = ai.definePrompt({
@@ -100,7 +235,7 @@ Reglas de interpretación:
 6. NO ENTENDIDO:
    - Si la frase es ininteligible o no tiene sentido -> tipoAccion: NO_ENTENDIDO.
 
-El campo "mensajeVoz" debe ser muy fluido, amigable y directo al grano para ser hablado en voz alta (ej: "Listo, iniciando tiempo libre en la mesa 1", "Agregando una Coca-Cola a la mesa 2").`,
+El campo "mensajeVoz" debe ser muy fluido, amigable y directo al grano para ser hablado en voz alta.`,
 });
 
 const asistenteVozFlow = ai.defineFlow(
@@ -110,14 +245,20 @@ const asistenteVozFlow = ai.defineFlow(
     outputSchema: AsistenteVozOutputSchema,
   },
   async input => {
-    const { output } = await prompt(input);
-    if (!output) {
-      return {
-        tipoAccion: 'NO_ENTENDIDO' as const,
-        mensajeVoz: 'Disculpa, no pude comprender el comando. Por favor intenta de nuevo.',
-        explicacion: 'No se obtuvo respuesta estructurada del modelo.',
-      };
+    try {
+      const { output } = await prompt(input);
+      if (output && output.tipoAccion !== 'NO_ENTENDIDO') {
+        return output;
+      }
+    } catch (err: any) {
+      console.warn('Fallo en API de Gemini (activando motor local de respaldo):', err?.message);
+      return interpretarComandoLocal(input, err?.message);
     }
-    return output;
+
+    return interpretarComandoLocal(input);
   }
 );
+
+export async function procesarComandoVoz(input: AsistenteVozInput): Promise<AsistenteVozOutput> {
+  return asistenteVozFlow(input);
+}

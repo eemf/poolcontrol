@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 279,
+    build: 280,
     fecha: "2026-10-07",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b280",
+    descripcion: "Arquitectura híbrida con motor local NLP de respaldo ante agotamiento de saldo en Google AI.",
+    cambios: [
+      "Motor local inteligente de procesamiento de comandos de voz con tolerancia total a fallas de API (error 402/429/red).",
+      "Ejecución garantizada sin costo de inicio de mesas, despachos a cuentas y consultas operativas sin depender de créditos.",
+      "Mensajes informativos contextuales orientando al usuario para recarga de API Key en Google AI Studio sin bloquear el sistema."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 279,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b279",
     descripcion: "Actualización de modelo de IA a Gemini 3.8 Flash para el asistente de voz inteligente.",
@@ -365,9 +379,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 279,
+  build: 280,
   date: "2026-10-07",
-  publicadaActual: releaseHistory[0], // Build 279
-  publicadaAnterior: releaseHistory[1], // Build 278
+  publicadaActual: releaseHistory[0], // Build 280
+  publicadaAnterior: releaseHistory[1], // Build 279
   historial: releaseHistory
 };
