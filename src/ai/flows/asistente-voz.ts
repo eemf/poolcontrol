@@ -51,6 +51,7 @@ export async function procesarComandoVoz(input: AsistenteVozInput): Promise<Asis
 
 const prompt = ai.definePrompt({
   name: 'asistenteVozPrompt',
+  model: 'googleai/gemini-3.8-flash',
   input: { schema: AsistenteVozInputSchema },
   output: { schema: AsistenteVozOutputSchema },
   prompt: `Eres el Asistente Inteligente de Pool Control, un sistema de gestión para clubes de billar, consolas y bar.
