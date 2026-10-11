@@ -112,6 +112,21 @@ function normalizarTexto(txt: string): string {
 }
 
 /**
+ * Extrae la cantidad numérica o textual de un segmento de texto
+ */
+function extraerCantidad(frase: string): number {
+  const matchNum = frase.match(/\b(\d+)\b/);
+  if (matchNum) return parseInt(matchNum[1], 10);
+  const fraseNorm = normalizarTexto(frase);
+  for (const [palabra, num] of Object.entries(PALABRAS_A_NUMERO)) {
+    if (new RegExp(`\\b${palabra}\\b`, 'i').test(fraseNorm)) {
+      return num;
+    }
+  }
+  return 1;
+}
+
+/**
  * Motor local inteligente de procesamiento de comandos de voz.
  * Soporta lenguaje natural coloquial, variaciones de entonación, sinónimos y extracción flexible de entidades.
  */
@@ -640,79 +655,110 @@ export async function interpretarComandoLocal(input: AsistenteVozInput, apiError
     }
   }
 
-  // D) Agregar consumo a cuenta de cliente (ej. "agrega una coca a la cuenta de Juan", "agrega una coca a Victor Hugo", "cárgale 2 cervezas a Carlos", "apunta un verde para Pedro", "ponle un casino a Maria")
-  const matchCuentaCliente = (
-    textoNorm.match(/(?:a\s+la\s+cuenta\s+de|en\s+la\s+cuenta\s+de|a\s+cuenta\s+de|cuenta\s+de)\s+([a-z\s]+)$/i) ||
-    textoNorm.match(/(?:agreg\w*|carg\w*|apunt\w*|anot\w*|pon\w*|pas\w*|sum\w*)\s+.*?\s+(?:a|para)\s+(?:la\s+cuenta\s+de\s+|cuenta\s+de\s+)?([a-z\s]+)$/i) ||
-    textoNorm.match(/(?:cargale|carga|apuntale|apunta|ponle)\s+(?:a|para)\s+([a-z\s]+)$/i) ||
-    (textoNorm.includes('cuenta') && textoNorm.match(/(?:para|a)\s+([a-z\s]+)$/i))
+  // D) Agregar consumo a cuenta de cliente / cuenta pendiente (ej. "agrega una coca a la cuenta de Juan", "agrega una coca a la cuenta pendiente de Samuel", "agrega una cerveza a la cuenta pendiente", "cárgale 2 cervezas a Carlos", "apunta un verde para Pedro", "ponle un casino a Maria")
+  const esComandoCuenta = (
+    /(?:cuenta|cuenta\s+pendiente)/i.test(textoNorm) ||
+    /(?:agreg\w*|carg\w*|apunt\w*|anot\w*|pon\w*|pas\w*|sum\w*)\s+.*?\s+(?:a|para)\s+/i.test(textoNorm) ||
+    /(?:cargale|carga|apuntale|apunta|ponle)\s+(?:a|para)\s+/i.test(textoNorm)
   );
 
-  if (matchCuentaCliente && !textoNorm.includes('mesa') && !textoNorm.includes('consola') && !textoNorm.includes('billar') && !textoNorm.includes('maquina') && !textoNorm.includes('slot') && !textoNorm.includes('tragamonedas')) {
-    let nomC = matchCuentaCliente[1].trim().replace(/^(?:la|el|cuenta|cliente|de)\s+/g, '');
-    const stopWords = ['efectivo', 'tarjeta', 'pos', 'mesa', 'cuenta', 'libre', 'definido', 'caja', 'turno'];
-    if (nomC && nomC.length >= 2 && !stopWords.includes(nomC)) {
-      if (input.clientesNombres && input.clientesNombres.length) {
-        const normNom = normalizarTexto(nomC);
-        const clienteExistente = input.clientesNombres.find(cn => {
-          const cnNorm = normalizarTexto(cn);
-          return cnNorm === normNom || cnNorm.includes(normNom) || normNom.includes(cnNorm);
-        });
-        if (clienteExistente) nomC = clienteExistente;
+  if (esComandoCuenta && !textoNorm.includes('mesa') && !textoNorm.includes('consola') && !textoNorm.includes('billar') && !textoNorm.includes('maquina') && !textoNorm.includes('slot') && !textoNorm.includes('tragamonedas')) {
+    const matchCuentaCliente = (
+      textoNorm.match(/(?:a\s+la\s+cuenta\s+(?:pendiente\s+)?de|en\s+la\s+cuenta\s+(?:pendiente\s+)?de|a\s+cuenta\s+(?:pendiente\s+)?de|cuenta\s+(?:pendiente\s+)?de)\s+([a-z\s]+)$/i) ||
+      textoNorm.match(/(?:agreg\w*|carg\w*|apunt\w*|anot\w*|pon\w*|pas\w*|sum\w*)\s+.*?\s+(?:a|para)\s+(?:la\s+cuenta\s+(?:pendiente\s+)?de\s+|cuenta\s+(?:pendiente\s+)?de\s+)?([a-z\s]+)$/i) ||
+      textoNorm.match(/(?:cargale|carga|apuntale|apunta|ponle)\s+(?:a|para)\s+([a-z\s]+)$/i) ||
+      (textoNorm.includes('cuenta') && textoNorm.match(/(?:para|a)\s+([a-z\s]+)$/i))
+    );
+
+    let nomC = matchCuentaCliente ? matchCuentaCliente[1].trim() : '';
+    // Limpiar prefijos redundantes
+    nomC = nomC.replace(/^(?:la\s+|el\s+|cuenta\s+|pendiente\s+|de\s+)+/gi, '').trim();
+    // Limpiar sufijos como "en su cuenta pendiente", "a su cuenta"
+    nomC = nomC.replace(/\s+(?:en\s+su\s+cuenta\s+pendiente|en\s+cuenta\s+pendiente|a\s+cuenta\s+pendiente|en\s+su\s+cuenta)$/gi, '').trim();
+
+    const stopWords = ['efectivo', 'tarjeta', 'pos', 'mesa', 'cuenta', 'pendiente', 'una', 'la', 'el', 'libre', 'definido', 'caja', 'turno'];
+    if (stopWords.includes(nomC.toLowerCase())) {
+      nomC = '';
+    }
+
+    if (nomC && input.clientesNombres && input.clientesNombres.length) {
+      const normNom = normalizarTexto(nomC);
+      const clienteExistente = input.clientesNombres.find(cn => {
+        const cnNorm = normalizarTexto(cn);
+        return cnNorm === normNom || cnNorm.includes(normNom) || normNom.includes(cnNorm);
+      });
+      if (clienteExistente) nomC = clienteExistente;
+    }
+
+    const nombreFormateado = (nomC && nomC.length >= 2)
+      ? nomC.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+      : undefined;
+
+    // Remover el nombre del cliente de la frase para buscar el producto de forma limpia
+    let fraseSinCliente = textoNorm;
+    if (nomC) {
+      fraseSinCliente = fraseSinCliente.replace(new RegExp(`(?:a|para)\\s+(?:la\\s+cuenta\\s+(?:pendiente\\s+)?de\\s+|cuenta\\s+(?:pendiente\s+)?de\\s+)?${nomC}$`, 'i'), '').trim();
+    }
+    fraseSinCliente = fraseSinCliente
+      .replace(/(?:a|en)\s+(?:la\s+)?cuenta\s+pendiente(?:\s+de)?/gi, '')
+      .replace(/(?:a|en)\s+(?:la\s+)?cuenta(?:\s+de)?/gi, '')
+      .trim();
+
+    // Detectar si hay múltiples productos separados por comas o "y"
+    const chunks = (fraseSinCliente || textoNorm)
+      .replace(/^(?:agrega|agregame|cargale|cargame|carga|apuntale|apuntame|apunta|sirve|sirvele|ponle|pon|dame)\s+/i, '')
+      .split(/(?:,| y | e )+/)
+      .map(c => c.trim())
+      .filter(Boolean);
+
+    const itemsDetectados: Array<{ nombreProducto: string; cantidad: number }> = [];
+    for (const chunk of chunks) {
+      const { producto: pFound } = buscarProductoCatalogo(chunk);
+      if (pFound) {
+        const matchCant = chunk.match(/^(?:(\d+)|un|una|uno|dos|tres|cuatro|cinco)\b/i);
+        const cChunk = matchCant ? extraerCantidad(chunk) : 1;
+        itemsDetectados.push({ nombreProducto: pFound, cantidad: cChunk });
       }
-      const nombreFormateado = nomC.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
 
-      // Remover el nombre del cliente de la frase para buscar el producto de forma 100% limpia
-      const fraseSinCliente = textoNorm
-        .replace(new RegExp(`(?:a|para)\\s+(?:la\\s+cuenta\\s+de\\s+|cuenta\\s+de\\s+)?${nomC}$`, 'i'), '')
-        .trim();
-
-      // Detectar si hay múltiples productos separados por comas o "y"
-      const chunks = (fraseSinCliente || textoNorm)
-        .replace(/^(?:agrega|agregame|cargale|cargame|carga|apuntale|apuntame|apunta|sirve|sirvele|ponle|pon|dame)\s+/i, '')
-        .split(/(?:,| y | e )+/)
-        .map(c => c.trim())
-        .filter(Boolean);
-
-      const itemsDetectados: Array<{ nombreProducto: string; cantidad: number }> = [];
-      for (const chunk of chunks) {
-        const { producto: pFound } = buscarProductoCatalogo(chunk);
-        if (pFound) {
-          const matchCant = chunk.match(/^(?:(\d+)|un|una|uno|dos|tres|cuatro|cinco)\b/i);
-          const cChunk = matchCant ? extraerCantidad(chunk) : 1;
-          itemsDetectados.push({ nombreProducto: pFound, cantidad: cChunk });
-        }
-      }
-
-      if (itemsDetectados.length > 1) {
-        return {
-          tipoAccion: 'AGREGAR_CONSUMO_CUENTA',
-          nombreCliente: nombreFormateado,
-          nombreProducto: itemsDetectados[0].nombreProducto,
-          cantidad: itemsDetectados[0].cantidad,
-          items: itemsDetectados,
-          mensajeVoz: `Listo, cargué ${itemsDetectados.map(i => `${i.cantidad} ${i.nombreProducto}`).join(', ')} a la cuenta de ${nombreFormateado}.`,
-          explicacion: `Cargados múltiples consumos a cuenta de ${nombreFormateado} vía comando local.`,
-        };
-      }
-
-      const { producto, terminoBuscado } = buscarProductoCatalogo(fraseSinCliente || textoNorm);
-      if (!producto) {
-        return {
-          tipoAccion: 'NO_ENTENDIDO',
-          mensajeVoz: `No encontré el producto "${terminoBuscado}" en el catálogo para cargar a ${nombreFormateado}.`,
-          explicacion: `El producto "${terminoBuscado}" no existe en el catálogo de esta sucursal.`,
-        };
-      }
+    if (itemsDetectados.length > 1) {
       return {
         tipoAccion: 'AGREGAR_CONSUMO_CUENTA',
         nombreCliente: nombreFormateado,
-        nombreProducto: producto,
-        cantidad,
-        mensajeVoz: `Listo, cargué ${cantidad} ${producto} a la cuenta de ${nombreFormateado}.`,
-        explicacion: `Cargado ${cantidad}x ${producto} a cuenta de ${nombreFormateado} vía comando local.`,
+        nombreProducto: itemsDetectados[0].nombreProducto,
+        cantidad: itemsDetectados[0].cantidad,
+        items: itemsDetectados,
+        mensajeVoz: nombreFormateado
+          ? `Listo, cargué ${itemsDetectados.map(i => `${i.cantidad} ${i.nombreProducto}`).join(', ')} a la cuenta de ${nombreFormateado}.`
+          : `Listo, agregando ${itemsDetectados.map(i => `${i.cantidad} ${i.nombreProducto}`).join(', ')} a la cuenta pendiente.`,
+        explicacion: nombreFormateado
+          ? `Cargados múltiples consumos a cuenta de ${nombreFormateado} vía comando local.`
+          : `Cargados múltiples consumos a cuenta pendiente vía comando local.`,
       };
     }
+
+    const { producto, terminoBuscado } = buscarProductoCatalogo(fraseSinCliente || textoNorm);
+    if (!producto) {
+      return {
+        tipoAccion: 'NO_ENTENDIDO',
+        mensajeVoz: `No encontré el producto "${terminoBuscado}" en el catálogo${nombreFormateado ? ` para cargar a ${nombreFormateado}` : ''}.`,
+        explicacion: `El producto "${terminoBuscado}" no existe en el catálogo de esta sucursal.`,
+      };
+    }
+
+    return {
+      tipoAccion: 'AGREGAR_CONSUMO_CUENTA',
+      nombreCliente: nombreFormateado,
+      nombreProducto: producto,
+      cantidad,
+      items: [{ nombreProducto: producto, cantidad }],
+      mensajeVoz: nombreFormateado
+        ? `Listo, cargué ${cantidad} ${producto} a la cuenta de ${nombreFormateado}.`
+        : `Listo, agregando ${cantidad} ${producto} a la cuenta pendiente.`,
+      explicacion: nombreFormateado
+        ? `Cargado ${cantidad}x ${producto} a cuenta de ${nombreFormateado} vía comando local.`
+        : `Cargado ${cantidad}x ${producto} a cuenta pendiente vía comando local.`,
+    };
   }
 
   // D) Venta rápida POS (ej. "vende una coca cola", "vender 2 cervezas en tarjeta", "despacha un agua", "despacho rápido 1 verde", "dame una coca")
@@ -862,17 +908,24 @@ DIRECTRICES CLAVE:
    También llena "nombreProducto" y "cantidad" con el primer producto.
    El "mensajeVoz" debe mencionar los productos de forma natural (ej: "Agregando una Coca Cola, un Casino y un Jugo de Vegetales a Samuel.").
 2. Para productos, asocia intuitivamente palabras coloquiales al catálogo (ej: "coca" -> "Coca Cola", "casino" -> "Galleta Casino" o "Casino", "verde" -> "Verde Lukis", "corona" -> "Cerveza Corona", "agua" -> "Agua Pura").
-3. Para clientes, extrae el nombre mencionado o busca la coincidencia más cercana en la lista de clientes (soporta tanto "a la cuenta de X" como "a X").
-4. DISTINCIÓN CRÍTICA EN COBRO DE CUENTAS DE CLIENTES:
+3. Para clientes, extrae el nombre mencionado o busca la coincidencia más cercana en la lista de clientes (soporta tanto "a la cuenta de X" como "a X" o "a X en su cuenta pendiente").
+4. AGREGAR CONSUMOS A CUENTAS O CUENTAS PENDIENTES (MÁXIMA PRIORIDAD):
+   Cualquier comando u orden para cargar, agregar, apuntar, anotar, poner, despachar o sumar consumos a una cuenta o cuenta pendiente:
+   - "agrega una coca a la cuenta de Samuel", "agrega una coca a la cuenta pendiente de Samuel", "cargar una cerveza a la cuenta de Juan", "apunta 2 aguas a Pedro", "ponle un casino a la cuenta pendiente de Carlos":
+     -> tipoAccion: "AGREGAR_CONSUMO_CUENTA", extrae "nombreCliente", productos en "items", "nombreProducto" y "cantidad".
+   - "agrega una coca a la cuenta pendiente", "agrega una coca a una cuenta", "agrega una cerveza a cuenta pendiente", "agrega un producto a la cuenta", "agrega un producto a una cuenta pendiente":
+     -> tipoAccion: "AGREGAR_CONSUMO_CUENTA", extrae los productos solicitados en "items" y "nombreProducto", y deja "nombreCliente" omitido/vacío para que el sistema consulte o resuelva el cliente.
+   - El "mensajeVoz" debe ser natural (ej: "Agregando una Coca Cola a la cuenta de Samuel." o "Agregando una Coca Cola a la cuenta pendiente.").
+5. DISTINCIÓN CRÍTICA EN COBRO DE CUENTAS DE CLIENTES:
    - "cobra la cuenta de Samuel", "cóbbrale a Samuel": Se refiere ÚNICAMENTE a su cuenta actual pendiente -> tipoAccion: "COBRAR_CUENTA_CLIENTE", nombreCliente: "Samuel", cobrarTodo: false.
    - "cobra el total de la cuenta de Samuel", "cobra todo lo de Samuel", "cobra la cuenta completa de Samuel", "cobra la deuda total de Samuel": Se refiere a la cuenta completa incluyendo créditos -> tipoAccion: "COBRAR_CUENTA_CLIENTE", nombreCliente: "Samuel", cobrarTodo: true.
-5. ABONO A CUENTAS DE CLIENTES:
+6. ABONO A CUENTAS DE CLIENTES:
    - "abona 20 a la cuenta de Samuel", "abona 50 a Carlos": tipoAccion: "ABONAR_CUENTA_CLIENTE", monto: 20, nombreCliente: "Samuel". Se aplica a la cuenta actual, y si sobrepasa la cuenta actual el sistema abona el excedente a la cuenta a crédito más antigua.
-6. Si el operador pide iniciar una mesa con tiempo definido y menciona "pagado", "contado", "al contado", marca pagadoDeContado: true, modoJuego: "definido".
-7. Si el operador pide finalizar o cobrar una mesa y pasar la cuenta a un cliente (ej: "finaliza la mesa 1 y pasa la cuenta a Samuel"), tipoAccion: "PASAR_MESA_A_CUENTA", numeroMesa: 1, nombreCliente: "Samuel".
-8. Si el operador pide dividir la cuenta (ej: "divide la cuenta de la mesa 1 entre 2 en efectivo"), tipoAccion: "DIVIDIR_CUENTA_MESA", numeroMesa: 1, numeroPartes: 2, metodoPago: "Efectivo".
-9. REGLA ESTRICTA PARA COMANDOS NO RECONOCIDOS O FRASES NO OPERATIVAS:
-Si el texto recibido no coincide con ninguna acción operativa o no se entiende, responde EXACTAMENTE:
+7. Si el operador pide iniciar una mesa con tiempo definido y menciona "pagado", "contado", "al contado", marca pagadoDeContado: true, modoJuego: "definido".
+8. Si el operador pide finalizar o cobrar una mesa y pasar la cuenta a un cliente (ej: "finaliza la mesa 1 y pasa la cuenta a Samuel"), tipoAccion: "PASAR_MESA_A_CUENTA", numeroMesa: 1, nombreCliente: "Samuel".
+9. Si el operador pide dividir la cuenta (ej: "divide la cuenta de la mesa 1 entre 2 en efectivo"), tipoAccion: "DIVIDIR_CUENTA_MESA", numeroMesa: 1, numeroPartes: 2, metodoPago: "Efectivo".
+10. REGLA PARA COMANDOS NO RECONOCIDOS O FRASES NO OPERATIVAS:
+Si el texto recibido no coincide con ninguna acción operativa de billar, bar, POS, cuentas o máquinas, responde EXACTAMENTE:
 tipoAccion: "NO_ENTENDIDO", mensajeVoz: "Comando no reconocido.", explicacion: "Comando no reconocido." SIN dar sugerencias ni explicaciones adicionales.`;
 
   const contextStr = [
@@ -882,7 +935,7 @@ tipoAccion: "NO_ENTENDIDO", mensajeVoz: "Comando no reconocido.", explicacion: "
     input.maquinasContexto?.length ? `Máquinas: ${JSON.stringify(input.maquinasContexto.map(m => ({ nombre: m.nombre, totalBase: m.totalBase, deuda: m.totalDeuda })))}` : '',
   ].filter(Boolean).join('\n');
 
-  const models = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b'];
+  const models = ['openai/gpt-oss-20b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-120b'];
 
   for (const model of models) {
     try {
@@ -901,7 +954,7 @@ tipoAccion: "NO_ENTENDIDO", mensajeVoz: "Comando no reconocido.", explicacion: "
           response_format: { type: 'json_object' },
           temperature: 0.1
         }),
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(8500)
       });
 
       if (!res.ok) {

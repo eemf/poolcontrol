@@ -12,9 +12,25 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 302,
+    build: 303,
     fecha: "2026-10-11",
     estado: "publicada_actual",
+    tipo: "Parche",
+    tagGit: "v1.0.0-b303",
+    descripcion: "Corrección y priorización del motor de IA en el Asistente de Voz para comandos de cuentas y cuentas pendientes.",
+    cambios: [
+      "Prioridad estricta al motor de IA (Groq): Inclusión de directrices completas en el modelo de lenguaje para interpretar órdenes de agregar productos a cuentas y cuentas pendientes ('a la cuenta de X', 'a la cuenta pendiente de X', 'a una cuenta pendiente', etc.).",
+      "Corrección de función auxiliar: Se implementó la función extraerCantidad requerida por el procesador, eliminando el fallo interno que activaba el motor local.",
+      "Búsqueda dual de cuentas de clientes: El ejecutor de voz ahora localiza clientes tanto en la colección de clientes como en las ventas pendientes de pago abiertas en la sucursal.",
+      "Asignación automática contextual: Si hay una única cuenta pendiente abierta y no se especifica cliente, el sistema la vincula o consulta amablemente a quién cargar el pedido.",
+      "Mayor resiliencia de modelos: Inclusión de modelo de lenguaje de respaldo adicional y extensión del tiempo de espera para evitar fallbacks indebidos."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 302,
+    fecha: "2026-10-11",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b302",
     descripcion: "Modificación de contraseñas de usuarios en sucursales y maestro, control estricto de sesión y privacidad de credenciales.",

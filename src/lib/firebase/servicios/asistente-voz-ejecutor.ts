@@ -256,7 +256,27 @@ async function buscarCliente(
       mejorCoincidencia = { id: c.id, nombre: c.nombre, dist: d };
     }
   }
-  return mejorCoincidencia ? { id: mejorCoincidencia.id, nombre: mejorCoincidencia.nombre } : null;
+  if (mejorCoincidencia) return { id: mejorCoincidencia.id, nombre: mejorCoincidencia.nombre };
+
+  // Buscar también en ventas pendientes de pago por si el cliente tiene cuenta abierta
+  try {
+    const qVentas = query(
+      collection(firestore, `sucursales/${sid}/ventas`),
+      where('estado', '==', 'Pendiente de pago')
+    );
+    const snapVentas = await getDocs(qVentas);
+    for (const vDoc of snapVentas.docs) {
+      const data = vDoc.data();
+      const n = (data.nombreCliente || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      if (n === normBuscado || n.split(/\s+/).includes(normBuscado) || n.includes(normBuscado) || normBuscado.includes(n)) {
+        return { id: data.clienteId || vDoc.id, nombre: data.nombreCliente };
+      }
+    }
+  } catch (errV) {
+    console.warn('Error buscando cliente en ventas pendientes:', errV);
+  }
+
+  return null;
 }
 
 async function buscarVentaPendienteDeCliente(
@@ -285,7 +305,7 @@ async function buscarVentaPendienteDeCliente(
   for (const vDoc of snapVentas.docs) {
     const data = vDoc.data();
     const n = (data.nombreCliente || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-    if (n === normBuscado || n.split(/\s+/).includes(normBuscado)) {
+    if (n === normBuscado || n.split(/\s+/).includes(normBuscado) || n.includes(normBuscado) || normBuscado.includes(n)) {
       return vDoc;
     }
   }
@@ -985,7 +1005,25 @@ export async function ejecutarAccionVoz(
 
       // 10. AGREGAR CONSUMO A CUENTA DE CLIENTE
       case 'AGREGAR_CONSUMO_CUENTA': {
-        const nomC = accion.nombreCliente?.trim();
+        let nomC = accion.nombreCliente?.trim();
+        if (!nomC) {
+          try {
+            const qVentasPendientes = query(
+              collection(firestore, `sucursales/${sid}/ventas`),
+              where('estado', '==', 'Pendiente de pago')
+            );
+            const snapPendientes = await getDocs(qVentasPendientes);
+            if (snapPendientes.size === 1) {
+              const vData = snapPendientes.docs[0].data();
+              if (vData.nombreCliente) {
+                nomC = vData.nombreCliente;
+              }
+            }
+          } catch (ePend) {
+            console.warn('Error verificando cuenta pendiente única:', ePend);
+          }
+        }
+
         if (!nomC) {
           return { exito: false, tipoAccion: accion.tipoAccion, mensaje: 'Cliente no especificado.', mensajeVoz: '¿A qué cliente deseas cargar el consumo?' };
         }
