@@ -3,10 +3,13 @@
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore, doc, getDoc, setDoc, getDocs, collectionGroup, query, where, limit } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 import type { UserAuthLookup } from '@/lib/tipos';
 import { registrarCacheUsuario } from '@/lib/firebase/servicios/auditoria';
+
+// Clave para identificar sesiones activas dentro de la ventana del navegador
+export const SESION_ACTIVA_KEY = 'pool_control_session_activa';
 
 // Internal state for user authentication
 interface UserAuthState {
@@ -84,13 +87,30 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
-    setUserAuthState({ user: null, isUserLoading: true, userError: null, claims: null }); // Reset on auth instance change
-    setProfile(null);
+    // Asegurar que la persistencia de autenticación esté vinculada a la sesión actual del navegador
+    setPersistence(auth, browserSessionPersistence).catch((err) => {
+      console.warn("FirebaseProvider: no se pudo fijar persistencia de sesión", err);
+    });
 
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser) => { // Auth state determined
         if (firebaseUser) {
+            // Verificar si el usuario proviene de una sesión activa iniciada en esta ventana del navegador
+            const tieneSesionValida = typeof window !== 'undefined' && sessionStorage.getItem(SESION_ACTIVA_KEY) === 'true';
+
+            if (!tieneSesionValida) {
+                // El navegador se abrió de nuevo o no hay sesión en esta ventana: limpiar token residual
+                try {
+                    await signOut(auth);
+                } catch (e) {
+                    console.warn("FirebaseProvider: error al limpiar sesión residual", e);
+                }
+                setUserAuthState({ user: null, isUserLoading: false, userError: null, claims: null });
+                setProfile(null);
+                return;
+            }
+
             try {
                 // Fetch claims first
                 const idTokenResult = await firebaseUser.getIdTokenResult(true);

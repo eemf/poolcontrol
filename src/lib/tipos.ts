@@ -172,7 +172,10 @@ export interface Pago {
     esVirtual?: boolean;
     cantidad?: number;
     idProducto?: string;
+    idVenta?: number;
   }[];
+  grupoPagoId?: string;
+  totalOperacion?: number;
 }
 
 export interface CierreCaja {

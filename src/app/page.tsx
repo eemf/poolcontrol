@@ -1,25 +1,28 @@
-'use client'
-import { useUser } from '@/firebase'
-import { redirect } from 'next/navigation'
-import { useEffect } from 'react'
+'use client';
+
+import { useUser } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Home() {
-  const { user, isUserLoading, isAdmin } = useUser()
+  const { user, isUserLoading, isAdmin } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isUserLoading) {
-      if (user) {
+      const tieneSesionValida = typeof window !== 'undefined' && sessionStorage.getItem('pool_control_session_activa') === 'true';
+      if (user && tieneSesionValida) {
         if (isAdmin) {
-          redirect('/admin-success');
+          router.replace('/admin-success');
         } else {
-          redirect('/dashboard');
+          router.replace('/dashboard');
         }
       } else {
-        redirect('/login');
+        router.replace('/login');
       }
     }
-  }, [user, isUserLoading, isAdmin]);
+  }, [user, isUserLoading, isAdmin, router]);
 
-  // Prevent rendering anything until redirection is determined
+  // Evitar renderizado mientras se resuelve la redirección
   return null;
 }

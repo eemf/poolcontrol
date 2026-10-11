@@ -351,16 +351,48 @@ export default function PaginaVentasPOS() {
     } catch (e: any) { toast({ title: "Error", description: e.message, variant: "destructive" }); }
   };
 
+  const manejarPermanecerEnVenta = () => {
+    setAlertaCancelarVentaAbierta(false);
+    if (clienteSeleccionadoId && clienteInputRef.current) {
+      const cli = clientes.find(c => c.id === clienteSeleccionadoId);
+      if (cli) {
+        clienteInputRef.current.value = cli.nombre;
+      }
+    }
+  };
+
   const manejarConfirmarCancelacion = async () => {
     if (!firestore || !user) return;
-    if (idVentaActiva) {
-      const v = ventasPendientes.find(x => x.id === idVentaActiva);
-      const idsOrig = new Set(v?.detalles.map(d => d.idDetalle));
-      const aDev = carrito.filter(item => item.idDetalle === 0 || !idsOrig.has(item.idDetalle));
-      if (aDev.length > 0) await cancelarVentaYDevolverStock(firestore, sucursalId, idVentaActiva, aDev, user.uid);
-    } else if (carrito.length > 0) await cancelarVentaYDevolverStock(firestore, sucursalId, null, carrito, user.uid);
-    setClienteSeleccionadoId(''); setCarrito([]); setIdVentaActiva(null); setAlertaCancelarVentaAbierta(false);
-    clienteInputRef.current?.focus();
+    try {
+      if (idVentaActiva) {
+        const v = ventasPendientes.find(x => x.id === idVentaActiva) || ventasACredito.find(x => x.id === idVentaActiva);
+        const idsOrig = new Set(v?.detalles.map(d => d.idDetalle));
+        const aDev = carrito.filter(item => item.idDetalle === 0 || !idsOrig.has(item.idDetalle));
+        if (aDev.length > 0) {
+          // Devolver el stock de los productos nuevos agregados en esta edición SIN borrar la venta existente
+          await cancelarVentaYDevolverStock(firestore, sucursalId, idVentaActiva, aDev, user.uid, false);
+          toast({
+            title: "Cambios descartados",
+            description: `Se devolvió el stock de ${aDev.length} producto(s). La cuenta de ${v?.nombreCliente || 'cliente'} se mantiene intacta.`,
+          });
+        }
+      } else if (carrito.length > 0) {
+        await cancelarVentaYDevolverStock(firestore, sucursalId, null, carrito, user.uid, false);
+        toast({
+          title: "Venta descartada",
+          description: "Se devolvió el stock de los artículos al inventario.",
+        });
+      }
+    } catch (e: any) {
+      console.error("Error al descartar cambios:", e);
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    } finally {
+      setClienteSeleccionadoId('');
+      setCarrito([]);
+      setIdVentaActiva(null);
+      setAlertaCancelarVentaAbierta(false);
+      clienteInputRef.current?.focus();
+    }
   };
 
   const abrirDialogoConsumoInterno = (venta: Venta) => { setVentaParaConsumo(venta); setPinConsumo(''); setDialogoConsumoInternoAbierto(true); };
@@ -475,7 +507,7 @@ export default function PaginaVentasPOS() {
           dialogoPagoAbierto, vistaDialogo, dialogoAbonoAbierto, dialogoConsumoInternoAbierto, alertaCancelarVentaAbierta, alertaEliminarAbierta, alertaCreditoMonedasAbierta, alertaClienteConCreditoAbierta, ventaParaPagar, ventaParaConsumo, clienteParaEliminar, itemsSeleccionadosParaPagar, montoAbono, montoAPagarDialogo, pinConsumo, procesandoPagoCredito, procesandoGuardado,
           incluirCreditoEnPago, saldoCreditoCliente
         }}
-        actions={{ setDialogoPagoAbierto, setVistaDialogo, setDialogoAbonoAbierto, setDialogoConsumoInternoAbierto, setAlertaCancelarVentaAbierta, setAlertaEliminarAbierta, setAlertaCreditoMonedasAbierta, setAlertaClienteConCreditoAbierta, setItemsSeleccionadosParaPagar, setMontoAbono, setPinConsumo, manejarConfirmarAbono, procederConPago, manejarConfirmarCancelacion, manejarConfirmarEliminarCliente: () => { eliminarCliente(firestore!, sucursalId, clienteParaEliminar!.id); setAlertaEliminarAbierta(false); }, confirmarPasarACredito: (v) => confirmarPasarACredito(v), procederAGuardarVenta, confirmarConsumoInterno, setIncluirCreditoEnPago }}
+        actions={{ setDialogoPagoAbierto, setVistaDialogo, setDialogoAbonoAbierto, setDialogoConsumoInternoAbierto, setAlertaCancelarVentaAbierta, setAlertaEliminarAbierta, setAlertaCreditoMonedasAbierta, setAlertaClienteConCreditoAbierta, setItemsSeleccionadosParaPagar, setMontoAbono, setPinConsumo, manejarConfirmarAbono, procederConPago, manejarConfirmarCancelacion, manejarPermanecerEnVenta, manejarConfirmarEliminarCliente: () => { eliminarCliente(firestore!, sucursalId, clienteParaEliminar!.id); setAlertaEliminarAbierta(false); }, confirmarPasarACredito: (v) => confirmarPasarACredito(v), procederAGuardarVenta, confirmarConsumoInterno, setIncluirCreditoEnPago }}
       />
     </div>
   );

@@ -107,6 +107,69 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
     );
   };
 
+  const resumenCredito = useMemo(() => {
+    const totalGlobal = state.ventasACredito.reduce((acc, v) => acc + (v.saldo || 0), 0);
+    const cantidadGlobal = state.ventasACredito.length;
+
+    const textoFiltro = (state.filtroCuentas || '').trim().toLowerCase();
+    const hayFiltro = textoFiltro.length > 0;
+
+    if (!hayFiltro) {
+      return {
+        hayFiltro: false,
+        titulo: 'Total Cuentas a Crédito',
+        subtitulo: `${cantidadGlobal} ${cantidadGlobal === 1 ? 'cuenta registrada' : 'cuentas registradas'}`,
+        monto: totalGlobal,
+        deudaTotalGlobal: null,
+      };
+    }
+
+    const totalFiltrado = cuentasFiltradas.reduce((acc, v) => acc + (v.saldo || 0), 0);
+    const cantidadFiltrada = cuentasFiltradas.length;
+
+    // Detectar si el filtro corresponde a un único cliente
+    const nombresClientes = Array.from(new Set(cuentasFiltradas.map(v => v.nombreCliente).filter(Boolean)));
+    const esClienteUnico = nombresClientes.length === 1;
+
+    if (esClienteUnico) {
+      const nombre = nombresClientes[0];
+      const clienteId = cuentasFiltradas[0]?.clienteId;
+
+      // Buscar si tiene saldo en cuenta actual pendiente
+      const saldoPendienteActual = clienteId
+        ? state.ventasPendientes.filter(v => v.clienteId === clienteId).reduce((acc, v) => acc + (v.saldo || 0), 0)
+        : 0;
+
+      return {
+        hayFiltro: true,
+        titulo: `Deuda de ${nombre}`,
+        subtitulo: saldoPendienteActual > 0
+          ? `${cantidadFiltrada} ${cantidadFiltrada === 1 ? 'crédito' : 'créditos'} (+ Q${saldoPendienteActual.toFixed(2)} cuenta actual)`
+          : `${cantidadFiltrada} ${cantidadFiltrada === 1 ? 'cuenta a crédito' : 'cuentas a crédito'}`,
+        monto: totalFiltrado,
+        deudaTotalGlobal: saldoPendienteActual > 0 ? (totalFiltrado + saldoPendienteActual) : null,
+      };
+    }
+
+    if (cantidadFiltrada > 0) {
+      return {
+        hayFiltro: true,
+        titulo: `Total Filtrado (${nombresClientes.length} clientes)`,
+        subtitulo: `${cantidadFiltrada} ${cantidadFiltrada === 1 ? 'cuenta encontrada' : 'cuentas encontradas'}`,
+        monto: totalFiltrado,
+        deudaTotalGlobal: null,
+      };
+    }
+
+    return {
+      hayFiltro: true,
+      titulo: 'Sin coincidencias en crédito',
+      subtitulo: `No se encontraron cuentas para "${state.filtroCuentas}"`,
+      monto: 0,
+      deudaTotalGlobal: null,
+    };
+  }, [state.ventasACredito, state.ventasPendientes, cuentasFiltradas, state.filtroCuentas]);
+
   return (
     <Tabs value={state.vistaCuentas} onValueChange={(value) => actions.setVistaCuentas(value as any)} className="w-full font-body">
       <Card className="border shadow-sm">
@@ -144,6 +207,49 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
         </div>
         <CardContent className='p-0'>
           <TabsContent value={state.vistaCuentas} className="mt-2">
+            {/* Resumen de Total a Crédito / Deuda por Cliente */}
+            {state.vistaCuentas === 'credito' && state.ventasACredito.length > 0 && (
+              <div className="px-4 pb-2.5">
+                <div className="flex items-center justify-between p-2.5 px-3 rounded-lg bg-[#17202e] border border-[#324157] shadow-sm">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border",
+                      resumenCredito.hayFiltro 
+                        ? "bg-cyan-500/15 border-cyan-400/30 text-cyan-400" 
+                        : "bg-blue-500/15 border-blue-400/30 text-blue-400"
+                    )}>
+                      {resumenCredito.hayFiltro ? (
+                        <User className="w-4 h-4" />
+                      ) : (
+                        <CreditCard className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-bold text-slate-100 truncate">
+                        {resumenCredito.titulo}
+                      </span>
+                      <span className="text-[11px] text-slate-400 truncate">
+                        {resumenCredito.subtitulo}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end shrink-0 pl-2">
+                    <span className={cn(
+                      "text-base font-bold font-mono tracking-tight",
+                      resumenCredito.hayFiltro ? "text-cyan-400" : "text-blue-400"
+                    )}>
+                      Q{resumenCredito.monto.toFixed(2)}
+                    </span>
+                    {resumenCredito.deudaTotalGlobal !== null && (
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        Total: <span className="text-indigo-400 font-bold font-mono">Q{resumenCredito.deudaTotalGlobal.toFixed(2)}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {cuentasFiltradas.length === 0 ? (
               <div className="flex items-center justify-center h-48 border-2 border-dashed border-muted-foreground/30 rounded-lg m-4">
                 <p className="text-muted-foreground italic text-sm">No hay cuentas {state.vistaCuentas === 'pendientes' ? 'pendientes' : 'a crédito'}.</p>

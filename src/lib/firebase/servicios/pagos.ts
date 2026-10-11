@@ -21,7 +21,8 @@ export async function registrarAbonoACuenta(
   sucursalId: string,
   ventaId: string,
   montoAbono: number,
-  usuarioId: string
+  usuarioId: string,
+  metodoPago: 'Efectivo' | 'Tarjeta' = 'Efectivo'
 ) {
     if (!usuarioId) throw new Error("Se requiere un ID de usuario para registrar un abono.");
     
@@ -119,9 +120,13 @@ export async function registrarAbonoACuenta(
         });
 
         // Actualizar contadores globales de ingresos
-        if (abonoAplicadoAOtros > 0) transaction.update(generalesRef, { totalEfectivo: increment(abonoAplicadoAOtros) });
-        if (abonoAplicadoAMesas > 0) transaction.update(generalesRef, { totalMesas: increment(abonoAplicadoAMesas) });
-        if (abonoAplicadoAMonedas > 0) transaction.update(generalesRef, { totalVentasMonedas: increment(abonoAplicadoAMonedas) });
+        if (metodoPago === 'Tarjeta') {
+            transaction.update(generalesRef, { totalVentasTarjeta: increment(montoAbono) });
+        } else {
+            if (abonoAplicadoAOtros > 0) transaction.update(generalesRef, { totalEfectivo: increment(abonoAplicadoAOtros) });
+            if (abonoAplicadoAMesas > 0) transaction.update(generalesRef, { totalMesas: increment(abonoAplicadoAMesas) });
+            if (abonoAplicadoAMonedas > 0) transaction.update(generalesRef, { totalVentasMonedas: increment(abonoAplicadoAMonedas) });
+        }
         
         // Si la venta estaba a crédito, descontar del contador de deuda global
         if (venta.estado === 'credito' && abonoAplicadoAMonedas > 0) {
@@ -138,7 +143,7 @@ export async function registrarAbonoACuenta(
             clienteNombre: venta.nombreCliente,
             montoTotalPagado: montoAbono,
             ventaTotal: venta.total,
-            metodoPago: 'Efectivo',
+            metodoPago: metodoPago,
             usuarioId,
             itemsSaldados,
         };
@@ -147,8 +152,8 @@ export async function registrarAbonoACuenta(
 
         registrarAuditoria(firestore, sucursalId, {
             usuarioId,
-            categoria: 'VENTAS',
-            accion: 'VENTA_ABONAR',
+            categoria: 'ventas',
+            accion: 'abono_registrado',
             titulo: `Abono a cuenta #${venta.idVenta}`,
             descripcion: `${venta.nombreCliente} - Abono de Q${montoAbono.toFixed(2)} (Saldo rest: Q${(venta.saldo - montoAbono).toFixed(2)})`,
             detalles: {
@@ -501,6 +506,7 @@ export async function procesarPagoUnificado(
             ventasCreditoDocs = snap.docs;
         }
 
+        const grupoPagoId = `grp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         let siguienteIdPago = (corrPagosSnap.data()?.correlativo || 0) + 1;
         
         // --- PROCESAMIENTO VENTA PRINCIPAL ---
@@ -518,7 +524,8 @@ export async function procesarPagoUnificado(
                 totalPagadoPrincipal += monto;
                 saldadosPrincipal.push({
                     idDetalle: detalle.idDetalle, nombreProducto: detalle.nombreProducto, montoAplicado: monto, 
-                    subtotalItem: detalle.subtotal, cantidad: detalle.cantidad, esVirtual: !!detalle.esVirtual, idProducto: detalle.idProducto
+                    subtotalItem: detalle.subtotal, cantidad: detalle.cantidad, esVirtual: !!detalle.esVirtual, idProducto: detalle.idProducto,
+                    idVenta: ventaPrincipal.idVenta
                 });
 
                 const esMesa = esAlquilerMesa(detalle.idProducto, detalle.nombreProducto);
@@ -552,7 +559,8 @@ export async function procesarPagoUnificado(
                     totalPagadoVenta += monto;
                     saldadosVenta.push({
                         idDetalle: detalle.idDetalle, nombreProducto: detalle.nombreProducto, montoAplicado: monto,
-                        subtotalItem: detalle.subtotal, cantidad: detalle.cantidad, esVirtual: !!detalle.esVirtual, idProducto: detalle.idProducto
+                        subtotalItem: detalle.subtotal, cantidad: detalle.cantidad, esVirtual: !!detalle.esVirtual, idProducto: detalle.idProducto,
+                        idVenta: vData.idVenta
                     });
 
                     const esMesa = esAlquilerMesa(detalle.idProducto, detalle.nombreProducto);
@@ -580,7 +588,7 @@ export async function procesarPagoUnificado(
             transaction.set(doc(firestore, `sucursales/${sid}/pagos`, idP.toString()), {
                 idPago: idP, sucursalId: sid, fecha: Timestamp.now(), idVenta: vData.idVenta, ventaDocId: vDoc.id,
                 clienteNombre: vData.nombreCliente, montoTotalPagado: totalPagadoVenta, ventaTotal: vData.total, 
-                metodoPago: metodoDePago, usuarioId, itemsSaldados: saldadosVenta
+                metodoPago: metodoDePago, usuarioId, itemsSaldados: saldadosVenta, grupoPagoId
             });
         }
 
@@ -590,7 +598,7 @@ export async function procesarPagoUnificado(
             transaction.set(doc(firestore, `sucursales/${sid}/pagos`, idP.toString()), {
                 idPago: idP, sucursalId: sid, fecha: Timestamp.now(), idVenta: ventaPrincipal.idVenta, ventaDocId: ventaPrincipalId,
                 clienteNombre: ventaPrincipal.nombreCliente, montoTotalPagado: totalPagadoPrincipal, ventaTotal: ventaPrincipal.total,
-                metodoPago: metodoDePago, usuarioId, itemsSaldados: saldadosPrincipal
+                metodoPago: metodoDePago, usuarioId, itemsSaldados: saldadosPrincipal, grupoPagoId
             });
         }
 
@@ -714,6 +722,7 @@ export async function registrarAbonoGeneral(
             throw new Error(`El abono (Q${montoAbono.toFixed(2)}) excede la deuda total del cliente (Q${saldoTotalDisponible.toFixed(2)}).`);
         }
 
+        const grupoPagoId = `grp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         let abonoRestante = montoAbono;
         let siguienteIdPago = (corrPagosDoc.data()?.correlativo || 0) + 1;
 
@@ -761,7 +770,8 @@ export async function registrarAbonoGeneral(
                     subtotalItem: detalle.subtotal,
                     cantidad: detalle.cantidad || 1,
                     esVirtual: !!detalle.esVirtual,
-                    idProducto: detalle.idProducto
+                    idProducto: detalle.idProducto,
+                    idVenta: venta.idVenta
                 });
 
                 const nuevoSaldoDetalle = detalle.saldo - montoAplicar;
@@ -820,6 +830,8 @@ export async function registrarAbonoGeneral(
                 metodoPago: metodoDePago,
                 usuarioId,
                 itemsSaldados,
+                grupoPagoId,
+                totalOperacion: montoAbono,
             };
             transaction.set(doc(firestore, `sucursales/${sid}/pagos`, idPagoActual.toString()), pagoData);
 

@@ -10,11 +10,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { useFirebase, useUser, useCollection, useMemoFirebase } from "@/firebase"
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login"
-import { collection, doc, setDoc, deleteDoc, query, orderBy, runTransaction } from "firebase/firestore"
+import { collection, doc, setDoc, deleteDoc, query, orderBy, runTransaction, updateDoc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import { Switch } from "@/components/ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 const FEATURE_GROUPS = [
     {
@@ -196,6 +197,18 @@ export default function PaginaSucursales() {
     router.push('/dashboard');
   };
 
+  const handleToggleVoice = async (sucursal: SucursalConDocId, enabled: boolean) => {
+    if (!firestore) return;
+    try {
+      const sucursalRef = doc(firestore, 'sucursales', sucursal.docId);
+      await updateDoc(sucursalRef, {
+        'features.asistenteVoz': enabled,
+      });
+    } catch (error) {
+      console.error("Error al actualizar control por voz:", error);
+    }
+  };
+
   const sucursalesConDocId = useMemo((): SucursalConDocId[] => {
     return (sucursales || []).map((s) => ({
       ...s,
@@ -266,10 +279,34 @@ export default function PaginaSucursales() {
                                 </div>
                             </CardHeader>
                             <CardContent className="flex-grow">
-                                <CardDescription className="font-body text-xs mb-4">
+                                <CardDescription className="font-body text-xs mb-3">
                                     ID #{sucursal.idSucursal} • {sucursal.direccion || 'Sin dirección registrada'}
                                 </CardDescription>
                                 
+                                {/* Control directo de Comandos de Voz por sucursal */}
+                                <div className="flex items-center justify-between p-2.5 my-2.5 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className={cn(
+                                            "h-8 w-8 rounded-lg flex items-center justify-center border transition-colors",
+                                            sucursal.features?.asistenteVoz !== false 
+                                                ? "bg-blue-500/10 text-blue-500 border-blue-500/30" 
+                                                : "bg-muted text-muted-foreground border-border"
+                                        )}>
+                                            <Mic className="h-4 w-4" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold text-foreground">Comandos de Voz</p>
+                                            <p className="text-[10px] text-muted-foreground">
+                                                {sucursal.features?.asistenteVoz !== false ? 'Activo en esta sucursal' : 'Desactivado'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <Switch 
+                                        checked={sucursal.features?.asistenteVoz !== false}
+                                        onCheckedChange={(checked) => handleToggleVoice(sucursal, checked)}
+                                    />
+                                </div>
+
                                 <div className="flex flex-wrap gap-1.5 mt-2">
                                     <TooltipProvider>
                                         {ALL_FEATURES.slice(0, 10).map(f => {
@@ -283,7 +320,7 @@ export default function PaginaSucursales() {
                                                         </div>
                                                     </TooltipTrigger>
                                                     <TooltipContent side="top">
-                                                        <p className="text-[10px] font-bold uppercase tracking-widest">{f.label}</p>
+                                                        <p className="text-[10px] font-semibold tracking-wide">{f.label}</p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             )

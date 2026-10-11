@@ -9,8 +9,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFirebase, useUser } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
 import type { Mesa, Producto, ProductoVirtual, Tarifa, GeneralesTragamonedas } from '@/lib/tipos';
-import { procesarComandoVoz, type AsistenteVozOutput } from '@/ai/flows/asistente-voz';
-import { ejecutarAccionVoz, type ResultadoEjecucionVoz } from '@/lib/firebase/servicios/asistente-voz-ejecutor';
+import { interpretarComandoLocal, type AsistenteVozOutput } from '@/ai/flows/asistente-voz';
+import {
+  ejecutarAccionVoz,
+  ejecutarAccionConfirmada,
+  type ResultadoEjecucionVoz,
+  type AccionConfirmable
+} from '@/lib/firebase/servicios/asistente-voz-ejecutor';
 import { useToast } from '@/hooks/use-toast';
 
 export interface UseVoiceAssistantProps {
@@ -42,9 +47,12 @@ export function useVoiceAssistant({
   const [interimTranscript, setInterimTranscript] = useState('');
   const [lastAction, setLastAction] = useState<AsistenteVozOutput | null>(null);
   const [lastResult, setLastResult] = useState<ResultadoEjecucionVoz | null>(null);
+  const [pendingConfirmation, setPendingConfirmation] = useState<AccionConfirmable | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSecureContext, setIsSecureContext] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+
+  const pendingConfirmationRef = useRef<AccionConfirmable | null>(null);
 
   // Referencias para evitar Stale Closures
   const recognitionRef = useRef<any>(null);
@@ -56,7 +64,10 @@ export function useVoiceAssistant({
   const accumulatedTextRef = useRef<string>('');
   const isProcessingRef = useRef<boolean>(false);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioDecayTimerRef = useRef<NodeJS.Timeout | null>(null);
   const handleProcessVoiceRef = useRef<(text: string) => Promise<void>>(() => Promise.resolve());
+
+  const isMobileRef = useRef<boolean>(false);
 
   // Detección de dispositivo móvil/tablet
   useEffect(() => {
@@ -64,6 +75,7 @@ export function useVoiceAssistant({
     const mobileDetected = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
       (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
     setIsMobile(!!mobileDetected);
+    isMobileRef.current = !!mobileDetected;
 
     const secure = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     setIsSecureContext(!!secure);
@@ -97,6 +109,61 @@ export function useVoiceAssistant({
     }
   }, []);
 
+  // Confirmar y ejecutar la acción pendiente (ej. crear cliente no existente)
+  const confirmPendingAction = useCallback(async () => {
+    const pending = pendingConfirmationRef.current;
+    if (!pending || !firestore || !sucursalId) return;
+
+    isProcessingRef.current = true;
+    setIsProcessing(true);
+    try {
+      const resultado = await ejecutarAccionConfirmada(
+        firestore,
+        sucursalId,
+        user?.uid || 'operador',
+        pending
+      );
+
+      pendingConfirmationRef.current = null;
+      setPendingConfirmation(null);
+      setLastResult(resultado);
+
+      if (resultado.mensajeVoz) {
+        speak(resultado.mensajeVoz);
+      }
+
+      toast({
+        title: resultado.exito ? 'Operación completada' : 'Aviso',
+        description: resultado.mensaje,
+        variant: resultado.exito ? 'default' : 'destructive',
+        duration: 5000,
+      });
+    } catch (err: any) {
+      console.error('Error al ejecutar acción confirmada:', err);
+      const errMsg = err?.message || 'Error al confirmar la acción.';
+      speak('Ocurrió un error al procesar la confirmación.');
+      toast({
+        title: 'Error',
+        description: errMsg,
+        variant: 'destructive',
+      });
+    } finally {
+      isProcessingRef.current = false;
+      setIsProcessing(false);
+    }
+  }, [firestore, sucursalId, user, speak, toast]);
+
+  // Cancelar la acción pendiente
+  const cancelPendingAction = useCallback(() => {
+    pendingConfirmationRef.current = null;
+    setPendingConfirmation(null);
+    speak('Operación cancelada.');
+    toast({
+      title: 'Acción cancelada',
+      description: 'No se creó el cliente ni se aplicaron cambios.',
+    });
+  }, [speak, toast]);
+
   // Procesar transcripción con IA y ejecutar acción
   const handleProcessVoice = useCallback(
     async (textParaProcesar: string) => {
@@ -110,6 +177,25 @@ export function useVoiceAssistant({
           variant: 'destructive',
         });
         return;
+      }
+
+      // Si hay una acción pendiente de confirmación (ej: cliente inexistente), verificar respuesta sí / no
+      if (pendingConfirmationRef.current) {
+        const lower = textoLimpio.toLowerCase().trim();
+        const esAfirmativo = /^(?:s[ií]|confirmar?|crear?|cr[eé]alo|crealo|hazlo|dale|adelante|afirmativo|proceder|ok|acepto|claro|por favor)/i.test(lower);
+        const esNegativo = /^(?:no|cancelar?|d[eé]jalo|dejalo|olv[ií]dalo|olvidalo|para|negativo|abortar|rechazar?)/i.test(lower);
+
+        if (esAfirmativo) {
+          await confirmPendingAction();
+          return;
+        } else if (esNegativo) {
+          cancelPendingAction();
+          return;
+        } else {
+          // Si el usuario da un comando nuevo, descartamos la confirmación previa y procesamos el comando
+          pendingConfirmationRef.current = null;
+          setPendingConfirmation(null);
+        }
       }
 
       isProcessingRef.current = true;
@@ -139,14 +225,36 @@ export function useVoiceAssistant({
           totalDeuda: m.totalDeuda || 0,
         }));
 
-        // 1. Interpretar comando (IA Gemini 3.8 Flash o Motor Local NLP integrado)
-        const decisionIA = await procesarComandoVoz({
-          transcripcion: textoLimpio,
-          mesasContexto: mesasCtx,
-          productosNombres,
-          clientesNombres: clientes,
-          maquinasContexto: maquinasCtx,
-        });
+        // 1. Interpretar comando (Prioridad: Servidor /api/asistente-voz con IA Groq; Respaldo: Motor Local NLP)
+        let decisionIA: AsistenteVozOutput;
+        try {
+          const resp = await fetch('/api/asistente-voz', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              transcripcion: textoLimpio,
+              mesasContexto: mesasCtx,
+              productosNombres,
+              clientesNombres: clientes,
+              maquinasContexto: maquinasCtx,
+            }),
+          });
+          if (resp.ok) {
+            decisionIA = await resp.json();
+          } else {
+            throw new Error(`API respondió con status ${resp.status}`);
+          }
+        } catch (apiErr: any) {
+          console.warn('[Asistente Voz] Falló llamada a API de IA, recurriendo a motor local offline:', apiErr?.message);
+          decisionIA = await interpretarComandoLocal({
+            transcripcion: textoLimpio,
+            mesasContexto: mesasCtx,
+            productosNombres,
+            clientesNombres: clientes,
+            maquinasContexto: maquinasCtx,
+          });
+          decisionIA.motorUtilizado = 'motor_local';
+        }
 
         setLastAction(decisionIA);
 
@@ -167,17 +275,27 @@ export function useVoiceAssistant({
 
         setLastResult(resultado);
 
+        // Si requiere confirmación (ej: crear cliente nuevo), registrarlo para que espere respuesta sí/no
+        if (resultado.requiereConfirmacion && resultado.accionConfirmable) {
+          pendingConfirmationRef.current = resultado.accionConfirmable;
+          setPendingConfirmation(resultado.accionConfirmable);
+        } else {
+          pendingConfirmationRef.current = null;
+          setPendingConfirmation(null);
+        }
+
         // 3. Respuesta por voz
         if (resultado.mensajeVoz) {
           speak(resultado.mensajeVoz);
         }
 
-        // 4. Notificación visual
+        // 4. Notificación visual con indicación clara de motor utilizado
+        const motorEtiqueta = resultado.motorUtilizado === 'api_groq' ? '⚡ IA Groq' : '🏠 Motor Local';
         toast({
-          title: resultado.exito ? 'Asistente de Voz' : 'Aviso del Asistente',
+          title: resultado.exito ? `Asistente (${motorEtiqueta})` : `Aviso (${motorEtiqueta})`,
           description: resultado.mensaje,
-          variant: resultado.exito ? 'default' : 'destructive',
-          duration: 5000,
+          variant: resultado.exito ? 'default' : (resultado.requiereConfirmacion ? 'default' : 'destructive'),
+          duration: 6000,
         });
       } catch (err: any) {
         console.error('Error al procesar comando de voz:', err);
@@ -195,7 +313,7 @@ export function useVoiceAssistant({
         setIsProcessing(false);
       }
     },
-    [firestore, sucursalId, user, mesas, productos, tarifas, clientes, maquinas, speak, toast]
+    [firestore, sucursalId, user, mesas, productos, tarifas, clientes, maquinas, speak, toast, confirmPendingAction, cancelPendingAction]
   );
 
   useEffect(() => {
@@ -252,7 +370,9 @@ export function useVoiceAssistant({
           sum += dataArray[i];
         }
         const avg = sum / bufferLength;
-        const normalized = Math.min(100, Math.round((avg / 128) * 100));
+        // Puerta de ruido (noise gate): eliminar ruido blanco estático ambiental (< 18)
+        const effectiveAvg = avg > 18 ? avg - 18 : 0;
+        const normalized = Math.min(100, Math.round((effectiveAvg / 60) * 100));
         setAudioLevel(normalized);
 
         animFrameRef.current = requestAnimationFrame(updateLevel);
@@ -275,11 +395,8 @@ export function useVoiceAssistant({
       setIsSupported(true);
       const recognition = new SpeechRecognition();
 
-      // En móviles (Android/iOS), continuous = false es el estándar nativo para evitar cuelgues o cierres instantáneos
-      const mobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-        (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
-
-      recognition.continuous = !mobileDevice;
+      // continuous = true permite escuchar con fluidez sin cortes intempestivos al pausar brevemente
+      recognition.continuous = true;
       recognition.interimResults = true;
 
       // Detección de idioma preferido (español)
@@ -311,9 +428,13 @@ export function useVoiceAssistant({
           accumulatedTextRef.current = fullCaptured;
           setTranscript(fullCaptured);
 
-          // En móvil, animar ondas de volumen reactivas al texto
-          if (mobileDevice) {
-            setAudioLevel(Math.min(95, Math.max(30, fullCaptured.length * 6)));
+          // En móvil, actualizar nivel reactivo solo cuando hay voz transcrita real (con decaimiento a 0)
+          if (isMobileRef.current) {
+            setAudioLevel(Math.min(90, Math.max(35, Math.round(fullCaptured.length * 5))));
+            if (audioDecayTimerRef.current) clearTimeout(audioDecayTimerRef.current);
+            audioDecayTimerRef.current = setTimeout(() => {
+              setAudioLevel(0);
+            }, 600);
           }
         }
 
@@ -343,6 +464,8 @@ export function useVoiceAssistant({
 
       recognition.onend = () => {
         setIsListening(false);
+        setAudioLevel(0);
+        if (audioDecayTimerRef.current) clearTimeout(audioDecayTimerRef.current);
         stopAudioAnalyser();
 
         const textoPendiente = accumulatedTextRef.current.trim();
@@ -358,6 +481,7 @@ export function useVoiceAssistant({
 
     return () => {
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      if (audioDecayTimerRef.current) clearTimeout(audioDecayTimerRef.current);
       if (recognitionRef.current) {
         try {
           recognitionRef.current.abort();
@@ -390,13 +514,10 @@ export function useVoiceAssistant({
     setError(null);
 
     // En escritorio iniciamos analizador acústico; en móviles no para evitar bloqueo exclusivo del hardware
-    const mobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
-
-    if (!mobileDevice) {
+    if (!isMobileRef.current) {
       await startAudioAnalyser();
     } else {
-      setAudioLevel(35);
+      setAudioLevel(0); // Silencio real inicial
     }
 
     try {
@@ -418,7 +539,12 @@ export function useVoiceAssistant({
       clearTimeout(silenceTimerRef.current);
       silenceTimerRef.current = null;
     }
+    if (audioDecayTimerRef.current) {
+      clearTimeout(audioDecayTimerRef.current);
+      audioDecayTimerRef.current = null;
+    }
 
+    setAudioLevel(0);
     stopAudioAnalyser();
 
     if (recognitionRef.current) {
@@ -456,6 +582,9 @@ export function useVoiceAssistant({
     interimTranscript,
     lastAction,
     lastResult,
+    pendingConfirmation,
+    confirmPendingAction,
+    cancelPendingAction,
     error,
     startListening,
     stopListening,

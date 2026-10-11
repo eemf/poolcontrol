@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo, FormEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Loader2, Save, Trash2, Edit, PlusCircle, Search, UserCheck, ShieldCheck } from "lucide-react"
+import { Loader2, Save, Trash2, Edit, PlusCircle, Search, UserCheck, ShieldCheck, KeyRound } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Switch } from "@/components/ui/switch"
+import { DialogoCambiarPassword } from "@/components/usuarios/DialogoCambiarPassword"
+import { cambiarPasswordUsuario } from "@/lib/firebase/servicios/usuarios-auth"
 
 type Usuario = {
   authUid: string;
@@ -50,6 +52,8 @@ export default function PaginaUsuarios() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UsuarioConDocId | null>(null);
   const [editingUser, setEditingUser] = useState<UsuarioConDocId | null>(null);
+  const [usuarioParaPassword, setUsuarioParaPassword] = useState<UsuarioConDocId | null>(null);
+  const [modalPasswordOpen, setModalPasswordOpen] = useState(false);
   
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -169,6 +173,34 @@ export default function PaginaUsuarios() {
         };
         batch.update(userInSucursalRef, dataToUpdate);
         batch.update(userAuthLookupRef, { nombre, rol: roleName, sucursalId: selectedSucursalId, accesoGlobal });
+
+        // Si se suministró una nueva contraseña al editar
+        if (password.trim()) {
+          if (password.length < 6) {
+            toast({ title: "Error", description: "La nueva contraseña debe tener al menos 6 caracteres.", variant: "destructive" });
+            setLoading(false);
+            return;
+          }
+          const resPassword = await cambiarPasswordUsuario({
+            authUid: editingUser.authUid,
+            email: editingUser.email,
+            nuevaPassword: password,
+            currentUser,
+            auth,
+          });
+          if (!resPassword.ok) {
+            toast({
+              variant: "destructive",
+              title: "Aviso de contraseña",
+              description: resPassword.message,
+            });
+          } else {
+            toast({
+              title: "Contraseña actualizada",
+              description: `Se actualizó la contraseña para ${editingUser.nombre}.`,
+            });
+          }
+        }
       } else {
         const userInSucursalRef = doc(firestore, 'sucursales', selectedSucursalId, 'usuarios', finalAuthUid);
         const userAuthLookupRef = doc(firestore, 'user_auth_lookup', finalAuthUid);
@@ -330,10 +362,20 @@ export default function PaginaUsuarios() {
                                     <p className="text-muted-foreground text-xs font-body">{usuario.email}</p>
                                 </div>
                                 <div className="flex sm:justify-center">
-                                    <Badge variant={'outline'} className={cn('font-body rounded-full px-3 text-[10px] uppercase tracking-wider', getRolBadge(usuario.rol))}>{usuario.rol}</Badge>
+                                    <Badge variant={'outline'} className={cn('font-body rounded-full px-3 text-[10px] tracking-wider', getRolBadge(usuario.rol))}>{usuario.rol}</Badge>
                                 </div>
                             </div>
                            <div className="flex items-center gap-2 shrink-0 pt-4 sm:pt-0 sm:ml-auto">
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-8 w-8 rounded-full text-foreground hover:bg-primary/10" 
+                                    title="Modificar contraseña"
+                                    onClick={() => { setUsuarioParaPassword(usuario); setModalPasswordOpen(true); }}
+                                >
+                                    <KeyRound className="h-4 w-4 text-primary" />
+                                    <span className="sr-only">Cambiar contraseña</span>
+                                </Button>
                                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => handleOpenModal(usuario)}>
                                     <Edit className="h-4 w-4" />
                                     <span className="sr-only">Editar</span>
@@ -379,10 +421,26 @@ export default function PaginaUsuarios() {
                                 <Label htmlFor="email" className="text-xs font-semibold ml-1">Correo Electrónico*</Label>
                                 <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={!!editingUser} className="rounded-full" placeholder="email@sucursal.com" />
                             </div>
-                            {!editingUser && (
+                            {editingUser ? (
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="password" title="Mínimo 6 caracteres" className="text-xs font-semibold ml-1">Nueva Contraseña (opcional)</Label>
+                                    <Input 
+                                      id="password" 
+                                      type="password" 
+                                      value={password} 
+                                      onChange={(e) => setPassword(e.target.value)} 
+                                      className="rounded-full" 
+                                      placeholder="Dejar en blanco para no modificar"
+                                      autoComplete="new-password"
+                                    />
+                                    <p className="text-[10px] text-muted-foreground ml-1">
+                                      Solo ingresa una contraseña si deseas actualizar la actual de este usuario.
+                                    </p>
+                                </div>
+                            ) : (
                                 <div className="space-y-2">
                                     <Label htmlFor="password" title="Mínimo 6 caracteres" className="text-xs font-semibold ml-1">Contraseña*</Label>
-                                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="rounded-full" placeholder="••••••" />
+                                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="rounded-full" placeholder="••••••" autoComplete="new-password" />
                                 </div>
                             )}
                             <div className="space-y-2">
@@ -448,6 +506,12 @@ export default function PaginaUsuarios() {
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
+
+        <DialogoCambiarPassword 
+            usuario={usuarioParaPassword}
+            abierto={modalPasswordOpen}
+            onOpenChange={setModalPasswordOpen}
+        />
     </div>
   )
 }

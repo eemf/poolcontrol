@@ -3,8 +3,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from 'firebase/auth'
 import { useFirebase, useUser } from '@/firebase'
+import { SESION_ACTIVA_KEY } from '@/firebase/provider'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -68,8 +69,8 @@ export default function LoginPage() {
   useEffect(() => {
     if (loginInitiated && !isUserLoading && user) {
         toast({
-            title: "Autenticación Exitosa",
-            description: `Rol detectado: ${isAdmin ? 'Superadministrador' : 'Usuario de Sucursal'}. Redirigiendo...`,
+            title: "Autenticación exitosa",
+            description: `Rol detectado: ${isAdmin ? 'Superadministrador' : 'Usuario de sucursal'}. Redirigiendo...`,
             duration: 3000
         });
 
@@ -88,8 +89,15 @@ export default function LoginPage() {
     setLoginInitiated(true);
     
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password)
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(SESION_ACTIVA_KEY, 'true');
+      }
+      await setPersistence(auth, browserSessionPersistence);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
     } catch (error: any) {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem(SESION_ACTIVA_KEY);
+      }
       setLoading(false);
       setLoginInitiated(false);
       
@@ -119,27 +127,28 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <Card className="w-full max-w-sm shadow-xl rounded-2xl overflow-hidden border-muted/60">
+      <Card className="w-full max-w-sm shadow-xl rounded-2xl border-muted/60">
         <CardHeader className="text-center pb-2">
           <Dices className="mx-auto h-12 w-12 text-primary" />
           <CardTitle className="mt-4 text-2xl font-headline font-bold">Pool Control</CardTitle>
           <CardDescription className="font-body">Inicia sesión para administrar tu sucursal</CardDescription>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate autoComplete="off">
             <CardContent className="space-y-4 pt-4">
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem className="space-y-1">
-                    <FormLabel className="text-xs font-semibold ml-1">Correo Electrónico</FormLabel>
+                    <FormLabel className="text-xs font-semibold ml-1">Correo electrónico</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="usuario@sucursal.com"
                         className="rounded-full h-11"
                         disabled={loading}
-                        autoComplete="email"
+                        autoComplete="off"
+                        data-lpignore="true"
                         {...field}
                       />
                     </FormControl>
@@ -160,7 +169,8 @@ export default function LoginPage() {
                           placeholder="••••••"
                           className="rounded-full h-11 pr-10"
                           disabled={loading}
-                          autoComplete="current-password"
+                          autoComplete="new-password"
+                          data-lpignore="true"
                           {...field}
                         />
                         <Button
@@ -187,7 +197,7 @@ export default function LoginPage() {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Verificando...
                   </>
-                ) : 'Ingresar al Sistema'}
+                ) : 'Ingresar al sistema'}
               </Button>
             </CardFooter>
           </form>

@@ -16,6 +16,8 @@ import { EncabezadoUsuarios } from "./_components/EncabezadoUsuarios"
 import { ListaUsuarios } from "./_components/ListaUsuarios"
 import { ModalUsuario } from "./_components/ModalUsuario"
 import { DialogoEliminarUsuario } from "./_components/DialogoEliminarUsuario"
+import { DialogoCambiarPassword } from "@/components/usuarios/DialogoCambiarPassword"
+import { cambiarPasswordUsuario } from "@/lib/firebase/servicios/usuarios-auth"
 
 type UsuarioConDocId = UsuarioSucursal & { docId: string };
 
@@ -36,6 +38,8 @@ export default function PaginaUsuariosSucursal() {
   // Estados de datos
   const [editingUser, setEditingUser] = useState<UsuarioConDocId | null>(null);
   const [userToDelete, setUserToDelete] = useState<UsuarioConDocId | null>(null);
+  const [usuarioParaPassword, setUsuarioParaPassword] = useState<UsuarioConDocId | null>(null);
+  const [modalPasswordOpen, setModalPasswordOpen] = useState(false);
 
   // Estados del formulario
   const [nombre, setNombre] = useState('');
@@ -149,6 +153,34 @@ export default function PaginaUsuariosSucursal() {
         };
         batch.update(userInSucursalRef, dataToUpdate);
         batch.update(userAuthLookupRef, { nombre, rol: roleName, sucursalId });
+
+        // Si se suministró una nueva contraseña al editar
+        if (password.trim()) {
+          if (password.length < 6) {
+            toast({ title: "Error", description: "La nueva contraseña debe tener al menos 6 caracteres.", variant: "destructive" });
+            setLoading(false);
+            return;
+          }
+          const resPassword = await cambiarPasswordUsuario({
+            authUid: editingUser.authUid,
+            email: editingUser.email,
+            nuevaPassword: password,
+            currentUser,
+            auth,
+          });
+          if (!resPassword.ok) {
+            toast({
+              variant: "destructive",
+              title: "Aviso de contraseña",
+              description: resPassword.message,
+            });
+          } else {
+            toast({
+              title: "Contraseña actualizada",
+              description: `Se actualizó la contraseña para ${editingUser.nombre}.`,
+            });
+          }
+        }
       } else {
         const userInSucursalRef = doc(firestore, 'sucursales', sucursalId, 'usuarios', finalAuthUid);
         const userAuthLookupRef = doc(firestore, 'user_auth_lookup', finalAuthUid);
@@ -224,6 +256,10 @@ export default function PaginaUsuariosSucursal() {
         onSearchChange={setSearchTerm}
         onEditar={setEditingUser}
         onEliminar={setUserToDelete}
+        onCambiarPassword={(u) => {
+          setUsuarioParaPassword(u);
+          setModalPasswordOpen(true);
+        }}
         errorPermisos={!!(errorUsuarios && errorUsuarios.message.includes("Missing or insufficient permissions"))}
         paginacion={{
           paginaActual: currentPage,
@@ -247,6 +283,12 @@ export default function PaginaUsuariosSucursal() {
           rol, setRol,
           password, setPassword
         }}
+      />
+
+      <DialogoCambiarPassword 
+        usuario={usuarioParaPassword}
+        abierto={modalPasswordOpen}
+        onOpenChange={setModalPasswordOpen}
       />
 
       <DialogoEliminarUsuario 

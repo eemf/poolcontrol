@@ -10,6 +10,7 @@ import {
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from "@/components/ui/alert-dialog"
 import DashboardNav from "@/app/components/dashboard-nav"
 import { useUser, useCollection, useMemoFirebase, useDoc } from '@/firebase'
+import { SESION_ACTIVA_KEY } from '@/firebase/provider'
 import { Loader2, AlertTriangle, CalendarX, ShieldAlert, CreditCard, CloudOff, RefreshCw, LogOut } from 'lucide-react'
 import { collection, doc, query, updateDoc, where, Timestamp } from 'firebase/firestore'
 import { signOut } from 'firebase/auth'
@@ -66,6 +67,9 @@ export default function LayoutDashboard({
   // --- Lógica de Salida ---
   const handleLogout = async () => {
     try {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem(SESION_ACTIVA_KEY);
+      }
       await signOut(auth);
       router.push('/login');
     } catch (error) {

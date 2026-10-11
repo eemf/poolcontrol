@@ -12,9 +12,296 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 302,
+    fecha: "2026-10-11",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b302",
+    descripcion: "Modificación de contraseñas de usuarios en sucursales y maestro, control estricto de sesión y privacidad de credenciales.",
+    cambios: [
+      "Modificación de contraseñas de usuarios: Módulo de actualización de contraseñas en tiempo real para personal de sucursales y en gestión de usuarios maestro.",
+      "Acción directa y modal especializado: Botón con icono de llave para cambio directo en cada usuario, validación de coincidencia y campo opcional al editar perfil.",
+      "Envío de enlace de restablecimiento: Opción de un solo clic para enviar correo oficial de Firebase al usuario.",
+      "Persistencia de sesión exclusiva: Configuración de autenticación por sesión de navegador (browserSessionPersistence) con invalidación de sesión residual al reabrir el navegador.",
+      "Prevención de autoguardado en navegador: Desactivación de recordatorio de contraseñas y autocompletado en pantalla de inicio de sesión.",
+      "Integración de credenciales de servicio: Configuración de Firebase Admin en el servidor para ejecución de cambios de claves administrativas."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 301,
+    fecha: "2026-10-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b301",
+    descripcion: "Rediseño integral de la página de Monitoreo Integral del Período: auditoría de gaveta, flujo de monedas, kardex de inventario y balance general del turno.",
+    cambios: [
+      "Rediseño visual completo estilo POS y dark theme: Encabezado estándar, selector unificado de turnos con estado dinámico en vivo, hora de apertura y duración del turno.",
+      "Cuatro tarjetas ejecutivas de métricas (KPIs): Visualización en tiempo real de Efectivo en gaveta, Flujo neto de monedas, Total efectivo esperado en caja física y Existencia actual de monedas.",
+      "Cuatro pestañas interactivas unificadas: Flujo de gaveta, Flujo de monedas, Kardex de inventario físico y Balance general contable con conciliación de los 3 pilares del negocio.",
+      "Buscadores y filtros en cada sección: Filtros por categoría de cobro (mesas vs productos), tipo de movimiento de monedas (ventas vs premios vs máquinas) y kardex de inventario, con ordenamiento cronológico alternable.",
+      "Unificación terminológica: Reemplazo integral del término 'fichas' por 'monedas' en todas las tablas, insignias, tarjetas y reportes.",
+      "Exportación de informe a CSV: Descarga inmediata de la auditoría y conciliación del turno a formato CSV."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 300,
+    fecha: "2026-10-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b300",
+    descripcion: "Módulo integral de Control y Auditoría de Pagos con soporte para pagos unificados multi-venta, rastreo profundo de productos, operadores y tiempos exactos.",
+    cambios: [
+      "Unificación inteligente de pagos multi-venta: Cuando un cliente abona o liquida varias ventas en una sola operación (ej. pago de Q40 que salda Q10 de una venta y Q30 de otra), el sistema lo agrupa automáticamente como un solo pago consolidado de Q40, desglosando con total claridad a qué ventas se destinó el dinero y qué productos cubrió en cada una.",
+      "Botón de filtros integrado al buscador: Se añadió un botón desplegable integrado físicamente al final del input de búsqueda para mostrar u ocultar los filtros secundarios (período, método, operador y tipo), con insignia de filtros activos y diseño limpio.",
+      "Encabezado unificado estilo POS y navegación única: Se homologó la tipografía, título y subtítulo al diseño estándar del Punto de Venta (POS), y se delimitó la ruta en el menú exclusivamente a Administración para evitar la doble selección simultánea en la barra lateral.",
+      "Cumplimiento estricto de regla sin mayúsculas: Se removieron todos los estilos en mayúsculas sostenidas (uppercase) en tarjetas de métricas, insignias, botones y tablas, preservando la tipografía natural del sistema.",
+      "Búsqueda profunda multidimensional de pagos: Localización inmediata de comprobantes buscando por productos específicos saldados (nombre o ID), clientes, número de cualquiera de las ventas cubiertas, número de recibo, cajero u operador y método de pago.",
+      "Rastreo de artículos cubiertos y tipo de liquidación: Desglose pormenorizado en cada pago mostrando qué productos fueron cubiertos, cantidades, montos aplicados individualmente, subtotales y distinción entre saldado al 100% y abonos parciales.",
+      "Métricas financieras en tiempo real y exportación: Tarjetas KPI con total recaudado, cobros en efectivo, tarjeta y artículos cubiertos según los filtros activos, con exportación completa a formato CSV y vista previa de ticket/comprobante unificado imprimible."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 299,
+    fecha: "2026-10-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b299",
+    descripcion: "Protección de ventas existentes al descartar cambios en edición en el Punto de Venta (POS).",
+    cambios: [
+      "Protección integral contra eliminación accidental de ventas: Al descartar cambios en una venta pendiente o a crédito que ya existía con productos y abonos, el sistema ahora devuelve única y exclusivamente el stock de los productos nuevos agregados durante esa sesión de edición, preservando intacta la venta original en Firestore con todos sus consumos y pagos previos.",
+      "Manejo seguro de la opción 'Permanecer': Al pulsar 'Permanecer' o cerrar el cuadro de diálogo de descarte, se restaura adecuadamente el nombre del cliente en el buscador y se mantiene activa la sesión de edición sin pérdidas de información."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 298,
+    fecha: "2026-10-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b298",
+    descripcion: "Métrica global de cuentas a crédito y desglose dinámico de deuda por cliente en el POS.",
+    cambios: [
+      "Métrica de total de cuentas a crédito: Se integró una tarjeta informativa ubicada entre el buscador y los acordeones de la pestaña de crédito que calcula y muestra en tiempo real la suma total adeudada de todas las cuentas a crédito registradas.",
+      "Desglose reactivo de deuda por cliente al buscar: Al escribir en el buscador para consultar a un cliente, la tarjeta se transforma dinámicamente indicando 'Deuda de [Cliente]', calculando el saldo total de sus cuentas a crédito e informando si posee cargos adicionales en su cuenta abierta actual.",
+      "Restauración de píldoras en escritorio: Se restauró la forma original redondeada tipo píldora (rounded-full, h-10 px-4) en los accesos rápidos del POS para computadoras y tablets, limitando los círculos compactos exclusivamente a la vista móvil en una fila."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 297,
+    fecha: "2026-10-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b297",
+    descripcion: "Optimización móvil de accesos rápidos en Punto de Venta: alineación en una sola fila con botones circulares compactos.",
+    cambios: [
+      "Accesos rápidos en una sola fila para móviles: En el encabezado del Punto de Venta (POSHeader), los accesos a Sala de Juegos, Tragamonedas e Historial ahora se organizan en una sola línea horizontal mediante botones circulares con sus respectivos iconos, evitando que ocupen dos filas en pantallas móviles.",
+      "Preservación de experiencia en escritorio: En pantallas medianas y grandes, los botones conservan su aspecto completo con icono y texto extendido."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 296,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b296",
+    descripcion: "Estabilización y suavizado de animación del micrófono y eliminación de falso nivel de audio en silencio para móviles.",
+    cambios: [
+      "Corrección de falso nivel de audio en silencio: Se eliminó el valor inicial forzado (35%) en dispositivos móviles y se integró una puerta de ruido (noise gate) que garantiza nivel 0% absoluto cuando hay silencio, evitando falsos positivos de 'Voz detectada'.",
+      "Eliminación de titileo y rebote brusco: Se reemplazaron las animaciones agresivas (bounce y parpadeo rápido de 75ms) por halos acústicos concéntricos con transiciones suaves (ease-out de 300ms) y escalado armónico reactivo a la voz.",
+      "Escucha continua estable en móviles: Se configuró continuous = true junto con decaimiento progresivo del volumen para evitar que el navegador cierre el micrófono de forma prematura en pausas breves.",
+      "Resolución de ReferenceError en móvil: Sincronización de detección de dispositivo mediante isMobileRef, eliminando errores de variables no definidas en el callback de Web Speech API.",
+      "Cabecera minimalista para móviles: Rediseño limpio del encabezado ('Asistente de Voz') sin sobrecarga de subtítulos, badges con ancho no divisible (whitespace-nowrap) y separación amplia para el botón de cierre (X), impidiendo que los textos se deformen o dividan en múltiples líneas."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 295,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b295",
+    descripcion: "Rediseño enfocado en móvil para el Asistente de Voz: Botón Hero prominente y comandos colapsables.",
+    cambios: [
+      "Eliminación del campo de texto manual: Se retiró el input de texto y botón de envío para priorizar la interacción 100% natural por voz.",
+      "Botón Hero de micrófono ampliado: El botón de captura de voz ahora es el elemento visual dominante, con ondas acústicas concéntricas animadas y retroalimentación inmediata.",
+      "Comandos sugeridos colapsables por defecto: La lista de módulos y ejemplos ahora viene oculta por defecto y cuenta con un botón desplegable para consultarla cuando sea necesario sin sobrecargar la pantalla móvil."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 294,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b294",
+    descripcion: "Optimización profunda y simplificación de código en ejecutores de voz e indicador de motor (API vs Local).",
+    cambios: [
+      "Optimización integral de asistente-voz-ejecutor.ts: Reducción de más de 800 líneas de código repetitivo mediante helpers modulares (resolverItemsPedido, obtenerMesaContexto, aplicarConsumosAVentaCliente) manteniendo el 100% de la funcionalidad y robustez transaccional.",
+      "Indicador en tiempo real de motor utilizado: Ahora se detecta y visualiza explícitamente en la interfaz y notificaciones si la orden se interpretó con la API de IA (Groq) o el Motor Local (Offline/Respaldo).",
+      "Conexión directa cliente-servidor para voz: El hook useVoiceAssistant ahora procesa a través del endpoint /api/asistente-voz para aprovechar la API Key de Groq en el servidor, con respaldo automático e instantáneo al motor local."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 293,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b293",
+    descripcion: "Diferenciación estricta entre cobro de cuenta actual y cobro de deuda total, con abonos inteligentes en cascada.",
+    cambios: [
+      "Distinción precisa de cobro: 'cobra la cuenta de Samuel' cobra única y exclusivamente su cuenta actual pendiente de pago (dejando intactos los créditos e informando el saldo a crédito restante). 'cobra el total de la cuenta de Samuel' (o 'cuenta completa', 'todo') liquida la deuda global completa incluyendo créditos.",
+      "Abono prioritario con excedente en cascada: 'abona 30 a Samuel' se aplica prioritariamente a la cuenta actual; si el abono cubre la cuenta actual y sobra saldo, el excedente se abona a la venta a crédito más antigua.",
+      "Control de límites y validación: Informa con claridad si el cliente no tiene cuenta actual pero sí créditos pendientes, guiando al operador para usar la orden correcta."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 292,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b292",
+    descripcion: "Abonos unificados y en cascada a deuda total del cliente (cuenta actual + créditos históricos) por comando de voz.",
+    cambios: [
+      "Abono consolidado a deuda total: Al indicar 'abona 30 a Samuel', el sistema calcula la deuda global (cuenta abierta actual más ventas a crédito pendientes). Si debe 10 en la cuenta actual y 30 en créditos (total 40), el abono de 30 se aplica exitosamente al total en lugar de limitarse a la cuenta individual.",
+      "Distribución transaccional en cascada: Se liquida primero la cuenta abierta pendiente y el excedente del abono se distribuye cronológicamente entre las ventas a crédito pendientes mediante registrarAbonoGeneral.",
+      "Cobro y consulta integral de cuentas: 'cobra la cuenta de X' y 'cuánto debe X' ahora contemplan la deuda consolidada completa e informan el saldo restante exacto con claridad."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 291,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b291",
+    descripcion: "Corrección transaccional de Firestore: orden estricto de lecturas antes de escrituras al agregar consumos por voz.",
+    cambios: [
+      "Garantía ACID en transacciones de Firestore: Corrección del error 'Firestore transactions require all reads to be executed before all writes' al registrar múltiples consumos en cuentas de clientes.",
+      "Todas las lecturas de correlativos y cuentas abiertas existentes se ejecutan en paralelo al inicio de la transacción antes de aplicar cualquier actualización de inventario o venta.",
+      "Registro atómico perfecto y sin excepciones al cargar uno o varios productos a clientes registrados o nuevos."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 290,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b290",
+    descripcion: "Soporte intuitivo para múltiples consumos en un solo comando de voz para cuentas de clientes, mesas y ventas rápidas.",
+    cambios: [
+      "Extracción de múltiples productos: El asistente ahora procesa comandos compuestos como 'agrega una coca, un casino, y un jugo de vegetales a Samuel' identificando y agregando cada ítem a la cuenta de forma atómica.",
+      "Consumos múltiples en mesas: Soporte para añadir varios productos simultáneamente a una mesa (ej: 'agrega 2 cervezas y un agua a la mesa 3') con descuento individual de inventario.",
+      "Ventas rápidas compuestas: Permite registrar múltiples productos en una sola venta rápida (ej: 'vende una coca y 2 casinos').",
+      "Confirmación agrupada de nuevo cliente: Si se ordenan múltiples productos para un cliente nuevo, se solicita confirmación una sola vez registrando todos los ítems en su cuenta.",
+      "Respuesta de síntesis de voz natural: El asistente confirma verbalmente la lista completa de productos cargados de manera fluida y cordial."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 289,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b289",
+    descripcion: "Integración del Agente de Inteligencia Artificial de Voz ultrarrápido con Groq (Llama/GPT-OSS 120B/20B) y tolerancia total ante fallos.",
+    cambios: [
+      "Agente de IA nativo con Groq: Motor de inferencia ultrarrápido (~200ms) impulsado por modelos avanzados con razonamiento en contexto completo del negocio.",
+      "Comprensión contextual profunda: Asocia automáticamente apodos, términos coloquiales y modismos al catálogo de productos ('un verde' -> 'Verde Lukis', 'una coca' -> 'Coca Cola', 'dos coronas' -> 'Cerveza Corona').",
+      "Control de mesas avanzado: Reconoce de inmediato mesas por tiempo definido pagadas al contado ('inicia mesa 2 definido una hora pagado de contado'), transferencias a clientes ('finaliza la mesa 1 y pasa la cuenta a Samuel') y división de cuentas ('divide la cuenta de la mesa 1 entre 2 en efectivo').",
+      "Gestión de cuentas y abonos: Infiere clientes tanto con sintaxis formal ('a la cuenta de X') como directa ('a X') y ejecuta abonos con precisión ('abona 20 a la cuenta de Samuel').",
+      "Arquitectura de resiliencia cero caídas: Si el servicio externo presenta lentitud o desconexión, el sistema activa automáticamente el motor local NLP integrado sin interrupciones para el operador.",
+      "Respuestas concisas sin ruido: Ante comandos ajenos a la operación o no entendidos, responde estrictamente 'Comando no reconocido.' sin recitar sugerencias innecesarias."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 288,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b288",
+    descripcion: "Comandos no reconocidos sin sugerencias, validación estricta de clientes y agrupación inteligente en cuentas abiertas existentes.",
+    cambios: [
+      "Comandos no reconocidos concisos: el asistente responde únicamente 'Comando no reconocido.' de forma directa sin recitar sugerencias, opciones ni ejemplos innecesarios.",
+      "Validación de clientes antes de cargar consumos: si el cliente existe en la lista oficial de clientes de la sucursal, ejecuta la orden de inmediato; si no existe, solicita confirmación por voz ('Sí'/'No') o botones visuales para crearlo formalmente antes de proceder.",
+      "Detección y agrupación en cuentas abiertas: tras verificar o registrar al cliente, comprueba si ya posee una cuenta (venta) pendiente de pago; si la tiene, añade el nuevo consumo a esa misma venta abierta en lugar de duplicar documentos; si no tiene cuenta abierta, genera una nueva venta pendiente de pago.",
+      "Soporte para asignación directa a nombre de cliente: compatibilidad natural tanto para frases formales ('agrega una coca a la cuenta de Victor Hugo') como directas ('agrega una coca a Victor Hugo', 'cárgale 2 cervezas a Carlos', 'apunta un agua para Pedro').",
+      "Abonos a cuentas por comando de voz: soporte completo para 'abona 20 a la cuenta de Samuel', 'abona 50 a Carlos', 'abono de 30 a Juan en tarjeta'. Valida que exista saldo pendiente, aplica el abono, actualiza ingresos de caja, genera el comprobante de pago oficial e informa el saldo restante de inmediato.",
+      "Protección contra cuentas ficticias por fallos fonéticos o de transcripción en comandos de punto de venta y mesas."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 287,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b287",
+    descripcion: "Corrección de cobro duplicado en mesas prepagadas, finalización a cuenta de cliente, cobro dividido y ventas rápidas POS por voz.",
+    cambios: [
+      "Solución al cobro duplicado de mesas prepagadas: al cobrar o finalizar una mesa pagada de contado, el alquiler ya no se vuelve a sumar, cobrando únicamente consumos si los hubiera o liberándola directamente.",
+      "Comando de voz para finalizar mesa y pasar a cuenta de cliente: soporte para frases como 'finaliza la mesa 1 y pasa la cuenta a Juan', 'cierra la 1 y cargala a Juan', 'pasa el total de la mesa 1 a la cuenta de Carlos'. Si el tiempo estaba prepagado, sólo se transfieren los consumos.",
+      "Comando de voz para dividir cuenta y cobrar: soporte para 'divide la cuenta de la mesa 1 entre 2', 'divide la mesa 1 en 3 partes en efectivo', 'cobra la mesa 1 dividida entre 2'. Distribución equitativa y cierre automático de la mesa.",
+      "Ventas rápidas de POS por voz: soporte para 'vende una coca cola', 'despacha 2 cervezas gallo en tarjeta', 'despacho rápido de 1 verde', 'cobra un agua en efectivo'. Reconocimiento de método de pago (Efectivo/Tarjeta), descuento automático de inventario e incremento en métricas generales de caja."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 286,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b286",
+    descripcion: "Inicio de mesas pagado de contado por voz, búsqueda flexible de productos (estilo despacho rápido) y corrección de monitoreo integral.",
+    cambios: [
+      "Soporte para iniciar mesas en tiempo definido pagado de contado inmediatamente por comando de voz (ej. 'inicia una hora en mesa 1 pagado de contado').",
+      "Búsqueda intuitiva de productos de catálogo por términos abreviados, alias o palabras clave (ej. 'coca' -> 'Coca Cola', 'verde' -> 'Verde Lukis').",
+      "Eliminación de fallbacks arbitrarios a 'Coca Cola': si un producto no existe en el catálogo, el asistente avisa claramente por voz sin cargar nada a la mesa.",
+      "Integración de productos virtuales y físicos en el contexto del asistente de voz desde el Header.",
+      "Corrección del TypeError ('Cannot read properties of null (reading inicio)') en la página de monitoreo integral."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 285,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b285",
+    descripcion: "Motor semántico local de comandos de voz ultra-flexible y coloquial para todas las operaciones.",
+    cambios: [
+      "Interpretación intuitiva de comandos de voz sin requerir sintaxis rígida ni palabras literales obligatorias.",
+      "Reconocimiento de múltiples variantes conversacionales: 'inicia tiempo en la mesa 1', 'inicia la 1', 'abre la 2', 'finaliza la mesa 1', 'termina la 1', 'cierra la mesa 2', 'cobra la 1'.",
+      "Normalización ortográfica y de acentos con mapeo expandido de numerales ordinales y cardinales (1 al 30).",
+      "Soporte integral y tolerante a fallas en modo sin conexión para Mesas de Billar, POS y Máquinas Tragamonedas."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 284,
+    fecha: "2026-10-07",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b284",
+    descripcion: "Interruptor directo para control por voz en cada tarjeta de sucursal del panel administrativo.",
+    cambios: [
+      "Agregado control interactivo directo (Switch con icono y estado) en las tarjetas de la página de gestión de sucursales.",
+      "Activación y desactivación instantánea de comandos de voz en Firestore con un solo clic sin necesidad de entrar a edición."
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 283,
     fecha: "2026-10-07",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b283",
     descripcion: "Corrección de referencia de ámbito en Header para generalesTragamonedas.",
@@ -424,9 +711,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 283,
-  date: "2026-10-07",
-  publicadaActual: releaseHistory[0], // Build 283
-  publicadaAnterior: releaseHistory[1], // Build 282
+  build: 302,
+  date: "2026-10-11",
+  publicadaActual: releaseHistory[0], // Build 302
+  publicadaAnterior: releaseHistory[1], // Build 301
   historial: releaseHistory
 };

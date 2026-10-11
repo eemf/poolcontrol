@@ -70,7 +70,25 @@ export function ModalUsuario({
                   className="rounded-full h-11 border-muted-foreground/20" 
                 />
               </div>
-              {!editando && (
+              {editando ? (
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" title="Mínimo 6 caracteres" className="text-xs font-semibold text-muted-foreground ml-1">
+                    Nueva contraseña (opcional)
+                  </Label>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    value={form.password} 
+                    onChange={(e) => form.setPassword(e.target.value)} 
+                    placeholder="Dejar en blanco para no modificar" 
+                    className="rounded-full h-11 border-muted-foreground/20" 
+                    autoComplete="new-password"
+                  />
+                  <p className="text-[10px] text-muted-foreground ml-1">
+                    Solo ingresa una contraseña si deseas actualizar la actual de este usuario.
+                  </p>
+                </div>
+              ) : (
                 <div className="space-y-2">
                   <Label htmlFor="password" title="Mínimo 6 caracteres" className="text-xs font-semibold text-muted-foreground ml-1">Contraseña*</Label>
                   <Input 
@@ -81,6 +99,7 @@ export function ModalUsuario({
                     required 
                     placeholder="••••••" 
                     className="rounded-full h-11 border-muted-foreground/20" 
+                    autoComplete="new-password"
                   />
                 </div>
               )}

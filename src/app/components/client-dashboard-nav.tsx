@@ -61,8 +61,9 @@ export const navItems: NavItemType[] = [
   {
     label: 'Administración',
     icon: Landmark,
-    anyPermission: ['admin.monitoreo', 'admin.movimientos', 'compras.gestionar', 'gastos.gestionar', 'tragamonedas.cuadre', 'cuadre.semanal', 'cuadre.mensual', 'ventas.eliminar_rango', 'admin.auditoria'],
+    anyPermission: ['admin.monitoreo', 'admin.movimientos', 'compras.gestionar', 'gastos.gestionar', 'tragamonedas.cuadre', 'cuadre.semanal', 'cuadre.mensual', 'ventas.eliminar_rango', 'admin.auditoria', 'mant.pagos'],
     items: [
+        { href: '/dashboard/control-pagos', label: 'Control de Pagos', icon: HandCoins, permission: 'mant.pagos' },
         { href: '/dashboard/administracion/monitoreo-integral', label: 'Monitoreo Integral', icon: MonitorCheck, permission: 'admin.monitoreo' },
         { href: '/dashboard/administracion/monitoreo-periodo', label: 'Monitoreo Período', icon: MonitorCheck, permission: 'admin.monitoreo', feature: 'adminMonitoreo' },
         { href: '/dashboard/administracion/movimiento-productos', label: 'Movimiento de Productos', icon: History, permission: 'admin.movimientos', feature: 'adminMovimientos' },
@@ -85,7 +86,6 @@ export const navItems: NavItemType[] = [
         { href: '/dashboard/mantenimiento/productos', label: 'Productos', icon: Package, permission: 'config.productos', feature: 'mantProductos' },
         { href: '/dashboard/mantenimiento/productos-virtuales', label: 'Prod. Virtuales', icon: Ghost, permission: 'mant.productos_virt', feature: 'mantProductosVirt' },
         { href: '/dashboard/mantenimiento/roles', label: 'Roles', icon: ShieldCheck, permission: 'mant.roles', feature: 'mantRoles' },
-        { href: '/dashboard/mantenimiento/gestion-pagos', label: 'Pagos', icon: HandCoins, permission: 'mant.pagos', feature: 'mantPagos' },
         { href: '/dashboard/mantenimiento/cuentas', label: 'Cuentas', icon: BookUser, permission: 'mant.cuentas', feature: 'adminCuentas' },
     ]
   },

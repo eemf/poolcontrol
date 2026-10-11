@@ -16,23 +16,35 @@ export function POSHeader() {
           Crea una nueva orden de venta.
         </p>
       </div>
-      <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 w-full sm:w-auto">
-        <Button variant="outline" asChild>
-          <Link href="/dashboard/mesas">
-            <LayoutGrid className="mr-2 h-4 w-4" />
-            Sala de Juegos
+      <div className="flex items-center justify-center gap-2 w-full sm:w-auto">
+        <Button 
+          variant="outline" 
+          className="w-10 h-10 p-0 sm:w-auto sm:h-10 sm:px-4 sm:py-2 rounded-full shrink-0" 
+          asChild
+        >
+          <Link href="/dashboard/mesas" title="Sala de Juegos" aria-label="Sala de Juegos">
+            <LayoutGrid className="h-4 w-4 sm:mr-2 shrink-0" />
+            <span className="hidden sm:inline">Sala de Juegos</span>
           </Link>
         </Button>
-        <Button variant="outline" asChild>
-          <Link href="/dashboard/gestion-tragamonedas">
-            <Dices className="mr-2 h-4 w-4" />
-            Tragamonedas
+        <Button 
+          variant="outline" 
+          className="w-10 h-10 p-0 sm:w-auto sm:h-10 sm:px-4 sm:py-2 rounded-full shrink-0" 
+          asChild
+        >
+          <Link href="/dashboard/gestion-tragamonedas" title="Tragamonedas" aria-label="Tragamonedas">
+            <Dices className="h-4 w-4 sm:mr-2 shrink-0" />
+            <span className="hidden sm:inline">Tragamonedas</span>
           </Link>
         </Button>
-        <Button variant="outline" asChild>
-          <Link href="/dashboard/historial-ventas">
-            <History className="mr-2 h-4 w-4" />
-            Historial
+        <Button 
+          variant="outline" 
+          className="w-10 h-10 p-0 sm:w-auto sm:h-10 sm:px-4 sm:py-2 rounded-full shrink-0" 
+          asChild
+        >
+          <Link href="/dashboard/historial-ventas" title="Historial" aria-label="Historial">
+            <History className="h-4 w-4 sm:mr-2 shrink-0" />
+            <span className="hidden sm:inline">Historial</span>
           </Link>
         </Button>
       </div>

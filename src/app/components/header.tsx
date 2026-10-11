@@ -170,6 +170,18 @@ export function Header() {
   );
   const { data: productosData } = useCollection<Producto>(productosQuery);
 
+  const productosVirtualesQuery = useMemoFirebase(() => 
+    (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/productos_virtuales`) : null,
+    [firestore, sucursalId]
+  );
+  const { data: productosVirtualesData } = useCollection<ProductoVirtual>(productosVirtualesQuery);
+
+  const todosLosProductos = useMemo(() => {
+    const fisicos = productosData || [];
+    const virtuales = (productosVirtualesData || []).map(pv => ({ ...pv, esVirtual: true }));
+    return [...fisicos, ...virtuales];
+  }, [productosData, productosVirtualesData]);
+
   const tarifasQuery = useMemoFirebase(() => 
     (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/tarifas`) : null,
     [firestore, sucursalId]
@@ -331,7 +343,7 @@ export function Header() {
         open={voiceDialogOpen}
         onOpenChange={setVoiceDialogOpen}
         mesas={mesasData || []}
-        productos={productosData || []}
+        productos={todosLosProductos}
         tarifas={tarifasData || []}
         clientes={clientesData?.map(c => c.nombre) || []}
         maquinas={maquinasData || []}

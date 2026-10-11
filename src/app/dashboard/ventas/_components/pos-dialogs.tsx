@@ -83,6 +83,7 @@ interface POSDialogsProps {
     manejarConfirmarAbono: () => void;
     procederConPago: (metodo: 'Efectivo' | 'Tarjeta') => void;
     manejarConfirmarCancelacion: () => void;
+    manejarPermanecerEnVenta?: () => void;
     manejarConfirmarEliminarCliente: () => void;
     confirmarPasarACredito: (v: Venta) => void;
     procederAGuardarVenta: () => void;
@@ -372,18 +373,24 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={state.alertaCancelarVentaAbierta} onOpenChange={actions.setAlertaCancelarVentaAbierta}>
+      <AlertDialog 
+        open={state.alertaCancelarVentaAbierta} 
+        onOpenChange={(abierta) => {
+          if (!abierta) actions.manejarPermanecerEnVenta?.();
+          actions.setAlertaCancelarVentaAbierta(abierta);
+        }}
+      >
         <AlertDialogContent className="rounded-2xl font-body border-none shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-headline text-xl font-bold flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-amber-500" /> ¿Descartar cambios?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm font-medium">
-              Hay artículos nuevos en el carrito sin guardar. Si continúas, se perderán y volverán al stock automáticamente.
+              Hay artículos nuevos en el carrito sin guardar. Si continúas, se descartarán únicamente los artículos nuevos y volverán al stock automáticamente sin alterar la venta previa.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 flex-col sm:flex-row gap-3">
-            <AlertDialogCancel className="rounded-full h-10 px-6 font-bold">Permanecer</AlertDialogCancel>
+            <AlertDialogCancel onClick={actions.manejarPermanecerEnVenta} className="rounded-full h-10 px-6 font-bold">Permanecer</AlertDialogCancel>
             <AlertDialogAction onClick={actions.manejarConfirmarCancelacion} className="rounded-full h-10 px-8 font-bold bg-destructive text-white hover:bg-destructive/90">Sí, descartar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

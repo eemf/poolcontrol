@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Loader2, Edit, Trash2, ChevronLeft, ChevronRight, User, Mail, Shield, ShieldAlert, Clock } from "lucide-react";
+import { Search, Loader2, Edit, Trash2, ChevronLeft, ChevronRight, User, Mail, Shield, ShieldAlert, Clock, KeyRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { UsuarioSucursal } from "@/lib/tipos";
@@ -20,6 +20,7 @@ interface ListaUsuariosProps {
   onSearchChange: (val: string) => void;
   onEditar: (usuario: UsuarioConDocId) => void;
   onEliminar: (usuario: UsuarioConDocId) => void;
+  onCambiarPassword?: (usuario: UsuarioConDocId) => void;
   errorPermisos: boolean;
   paginacion: {
     paginaActual: number;
@@ -37,6 +38,7 @@ export function ListaUsuarios({
   onSearchChange,
   onEditar,
   onEliminar,
+  onCambiarPassword,
   errorPermisos,
   paginacion
 }: ListaUsuariosProps) {
@@ -127,7 +129,18 @@ export function ListaUsuarios({
                       </div>
                     </div>
 
-                    <div className="flex justify-end gap-2 pt-4 border-t border-dashed border-muted-foreground/20">
+                    <div className="flex flex-wrap justify-end gap-2 pt-4 border-t border-dashed border-muted-foreground/20">
+                      {onCambiarPassword && (
+                        <Button 
+                          variant="outline"
+                          size="sm" 
+                          className="rounded-full h-9 px-4 font-bold text-xs gap-1.5 border-muted-foreground/20 hover:bg-primary/5 text-foreground"
+                          onClick={() => onCambiarPassword(usuario)}
+                        >
+                          <KeyRound className="h-3.5 w-3.5 text-primary" />
+                          <span>Contraseña</span>
+                        </Button>
+                      )}
                       <Button 
                         size="sm" 
                         className="rounded-full h-9 px-5 font-bold text-xs bg-sky-600 hover:bg-sky-700 text-white shadow-sm"

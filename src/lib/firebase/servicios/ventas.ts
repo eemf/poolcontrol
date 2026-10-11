@@ -188,7 +188,14 @@ export async function guardarVentaYActualizarStock(
 /**
  * Anula una venta y devuelve el stock de los productos involucrados.
  */
-export async function cancelarVentaYDevolverStock(firestore: Firestore, sucursalId: string, ventaId: string | null, itemsADevolver: DetalleVenta[], usuarioId: string) {
+export async function cancelarVentaYDevolverStock(
+    firestore: Firestore, 
+    sucursalId: string, 
+    ventaId: string | null, 
+    itemsADevolver: DetalleVenta[], 
+    usuarioId: string,
+    eliminarVenta: boolean = false
+) {
     const sid = validarSucursal(sucursalId);
 
     return runTransaction(firestore, async (transaction) => {
@@ -216,7 +223,7 @@ export async function cancelarVentaYDevolverStock(firestore: Firestore, sucursal
                         cantidad: cantidadADevolver,
                         existenciaAnterior,
                         existenciaNueva,
-                        referencia: `Anulación en POS (Venta #${ventaId})`,
+                        referencia: eliminarVenta ? `Anulación en POS (Venta #${ventaId})` : `Descarte de edición en POS (Venta #${ventaId || 'Borrador'})`,
                         usuarioId,
                     });
                     siguienteIdHistorial++;
@@ -240,7 +247,7 @@ export async function cancelarVentaYDevolverStock(firestore: Firestore, sucursal
                                 cantidad: cantidadADevolver,
                                 existenciaAnterior,
                                 existenciaNueva,
-                                referencia: `Anulación en POS (Venta #${ventaId})`,
+                                referencia: eliminarVenta ? `Anulación en POS (Venta #${ventaId})` : `Descarte de edición en POS (Venta #${ventaId || 'Borrador'})`,
                                 usuarioId,
                             });
                             siguienteIdHistorial++;
@@ -252,7 +259,7 @@ export async function cancelarVentaYDevolverStock(firestore: Firestore, sucursal
         
         transaction.set(correlativoHistorialRef, { correlativo: siguienteIdHistorial - 1 }, { merge: true });
 
-        if (ventaId) {
+        if (ventaId && eliminarVenta) {
             const ventaRef = doc(firestore, `sucursales/${sid}/ventas`, ventaId);
             transaction.delete(ventaRef);
         }
@@ -264,9 +271,9 @@ export async function cancelarVentaYDevolverStock(firestore: Firestore, sucursal
         registrarAuditoria(firestore, sid, {
             usuarioId,
             categoria: 'VENTAS',
-            accion: 'VENTA_ANULAR',
-            titulo: `Anulación de venta #${ventaId || 'desconocida'}`,
-            descripcion: `Devolución al inventario: ${resumenDevueltos || `${itemsADevolver.length} ítems`}`,
+            accion: eliminarVenta ? 'VENTA_ANULAR' : 'VENTA_EDITAR_DESCARTAR',
+            titulo: eliminarVenta ? `Anulación de venta #${ventaId || 'desconocida'}` : `Descarte de ítems sin guardar en venta #${ventaId || 'Borrador'}`,
+            descripcion: eliminarVenta ? `Devolución al inventario: ${resumenDevueltos || `${itemsADevolver.length} ítems`}` : `Devolución al inventario de ítems sin guardar: ${resumenDevueltos || `${itemsADevolver.length} ítems`}`,
             detalles: {
                 ventaId,
                 itemsDevueltos: itemsADevolver.map(i => ({ nombre: i.nombreProducto, cantidad: i.cantidad }))
@@ -285,7 +292,8 @@ export async function procesarVentaRapidaConId(
   comando: ComandoAnalizado,
   productoId: string,
   productoData: Producto | ProductoVirtual,
-  esVirtual: boolean
+  esVirtual: boolean,
+  metodoPago: 'Efectivo' | 'Tarjeta' = 'Efectivo'
 ) {
     const sid = validarSucursal(sucursalId);
     const productoRef = doc(firestore, `sucursales/${sid}/${esVirtual ? 'productos_virtuales' : 'productos'}`, productoId);
@@ -365,7 +373,9 @@ export async function procesarVentaRapidaConId(
         const detalle: DetalleVenta = {
             idDetalle: nuevoIdDetalle, idProducto: productoId, nombreProducto: nombreVenta,
             cantidad: comando.cantidad, precioUnitario, subtotal: totalVenta, saldo: 0,
-            pagadoEfectivo: totalVenta, pagadoTarjeta: 0, metodoPago: 'Efectivo',
+            pagadoEfectivo: metodoPago === 'Efectivo' ? totalVenta : 0, 
+            pagadoTarjeta: metodoPago === 'Tarjeta' ? totalVenta : 0, 
+            metodoPago: metodoPago,
             estado: 'Pagada', fechaAgregado: Timestamp.now(),
             esVirtual: esVirtual,
             ingredientesConsumidos: ingredientesConsumidos
@@ -376,7 +386,7 @@ export async function procesarVentaRapidaConId(
             sucursalId: sid,
             fecha: Timestamp.now(),
             clienteId: '0', nombreCliente: 'Venta Rápida', total: totalVenta, saldo: 0,
-            tipoVenta: 'Rapida', metodoPago: 'Efectivo', estado: 'Pagada', detalles: [detalle],
+            tipoVenta: 'Rapida', metodoPago: metodoPago, estado: 'Pagada', detalles: [detalle],
         };
         
         const pagoData: Omit<Pago, 'id'> = {
@@ -384,7 +394,7 @@ export async function procesarVentaRapidaConId(
             sucursalId: sid,
             fecha: Timestamp.now(),
             idVenta: nuevoIdVenta, ventaDocId: nuevoIdVenta.toString(), clienteNombre: 'Venta Rápida',
-            montoTotalPagado: totalVenta, ventaTotal: totalVenta, metodoPago: 'Efectivo', usuarioId,
+            montoTotalPagado: totalVenta, ventaTotal: totalVenta, metodoPago: metodoPago, usuarioId,
             itemsSaldados: [{ idDetalle: detalle.idDetalle, nombreProducto: detalle.nombreProducto, montoAplicado: totalVenta, subtotalItem: totalVenta, cantidad: comando.cantidad, esVirtual: esVirtual }]
         };
 
@@ -396,12 +406,24 @@ export async function procesarVentaRapidaConId(
 
         if (esVirtual) {
             transaction.update(productoRef, { existencia: increment(-comando.cantidad) });
-            transaction.update(doc(firestore, `sucursales/${sid}/generales`, 'actual'), {
-                totalVentasMonedas: increment(totalVenta)
-            });
+            if (metodoPago === 'Efectivo') {
+              transaction.update(doc(firestore, `sucursales/${sid}/generales`, 'actual'), {
+                  totalVentasMonedas: increment(totalVenta),
+                  efectivoAcumuladoMonedas: increment(totalVenta)
+              });
+            } else {
+              transaction.update(doc(firestore, `sucursales/${sid}/generales`, 'actual'), {
+                  totalMonedasTarjeta: increment(totalVenta),
+                  acumuladoMonedasTarjeta: increment(totalVenta)
+              });
+            }
         } else {
             transaction.update(productoRef, { existencia: increment(-comando.cantidad) });
-            transaction.update(doc(firestore, `sucursales/${sid}/generales`, 'actual'), { totalEfectivo: increment(totalVenta) });
+            if (metodoPago === 'Efectivo') {
+              transaction.update(doc(firestore, `sucursales/${sid}/generales`, 'actual'), { totalEfectivo: increment(totalVenta) });
+            } else {
+              transaction.update(doc(firestore, `sucursales/${sid}/generales`, 'actual'), { totalVentasTarjeta: increment(totalVenta) });
+            }
             
             for (const ing of ingredientesConsumidos) {
                 const ingSnap = ingredientesSnapsMap.get(ing.productoId);

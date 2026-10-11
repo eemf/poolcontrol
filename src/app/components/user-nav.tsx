@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { LogOut, Moon, Sun, Monitor } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { SESION_ACTIVA_KEY } from "@/firebase/provider"
 import { useUser } from "@/firebase"
 import { useTheme } from "next-themes"
 
@@ -31,6 +32,9 @@ export function UserNav() {
   }, [])
 
   const handleLogout = async () => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem(SESION_ACTIVA_KEY)
+    }
     await signOut(auth)
     router.push('/login')
   }
@@ -79,7 +83,7 @@ export function UserNav() {
                 {displayEmail}
                 </p>
                 {profile?.rol && (
-                  <p className="text-[9px] leading-none text-primary mt-2 uppercase tracking-widest font-black opacity-80 bg-primary/5 w-fit px-2 py-1 rounded-full">
+                  <p className="text-[9px] leading-none text-primary mt-2 tracking-widest font-black opacity-80 bg-primary/5 w-fit px-2 py-1 rounded-full">
                     {profile.rol}
                   </p>
                 )}
@@ -87,12 +91,12 @@ export function UserNav() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="my-2" />
              <DropdownMenuGroup>
-                <p className="px-3 py-1.5 text-[9px] font-black text-muted-foreground uppercase tracking-widest">Apariencia</p>
+                <p className="px-3 py-1.5 text-[9px] font-black text-muted-foreground tracking-widest">Apariencia</p>
                 <DropdownMenuItem onClick={() => setTheme("light")} className="rounded-xl cursor-pointer">
-                    <Sun className="mr-2 h-4 w-4" /> <span className="text-xs font-medium">Modo Claro</span>
+                    <Sun className="mr-2 h-4 w-4" /> <span className="text-xs font-medium">Modo claro</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("dark")} className="rounded-xl cursor-pointer">
-                    <Moon className="mr-2 h-4 w-4" /> <span className="text-xs font-medium">Modo Oscuro</span>
+                    <Moon className="mr-2 h-4 w-4" /> <span className="text-xs font-medium">Modo oscuro</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("system")} className="rounded-xl cursor-pointer">
                     <Monitor className="mr-2 h-4 w-4" /> <span className="text-xs font-medium">Sistema</span>
@@ -101,7 +105,7 @@ export function UserNav() {
             <DropdownMenuSeparator className="my-2" />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 rounded-xl cursor-pointer">
                 <LogOut className="mr-2 h-4 w-4" />
-                <span className="text-xs font-bold uppercase tracking-wider">Cerrar Sesión</span>
+                <span className="text-xs font-bold tracking-wider">Cerrar sesión</span>
             </DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>
