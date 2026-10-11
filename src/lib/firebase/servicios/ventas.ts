@@ -360,9 +360,7 @@ export async function procesarVentaRapidaConId(
             });
         }
 
-        if (!esVirtual && 'existencia' in baseProductoData && (baseProductoData.existencia ?? 0) < comando.cantidad) {
-            throw new Error(`Stock insuficiente para ${baseProductoData.nombre}.`);
-        }
+        // Se descuenta el stock directamente (permitiendo balance negativo si hay desfase de inventario físico)
         
         const totalVenta = comando.cantidad * precioUnitario;
         const nuevoIdVenta = (corrVentaDoc.data()?.correlativo || 0) + 1;

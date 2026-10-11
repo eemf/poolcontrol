@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 303,
+    build: 304,
     fecha: "2026-10-11",
     estado: "publicada_actual",
+    tipo: "Parche",
+    tagGit: "v1.0.0-b304",
+    descripcion: "Corrección de persistencia de auditoría transaccional en Firestore y prevención de bloqueos operativos por inventario.",
+    cambios: [
+      "Sanitización profunda en auditoría: Implementación de limpieza recursiva (limpiarProfundoFirestore) para evitar campos con valores undefined en operaciones Transaction.set() de auditoría.",
+      "Prevención de bloqueos por stock físico: Eliminación de bloqueos rígidos por stock insuficiente en ventas y consumos temporales, permitiendo el registro de pedidos reales cuando existe desfase en el inventario digital.",
+      "Control robusto de excepciones en asistente: Captura y manejo estructurado de errores en el ejecutor de voz para evitar pantallas de fallo o interrupciones en la interfaz de usuario."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 303,
+    fecha: "2026-10-11",
+    estado: "publicada_anterior",
     tipo: "Parche",
     tagGit: "v1.0.0-b303",
     descripcion: "Corrección y priorización del motor de IA en el Asistente de Voz para comandos de cuentas y cuentas pendientes.",

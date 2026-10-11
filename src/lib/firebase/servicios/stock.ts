@@ -8,7 +8,7 @@ export async function descontarStockTemporal(firestore: Firestore, sucursalId: s
     const productoDoc = await transaction.get(productoRef);
     if (!productoDoc.exists()) throw new Error(`Producto con ID ${productoId} no encontrado.`);
     const existenciaActual = productoDoc.data().existencia || 0;
-    if (existenciaActual < cantidad) throw new Error(`Stock insuficiente para ${productoDoc.data().nombre}.`);
+    // Se permite stock negativo para evitar bloqueos operativos en ventas y consumos cuando hay desfase de inventario
     transaction.update(productoRef, { existencia: existenciaActual - cantidad });
   });
 }

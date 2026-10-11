@@ -1386,9 +1386,20 @@ export async function ejecutarAccionVoz(
     }
   };
 
-  const resultado = await ejecutarInterno();
-  if (accion.motorUtilizado) {
-    resultado.motorUtilizado = accion.motorUtilizado;
+  try {
+    const resultado = await ejecutarInterno();
+    if (accion.motorUtilizado) {
+      resultado.motorUtilizado = accion.motorUtilizado;
+    }
+    return resultado;
+  } catch (err: any) {
+    console.error('Error al ejecutar acción de voz:', err);
+    return {
+      exito: false,
+      tipoAccion: accion.tipoAccion,
+      mensaje: err?.message || 'Error al ejecutar la acción.',
+      mensajeVoz: 'Ocurrió un error al procesar el comando.',
+      motorUtilizado: accion.motorUtilizado,
+    };
   }
-  return resultado;
 }

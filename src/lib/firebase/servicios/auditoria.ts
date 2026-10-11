@@ -136,32 +136,49 @@ export async function registrarAuditoria(
       resolucion: infoDisp.resolucion || '',
     };
 
-    // Sanitizar detalles para que no contengan valores undefined (incompatibles con Firestore)
-    const detallesSanitizados: Record<string, any> = {};
-    if (params.detalles) {
-      for (const [k, v] of Object.entries(params.detalles)) {
-        if (v !== undefined) {
-          detallesSanitizados[k] = v;
-        }
-      }
+function limpiarProfundoFirestore(obj: any): any {
+  if (obj === undefined) return null;
+  if (obj === null) return null;
+  if (typeof obj !== 'object') return obj;
+  if (obj instanceof Timestamp || obj instanceof Date) return obj;
+  if (Array.isArray(obj)) {
+    return obj
+      .map(item => limpiarProfundoFirestore(item))
+      .filter(item => item !== undefined);
+  }
+  const limpio: Record<string, any> = {};
+  for (const [clave, valor] of Object.entries(obj)) {
+    if (valor !== undefined) {
+      limpio[clave] = limpiarProfundoFirestore(valor);
     }
+  }
+  return limpio;
+}
 
-    const registro: Omit<RegistroAuditoria, 'id'> = {
-      sucursalId: sid,
+    // Sanitizar y estructurar registro de auditoría sin valores undefined
+    const registroCrudo = {
+      sucursalId: sid || '1',
       fecha: params.fecha instanceof Timestamp ? params.fecha : (params.fecha instanceof Date ? Timestamp.fromDate(params.fecha) : Timestamp.now()),
       usuarioId: params.usuarioId || 'desconocido',
-      usuarioNombre: finalUsuarioNombre,
-      usuarioEmail: finalUsuarioEmail,
-      usuarioRol: finalUsuarioRol,
-      nombreEquipo: finalNombreEquipo,
-      tipoDispositivo: finalTipoDispositivo,
-      detallesDispositivo: finalDetallesDispositivo,
-      categoria: params.categoria,
-      accion: params.accion,
-      titulo: params.titulo,
-      descripcion: params.descripcion,
-      detalles: detallesSanitizados,
+      usuarioNombre: finalUsuarioNombre || 'Operador',
+      usuarioEmail: finalUsuarioEmail || '',
+      usuarioRol: finalUsuarioRol || 'Operador',
+      nombreEquipo: finalNombreEquipo || 'Equipo',
+      tipoDispositivo: finalTipoDispositivo || 'computadora',
+      detallesDispositivo: {
+        so: finalDetallesDispositivo?.so || 'Web',
+        navegador: finalDetallesDispositivo?.navegador || 'Web',
+        modelo: finalDetallesDispositivo?.modelo || '',
+        resolucion: finalDetallesDispositivo?.resolucion || '',
+      },
+      categoria: params.categoria || 'sistema',
+      accion: params.accion || 'operacion',
+      titulo: params.titulo || 'Registro de auditoría',
+      descripcion: params.descripcion || '',
+      detalles: params.detalles || {},
     };
+
+    const registro = limpiarProfundoFirestore(registroCrudo);
 
     if (transaction) {
       const nuevoDocRef = doc(auditoriaCol);
