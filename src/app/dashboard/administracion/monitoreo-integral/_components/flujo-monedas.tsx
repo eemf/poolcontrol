@@ -41,6 +41,7 @@ interface FlujoMonedasProps {
   lista: any[];
   ventaNetaPeriodo: number;
   monedasIniciales: number;
+  efectivoInicialMonedas?: number;
   efectivoAcumuladoMonedas: number;
   inicioPeriodo: Date;
   isLoading: boolean;
@@ -50,6 +51,7 @@ export function FlujoMonedas({
   lista, 
   ventaNetaPeriodo, 
   monedasIniciales, 
+  efectivoInicialMonedas = 0,
   efectivoAcumuladoMonedas, 
   inicioPeriodo, 
   isLoading 
@@ -132,7 +134,9 @@ export function FlujoMonedas({
             <p className="text-xl sm:text-2xl font-black font-mono text-white mt-1">
               {monedasIniciales}
             </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Monedas al abrir turno</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              Efectivo base: <span className="text-emerald-400 font-mono font-bold">Q{efectivoInicialMonedas.toFixed(2)}</span>
+            </p>
           </div>
         </Card>
 
@@ -279,13 +283,13 @@ export function FlujoMonedas({
           <div className="divide-y divide-[#324157]/60">
             {/* Fila de Apertura (orden ASC) */}
             {sortOrder === 'asc' && (
-              <div className="p-3.5 sm:p-4 flex items-center justify-between bg-purple-500/10 transition-colors">
-                <div className="flex items-center gap-3">
+              <div className="p-3.5 sm:p-4 flex items-center justify-between bg-purple-500/10 transition-colors gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <div className="h-9 w-9 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
                     <Coins className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="font-bold text-sm text-white flex items-center gap-2">
+                    <div className="font-bold text-sm text-white flex items-center gap-2 flex-wrap">
                       Apertura de monedas del período
                       <Badge className="text-[9px] bg-purple-500/20 text-purple-300 border-none rounded-full">Apertura</Badge>
                     </div>
@@ -294,11 +298,17 @@ export function FlujoMonedas({
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-base font-black font-mono text-purple-300">
-                    {monedasIniciales} monedas
-                  </span>
-                  <p className="text-[10px] text-muted-foreground">Existencia inicial</p>
+                <div className="text-right shrink-0">
+                  <div className="flex items-baseline justify-end gap-1.5">
+                    <span className="text-[11px] text-muted-foreground font-medium">Efectivo:</span>
+                    <span className="text-sm sm:text-base font-black font-mono text-emerald-400 tabular-nums">
+                      Q{efectivoInicialMonedas.toFixed(2)}
+                    </span>
+                  </div>
+                  <p className="text-[10px] font-mono font-bold text-purple-300 tabular-nums mt-0.5">
+                    Stock: {monedasIniciales} monedas
+                  </p>
+                  <p className="text-[9px] text-muted-foreground">Existencia y saldo inicial</p>
                 </div>
               </div>
             )}
@@ -384,18 +394,32 @@ export function FlujoMonedas({
                       </div>
                     </div>
 
-                    {/* Importe e impacto en stock */}
+                    {/* Importe e impacto en stock y efectivo */}
                     <div className="text-right shrink-0">
-                      {mov.monto !== 0 ? (
-                        <p className={cn(
-                          "text-sm sm:text-base font-black font-mono tabular-nums",
-                          esIngresoEfectivo ? "text-emerald-400" : "text-amber-400"
+                      <div className="flex items-baseline justify-end gap-1.5">
+                        {mov.monto !== 0 ? (
+                          <span className={cn(
+                            "text-sm sm:text-base font-black font-mono tabular-nums",
+                            esIngresoEfectivo ? "text-emerald-400" : "text-amber-400"
+                          )}>
+                            {esIngresoEfectivo ? '+' : ''}Q{mov.monto.toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="text-sm font-mono text-muted-foreground">--</span>
+                        )}
+                      </div>
+
+                      {/* Efectivo acumulado de monedas en el período */}
+                      <p className="text-[10px] font-mono text-muted-foreground tabular-nums mt-0.5">
+                        Efectivo en período: <span className={cn(
+                          "font-bold",
+                          (mov.cashAcumulado ?? 0) >= 0 ? "text-white" : "text-amber-400"
                         )}>
-                          {esIngresoEfectivo ? '+' : ''}Q{mov.monto.toFixed(2)}
-                        </p>
-                      ) : (
-                        <p className="text-sm font-mono text-muted-foreground">--</p>
-                      )}
+                          Q{(mov.cashAcumulado ?? 0).toFixed(2)}
+                        </span>
+                      </p>
+
+                      {/* Stock acumulado de monedas */}
                       <p className="text-[10px] font-mono text-purple-300 tabular-nums">
                         Stock: {mov.stockAcumulado} monedas ({mov.tipo === 'venta' || mov.tipo === 'base' ? '-' : '+'}{mov.cantidad})
                       </p>
@@ -407,13 +431,13 @@ export function FlujoMonedas({
 
             {/* Fila de Apertura (orden DESC) */}
             {sortOrder === 'desc' && (
-              <div className="p-3.5 sm:p-4 flex items-center justify-between bg-purple-500/10 transition-colors">
-                <div className="flex items-center gap-3">
+              <div className="p-3.5 sm:p-4 flex items-center justify-between bg-purple-500/10 transition-colors gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <div className="h-9 w-9 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
                     <Coins className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="font-bold text-sm text-white flex items-center gap-2">
+                    <div className="font-bold text-sm text-white flex items-center gap-2 flex-wrap">
                       Apertura de monedas del período
                       <Badge className="text-[9px] bg-purple-500/20 text-purple-300 border-none rounded-full">Apertura</Badge>
                     </div>
@@ -422,11 +446,17 @@ export function FlujoMonedas({
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-base font-black font-mono text-purple-300">
-                    {monedasIniciales} monedas
-                  </span>
-                  <p className="text-[10px] text-muted-foreground">Existencia inicial</p>
+                <div className="text-right shrink-0">
+                  <div className="flex items-baseline justify-end gap-1.5">
+                    <span className="text-[11px] text-muted-foreground font-medium">Efectivo:</span>
+                    <span className="text-sm sm:text-base font-black font-mono text-emerald-400 tabular-nums">
+                      Q{efectivoInicialMonedas.toFixed(2)}
+                    </span>
+                  </div>
+                  <p className="text-[10px] font-mono font-bold text-purple-300 tabular-nums mt-0.5">
+                    Stock: {monedasIniciales} monedas
+                  </p>
+                  <p className="text-[9px] text-muted-foreground">Existencia y saldo inicial</p>
                 </div>
               </div>
             )}

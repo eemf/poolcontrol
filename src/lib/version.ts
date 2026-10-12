@@ -12,9 +12,38 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 306,
+    fecha: "2026-10-12",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b306",
+    descripcion: "Trazabilidad de efectivo de monedas vendidas en el período: inicio en Q0.00 tras cierre de caja y rastreo acumulado línea por línea de ventas y premios del turno.",
+    cambios: [
+      "Apertura en cero para el período: El efectivo de venta de monedas en la apertura inicia en Q0.00 tras el corte de caja, reflejando fielmente el flujo del nuevo turno.",
+      "Trazabilidad de efectivo por movimiento en el período: Cada venta (+Q) o premio pagado (-Q) actualiza el indicador 'Efectivo en período: Q...' mostrando cómo se acumula el efectivo neto del turno hasta alcanzar el total del período (ej. Q40).",
+      "Integridad de exportación CSV: El reporte exportado incluye el inicio en Q0.00 y la columna de efectivo acumulado del período."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 305,
+    fecha: "2026-10-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v1.0.0-b305",
+    descripcion: "Reorganización modular de menú y permisos: nuevo grupo Reportes y remoción definitiva de páginas descontinuadas.",
+    cambios: [
+      "Eliminación definitiva de páginas obsoletas: Remoción completa de los módulos y rutas de Monitoreo de Período y Movimiento de Producto.",
+      "Nuevo grupo de navegación 'Reportes': Se integró un menú dedicado con Monitoreo Integral, Control de Pagos, Auditoría y Eliminar por Rango de Fecha.",
+      "Matriz de permisos integrada para Reportes: Configuración de privilegios de usuario para cada reporte (reportes.monitoreo, reportes.pagos, reportes.auditoria, reportes.eliminar_rango) con compatibilidad total para roles previos.",
+      "Depuración del menú de Administración: Administración ahora queda enfocada en Compras, Gastos, Cuadre de Tragamonedas, Cuadre Semanal y Cuadre Mensual."
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 304,
     fecha: "2026-10-11",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Parche",
     tagGit: "v1.0.0-b304",
     descripcion: "Corrección de persistencia de auditoría transaccional en Firestore y prevención de bloqueos operativos por inventario.",
@@ -741,9 +770,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 302,
-  date: "2026-10-11",
-  publicadaActual: releaseHistory[0], // Build 302
-  publicadaAnterior: releaseHistory[1], // Build 301
+  build: 306,
+  date: "2026-10-12",
+  publicadaActual: releaseHistory[0], // Build 306
+  publicadaAnterior: releaseHistory[1], // Build 305
   historial: releaseHistory
 };

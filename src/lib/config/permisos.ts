@@ -38,10 +38,17 @@ export const PERMISSIONS_GROUPS: PermissionGroup[] = [
     ]
   },
   {
-    groupName: 'Administración y Reportes',
+    groupName: 'Reportes',
     permissions: [
-      { key: 'admin.monitoreo', label: 'Monitoreo de Período', description: 'Permite auditar pagos y movimientos del turno actual.' },
-      { key: 'admin.movimientos', label: 'Movimiento de Productos', description: 'Permite rastrear el historial de entradas y salidas de stock.' },
+      { key: 'reportes.monitoreo', label: 'Monitoreo Integral', description: 'Permite auditar el flujo de efectivo, monedas y kardex del turno.' },
+      { key: 'reportes.pagos', label: 'Control de Pagos', description: 'Permite auditar comprobantes y pagos unificados de clientes.' },
+      { key: 'reportes.auditoria', label: 'Auditoría', description: 'Permite consultar la bitácora completa de acciones y transacciones.' },
+      { key: 'reportes.eliminar_rango', label: 'Eliminar por Rango de Fecha', description: 'Permite eliminar registros de ventas por rango de fechas o identificadores.' },
+    ]
+  },
+  {
+    groupName: 'Administración',
+    permissions: [
       { key: 'compras.gestionar', label: 'Gestionar Compras', description: 'Permite registrar entradas de mercadería al inventario.' },
       { key: 'gastos.gestionar', label: 'Gestionar Gastos', description: 'Permite registrar egresos operativos de la sucursal.' },
       { key: 'tragamonedas.cuadre', label: 'Cuadre de Tragamonedas', description: 'Permite realizar el cierre financiero de las máquinas.' },
@@ -49,8 +56,6 @@ export const PERMISSIONS_GROUPS: PermissionGroup[] = [
       { key: 'cuadre.semanal', label: 'Cuadre Semanal', description: 'Permite consolidar ingresos y egresos de la semana.' },
       { key: 'cuadre.mensual', label: 'Cuadre Mensual', description: 'Permite generar el cierre consolidado del mes.' },
       { key: 'inventario.revisar', label: 'Hacer Revisión Inventario', description: 'Permite realizar el conteo físico y ajustes de stock.' },
-      { key: 'ventas.eliminar_rango', label: 'Mantenimiento de Ventas', description: 'Permite eliminar registros de ventas por rango (Admin).' },
-      { key: 'admin.auditoria', label: 'Auditoría de Usuarios', description: 'Permite consultar la bitácora completa de acciones y transacciones por usuario.' },
       { key: 'sucursales.saltar', label: 'Navegación Multisucursal', description: 'Permite cambiar de sucursal rápidamente (Gerencia Global).' },
     ]
   },
@@ -61,7 +66,6 @@ export const PERMISSIONS_GROUPS: PermissionGroup[] = [
       { key: 'config.productos', label: 'Catálogo de Productos', description: 'Permite crear y editar productos físicos y recetas.' },
       { key: 'mant.productos_virt', label: 'Productos Virtuales', description: 'Permite gestionar servicios y monedas virtuales.' },
       { key: 'mant.roles', label: 'Gestionar Roles', description: 'Permite crear y editar los perfiles de acceso (Admin).' },
-      { key: 'mant.pagos', label: 'Historial de Pagos', description: 'Permite consultar el registro histórico de cobros.' },
       { key: 'mant.cuentas', label: 'Cuentas Financieras', description: 'Permite administrar las cuentas de efectivo y bancos.' },
     ]
   },

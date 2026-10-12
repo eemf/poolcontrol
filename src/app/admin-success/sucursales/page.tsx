@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, FormEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { Loader2, Save, Trash2, Edit, PlusCircle, Building, Search, LogIn, SlidersHorizontal, LayoutGrid, ShoppingCart, Dices, Truck, Scale, Zap, MonitorCheck, Boxes, History, DollarSign, PiggyBank, BookUser, CalendarDays, Calendar, Settings, Contact, Package, Ghost, ShieldCheck, HandCoins, ExternalLink, Mic } from "lucide-react"
+import { Loader2, Save, Trash2, Edit, PlusCircle, Building, Search, LogIn, SlidersHorizontal, LayoutGrid, ShoppingCart, Dices, Truck, Scale, Zap, MonitorCheck, Boxes, History, DollarSign, PiggyBank, BookUser, CalendarDays, Calendar, Settings, Contact, Package, Ghost, ShieldCheck, HandCoins, ExternalLink, Mic, BarChart3, Eraser } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -31,11 +31,18 @@ const FEATURE_GROUPS = [
         ]
     },
     {
+        name: "Reportes",
+        features: [
+            { id: 'repMonitoreo', label: 'Monitoreo Integral', icon: MonitorCheck },
+            { id: 'repControlPagos', label: 'Control de Pagos', icon: HandCoins },
+            { id: 'repAuditoria', label: 'Auditoría', icon: ShieldCheck },
+            { id: 'repEliminarRango', label: 'Eliminar por Rango de Fecha', icon: Eraser },
+        ]
+    },
+    {
         name: "Administración",
         features: [
-            { id: 'adminMonitoreo', label: 'Monitoreo Período', icon: MonitorCheck },
             { id: 'adminInventario', label: 'Inventario (Admin)', icon: Boxes },
-            { id: 'adminMovimientos', label: 'Movimiento de Producto', icon: History },
             { id: 'adminGastos', label: 'Gastos', icon: DollarSign },
             { id: 'adminCuadreTraga', label: 'Cuadre Tragamonedas', icon: PiggyBank },
             { id: 'adminCuentas', label: 'Cuentas Financieras', icon: BookUser },
@@ -52,7 +59,6 @@ const FEATURE_GROUPS = [
             { id: 'mantProductos', label: 'Mantenimiento Productos', icon: Package },
             { id: 'mantProductosVirt', label: 'Mantenimiento Prod. Virtuales', icon: Ghost },
             { id: 'mantRoles', label: 'Mantenimiento Roles', icon: ShieldCheck },
-            { id: 'mantPagos', label: 'Mantenimiento Pagos', icon: HandCoins },
         ]
     }
 ];

@@ -86,6 +86,7 @@ export default function PaginaMonitoreoIntegral() {
         esTurnoAbierto: true,
         monedasIniciales: turnoActual.monedasTurnoAbierto ?? turnoActual.monedasIniciales ?? 0,
         efectivoInicial: turnoActual.efectivoInicial ?? 0,
+        efectivoInicialMonedas: 0, // Al abrir el turno inicia en 0 y se acumula en el período
         efectivoAcumuladoMonedas: turnoActual.efectivoAcumuladoMonedas ?? 0,
         idCuadre: null,
       };
@@ -99,6 +100,7 @@ export default function PaginaMonitoreoIntegral() {
       esTurnoAbierto: false,
       monedasIniciales: cierre.snapshotMonedas?.existenciaAlInicio ?? cierre.snapshotMonedas?.existencia ?? 0,
       efectivoInicial: cierre.efectivoInicial ?? 0,
+      efectivoInicialMonedas: 0, // Al abrir el turno inicia en 0
       efectivoAcumuladoMonedas: cierre.snapshotMonedas?.efectivoAcumulado ?? 0,
       idCuadre: cierre.idCuadre,
     };
@@ -215,10 +217,10 @@ export default function PaginaMonitoreoIntegral() {
   }, [pagos, configPeriodo]);
 
   const flujoMonedasObj = useMemo(() => {
-    if (!configPeriodo) return { lista: [], ventaNetaPeriodo: 0, stockFinal: 0 };
+    if (!configPeriodo) return { lista: [], ventaNetaPeriodo: 0, stockFinal: 0, efectivoFinal: 0 };
     const lista: any[] = [];
     let stock = configPeriodo.monedasIniciales;
-    let cash = 0; 
+    let cash = configPeriodo.efectivoInicialMonedas || 0; 
     let ventaNetaPeriodo = 0;
 
     const ventas = (pagos || []).map(p => {
@@ -259,7 +261,7 @@ export default function PaginaMonitoreoIntegral() {
       lista.push({ ...mov, stockAcumulado: stock, cashAcumulado: cash });
     });
 
-    return { lista, ventaNetaPeriodo, stockFinal: stock };
+    return { lista, ventaNetaPeriodo, stockFinal: stock, efectivoFinal: cash };
   }, [pagos, movTraga, configPeriodo]);
 
   // Duración del período en texto
@@ -290,6 +292,7 @@ export default function PaginaMonitoreoIntegral() {
       csvContent += `Ventas de productos,${resumenGaveta.ventas.toFixed(2)}\n`;
       csvContent += `Alquiler de mesas,${resumenGaveta.alquileres.toFixed(2)}\n`;
       csvContent += `Subtotal en gaveta,${resumenGaveta.totalGaveta.toFixed(2)}\n`;
+      csvContent += `Efectivo inicial venta de monedas,${(configPeriodo.efectivoInicialMonedas || 0).toFixed(2)}\n`;
       csvContent += `Venta neta de monedas,${flujoMonedasObj.ventaNetaPeriodo.toFixed(2)}\n`;
       csvContent += `Total efectivo esperado en caja,${(resumenGaveta.totalGaveta + flujoMonedasObj.ventaNetaPeriodo).toFixed(2)}\n`;
       csvContent += `Monedas iniciales,${configPeriodo.monedasIniciales}\n`;
@@ -299,6 +302,12 @@ export default function PaginaMonitoreoIntegral() {
       csvContent += `Pago ID,Venta ID,Cliente,Fecha,Hora,Importe (Q),Saldo acumulado (Q)\n`;
       flujoGavetaList.forEach(p => {
         csvContent += `"${p.idPago}","${p.idVenta}","${p.clienteNombre}","${format(toDate(p.fecha), 'dd/MM/yyyy')}","${format(toDate(p.fecha), 'HH:mm:ss')}",${p.montoConsumo.toFixed(2)},${p.saldoAcumulado.toFixed(2)}\n`;
+      });
+
+      csvContent += `\nMovimientos de monedas\n`;
+      csvContent += `Tipo,Descripción,Referencia,Fecha,Hora,Importe (Q),Saldo acumulado efectivo (Q),Existencia acumulada\n`;
+      flujoMonedasObj.lista.forEach(m => {
+        csvContent += `"${m.tipo}","${m.desc}","${m.ref || ''}","${format(toDate(m.fecha), 'dd/MM/yyyy')}","${format(toDate(m.fecha), 'HH:mm:ss')}",${m.monto.toFixed(2)},${(m.cashAcumulado || 0).toFixed(2)},${m.stockAcumulado}\n`;
       });
 
       const encodedUri = encodeURI(csvContent);
@@ -615,7 +624,8 @@ export default function PaginaMonitoreoIntegral() {
                 lista={flujoMonedasObj.lista} 
                 ventaNetaPeriodo={flujoMonedasObj.ventaNetaPeriodo} 
                 monedasIniciales={configPeriodo.monedasIniciales} 
-                efectivoAcumuladoMonedas={0} 
+                efectivoInicialMonedas={configPeriodo.efectivoInicialMonedas || 0}
+                efectivoAcumuladoMonedas={configPeriodo.efectivoAcumuladoMonedas || 0} 
                 inicioPeriodo={configPeriodo.inicio} 
                 isLoading={isLoadingTraga || isLoadingPagos} 
               />

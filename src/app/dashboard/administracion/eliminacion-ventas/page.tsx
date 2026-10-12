@@ -92,7 +92,7 @@ export default function PaginaMantenimientoVentas() {
         return <div className="flex h-[60vh] items-center justify-center"><Loader2 className="animate-spin text-primary h-10 w-10" /></div>;
     }
 
-    if (!hasPermission('ventas.eliminar_rango')) {
+    if (!hasPermission('reportes.eliminar_rango') && !hasPermission('ventas.eliminar_rango')) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center p-6 font-body">
                 <ShieldAlert className="h-12 w-12 text-destructive mb-4" />

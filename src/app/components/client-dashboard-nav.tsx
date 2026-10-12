@@ -8,7 +8,8 @@ import {
   Palette, Contact, UserCheck, ShieldCheck, Package, DollarSign, 
   TableProperties,
   Truck, Scale, History, HandCoins, Landmark, BookUser, CalendarDays, 
-  Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2, Info
+  Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2, Info,
+  BarChart3
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -59,29 +60,33 @@ export const navItems: NavItemType[] = [
   { href: '/dashboard/cierre-caja', label: 'Cierre de Caja', icon: Scale, permission: 'caja.cerrar', feature: 'cierreCaja' },
   { href: '/dashboard/administracion/inventario', label: 'Inventario', icon: Boxes, permission: 'inventario.ver', feature: 'adminInventario' },
   {
+    label: 'Reportes',
+    icon: BarChart3,
+    anyPermission: ['reportes.monitoreo', 'reportes.pagos', 'reportes.auditoria', 'reportes.eliminar_rango'],
+    items: [
+      { href: '/dashboard/administracion/monitoreo-integral', label: 'Monitoreo Integral', icon: MonitorCheck, permission: 'reportes.monitoreo', feature: 'repMonitoreo' },
+      { href: '/dashboard/control-pagos', label: 'Control de Pagos', icon: HandCoins, permission: 'reportes.pagos', feature: 'repControlPagos' },
+      { href: '/dashboard/administracion/auditoria', label: 'Auditoría', icon: ShieldCheck, permission: 'reportes.auditoria', feature: 'repAuditoria' },
+      { href: '/dashboard/administracion/eliminacion-ventas', label: 'Eliminar por Rango de Fecha', icon: Eraser, permission: 'reportes.eliminar_rango', feature: 'repEliminarRango' },
+    ]
+  },
+  {
     label: 'Administración',
     icon: Landmark,
-    anyPermission: ['admin.monitoreo', 'admin.movimientos', 'compras.gestionar', 'gastos.gestionar', 'tragamonedas.cuadre', 'cuadre.semanal', 'cuadre.mensual', 'ventas.eliminar_rango', 'admin.auditoria', 'mant.pagos'],
+    anyPermission: ['compras.gestionar', 'gastos.gestionar', 'tragamonedas.cuadre', 'cuadre.semanal', 'cuadre.mensual'],
     items: [
-        { href: '/dashboard/control-pagos', label: 'Control de Pagos', icon: HandCoins, permission: 'mant.pagos' },
-        { href: '/dashboard/administracion/monitoreo-integral', label: 'Monitoreo Integral', icon: MonitorCheck, permission: 'admin.monitoreo' },
-        { href: '/dashboard/administracion/monitoreo-periodo', label: 'Monitoreo Período', icon: MonitorCheck, permission: 'admin.monitoreo', feature: 'adminMonitoreo' },
-        { href: '/dashboard/administracion/movimiento-productos', label: 'Movimiento de Productos', icon: History, permission: 'admin.movimientos', feature: 'adminMovimientos' },
         { href: '/dashboard/compras', label: 'Compras', icon: Truck, permission: 'compras.gestionar', feature: 'compras' },
         { href: '/dashboard/gastos', label: 'Gastos', icon: DollarSign, permission: 'gastos.gestionar', feature: 'adminGastos' },
         { href: '/dashboard/administracion/cuadre-tragamonedas', label: 'Cuadre Tragamonedas', icon: PiggyBank, permission: 'tragamonedas.cuadre', feature: 'adminCuadreTraga' },
         { href: '/dashboard/administracion/cuadre-semanal', label: 'Cuadre Semanal', icon: CalendarDays, permission: 'cuadre.semanal', feature: 'adminCuadreSemanal' },
         { href: '/dashboard/administracion/cuadre-mensual', label: 'Cuadre Mensual', icon: Calendar, permission: 'cuadre.mensual', feature: 'adminCuadreMensual' },
-        { href: '/dashboard/administracion/auditoria', label: 'Auditoría', icon: ShieldCheck, permission: 'admin.auditoria' },
-        { href: '/dashboard/administracion/eliminacion-ventas', label: 'Eliminar por Rango', icon: Eraser, permission: 'ventas.eliminar_rango' },
     ]
   },
   {
     label: 'Mantenimiento',
     icon: Wrench,
-    anyPermission: ['mant.clientes', 'config.productos', 'mant.productos_virt', 'mant.roles', 'mant.pagos', 'mant.cuentas', 'admin.monitoreo'],
+    anyPermission: ['mant.clientes', 'config.productos', 'mant.productos_virt', 'mant.roles', 'mant.cuentas'],
     items: [
-        { href: '/dashboard/mantenimiento/monitoreo-integral', label: 'Monitoreo Integral (Pruebas)', icon: MonitorCheck, permission: 'admin.monitoreo' },
         { href: '/dashboard/mantenimiento/clientes', label: 'Clientes', icon: Contact, permission: 'mant.clientes', feature: 'mantClientes' },
         { href: '/dashboard/mantenimiento/productos', label: 'Productos', icon: Package, permission: 'config.productos', feature: 'mantProductos' },
         { href: '/dashboard/mantenimiento/productos-virtuales', label: 'Prod. Virtuales', icon: Ghost, permission: 'mant.productos_virt', feature: 'mantProductosVirt' },

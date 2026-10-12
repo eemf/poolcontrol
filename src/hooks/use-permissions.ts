@@ -56,12 +56,25 @@ export function usePermissions() {
     return perms;
   }, [rolesData, userData, isSuperAdmin, profile]);
 
+  const PERMISSION_ALIASES: Record<string, string[]> = {
+    'reportes.monitoreo': ['admin.monitoreo'],
+    'admin.monitoreo': ['reportes.monitoreo'],
+    'reportes.pagos': ['mant.pagos'],
+    'mant.pagos': ['reportes.pagos'],
+    'reportes.auditoria': ['admin.auditoria'],
+    'admin.auditoria': ['reportes.auditoria'],
+    'reportes.eliminar_rango': ['ventas.eliminar_rango'],
+    'ventas.eliminar_rango': ['reportes.eliminar_rango'],
+  };
+
   /**
    * Verifica si el usuario tiene un permiso específico.
    */
   const hasPermission = (permissionKey: string): boolean => {
     if (isSuperAdmin || permissions.has('*')) return true;
-    return permissions.has(permissionKey);
+    if (permissions.has(permissionKey)) return true;
+    const aliases = PERMISSION_ALIASES[permissionKey] || [];
+    return aliases.some(alias => permissions.has(alias));
   };
 
   /**
@@ -69,7 +82,7 @@ export function usePermissions() {
    */
   const hasAnyPermission = (keys: string[]): boolean => {
     if (isSuperAdmin || permissions.has('*')) return true;
-    return keys.some(key => permissions.has(key));
+    return keys.some(key => hasPermission(key));
   };
 
   return {
