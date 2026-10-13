@@ -12,9 +12,23 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 307,
+    fecha: "2026-10-13",
+    estado: "publicada_actual",
+    tipo: "Parche",
+    tagGit: "v1.0.0-b307",
+    descripcion: "Corrección de persistencia en efectivoAcumuladoMonedas: congelación durante el período operativo y actualización exclusiva en cierre de caja y cuadre de máquinas.",
+    cambios: [
+      "Congelación de acumulado durante el turno: Se eliminó el incremento indebido de efectivoAcumuladoMonedas en ventas rápidas y comandos de voz, garantizando que el acumulado multi-turno no varíe en el transcurso del período.",
+      "Aislamiento contable del período: Las ventas de monedas en efectivo ahora alimentan de forma exclusiva el contador del período actual (totalVentasMonedas).",
+      "Consistencia con Cierre de Caja y Cuadre: Se elimina la duplicación accidental de montos al consolidar el turno y se garantiza que efectivoAcumuladoMonedas solo sea modificado en el cierre de caja o cuadre de tragamonedas."
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 306,
     fecha: "2026-10-12",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v1.0.0-b306",
     descripcion: "Trazabilidad de efectivo de monedas vendidas en el período: inicio en Q0.00 tras cierre de caja y rastreo acumulado línea por línea de ventas y premios del turno.",
@@ -770,9 +784,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 306,
-  date: "2026-10-12",
-  publicadaActual: releaseHistory[0], // Build 306
-  publicadaAnterior: releaseHistory[1], // Build 305
+  build: 307,
+  date: "2026-10-13",
+  publicadaActual: releaseHistory[0], // Build 307
+  publicadaAnterior: releaseHistory[1], // Build 306
   historial: releaseHistory
 };

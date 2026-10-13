@@ -406,8 +406,7 @@ export async function procesarVentaRapidaConId(
             transaction.update(productoRef, { existencia: increment(-comando.cantidad) });
             if (metodoPago === 'Efectivo') {
               transaction.update(doc(firestore, `sucursales/${sid}/generales`, 'actual'), {
-                  totalVentasMonedas: increment(totalVenta),
-                  efectivoAcumuladoMonedas: increment(totalVenta)
+                  totalVentasMonedas: increment(totalVenta)
               });
             } else {
               transaction.update(doc(firestore, `sucursales/${sid}/generales`, 'actual'), {
