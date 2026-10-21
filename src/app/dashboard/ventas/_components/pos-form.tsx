@@ -145,7 +145,11 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
                     onKeyDown={e => { 
                       if (e.key === 'Enter') {
                         e.preventDefault();
-                        refs.itemManualAddBtnRef.current?.focus();
+                        if (state.descripcionItemManual.trim() && state.precioUnitarioItemManual && Number(state.precioUnitarioItemManual) > 0 && state.cantidadItemManual && Number(state.cantidadItemManual) > 0) {
+                          actions.manejarAnadirItemManual();
+                        } else {
+                          refs.itemManualAddBtnRef.current?.focus();
+                        }
                       }
                     }} 
                     className="text-center h-10" 
@@ -155,7 +159,13 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
                   <Button 
                     ref={refs.itemManualAddBtnRef} 
                     onClick={actions.manejarAnadirItemManual} 
-                    disabled={!state.descripcionItemManual || !state.precioUnitarioItemManual || state.precioUnitarioItemManual <= 0}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        actions.manejarAnadirItemManual();
+                      }
+                    }}
+                    disabled={!state.descripcionItemManual || !state.precioUnitarioItemManual || Number(state.precioUnitarioItemManual) <= 0}
                     className="w-full h-10 font-bold rounded-full"
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />

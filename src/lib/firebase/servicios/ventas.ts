@@ -115,6 +115,14 @@ export async function guardarVentaYActualizarStock(
         const docIdFinal = ventaExistenteSnap?.id ?? idVentaFinal.toString();
         const ventaRef = doc(firestore, `sucursales/${sid}/ventas`, docIdFinal);
 
+        // Comprobar si se eliminaron productos que estaban guardados en la venta existente
+        const itemsEliminados = ventaExistente 
+            ? ventaExistente.detalles.filter(oldDet => 
+                oldDet.idDetalle !== 0 && 
+                !detallesProcesados.some(newDet => newDet.idDetalle === oldDet.idDetalle)
+              )
+            : [];
+
         for (const detalle of itemsNuevos) {
             const map = detalle.esVirtual ? productosVirtMap : productosMap;
             const productoDoc = map.get(detalle.idProducto);
@@ -156,7 +164,18 @@ export async function guardarVentaYActualizarStock(
             .map(d => `${d.cantidad}x ${d.nombreProducto || 'Producto'} (Q${(d.subtotal || (d.cantidad * d.precioUnitario)).toFixed(2)})`)
             .join(', ');
 
-        const descCompleta = `${ventaData.nombreCliente || 'Cliente'} - Total: Q${totalVenta.toFixed(2)}${resumenProductos ? ` • ${ventaExistente ? 'Agregó' : 'Productos'}: ${resumenProductos}` : ''}`;
+        const resumenEliminados = itemsEliminados
+            .map(d => `${d.cantidad}x ${d.nombreProducto || 'Producto'}`)
+            .join(', ');
+
+        const descPartes: string[] = [`${ventaData.nombreCliente || 'Cliente'} - Total: Q${totalVenta.toFixed(2)}`];
+        if (resumenProductos) {
+            descPartes.push(`${ventaExistente ? 'Agregó' : 'Productos'}: ${resumenProductos}`);
+        }
+        if (resumenEliminados) {
+            descPartes.push(`Eliminó: ${resumenEliminados}`);
+        }
+        const descCompleta = descPartes.join(' • ');
 
         registrarAuditoria(firestore, sid, {
             usuarioId,
@@ -177,11 +196,185 @@ export async function guardarVentaYActualizarStock(
                     precioUnitario: d.precioUnitario,
                     subtotal: d.subtotal || (d.cantidad * d.precioUnitario)
                 })),
+                itemsEliminados: itemsEliminados.map(d => ({
+                    nombre: d.nombreProducto || 'Producto',
+                    cantidad: d.cantidad,
+                    precioUnitario: d.precioUnitario,
+                    subtotal: d.subtotal || (d.cantidad * d.precioUnitario)
+                })),
                 cantidadItemsTotal: detallesProcesados.length
             }
         }, transaction);
 
         return { ventaId: docIdFinal, idVenta: idVentaFinal };
+    });
+}
+
+/**
+ * Elimina un producto específico de una venta guardada en Firestore.
+ * Reintegra el stock al inventario, registra el movimiento en el Kardex y crea la auditoría correspondiente.
+ */
+export async function eliminarProductoDeVenta(
+    firestore: Firestore,
+    sucursalId: string,
+    ventaDocId: string,
+    itemAEliminar: DetalleVenta,
+    usuarioId: string
+) {
+    const sid = validarSucursal(sucursalId);
+
+    return runTransaction(firestore, async (transaction) => {
+        const ventaRef = doc(firestore, `sucursales/${sid}/ventas`, ventaDocId);
+        const correlativoHistorialRef = doc(firestore, `sucursales/${sid}/correlativos`, "historial_inventario");
+
+        // 1. FASE DE LECTURAS (READS FIRST)
+        const [ventaDoc, correlativoHistorialDoc] = await Promise.all([
+            transaction.get(ventaRef),
+            transaction.get(correlativoHistorialRef)
+        ]);
+
+        if (!ventaDoc.exists()) {
+            throw new Error("La venta a la que pertenece este producto no existe o fue eliminada.");
+        }
+
+        const ventaData = ventaDoc.data() as Venta;
+
+        // Leer producto principal si no es manual
+        let productoDoc: DocumentSnapshot | null = null;
+        let productoRef: any = null;
+        if (itemAEliminar.idProducto !== 'item-manual') {
+            const coll = itemAEliminar.esVirtual ? 'productos_virtuales' : 'productos';
+            productoRef = doc(firestore, `sucursales/${sid}/${coll}`, itemAEliminar.idProducto);
+            productoDoc = await transaction.get(productoRef);
+        }
+
+        // Leer ingredientes si correspondiera
+        const ingredientesDocs: { ref: any; doc: DocumentSnapshot; cantidad: number }[] = [];
+        if (!itemAEliminar.esVirtual && itemAEliminar.ingredientesConsumidos && itemAEliminar.ingredientesConsumidos.length > 0) {
+            for (const ing of itemAEliminar.ingredientesConsumidos) {
+                const ingRef = doc(firestore, `sucursales/${sid}/productos`, ing.productoId);
+                const ingDoc = await transaction.get(ingRef);
+                ingredientesDocs.push({ ref: ingRef, doc: ingDoc, cantidad: ing.cantidad * itemAEliminar.cantidad });
+            }
+        }
+
+        // 2. FASE DE PROCESAMIENTO
+        let eliminado = false;
+        const nuevosDetalles = ventaData.detalles.filter(d => {
+            if (!eliminado) {
+                const coincideId = itemAEliminar.idDetalle && itemAEliminar.idDetalle > 0 && d.idDetalle === itemAEliminar.idDetalle;
+                const coincideProducto = d.idProducto === itemAEliminar.idProducto && d.cantidad === itemAEliminar.cantidad && d.precioUnitario === itemAEliminar.precioUnitario;
+                if (coincideId || coincideProducto) {
+                    eliminado = true;
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        const nuevoTotal = nuevosDetalles.reduce((acc, item) => acc + (item.subtotal || 0), 0);
+        const nuevoSaldo = nuevosDetalles.reduce((acc, item) => acc + (item.saldo || 0), 0);
+        const nuevoEstado = nuevoSaldo < 0.01 ? 'Pagada' : 'Pendiente de pago';
+
+        let siguienteIdHistorial = (correlativoHistorialDoc.data()?.correlativo || 0) + 1;
+
+        // 3. FASE DE ESCRITURAS (WRITES LAST)
+        // A. Actualizar existencia y registrar en Kardex
+        if (productoRef && productoDoc && productoDoc.exists()) {
+            const existenciaAnterior = productoDoc.data()!.existencia || 0;
+            const cantidadADevolver = itemAEliminar.cantidad;
+            const existenciaNueva = existenciaAnterior + cantidadADevolver;
+
+            transaction.update(productoRef, { existencia: existenciaNueva });
+
+            registrarMovimientoInventario(transaction, firestore, sid, siguienteIdHistorial++, {
+                productoId: itemAEliminar.idProducto,
+                nombreProducto: itemAEliminar.nombreProducto,
+                tipoMovimiento: 'Producto Eliminado',
+                cantidad: cantidadADevolver,
+                existenciaAnterior,
+                existenciaNueva,
+                referencia: `Eliminado de Venta #${ventaData.idVenta}`,
+                usuarioId,
+            });
+        }
+
+        // B. Reintegrar ingredientes a existencia y Kardex
+        for (const ingInfo of ingredientesDocs) {
+            if (ingInfo.doc.exists()) {
+                const exAnt = ingInfo.doc.data()!.existencia || 0;
+                const exNue = exAnt + ingInfo.cantidad;
+                transaction.update(ingInfo.ref, { existencia: exNue });
+
+                registrarMovimientoInventario(transaction, firestore, sid, siguienteIdHistorial++, {
+                    productoId: ingInfo.ref.id,
+                    nombreProducto: ingInfo.doc.data()!.nombre || 'Ingrediente',
+                    tipoMovimiento: 'Producto Eliminado',
+                    cantidad: ingInfo.cantidad,
+                    existenciaAnterior: exAnt,
+                    existenciaNueva: exNue,
+                    referencia: `Eliminado de Venta #${ventaData.idVenta}`,
+                    usuarioId,
+                });
+            }
+        }
+
+        // C. Actualizar correlativo de historial
+        transaction.set(correlativoHistorialRef, { correlativo: siguienteIdHistorial - 1 }, { merge: true });
+
+        // D. Actualizar documento de venta
+        transaction.update(ventaRef, {
+            detalles: nuevosDetalles,
+            total: nuevoTotal,
+            saldo: nuevoSaldo,
+            estado: nuevoEstado,
+        });
+
+        // E. Registrar Auditoría
+        const precioUnitario = itemAEliminar.precioUnitario || 0;
+        const subtotal = itemAEliminar.subtotal || (itemAEliminar.cantidad * precioUnitario);
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'VENTAS',
+            accion: 'VENTA_ELIMINAR_PRODUCTO',
+            titulo: `Producto eliminado de venta #${ventaData.idVenta}`,
+            descripcion: `Se eliminó ${itemAEliminar.cantidad}x ${itemAEliminar.nombreProducto} (Q${subtotal.toFixed(2)}) de la venta #${ventaData.idVenta} (${ventaData.nombreCliente || 'Cliente'})`,
+            detalles: {
+                idVenta: ventaData.idVenta,
+                ventaId: ventaDocId,
+                clienteId: ventaData.clienteId,
+                nombreCliente: ventaData.nombreCliente,
+                productoEliminado: itemAEliminar.nombreProducto,
+                cantidad: itemAEliminar.cantidad,
+                precioUnitario,
+                subtotal,
+                itemsEliminados: [{
+                    nombre: itemAEliminar.nombreProducto,
+                    cantidad: itemAEliminar.cantidad,
+                    precioUnitario,
+                    subtotal,
+                }],
+                itemsDevueltos: [{
+                    nombre: itemAEliminar.nombreProducto,
+                    cantidad: itemAEliminar.cantidad,
+                    precioUnitario,
+                    subtotal,
+                }],
+                totalAnterior: ventaData.total,
+                totalNuevo: nuevoTotal,
+                saldoAnterior: ventaData.saldo,
+                saldoNuevo: nuevoSaldo,
+            }
+        }, transaction);
+
+        return {
+            nuevosDetalles,
+            nuevoTotal,
+            nuevoSaldo,
+            idVenta: ventaData.idVenta,
+            nombreCliente: ventaData.nombreCliente,
+        };
     });
 }
 
@@ -276,7 +469,13 @@ export async function cancelarVentaYDevolverStock(
             descripcion: eliminarVenta ? `Devolución al inventario: ${resumenDevueltos || `${itemsADevolver.length} ítems`}` : `Devolución al inventario de ítems sin guardar: ${resumenDevueltos || `${itemsADevolver.length} ítems`}`,
             detalles: {
                 ventaId,
-                itemsDevueltos: itemsADevolver.map(i => ({ nombre: i.nombreProducto, cantidad: i.cantidad }))
+                itemsDevueltos: itemsADevolver.map(i => ({ nombre: i.nombreProducto, cantidad: i.cantidad })),
+                itemsEliminados: itemsADevolver.map(i => ({ 
+                    nombre: i.nombreProducto, 
+                    cantidad: i.cantidad,
+                    precioUnitario: i.precioUnitario,
+                    subtotal: i.subtotal || (i.cantidad * i.precioUnitario)
+                }))
             }
         }, transaction);
     });
@@ -315,6 +514,11 @@ export async function procesarVentaRapidaConId(
         const baseProductoData = productoDoc.data() as Producto | ProductoVirtual;
         const generalesActual = getFullGenerales(generalesDoc.data());
         
+        const existenciaActual = baseProductoData.existencia ?? 0;
+        if (existenciaActual < comando.cantidad) {
+            throw new Error(`Stock insuficiente para "${baseProductoData.nombre}". Existencia disponible: ${existenciaActual}, cantidad solicitada: ${comando.cantidad}.`);
+        }
+
         let nombreVenta = baseProductoData.nombre;
         let precioUnitario = baseProductoData.precioVenta;
         let ingredientesConsumidos: any[] = [];
@@ -323,8 +527,8 @@ export async function procesarVentaRapidaConId(
         const stockInfo = {
             producto: {
                 nombre: baseProductoData.nombre,
-                inicial: baseProductoData.existencia || 0,
-                final: (baseProductoData.existencia || 0) - comando.cantidad
+                inicial: existenciaActual,
+                final: existenciaActual - comando.cantidad
             },
             ingredientes: [] as { nombre: string; inicial: number; final: number; }[]
         };
@@ -350,7 +554,10 @@ export async function procesarVentaRapidaConId(
                 
                 if (snap.exists()) {
                     const cantARestar = ingredientesConsumidos[i].cantidad * comando.cantidad;
-                    const inicial = snap.data().existencia || 0;
+                    const inicial = snap.data().existencia ?? 0;
+                    if (inicial < cantARestar) {
+                        throw new Error(`Stock insuficiente del ingrediente "${snap.data().nombre}". Existencia disponible: ${inicial}, cantidad requerida: ${cantARestar}.`);
+                    }
                     stockInfo.ingredientes.push({
                         nombre: snap.data().nombre,
                         inicial,
@@ -359,8 +566,6 @@ export async function procesarVentaRapidaConId(
                 }
             });
         }
-
-        // Se descuenta el stock directamente (permitiendo balance negativo si hay desfase de inventario físico)
         
         const totalVenta = comando.cantidad * precioUnitario;
         const nuevoIdVenta = (corrVentaDoc.data()?.correlativo || 0) + 1;

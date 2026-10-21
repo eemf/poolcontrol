@@ -16,6 +16,7 @@ import {
 } from 'firebase/firestore';
 import type { Venta, Pago, Generales } from '@/lib/tipos';
 import { registrarMovimientoInventario } from './historial-inventario';
+import { registrarAuditoria } from './auditoria';
 
 /**
  * Anula una venta completa, devolviendo stock y ajustando balances de caja.
@@ -170,6 +171,39 @@ export async function anularVentaCompleta(
       }
     }
 
+    // Registrar Auditoría con detalle de productos eliminados / devueltos
+    const resumenDevueltos = ventaData.detalles
+      .map(i => `${i.cantidad}x ${i.nombreProducto}`)
+      .join(', ');
+
+    registrarAuditoria(firestore, sucursalId, {
+      usuarioId,
+      categoria: 'VENTAS',
+      accion: 'VENTA_ANULAR',
+      titulo: `Anulación de venta #${ventaData.idVenta}`,
+      descripcion: `Anulación total de venta #${ventaData.idVenta} (${ventaData.nombreCliente || 'Cliente'}) • Devolución al inventario: ${resumenDevueltos || `${ventaData.detalles.length} productos`}`,
+      detalles: {
+        idVenta: ventaData.idVenta,
+        ventaId: ventaDocId,
+        clienteId: ventaData.clienteId,
+        nombreCliente: ventaData.nombreCliente,
+        total: ventaData.total,
+        saldo: ventaData.saldo,
+        itemsEliminados: ventaData.detalles.map(i => ({
+          nombre: i.nombreProducto,
+          cantidad: i.cantidad,
+          precioUnitario: i.precioUnitario,
+          subtotal: i.subtotal || (i.cantidad * i.precioUnitario),
+        })),
+        itemsDevueltos: ventaData.detalles.map(i => ({
+          nombre: i.nombreProducto,
+          cantidad: i.cantidad,
+          precioUnitario: i.precioUnitario,
+          subtotal: i.subtotal || (i.cantidad * i.precioUnitario),
+        })),
+      }
+    }, transaction);
+
     // Eliminar Documentos de la venta y sus pagos
     paymentsSnap.docs.forEach(d => transaction.delete(d.ref));
     transaction.delete(ventaRef);
@@ -268,7 +302,7 @@ export async function cambiarMetodoPago(
     const allPayments = paymentsSnap.docs.map(d => d.id === pagoDocId ? { ...d.data(), metodoPago: nuevoMetodo } : d.data()) as Pago[];
     const metodos = new Set(allPayments.map(p => p.metodoPago));
     let metodoFinal: string = 'Mixto';
-    if (metodos.size === 1) metodoFinal = metodos.values().next().value;
+    if (metodos.size === 1) metodoFinal = metodos.values().next().value ?? 'Mixto';
     
     transaction.update(ventaRef, { metodoPago: metodoFinal });
   });

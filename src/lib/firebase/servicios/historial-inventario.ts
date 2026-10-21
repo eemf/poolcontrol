@@ -1,6 +1,6 @@
 
 'use client';
-import { doc, Timestamp, Firestore, Transaction } from 'firebase/firestore';
+import { doc, Timestamp, Firestore, Transaction, runTransaction } from 'firebase/firestore';
 import type { HistorialInventario } from '@/lib/tipos';
 
 /**
@@ -32,4 +32,19 @@ export function registrarMovimientoInventario(
 
     transaction.set(historialRef, historialData);
     // La actualización del correlativo se debe hacer en la transacción principal que llama a esta función.
+}
+
+export async function registrarMovimientoInventarioDirecto(
+    firestore: Firestore,
+    sucursalId: string,
+    data: Omit<HistorialInventario, 'id' | 'idHistorial' | 'fecha' | 'sucursalId'>
+) {
+    return runTransaction(firestore, async (transaction) => {
+        const corrRef = doc(firestore, `sucursales/${sucursalId}/correlativos`, 'historial_inventario');
+        const corrDoc = await transaction.get(corrRef);
+        const sigId = (corrDoc.data()?.correlativo || 0) + 1;
+        registrarMovimientoInventario(transaction, firestore, sucursalId, sigId, data);
+        transaction.set(corrRef, { correlativo: sigId }, { merge: true });
+        return sigId;
+    });
 }

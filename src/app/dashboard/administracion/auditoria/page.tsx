@@ -35,6 +35,7 @@ import {
 import { Loader } from '@/components/ui/loader';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 import { 
   obtenerInfoDetalladaDispositivo,
   obtenerNombreEquipo, 
@@ -135,7 +136,7 @@ export interface ItemAuditoriaVisual {
   cantidad: number;
   precioUnitario?: number;
   subtotal?: number;
-  tipo?: 'agregado' | 'devuelto' | 'pagado' | 'ajustado' | 'info';
+  tipo?: 'agregado' | 'devuelto' | 'eliminado' | 'pagado' | 'ajustado' | 'info';
 }
 
 /**
@@ -144,29 +145,59 @@ export interface ItemAuditoriaVisual {
 export function extraerArticulosDeRegistro(reg?: RegistroAuditoria | null): ItemAuditoriaVisual[] {
   if (!reg || !reg.detalles) return [];
   const d = reg.detalles;
+  const articulos: ItemAuditoriaVisual[] = [];
 
-  // 1. itemsAgregados (nuevo formato estructurado en ventas y cobros)
-  if (Array.isArray(d.itemsAgregados) && d.itemsAgregados.length > 0) {
-    return d.itemsAgregados.map((it: any) => ({
-      nombre: it.nombre || it.nombreProducto || 'Producto',
-      cantidad: Number(it.cantidad) || 1,
-      precioUnitario: it.precioUnitario ? Number(it.precioUnitario) : undefined,
-      subtotal: it.subtotal ? Number(it.subtotal) : ((Number(it.cantidad) || 1) * (Number(it.precioUnitario) || 0)),
-      tipo: 'agregado' as const,
-    }));
+  // 1. itemsEliminados (productos eliminados de una venta o cuenta)
+  if (Array.isArray(d.itemsEliminados) && d.itemsEliminados.length > 0) {
+    d.itemsEliminados.forEach((it: any) => {
+      articulos.push({
+        nombre: it.nombre || it.nombreProducto || 'Producto Eliminado',
+        cantidad: Number(it.cantidad) || 1,
+        precioUnitario: it.precioUnitario ? Number(it.precioUnitario) : undefined,
+        subtotal: it.subtotal ? Number(it.subtotal) : ((Number(it.cantidad) || 1) * (Number(it.precioUnitario) || 0)),
+        tipo: 'eliminado' as const,
+      });
+    });
+  } else if (d.productoEliminado) {
+    articulos.push({
+      nombre: String(d.productoEliminado),
+      cantidad: Number(d.cantidad) || 1,
+      precioUnitario: d.precioUnitario ? Number(d.precioUnitario) : undefined,
+      subtotal: d.subtotal ? Number(d.subtotal) : ((Number(d.cantidad) || 1) * (Number(d.precioUnitario) || 0)),
+      tipo: 'eliminado' as const,
+    });
   }
 
-  // 2. itemsDevueltos / itemsRevertidos (anulaciones de venta o devoluciones)
+  // 2. itemsAgregados (nuevo formato estructurado en ventas y cobros)
+  if (Array.isArray(d.itemsAgregados) && d.itemsAgregados.length > 0) {
+    d.itemsAgregados.forEach((it: any) => {
+      articulos.push({
+        nombre: it.nombre || it.nombreProducto || 'Producto',
+        cantidad: Number(it.cantidad) || 1,
+        precioUnitario: it.precioUnitario ? Number(it.precioUnitario) : undefined,
+        subtotal: it.subtotal ? Number(it.subtotal) : ((Number(it.cantidad) || 1) * (Number(it.precioUnitario) || 0)),
+        tipo: 'agregado' as const,
+      });
+    });
+  }
+
+  // Si ya tenemos items estructurados (agregados y/o eliminados), retornarlos
+  if (articulos.length > 0) return articulos;
+
+  // 3. itemsDevueltos / itemsRevertidos (anulaciones de venta o devoluciones)
   const itemsDev = d.itemsDevueltos || d.itemsRevertidos;
   if (Array.isArray(itemsDev) && itemsDev.length > 0) {
+    const esEliminacionDirecta = reg.accion === 'VENTA_ELIMINAR_PRODUCTO' || (reg.titulo || '').toLowerCase().includes('elimin');
     return itemsDev.map((it: any) => ({
       nombre: it.nombre || it.nombreProducto || 'Producto',
       cantidad: Number(it.cantidad) || 1,
-      tipo: 'devuelto' as const,
+      precioUnitario: it.precioUnitario ? Number(it.precioUnitario) : undefined,
+      subtotal: it.subtotal ? Number(it.subtotal) : undefined,
+      tipo: esEliminacionDirecta ? ('eliminado' as const) : ('devuelto' as const),
     }));
   }
 
-  // 3. items (usado en compras o consumos)
+  // 4. items (usado en compras o consumos)
   if (Array.isArray(d.items) && d.items.length > 0) {
     return d.items.map((it: any) => ({
       nombre: it.nombre || it.nombreProducto || 'Producto',
@@ -177,7 +208,7 @@ export function extraerArticulosDeRegistro(reg?: RegistroAuditoria | null): Item
     }));
   }
 
-  // 4. consumos (sala de mesas)
+  // 5. consumos (sala de mesas)
   if (Array.isArray(d.consumos) && d.consumos.length > 0) {
     return d.consumos.map((it: any) => ({
       nombre: it.nombreProducto || it.nombre || 'Consumo',
@@ -188,7 +219,7 @@ export function extraerArticulosDeRegistro(reg?: RegistroAuditoria | null): Item
     }));
   }
 
-  // 5. productosAjustados (inventario)
+  // 6. productosAjustados (inventario)
   if (Array.isArray(d.productosAjustados) && d.productosAjustados.length > 0) {
     return d.productosAjustados.map((it: any) => ({
       nombre: it.nombre || it.nombreProducto || 'Producto',
@@ -197,7 +228,7 @@ export function extraerArticulosDeRegistro(reg?: RegistroAuditoria | null): Item
     }));
   }
 
-  // 6. itemsPagados (liquidación / cobro)
+  // 7. itemsPagados (liquidación / cobro)
   if (Array.isArray(d.itemsPagados) && d.itemsPagados.length > 0) {
     return d.itemsPagados.map((it: any) => ({
       nombre: it.nombre || it.nombreProducto || 'Ítem pagado',
@@ -207,7 +238,7 @@ export function extraerArticulosDeRegistro(reg?: RegistroAuditoria | null): Item
     }));
   }
 
-  // 7. producto + cantidad (venta rápida)
+  // 8. producto + cantidad (venta rápida)
   if (d.producto && d.cantidad) {
     return [{
       nombre: String(d.producto),
@@ -1090,10 +1121,27 @@ export default function PaginaAuditoria() {
                           {itemsCard.slice(0, 3).map((it, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-muted/70 text-foreground font-medium border border-border/70"
+                              className={cn(
+                                "inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md font-medium border",
+                                it.tipo === 'eliminado'
+                                  ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/50"
+                                  : it.tipo === 'devuelto'
+                                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50"
+                                  : "bg-muted/70 text-foreground border-border/70"
+                              )}
                             >
-                              <span className="text-primary font-bold">{it.cantidad > 0 ? `${it.cantidad}x` : `${it.cantidad}`}</span>
+                              <span className={cn(
+                                "font-bold",
+                                it.tipo === 'eliminado' ? "text-rose-600 dark:text-rose-400" : "text-primary"
+                              )}>
+                                {it.tipo === 'eliminado' ? `-${it.cantidad}x` : (it.cantidad > 0 ? `${it.cantidad}x` : `${it.cantidad}`)}
+                              </span>
                               <span className="truncate max-w-[150px]">{it.nombre}</span>
+                              {it.tipo === 'eliminado' && (
+                                <Badge variant="outline" className="text-[8px] px-1 py-0 h-3.5 border-rose-500/40 text-rose-600 dark:text-rose-400 font-bold">
+                                  Eliminado
+                                </Badge>
+                              )}
                               {it.subtotal !== undefined && it.subtotal > 0 ? (
                                 <span className="text-muted-foreground font-mono text-[10px]">
                                   (Q{it.subtotal.toFixed(2)})
@@ -1288,15 +1336,30 @@ export default function PaginaAuditoria() {
                           {itemsAVisualizar.map((it, idx) => (
                             <div
                               key={idx}
-                              className="flex items-center justify-between p-2 rounded-md bg-muted/40 border border-border/50 text-xs"
+                              className={cn(
+                                "flex items-center justify-between p-2 rounded-md border text-xs",
+                                it.tipo === 'eliminado'
+                                  ? "bg-rose-500/5 border-rose-500/30 dark:bg-rose-950/20"
+                                  : "bg-muted/40 border-border/50"
+                              )}
                             >
                               <div className="flex items-center gap-2 min-w-0">
-                                <span className="font-bold text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 shrink-0">
-                                  {it.cantidad > 0 ? `${it.cantidad}x` : `${it.cantidad}`}
+                                <span className={cn(
+                                  "font-bold px-1.5 py-0.5 rounded border shrink-0",
+                                  it.tipo === 'eliminado'
+                                    ? "bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30"
+                                    : "bg-primary/10 text-primary border-primary/20"
+                                )}>
+                                  {it.tipo === 'eliminado' ? `-${it.cantidad}x` : (it.cantidad > 0 ? `${it.cantidad}x` : `${it.cantidad}`)}
                                 </span>
                                 <span className="font-semibold text-foreground truncate">
                                   {it.nombre}
                                 </span>
+                                {it.tipo === 'eliminado' && (
+                                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-rose-500/50 text-rose-600 dark:text-rose-400 bg-rose-500/10 font-bold">
+                                    Eliminado
+                                  </Badge>
+                                )}
                                 {it.tipo === 'devuelto' && (
                                   <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 border-amber-400 text-amber-500">
                                     Devuelto
@@ -1306,8 +1369,11 @@ export default function PaginaAuditoria() {
 
                               <div className="text-right shrink-0">
                                 {it.subtotal !== undefined && it.subtotal > 0 ? (
-                                  <span className="font-mono font-bold text-foreground">
-                                    Q{it.subtotal.toFixed(2)}
+                                  <span className={cn(
+                                    "font-mono font-bold",
+                                    it.tipo === 'eliminado' ? "text-rose-600 dark:text-rose-400" : "text-foreground"
+                                  )}>
+                                    {it.tipo === 'eliminado' ? '-' : ''}Q{it.subtotal.toFixed(2)}
                                     {it.precioUnitario && it.cantidad > 1 && (
                                       <span className="text-[10px] text-muted-foreground block font-normal">
                                         Q{it.precioUnitario.toFixed(2)} c/u
@@ -1315,8 +1381,11 @@ export default function PaginaAuditoria() {
                                     )}
                                   </span>
                                 ) : it.precioUnitario !== undefined && it.precioUnitario > 0 ? (
-                                  <span className="font-mono font-bold text-foreground">
-                                    Q{(it.precioUnitario * (it.cantidad || 1)).toFixed(2)}
+                                  <span className={cn(
+                                    "font-mono font-bold",
+                                    it.tipo === 'eliminado' ? "text-rose-600 dark:text-rose-400" : "text-foreground"
+                                  )}>
+                                    {it.tipo === 'eliminado' ? '-' : ''}Q{(it.precioUnitario * (it.cantidad || 1)).toFixed(2)}
                                   </span>
                                 ) : null}
                               </div>

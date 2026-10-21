@@ -66,6 +66,9 @@ interface POSDialogsProps {
     procesandoGuardado: boolean;
     incluirCreditoEnPago: boolean;
     saldoCreditoCliente: number;
+    alertaEliminarItemAbierta: boolean;
+    itemParaEliminar: { item: any; index: number } | null;
+    procesandoEliminarItem: boolean;
   };
   actions: {
     setDialogoPagoAbierto: (val: boolean) => void;
@@ -88,6 +91,8 @@ interface POSDialogsProps {
     confirmarPasarACredito: (v: Venta) => void;
     procederAGuardarVenta: () => void;
     confirmarConsumoInterno: () => void;
+    setAlertaEliminarItemAbierta: (val: boolean) => void;
+    confirmarEliminarItem: () => void;
   };
   refs: {
     abonoInputRef: React.RefObject<HTMLInputElement | null>;
@@ -444,6 +449,48 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                 <AlertDialogCancel className="rounded-full h-11 px-8 font-bold">Revisar Deuda</AlertDialogCancel>
                 <AlertDialogAction onClick={actions.procederAGuardarVenta} className="rounded-full h-11 px-10 font-bold bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-500/20">Continuar Nueva Venta</AlertDialogAction>
             </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog 
+        open={state.alertaEliminarItemAbierta} 
+        onOpenChange={state.procesandoEliminarItem ? undefined : actions.setAlertaEliminarItemAbierta}
+      >
+        <AlertDialogContent className="rounded-xl font-body bg-card border border-border shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-headline text-xl font-bold text-destructive flex items-center gap-3">
+              <Trash2 className="h-6 w-6" /> ¿Eliminar Producto de la Venta?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm font-medium text-muted-foreground mt-2 leading-relaxed">
+              ¿Estás Seguro de que Deseas Eliminar <span className="font-bold text-foreground">"{state.itemParaEliminar?.item.nombreProducto}"</span> de Esta Venta?
+              {state.itemParaEliminar?.item.idDetalle !== 0 && (
+                <span className="block mt-2 text-xs text-rose-500 font-semibold bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/20">
+                  • Se Reintegrará el Stock al Inventario y el Movimiento Quedará Registrado en el Kardex y en la Auditoría.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex flex-col sm:flex-row gap-3">
+            <AlertDialogCancel 
+              disabled={state.procesandoEliminarItem}
+              className="rounded-xl h-10 px-6 font-bold"
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={actions.confirmarEliminarItem} 
+              disabled={state.procesandoEliminarItem}
+              className="bg-destructive text-white hover:bg-destructive/90 rounded-xl h-10 px-8 font-bold"
+            >
+              {state.procesandoEliminarItem ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Eliminando...
+                </span>
+              ) : (
+                "Sí, Eliminar Producto"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>

@@ -425,7 +425,7 @@ export interface HistorialInventario {
   fecha: Timestamp;
   productoId: string;
   nombreProducto: string;
-  tipoMovimiento: "Venta" | "Compra" | "Ajuste" | "Venta Anulada";
+  tipoMovimiento: "Venta" | "Compra" | "Ajuste" | "Venta Anulada" | "Producto Eliminado" | string;
   cantidad: number; // Negativo para salidas, positivo para entradas
   existenciaAnterior: number;
   existenciaNueva: number;
@@ -434,14 +434,18 @@ export interface HistorialInventario {
   verificado?: boolean; // Nuevo campo para auditoría visual de éxito
 }
 
-export type CategoriaAuditoria = 'ventas' | 'mesas' | 'caja' | 'compras' | 'inventario' | 'catalogo';
+export type CategoriaAuditoria = 
+  | 'ventas' | 'mesas' | 'caja' | 'compras' | 'inventario' | 'catalogo'
+  | 'VENTAS' | 'MESAS' | 'CAJA' | 'COMPRAS' | 'INVENTARIO' | 'CATALOGO';
 
 export type AccionAuditoria = 
   | 'venta_guardada' | 'venta_anulada' | 'producto_agregado' | 'producto_eliminado'
   | 'pago_recibido' | 'abono_registrado' | 'credito_otorgado'
   | 'mesa_iniciada' | 'mesa_cobrada' | 'mesa_trasladada' | 'mesa_tiempo_ajustado' | 'mesa_consumo_agregado' | 'mesa_consumo_eliminado'
   | 'cierre_caja' | 'apertura_caja' | 'compra_registrada'
-  | 'ajuste_inventario' | 'producto_creado' | 'producto_editado' | 'producto_eliminado_catalogo';
+  | 'ajuste_inventario' | 'producto_creado' | 'producto_editado' | 'producto_eliminado_catalogo'
+  | 'VENTA_CREAR' | 'VENTA_EDITAR' | 'VENTA_ELIMINAR_PRODUCTO' | 'VENTA_ANULAR' | 'VENTA_PAGAR' | 'VENTA_ABONAR' | 'VENTA_RAPIDA' | 'VENTA_EDITAR_DESCARTAR'
+  | (string & {});
 
 export interface RegistroAuditoria {
   id?: string;

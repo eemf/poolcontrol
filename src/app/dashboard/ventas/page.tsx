@@ -14,6 +14,7 @@ import {
   devolverStockTemporal, 
   cancelarVentaYDevolverStock, 
   guardarVentaYActualizarStock, 
+  eliminarProductoDeVenta,
   procesarPagoVenta, 
   liquidarVentaACredito, 
   liquidarComoConsumoInterno, 
@@ -96,6 +97,9 @@ export default function PaginaVentasPOS() {
   const [alertaEliminarAbierta, setAlertaEliminarAbierta] = useState(false);
   const [alertaCreditoMonedasAbierta, setAlertaCreditoMonedasAbierta] = useState(false);
   const [alertaClienteConCreditoAbierta, setAlertaClienteConCreditoAbierta] = useState(false);
+  const [alertaEliminarItemAbierta, setAlertaEliminarItemAbierta] = useState(false);
+  const [itemParaEliminar, setItemParaEliminar] = useState<{ item: DetalleVenta; index: number } | null>(null);
+  const [procesandoEliminarItem, setProcesandoEliminarItem] = useState(false);
   const [ventaParaPagar, setVentaParaPagar] = useState<Venta | null>(null);
   const [ventaParaConsumo, setVentaParaConsumo] = useState<Venta | null>(null);
   const [clienteParaEliminar, setClienteParaEliminar] = useState<Cliente | null>(null);
@@ -155,6 +159,7 @@ export default function PaginaVentasPOS() {
       const cli = clientes.find(c => c.id === clienteSeleccionadoId);
       await guardarVentaYActualizarStock(firestore, sucursalId, idVentaActiva, { clienteId: cli!.id, nombreCliente: cli!.nombre, detalles: carrito, tipoVenta: 'POS' }, user.uid);
       setClienteSeleccionadoId(''); setCarrito([]); setIdVentaActiva(null);
+      setMostrarItemManual(false); setDescripcionItemManual(''); setPrecioUnitarioItemManual(''); setCantidadItemManual(1);
       toast({ title: "Éxito", description: "Venta guardada." });
       clienteInputRef.current?.focus();
     } catch (e: any) { toast({ title: "Error", description: e.message, variant: "destructive" }); }
@@ -175,6 +180,11 @@ export default function PaginaVentasPOS() {
       setAlertaCancelarVentaAbierta(true);
       return;
     }
+
+    setMostrarItemManual(false);
+    setDescripcionItemManual('');
+    setPrecioUnitarioItemManual('');
+    setCantidadItemManual(1);
 
     if (!id) {
       setClienteSeleccionadoId(''); setCarrito([]); setIdVentaActiva(null);
@@ -202,6 +212,10 @@ export default function PaginaVentasPOS() {
       setAlertaCancelarVentaAbierta(true);
       return;
     }
+    setMostrarItemManual(false);
+    setDescripcionItemManual('');
+    setPrecioUnitarioItemManual('');
+    setCantidadItemManual(1);
     setClienteSeleccionadoId(venta.clienteId);
     setCarrito(venta.detalles);
     setIdVentaActiva(venta.id);
@@ -224,7 +238,24 @@ export default function PaginaVentasPOS() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'F6') { event.preventDefault(); setMostrarItemManual(prev => !prev); }
+      if (event.key === 'F6') {
+        event.preventDefault();
+        setMostrarItemManual(prev => {
+          const next = !prev;
+          if (next) {
+            setTimeout(() => {
+              itemManualCantRef.current?.focus();
+              if (itemManualCantRef.current) itemManualCantRef.current.select();
+            }, 0);
+          } else {
+            setTimeout(() => {
+              cantidadInputRef.current?.focus();
+              if (cantidadInputRef.current) cantidadInputRef.current.select();
+            }, 0);
+          }
+          return next;
+        });
+      }
       if (event.key === 'F3') { event.preventDefault(); if (!procesandoGuardado) manejarGuardarVenta(); }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -256,41 +287,114 @@ export default function PaginaVentasPOS() {
     const prod = esVirtual ? productosVirtuales.find(p => p.id === id) : productos.find(p => p.id === id);
     if (!prod) { setProcesandoAnadir(false); return; }
 
+    const cantNum = Number(cantidad);
+    const stockDisponible = prod.existencia ?? 0;
+    if (stockDisponible < cantNum) {
+      setProcesandoAnadir(false);
+      toast({
+        title: "Stock Insuficiente",
+        description: `No hay suficiente stock para "${prod.nombre}". Existencia disponible: ${stockDisponible}, cantidad solicitada: ${cantNum}.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       let n = prod.nombre, p = prod.precioVenta, ing: any[] = [];
-      if (esVirtual) await descontarStockVirtualTemporal(firestore, sucursalId, id, Number(cantidad));
+      if (esVirtual) await descontarStockVirtualTemporal(firestore, sucursalId, id, cantNum);
       else {
-        await descontarStockTemporal(firestore, sucursalId, id, Number(cantidad));
+        await descontarStockTemporal(firestore, sucursalId, id, cantNum);
         if (preparacionSeleccionada && preparacionSeleccionada !== 'base' && 'preparaciones' in prod) {
           n = `${prod.nombre} (${preparacionSeleccionada.nombre})`; p = preparacionSeleccionada.precioVenta; ing = preparacionSeleccionada.ingredientes || [];
-          for (const i of ing) await descontarStockTemporal(firestore, sucursalId, i.productoId, i.cantidad * Number(cantidad));
+          const ingDescontados: { productoId: string; cantidad: number }[] = [];
+          try {
+            for (const i of ing) {
+              const cantIng = i.cantidad * cantNum;
+              await descontarStockTemporal(firestore, sucursalId, i.productoId, cantIng);
+              ingDescontados.push({ productoId: i.productoId, cantidad: cantIng });
+            }
+          } catch (errIng) {
+            for (const itemRevert of ingDescontados) {
+              await devolverStockTemporal(firestore, sucursalId, itemRevert.productoId, itemRevert.cantidad).catch(() => {});
+            }
+            await devolverStockTemporal(firestore, sucursalId, id, cantNum).catch(() => {});
+            throw errIng;
+          }
         }
       }
-      const det: DetalleVenta = { idDetalle: 0, idProducto: id, nombreProducto: n, cantidad: Number(cantidad), precioUnitario: p, subtotal: Number(cantidad)*p, saldo: Number(cantidad)*p, pagadoEfectivo: 0, pagadoTarjeta: 0, metodoPago: null, estado: 'Pendiente de pago', fechaAgregado: new Date().toISOString(), ingredientesConsumidos: ing, esVirtual };
+      const det: DetalleVenta = { idDetalle: 0, idProducto: id, nombreProducto: n, cantidad: cantNum, precioUnitario: p, subtotal: cantNum*p, saldo: cantNum*p, pagadoEfectivo: 0, pagadoTarjeta: 0, metodoPago: null, estado: 'Pendiente de pago', fechaAgregado: new Date().toISOString(), ingredientesConsumidos: ing, esVirtual };
       setCarrito(prev => [det, ...prev]);
     } catch (e: any) { toast({ title: "Error de Stock", description: e.message, variant: "destructive" }); }
     finally { setProductoSeleccionadoId(''); setCantidad(1); setPreparacionSeleccionada(null); setProcesandoAnadir(false); setTimeout(() => { cantidadInputRef.current?.focus(); if (cantidadInputRef.current) cantidadInputRef.current.select(); }, 0); }
   };
 
   const manejarAnadirItemManual = () => {
-    if (!descripcionItemManual.trim() || !precioUnitarioItemManual || !cantidadItemManual) return;
+    if (!descripcionItemManual.trim() || !precioUnitarioItemManual || !cantidadItemManual || Number(precioUnitarioItemManual) <= 0 || Number(cantidadItemManual) <= 0) return;
     const sub = Number(cantidadItemManual) * Number(precioUnitarioItemManual);
     const det: DetalleVenta = { idDetalle: 0, idProducto: 'item-manual', nombreProducto: descripcionItemManual.trim(), cantidad: Number(cantidadItemManual), precioUnitario: Number(precioUnitarioItemManual), subtotal: sub, saldo: sub, pagadoEfectivo: 0, pagadoTarjeta: 0, metodoPago: null, estado: 'Pendiente de pago', fechaAgregado: new Date().toISOString() };
     setCarrito(prev => [det, ...prev]);
-    setDescripcionItemManual(''); setPrecioUnitarioItemManual(''); setCantidadItemManual(1); setTimeout(() => { itemManualCantRef.current?.focus(); if (itemManualCantRef.current) itemManualCantRef.current.select(); }, 0);
+    setDescripcionItemManual('');
+    setPrecioUnitarioItemManual('');
+    setCantidadItemManual(1);
+    setMostrarItemManual(false);
+    setTimeout(() => {
+      cantidadInputRef.current?.focus();
+      if (cantidadInputRef.current) cantidadInputRef.current.select();
+    }, 50);
   };
 
-  const manejarEliminarDelCarrito = async (index: number) => {
+  const manejarEliminarDelCarrito = (index: number) => {
     const item = carrito[index];
-    if (item.estado === 'Pagada' || item.saldo < item.subtotal) return;
+    if (!item || item.estado === 'Pagada' || item.saldo < item.subtotal) return;
+    setItemParaEliminar({ item, index });
+    setAlertaEliminarItemAbierta(true);
+  };
+
+  const confirmarEliminarItem = async () => {
+    if (!itemParaEliminar) return;
+    const { item, index } = itemParaEliminar;
+    setProcesandoEliminarItem(true);
     try {
-      if (item.esVirtual) await devolverStockVirtualTemporal(firestore!, sucursalId, item.idProducto, item.cantidad);
-      else if (item.idProducto !== 'item-manual') {
-        await devolverStockTemporal(firestore!, sucursalId, item.idProducto, item.cantidad);
-        if (item.ingredientesConsumidos) for (const i of item.ingredientesConsumidos) await devolverStockTemporal(firestore!, sucursalId, i.productoId, i.cantidad * item.cantidad);
+      if (idVentaActiva && item.idDetalle && item.idDetalle !== 0) {
+        // El producto ya pertenecía a la venta guardada en la base de datos
+        const resultado = await eliminarProductoDeVenta(
+          firestore!, 
+          sucursalId, 
+          idVentaActiva, 
+          item, 
+          user!.uid
+        );
+        // Preservar en el carrito los productos agregados recientemente que aún no se han guardado en Firestore
+        setCarrito(prev => prev.filter((_, i) => i !== index));
+        toast({ 
+          title: "Producto Eliminado", 
+          description: `Se Eliminó ${item.nombreProducto} de la Venta #${resultado.idVenta} y se Reintegró al Inventario.` 
+        });
+      } else {
+        // El producto es temporal en la sesión actual
+        if (item.esVirtual) {
+          await devolverStockVirtualTemporal(firestore!, sucursalId, item.idProducto, item.cantidad);
+        } else if (item.idProducto !== 'item-manual') {
+          await devolverStockTemporal(firestore!, sucursalId, item.idProducto, item.cantidad);
+          if (item.ingredientesConsumidos) {
+            for (const i of item.ingredientesConsumidos) {
+              await devolverStockTemporal(firestore!, sucursalId, i.productoId, i.cantidad * item.cantidad);
+            }
+          }
+        }
+        setCarrito(prev => prev.filter((_, i) => i !== index));
+        toast({ 
+          title: "Producto Eliminado", 
+          description: `Se Eliminó ${item.nombreProducto} del Carrito.` 
+        });
       }
-      setCarrito(prev => prev.filter((_, i) => i !== index));
-    } catch (e: any) { toast({ title: "Error al devolver stock", description: e.message, variant: "destructive" }); }
+      setAlertaEliminarItemAbierta(false);
+      setItemParaEliminar(null);
+    } catch (e: any) { 
+      toast({ title: "Error al Eliminar Producto", description: e.message, variant: "destructive" }); 
+    } finally {
+      setProcesandoEliminarItem(false);
+    }
   };
 
   const manejarConfirmarAbono = async () => {
@@ -390,6 +494,10 @@ export default function PaginaVentasPOS() {
       setClienteSeleccionadoId('');
       setCarrito([]);
       setIdVentaActiva(null);
+      setMostrarItemManual(false);
+      setDescripcionItemManual('');
+      setPrecioUnitarioItemManual('');
+      setCantidadItemManual(1);
       setAlertaCancelarVentaAbierta(false);
       clienteInputRef.current?.focus();
     }
@@ -505,9 +613,13 @@ export default function PaginaVentasPOS() {
         refs={{ abonoInputRef }}
         state={{ 
           dialogoPagoAbierto, vistaDialogo, dialogoAbonoAbierto, dialogoConsumoInternoAbierto, alertaCancelarVentaAbierta, alertaEliminarAbierta, alertaCreditoMonedasAbierta, alertaClienteConCreditoAbierta, ventaParaPagar, ventaParaConsumo, clienteParaEliminar, itemsSeleccionadosParaPagar, montoAbono, montoAPagarDialogo, pinConsumo, procesandoPagoCredito, procesandoGuardado,
-          incluirCreditoEnPago, saldoCreditoCliente
+          incluirCreditoEnPago, saldoCreditoCliente,
+          alertaEliminarItemAbierta, itemParaEliminar, procesandoEliminarItem
         }}
-        actions={{ setDialogoPagoAbierto, setVistaDialogo, setDialogoAbonoAbierto, setDialogoConsumoInternoAbierto, setAlertaCancelarVentaAbierta, setAlertaEliminarAbierta, setAlertaCreditoMonedasAbierta, setAlertaClienteConCreditoAbierta, setItemsSeleccionadosParaPagar, setMontoAbono, setPinConsumo, manejarConfirmarAbono, procederConPago, manejarConfirmarCancelacion, manejarPermanecerEnVenta, manejarConfirmarEliminarCliente: () => { eliminarCliente(firestore!, sucursalId, clienteParaEliminar!.id); setAlertaEliminarAbierta(false); }, confirmarPasarACredito: (v) => confirmarPasarACredito(v), procederAGuardarVenta, confirmarConsumoInterno, setIncluirCreditoEnPago }}
+        actions={{ 
+          setDialogoPagoAbierto, setVistaDialogo, setDialogoAbonoAbierto, setDialogoConsumoInternoAbierto, setAlertaCancelarVentaAbierta, setAlertaEliminarAbierta, setAlertaCreditoMonedasAbierta, setAlertaClienteConCreditoAbierta, setItemsSeleccionadosParaPagar, setMontoAbono, setPinConsumo, manejarConfirmarAbono, procederConPago, manejarConfirmarCancelacion, manejarPermanecerEnVenta, manejarConfirmarEliminarCliente: () => { eliminarCliente(firestore!, sucursalId, clienteParaEliminar!.id); setAlertaEliminarAbierta(false); }, confirmarPasarACredito: (v) => confirmarPasarACredito(v), procederAGuardarVenta, confirmarConsumoInterno, setIncluirCreditoEnPago,
+          setAlertaEliminarItemAbierta, confirmarEliminarItem
+        }}
       />
     </div>
   );

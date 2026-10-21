@@ -18,6 +18,7 @@ import {
 import type { Mesa, Tarifa, Generales, Venta, DetalleVenta, Pago, Cliente } from '@/lib/tipos';
 import { toDate, validarSucursal } from './utils';
 import { registrarAuditoria } from './auditoria';
+import { registrarMovimientoInventario } from './historial-inventario';
 
 /**
  * Formatea milisegundos en HH:MM:SS de forma segura, evitando valores negativos.
@@ -775,10 +776,40 @@ export async function eliminarConsumoMesa(firestore: Firestore, sucursalId: stri
 
         const idProd = item.idProducto || item.productoId; 
         if (idProd !== 'item-manual') {
+            const corrHRef = doc(firestore, `sucursales/${sid}/correlativos`, 'historial_inventario');
+            const corrHDoc = await transaction.get(corrHRef);
+            let sigHId = (corrHDoc.data()?.correlativo || 0) + 1;
+
             transaction.update(doc(firestore, `sucursales/${sid}/${item.esVirtual ? 'productos_virtuales' : 'productos'}`, idProd), { existencia: increment(item.cantidad) });
+            
+            registrarMovimientoInventario(transaction, firestore, sid, sigHId++, {
+                productoId: idProd,
+                nombreProducto: item.nombreProducto,
+                tipoMovimiento: 'Producto Eliminado',
+                cantidad: item.cantidad,
+                existenciaAnterior: 0,
+                existenciaNueva: 0,
+                referencia: `Eliminado de Mesa #${mD.data()?.numeroMesa || ''}`,
+                usuarioId: usuarioId || 'sistema'
+            });
+
             if (!item.esVirtual && item.ingredientesConsumidos) {
-                item.ingredientesConsumidos.forEach((ing: any) => transaction.update(doc(firestore, `sucursales/${sid}/productos`, ing.productoId), { existencia: increment(ing.cantidad * item.cantidad) }));
+                for (const ing of item.ingredientesConsumidos) {
+                    transaction.update(doc(firestore, `sucursales/${sid}/productos`, ing.productoId), { existencia: increment(ing.cantidad * item.cantidad) });
+                    registrarMovimientoInventario(transaction, firestore, sid, sigHId++, {
+                        productoId: ing.productoId,
+                        nombreProducto: 'Ingrediente devuelto',
+                        tipoMovimiento: 'Producto Eliminado',
+                        cantidad: ing.cantidad * item.cantidad,
+                        existenciaAnterior: 0,
+                        existenciaNueva: 0,
+                        referencia: `Eliminado de Mesa #${mD.data()?.numeroMesa || ''}`,
+                        usuarioId: usuarioId || 'sistema'
+                    });
+                }
             }
+
+            transaction.set(corrHRef, { correlativo: sigHId - 1 }, { merge: true });
         }
         transaction.update(mR, { consumos: cons.filter((c: any) => c.id !== consumoId) });
 

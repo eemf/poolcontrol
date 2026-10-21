@@ -7,8 +7,12 @@ export async function descontarStockTemporal(firestore: Firestore, sucursalId: s
   return runTransaction(firestore, async (transaction) => {
     const productoDoc = await transaction.get(productoRef);
     if (!productoDoc.exists()) throw new Error(`Producto con ID ${productoId} no encontrado.`);
-    const existenciaActual = productoDoc.data().existencia || 0;
-    // Se permite stock negativo para evitar bloqueos operativos en ventas y consumos cuando hay desfase de inventario
+    const data = productoDoc.data();
+    const existenciaActual = data.existencia ?? 0;
+    const nombre = data.nombre || 'Producto';
+    if (existenciaActual < cantidad) {
+      throw new Error(`Stock insuficiente para "${nombre}". Existencia disponible: ${existenciaActual}, cantidad solicitada: ${cantidad}.`);
+    }
     transaction.update(productoRef, { existencia: existenciaActual - cantidad });
   });
 }
@@ -28,8 +32,12 @@ export async function descontarStockVirtualTemporal(firestore: Firestore, sucurs
   return runTransaction(firestore, async (transaction) => {
     const productoDoc = await transaction.get(productoRef);
     if (!productoDoc.exists()) throw new Error(`Producto virtual con ID ${productoId} no encontrado.`);
-    const existenciaActual = productoDoc.data().existencia || 0;
-    // Se permite stock negativo para productos virtuales para evitar bloqueos por desfase de conteo.
+    const data = productoDoc.data();
+    const existenciaActual = data.existencia ?? 0;
+    const nombre = data.nombre || 'Producto virtual';
+    if (existenciaActual < cantidad) {
+      throw new Error(`Stock insuficiente para "${nombre}". Existencia disponible: ${existenciaActual}, cantidad solicitada: ${cantidad}.`);
+    }
     transaction.update(productoRef, { existencia: existenciaActual - cantidad });
   });
 }

@@ -19,7 +19,8 @@ import {
   Clock, 
   Sparkles,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Banknote
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -58,7 +59,7 @@ export function FlujoMonedas({
 }: FlujoMonedasProps) {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [filtroTexto, setFiltroTexto] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'venta' | 'premio' | 'maquina'>('todos');
+  const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'ventas' | 'despachos' | 'premios' | 'maquinas'>('todos');
 
   // Existencia final calculada
   const existenciaFinal = useMemo(() => {
@@ -69,14 +70,20 @@ export function FlujoMonedas({
 
   // Totales para métricas
   const estadisticas = useMemo(() => {
-    let monedasVendidas = 0;
+    let monedasDespachadas = 0;
     let efectivoVentas = 0;
     let monedasPremios = 0;
     let efectivoPremios = 0;
 
     lista.forEach(m => {
-      if (m.tipo === 'venta') {
-        monedasVendidas += (m.cantidad || 0);
+      if (m.tipo === 'venta_rapida' || m.tipo === 'venta') {
+        monedasDespachadas += (m.cantidad || 0);
+        efectivoVentas += (m.monto || 0);
+      } else if (m.tipo === 'despacho') {
+        monedasDespachadas += (m.cantidad || 0);
+      } else if (m.tipo === 'eliminacion') {
+        monedasDespachadas -= (m.cantidad || 0);
+      } else if (m.tipo === 'abono' || m.tipo === 'cobro') {
         efectivoVentas += (m.monto || 0);
       } else if (m.tipo === 'premio') {
         monedasPremios += (m.cantidad || 0);
@@ -84,7 +91,12 @@ export function FlujoMonedas({
       }
     });
 
-    return { monedasVendidas, efectivoVentas, monedasPremios, efectivoPremios };
+    return { 
+      monedasVendidas: Math.max(0, monedasDespachadas), 
+      efectivoVentas, 
+      monedasPremios, 
+      efectivoPremios 
+    };
   }, [lista]);
 
   // Lista filtrada
@@ -102,9 +114,18 @@ export function FlujoMonedas({
 
     if (tipoFiltro !== 'todos') {
       result = result.filter(m => {
-        if (tipoFiltro === 'venta') return m.tipo === 'venta';
-        if (tipoFiltro === 'premio') return m.tipo === 'premio';
-        if (tipoFiltro === 'maquina') return m.tipo === 'base' || m.tipo === 'extraccion';
+        if (tipoFiltro === 'ventas') {
+          return m.tipo === 'venta_rapida' || m.tipo === 'venta' || m.tipo === 'abono' || m.tipo === 'cobro';
+        }
+        if (tipoFiltro === 'despachos') {
+          return m.tipo === 'despacho' || m.tipo === 'eliminacion' || m.tipo === 'venta_rapida';
+        }
+        if (tipoFiltro === 'premios') {
+          return m.tipo === 'premio';
+        }
+        if (tipoFiltro === 'maquinas') {
+          return m.tipo === 'base' || m.tipo === 'extraccion' || m.tipo === 'ajuste';
+        }
         return true;
       });
     }
@@ -214,39 +235,48 @@ export function FlujoMonedas({
 
         {/* Filtros de tipo y orden */}
         <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-between sm:justify-end">
-          <div className="flex items-center p-1 bg-[#283244] border border-[#324157] rounded-full text-xs">
+          <div className="flex items-center p-1 bg-[#283244] border border-[#324157] rounded-full text-xs overflow-x-auto scrollbar-none">
             <button
               onClick={() => setTipoFiltro('todos')}
               className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'todos' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-white"
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
+                tipoFiltro === 'todos' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
               )}
             >
               Todos
             </button>
             <button
-              onClick={() => setTipoFiltro('venta')}
+              onClick={() => setTipoFiltro('ventas')}
               className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'venta' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-white"
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
+                tipoFiltro === 'ventas' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
               )}
             >
-              Ventas
+              Cobros y Ventas
             </button>
             <button
-              onClick={() => setTipoFiltro('premio')}
+              onClick={() => setTipoFiltro('despachos')}
               className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'premio' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-white"
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
+                tipoFiltro === 'despachos' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
+              )}
+            >
+              Despachos
+            </button>
+            <button
+              onClick={() => setTipoFiltro('premios')}
+              className={cn(
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
+                tipoFiltro === 'premios' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
               )}
             >
               Premios
             </button>
             <button
-              onClick={() => setTipoFiltro('maquina')}
+              onClick={() => setTipoFiltro('maquinas')}
               className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'maquina' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-white"
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
+                tipoFiltro === 'maquinas' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
               )}
             >
               Máquinas
@@ -324,7 +354,10 @@ export function FlujoMonedas({
             ) : (
               listaFiltrada.map((mov, idx) => {
                 const getIcon = () => {
-                  if (mov.tipo === 'venta') return <ShoppingCart className="h-4 w-4" />;
+                  if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return <ShoppingCart className="h-4 w-4" />;
+                  if (mov.tipo === 'despacho') return <ArrowDownRight className="h-4 w-4" />;
+                  if (mov.tipo === 'eliminacion') return <ArrowUpRight className="h-4 w-4" />;
+                  if (mov.tipo === 'abono' || mov.tipo === 'cobro') return <Banknote className="h-4 w-4" />;
                   if (mov.tipo === 'premio') return <Trophy className="h-4 w-4" />;
                   if (mov.tipo === 'base') return <Landmark className="h-4 w-4" />;
                   if (mov.tipo === 'extraccion') return <MinusCircle className="h-4 w-4" />;
@@ -332,18 +365,25 @@ export function FlujoMonedas({
                 };
 
                 const getIconColor = () => {
-                  if (mov.tipo === 'venta') return "bg-emerald-500/20 text-emerald-400";
-                  if (mov.tipo === 'premio') return "bg-amber-500/20 text-amber-400";
+                  if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return "bg-emerald-500/20 text-emerald-400";
+                  if (mov.tipo === 'despacho') return "bg-blue-500/20 text-blue-400";
+                  if (mov.tipo === 'eliminacion') return "bg-amber-500/20 text-amber-400";
+                  if (mov.tipo === 'abono' || mov.tipo === 'cobro') return "bg-emerald-500/20 text-emerald-300";
+                  if (mov.tipo === 'premio') return "bg-purple-500/20 text-purple-400";
                   if (mov.tipo === 'base') return "bg-indigo-500/20 text-indigo-300";
-                  if (mov.tipo === 'extraccion') return "bg-blue-500/20 text-blue-400";
-                  return "bg-purple-500/20 text-purple-400";
+                  if (mov.tipo === 'extraccion') return "bg-cyan-500/20 text-cyan-400";
+                  return "bg-slate-500/20 text-slate-300";
                 };
 
                 const getBadgeLabel = () => {
-                  if (mov.tipo === 'venta') return 'Venta de monedas';
+                  if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return 'Venta rápida';
+                  if (mov.tipo === 'despacho') return 'Despacho a cuenta';
+                  if (mov.tipo === 'eliminacion') return 'Monedas devueltas';
+                  if (mov.tipo === 'abono' || mov.tipo === 'cobro') return 'Cobro / Abono';
                   if (mov.tipo === 'premio') return 'Premio pagado';
                   if (mov.tipo === 'base') return 'Base de máquina';
                   if (mov.tipo === 'extraccion') return 'Extracción';
+                  if (mov.tipo === 'ajuste') return 'Ajuste manual';
                   return 'Movimiento';
                 };
 
@@ -405,7 +445,7 @@ export function FlujoMonedas({
                             {esIngresoEfectivo ? '+' : ''}Q{mov.monto.toFixed(2)}
                           </span>
                         ) : (
-                          <span className="text-sm font-mono text-muted-foreground">--</span>
+                          <span className="text-xs font-mono text-muted-foreground/70">--</span>
                         )}
                       </div>
 
@@ -421,7 +461,14 @@ export function FlujoMonedas({
 
                       {/* Stock acumulado de monedas */}
                       <p className="text-[10px] font-mono text-purple-300 tabular-nums">
-                        Stock: {mov.stockAcumulado} monedas ({mov.tipo === 'venta' || mov.tipo === 'base' ? '-' : '+'}{mov.cantidad})
+                        Stock: {mov.stockAcumulado} monedas{' '}
+                        {mov.tipo === 'abono' || mov.tipo === 'cobro' ? (
+                          <span className="text-muted-foreground/70 font-normal">(Cobro sin salida de stock)</span>
+                        ) : mov.tipo === 'despacho' || mov.tipo === 'venta_rapida' || mov.tipo === 'venta' || mov.tipo === 'base' ? (
+                          <span className="text-amber-400 font-bold">(-{mov.cantidad})</span>
+                        ) : (
+                          <span className="text-emerald-400 font-bold">(+{mov.cantidad})</span>
+                        )}
                       </p>
                     </div>
                   </div>

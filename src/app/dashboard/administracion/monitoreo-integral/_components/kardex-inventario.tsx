@@ -42,17 +42,28 @@ interface KardexInventarioProps {
 
 export function KardexInventario({ inventario, isLoading }: KardexInventarioProps) {
   const [filtroTexto, setFiltroTexto] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'ventas' | 'entradas' | 'ajustes'>('todos');
+  const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'ventas' | 'entradas' | 'eliminados' | 'ajustes'>('todos');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Estadísticas del inventario en este período
   const estadisticas = useMemo(() => {
-    if (!inventario) return { total: 0, entradas: 0, salidas: 0 };
+    if (!inventario) return { total: 0, entradas: 0, salidas: 0, eliminados: 0, unidadesEliminadas: 0 };
     let entradas = 0;
     let salidas = 0;
+    let eliminados = 0;
+    let unidadesEliminadas = 0;
 
     inventario.forEach(item => {
       const cant = Number(item.cantidad) || 0;
+      const tipo = (item.tipoMovimiento || '').toLowerCase();
+      const ref = (item.referencia || '').toLowerCase();
+      const esElim = tipo.includes('elimin') || tipo.includes('anula') || ref.includes('elimin') || ref.includes('anula');
+
+      if (esElim) {
+        eliminados++;
+        unidadesEliminadas += Math.abs(cant);
+      }
+
       if (cant > 0) entradas += cant;
       else if (cant < 0) salidas += Math.abs(cant);
     });
@@ -60,7 +71,9 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
     return {
       total: inventario.length,
       entradas,
-      salidas
+      salidas,
+      eliminados,
+      unidadesEliminadas
     };
   }, [inventario]);
 
@@ -81,9 +94,13 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
       result = result.filter(item => {
         const tipo = (item.tipoMovimiento || '').toLowerCase();
         const cant = Number(item.cantidad) || 0;
-        if (tipoFiltro === 'ventas') return tipo.includes('venta') || cant < 0;
-        if (tipoFiltro === 'entradas') return cant > 0 || tipo.includes('entrada') || tipo.includes('compra');
-        if (tipoFiltro === 'ajustes') return tipo.includes('ajuste');
+        const ref = (item.referencia || '').toLowerCase();
+        const esElim = tipo.includes('elimin') || tipo.includes('anula') || ref.includes('elimin') || ref.includes('anula');
+
+        if (tipoFiltro === 'eliminados') return esElim;
+        if (tipoFiltro === 'ventas') return (tipo.includes('venta') && !esElim) || (cant < 0 && !esElim);
+        if (tipoFiltro === 'entradas') return (cant > 0 || tipo.includes('entrada') || tipo.includes('compra')) && !esElim;
+        if (tipoFiltro === 'ajustes') return tipo.includes('ajuste') && !esElim;
         return true;
       });
     }
@@ -98,76 +115,8 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
   }, [inventario, filtroTexto, tipoFiltro, sortOrder]);
 
   return (
-    <div className="space-y-6 outline-none animate-in fade-in-50 duration-300">
-      {/* 1. Tarjetas de métricas del inventario */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* Total Movimientos */}
-        <Card className="bg-[#283244] border-[#324157] shadow-sm rounded-xl overflow-hidden">
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground">Movimientos registrados</span>
-              <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
-                <Boxes className="h-4 w-4" />
-              </div>
-            </div>
-            <p className="text-xl sm:text-2xl font-black font-mono text-white mt-1">
-              {estadisticas.total}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Operaciones de stock</p>
-          </div>
-        </Card>
-
-        {/* Salidas / Ventas */}
-        <Card className="bg-[#283244] border-[#324157] shadow-sm rounded-xl overflow-hidden">
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground">Unidades despachadas</span>
-              <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
-                <ArrowDownRight className="h-4 w-4" />
-              </div>
-            </div>
-            <p className="text-xl sm:text-2xl font-black font-mono text-amber-400 mt-1">
-              -{estadisticas.salidas}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Ventas y consumo del local</p>
-          </div>
-        </Card>
-
-        {/* Entradas */}
-        <Card className="bg-[#283244] border-[#324157] shadow-sm rounded-xl overflow-hidden">
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground">Unidades ingresadas</span>
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-                <ArrowUpRight className="h-4 w-4" />
-              </div>
-            </div>
-            <p className="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-1">
-              +{estadisticas.entradas}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Reposiciones y compras</p>
-          </div>
-        </Card>
-
-        {/* Balance Neto */}
-        <Card className="bg-[#17202e] border-primary/40 shadow-sm rounded-xl overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full -mr-6 -mt-6 pointer-events-none" />
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-primary">Balance neto de stock</span>
-              <Badge className="bg-primary/20 text-primary border-none text-[9px] px-1.5 py-0 rounded-full">
-                Kardex
-              </Badge>
-            </div>
-            <p className="text-xl sm:text-2xl font-black font-mono text-white mt-1">
-              {estadisticas.entradas - estadisticas.salidas > 0 ? '+' : ''}{estadisticas.entradas - estadisticas.salidas}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Variación neta en unidades</p>
-          </div>
-        </Card>
-      </div>
-
-      {/* 2. Barra de búsqueda y filtros */}
+    <div className="space-y-4 outline-none animate-in fade-in-50 duration-300">
+      {/* Barra de búsqueda y filtros */}
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary pointer-events-none" />
@@ -187,41 +136,65 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
           )}
         </div>
 
-        {/* Filtros de tipo y orden */}
+        {/* Filtros de tipo y orden con métricas integradas */}
         <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-between sm:justify-end">
           <div className="flex items-center p-1 bg-[#283244] border border-[#324157] rounded-full text-xs">
             <button
               onClick={() => setTipoFiltro('todos')}
               className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'todos' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-white"
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors flex items-center gap-1",
+                tipoFiltro === 'todos' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
               )}
             >
-              Todos
+              <span>Todos</span>
+              <span className="text-[10px] opacity-80 font-mono">({estadisticas.total})</span>
             </button>
             <button
               onClick={() => setTipoFiltro('ventas')}
               className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'ventas' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-white"
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors flex items-center gap-1",
+                tipoFiltro === 'ventas' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
               )}
             >
-              Ventas
+              <span>Ventas</span>
+              {estadisticas.salidas > 0 && (
+                <span className="text-[10px] text-amber-300 font-mono">(-{estadisticas.salidas})</span>
+              )}
             </button>
             <button
               onClick={() => setTipoFiltro('entradas')}
               className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'entradas' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-white"
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors flex items-center gap-1",
+                tipoFiltro === 'entradas' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
               )}
             >
-              Entradas
+              <span>Entradas</span>
+              {estadisticas.entradas > 0 && (
+                <span className="text-[10px] text-emerald-300 font-mono">(+{estadisticas.entradas})</span>
+              )}
+            </button>
+            <button
+              onClick={() => setTipoFiltro('eliminados')}
+              className={cn(
+                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors flex items-center gap-1",
+                tipoFiltro === 'eliminados' ? "bg-rose-600 text-white font-bold" : "text-rose-400 hover:text-rose-300"
+              )}
+            >
+              <span>Eliminados</span>
+              {estadisticas.eliminados > 0 && (
+                <span className={cn(
+                  "px-1.5 py-0 rounded-full text-[9px] font-mono font-bold",
+                  tipoFiltro === 'eliminados' ? "bg-white/20 text-white" : "bg-rose-500/20 text-rose-300"
+                )}>
+                  {estadisticas.eliminados}
+                </span>
+              )}
             </button>
             <button
               onClick={() => setTipoFiltro('ajustes')}
               className={cn(
                 "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'ajustes' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-white"
+                tipoFiltro === 'ajustes' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
               )}
             >
               Ajustes
@@ -235,7 +208,7 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
             className="h-9 px-3 rounded-full text-xs bg-[#283244] border-[#324157] text-white hover:bg-[#324157] shrink-0 gap-1"
           >
             {sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-primary" /> : <ArrowDown className="h-3.5 w-3.5 text-primary" />}
-            <span className="hidden sm:inline">{sortOrder === 'asc' ? 'Antiguos primero' : 'Recientes primero'}</span>
+            <span className="hidden sm:inline">{sortOrder === 'asc' ? 'Antiguos Primero' : 'Recientes Primero'}</span>
           </Button>
         </div>
       </div>
@@ -246,7 +219,7 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
         <div className="p-3 sm:p-4 border-b border-[#324157] bg-[#17202e] flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <PackageSearch className="h-4 w-4 text-primary" />
-            <span className="font-bold text-white">Kardex de movimientos físicos</span>
+            <span className="font-bold text-white">Kardex de Movimientos Físicos</span>
             <Badge className="bg-[#283244] text-white border-[#324157] font-mono text-[10px] rounded-full">
               {inventarioProcesado.length} registro{inventarioProcesado.length !== 1 ? 's' : ''}
             </Badge>
@@ -268,18 +241,34 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
               inventarioProcesado.map((mov, idx) => {
                 const cantidad = Number(mov.cantidad) || 0;
                 const esEntrada = cantidad > 0;
+                const tipoLower = (mov.tipoMovimiento || '').toLowerCase();
+                const refLower = (mov.referencia || '').toLowerCase();
+                const esEliminado = tipoLower.includes('elimin') || tipoLower.includes('anula') || refLower.includes('elimin') || refLower.includes('anula');
 
                 return (
                   <div 
                     key={idx} 
-                    className="p-3.5 sm:p-4 flex items-center justify-between hover:bg-[#283244]/50 transition-colors gap-3"
+                    className={cn(
+                      "p-3.5 sm:p-4 flex items-center justify-between hover:bg-[#283244]/50 transition-colors gap-3",
+                      esEliminado && "bg-rose-950/10 hover:bg-rose-950/20"
+                    )}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className={cn(
                         "h-9 w-9 rounded-xl flex items-center justify-center shrink-0 shadow-xs",
-                        esEntrada ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"
+                        esEliminado
+                          ? "bg-rose-500/20 text-rose-400"
+                          : esEntrada 
+                          ? "bg-emerald-500/20 text-emerald-400" 
+                          : "bg-amber-500/20 text-amber-400"
                       )}>
-                        {esEntrada ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                        {esEliminado ? (
+                          <RotateCcw className="h-4 w-4" />
+                        ) : esEntrada ? (
+                          <ArrowUpRight className="h-4 w-4" />
+                        ) : (
+                          <ArrowDownRight className="h-4 w-4" />
+                        )}
                       </div>
 
                       <div className="min-w-0">
@@ -289,12 +278,19 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
                           </span>
                           <Badge variant="outline" className={cn(
                             "text-[9px] font-medium rounded-full px-1.5 py-0",
-                            esEntrada ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-amber-500/40 text-amber-400 bg-amber-500/10"
+                            esEliminado
+                              ? "border-rose-500/40 text-rose-400 bg-rose-500/10 font-bold"
+                              : esEntrada 
+                              ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" 
+                              : "border-amber-500/40 text-amber-400 bg-amber-500/10"
                           )}>
-                            {mov.tipoMovimiento || (esEntrada ? 'Entrada' : 'Salida')}
+                            {mov.tipoMovimiento || (esEliminado ? 'Producto Eliminado' : (esEntrada ? 'Entrada' : 'Salida'))}
                           </Badge>
                           {mov.referencia && (
-                            <span className="text-[10px] text-muted-foreground truncate hidden sm:inline">
+                            <span className={cn(
+                              "text-[10px] truncate hidden sm:inline",
+                              esEliminado ? "text-rose-300/80 font-medium" : "text-muted-foreground"
+                            )}>
                               Ref: {mov.referencia}
                             </span>
                           )}
@@ -309,6 +305,12 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
                           <span className="hidden sm:inline">
                             {formatDistanceToNow(toDate(mov.fecha), { addSuffix: true, locale: es })}
                           </span>
+                          {esEliminado && (
+                            <>
+                              <span>•</span>
+                              <span className="text-rose-400 font-medium">Reingresado por eliminación</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -317,7 +319,7 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
                     <div className="text-right shrink-0">
                       <p className={cn(
                         "text-sm sm:text-base font-black font-mono tabular-nums",
-                        esEntrada ? "text-emerald-400" : "text-amber-400"
+                        esEliminado ? "text-rose-400" : (esEntrada ? "text-emerald-400" : "text-amber-400")
                       )}>
                         {esEntrada ? `+${cantidad}` : cantidad}
                       </p>

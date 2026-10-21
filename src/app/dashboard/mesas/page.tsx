@@ -7,7 +7,7 @@ import { collection, doc, Timestamp, query, updateDoc, orderBy, getDocs, where, 
 import { useFirebase, useUser, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { iniciarSesion, pasarACuenta, procesarVentaTiempoDeMesa, trasladarMesa, ajustarTiempoDefinido, procesarPagoDivision, eliminarConsumoMesa } from '@/lib/firebase/servicios/mesas';
-import { guardarCliente, descontarStockTemporal, devolverStockTemporal, descontarStockVirtualTemporal, devolverStockVirtualTemporal, registrarAuditoria, registrarCacheUsuario } from '@/lib/firebase/servicios';
+import { guardarCliente, descontarStockTemporal, devolverStockTemporal, descontarStockVirtualTemporal, devolverStockVirtualTemporal, registrarAuditoria, registrarCacheUsuario, registrarMovimientoInventarioDirecto } from '@/lib/firebase/servicios';
 import { toDate, validarSucursal } from '@/lib/firebase/servicios/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -321,8 +321,27 @@ export default function PaginaMesas() {
     if (!mesaParaConsumo || !firestore || !sucursalId || processingConsumption) return;
     setProcessingConsumption(true);
     try {
+      const additions = carritoConsumoTemporal.filter(t => !carritoOriginalRef.current.some(o => o.id === t.id));
+
       await updateDoc(doc(firestore, `sucursales/${sucursalId}/mesas_de_billar`, mesaParaConsumo.id), { consumos: carritoConsumoTemporal });
       
+      // Registrar salida en inventario para ítems agregados
+      for (const item of additions) {
+        const idProd = item.idProducto || item.productoId;
+        if (idProd && idProd !== 'item-manual') {
+          await registrarMovimientoInventarioDirecto(firestore, sucursalId, {
+            productoId: idProd,
+            nombreProducto: item.nombreProducto,
+            tipoMovimiento: 'Venta',
+            cantidad: -item.cantidad,
+            existenciaAnterior: 0,
+            existenciaNueva: 0,
+            referencia: `Consumo Mesa #${mesaParaConsumo.numeroMesa}`,
+            usuarioId: user?.uid || 'sistema'
+          }).catch(err => console.error("Error registrando inventario mesa:", err));
+        }
+      }
+
       const resumenConsumos = carritoConsumoTemporal
         .map((c: any) => `${c.cantidad}x ${c.nombreProducto || 'Producto'} (Q${(c.total || 0).toFixed(2)})`)
         .join(', ');
@@ -345,6 +364,10 @@ export default function PaginaMesas() {
 
       toast({ title: 'Éxito', description: 'Consumo guardado correctamente.' });
       setHasSavedConsumo(true);
+      setIsConsumoManual(false);
+      setDescripcionConsumoManual('');
+      setPrecioConsumoManual('');
+      setCantidadConsumo(1);
       setIsConsumoModalOpen(false);
     } catch (e: any) { toast({ title: "Error", description: e.message, variant: 'destructive' }); }
     finally { setProcessingConsumption(false); }
@@ -446,29 +469,57 @@ export default function PaginaMesas() {
         setDescripcionConsumoManual(''); 
         setPrecioConsumoManual(''); 
         setCantidadConsumo(1);
+        setIsConsumoManual(false);
         setTimeout(() => {
-          itemManualCantRef.current?.focus();
-          itemManualCantRef.current?.select();
-        }, 0);
+          cantidadConsumoInputRef.current?.focus();
+          cantidadConsumoInputRef.current?.select();
+        }, 50);
     } else {
         if (!productoConsumoSeleccionado || !cantidadConsumo || !firestore || !sucursalId) return;
         setProcesandoAnadir(true);
+        const cantNum = Number(cantidadConsumo);
+        const stockDisponible = productoConsumoSeleccionado.existencia ?? 0;
+        if (stockDisponible < cantNum) {
+          setProcesandoAnadir(false);
+          toast({
+            title: "Stock Insuficiente",
+            description: `No hay suficiente stock para "${productoConsumoSeleccionado.nombre}". Existencia disponible: ${stockDisponible}, cantidad solicitada: ${cantNum}.`,
+            variant: "destructive"
+          });
+          return;
+        }
+
         try {
             let name = productoConsumoSeleccionado.nombre, price = productoConsumoSeleccionado.precioVenta, ing: any[] = [];
             if (productoConsumoSeleccionado.esVirtual) {
-                await descontarStockVirtualTemporal(firestore, sucursalId, productoConsumoSeleccionado.id, Number(cantidadConsumo));
+                await descontarStockVirtualTemporal(firestore, sucursalId, productoConsumoSeleccionado.id, cantNum);
             } else {
-                await descontarStockTemporal(firestore, sucursalId, productoConsumoSeleccionado.id, Number(cantidadConsumo));
+                await descontarStockTemporal(firestore, sucursalId, productoConsumoSeleccionado.id, cantNum);
             }
             if (preparacionSeleccionada && preparacionSeleccionada !== 'base' && 'preparaciones' in productoConsumoSeleccionado) { 
               name = `${productoConsumoSeleccionado.nombre} (${preparacionSeleccionada.nombre})`; 
               price = preparacionSeleccionada.precioVenta; 
               ing = preparacionSeleccionada.ingredientes || []; 
-              for (const i of ing) {
-                await descontarStockTemporal(firestore, sucursalId, i.productoId, i.cantidad * Number(cantidadConsumo));
+              const ingDescontados: { productoId: string; cantidad: number }[] = [];
+              try {
+                for (const i of ing) {
+                  const cantIng = i.cantidad * cantNum;
+                  await descontarStockTemporal(firestore, sucursalId, i.productoId, cantIng);
+                  ingDescontados.push({ productoId: i.productoId, cantidad: cantIng });
+                }
+              } catch (errIng) {
+                for (const itemRevert of ingDescontados) {
+                  await devolverStockTemporal(firestore, sucursalId, itemRevert.productoId, itemRevert.cantidad).catch(() => {});
+                }
+                if (productoConsumoSeleccionado.esVirtual) {
+                  await devolverStockVirtualTemporal(firestore, sucursalId, productoConsumoSeleccionado.id, cantNum).catch(() => {});
+                } else {
+                  await devolverStockTemporal(firestore, sucursalId, productoConsumoSeleccionado.id, cantNum).catch(() => {});
+                }
+                throw errIng;
               }
             }
-            const n = { id: `${Date.now()}-${Math.random()}`, idProducto: productoConsumoSeleccionado.id, nombreProducto: name, cantidad: Number(cantidadConsumo), precioUnitario: price, total: Number(cantidadConsumo) * price, fechaAgregado: Timestamp.now(), esVirtual: !!productoConsumoSeleccionado.esVirtual, ingredientesConsumidos: ing };
+            const n = { id: `${Date.now()}-${Math.random()}`, idProducto: productoConsumoSeleccionado.id, nombreProducto: name, cantidad: cantNum, precioUnitario: price, total: cantNum * price, fechaAgregado: Timestamp.now(), esVirtual: !!productoConsumoSeleccionado.esVirtual, ingredientesConsumidos: ing };
             setCarritoConsumoTemporal(prev => [...prev, n]); 
             setProductoConsumoId(''); 
             setCantidadConsumo(1); 
@@ -628,6 +679,9 @@ export default function PaginaMesas() {
                   carritoOriginalRef.current = [...(m.consumos || [])];
                   setProductoConsumoId(''); 
                   setIsConsumoManual(false); 
+                  setDescripcionConsumoManual('');
+                  setPrecioConsumoManual('');
+                  setCantidadConsumo(1);
                   setHasSavedConsumo(false);
                   setIsConsumoModalOpen(true); 
                 }}

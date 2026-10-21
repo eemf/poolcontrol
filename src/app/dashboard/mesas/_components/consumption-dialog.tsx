@@ -146,13 +146,28 @@ export function ConsumptionDialog({
                       onFocus={(e) => e.target.select()}
                       placeholder="0.00" 
                       className="rounded-full text-center h-10 px-1 border-muted-foreground/20"
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); itemManualAddBtnRef.current?.focus(); } }} 
+                      onKeyDown={(e) => { 
+                        if (e.key === 'Enter') { 
+                          e.preventDefault(); 
+                          if (descripcionConsumoManual.trim() && precioConsumoManual && Number(precioConsumoManual) > 0 && cantidadConsumo && Number(cantidadConsumo) > 0) {
+                            onAddConsumo();
+                          } else {
+                            itemManualAddBtnRef.current?.focus(); 
+                          }
+                        } 
+                      }} 
                     />
                   </div>
                   <div className="col-span-12 sm:col-span-3">
                     <Button 
                       ref={itemManualAddBtnRef} 
                       onClick={onAddConsumo} 
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          onAddConsumo();
+                        }
+                      }}
                       disabled={!descripcionConsumoManual.trim() || !precioConsumoManual || Number(precioConsumoManual) <= 0 || !cantidadConsumo || Number(cantidadConsumo) <= 0} 
                       className="w-full rounded-full h-10 font-bold shadow-lg shadow-primary/20"
                     >
