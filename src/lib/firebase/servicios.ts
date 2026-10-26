@@ -34,3 +34,4 @@ export * from './servicios/cuadre-mensual';
 export * from './servicios/suscripciones';
 export * from './servicios/pagos-suscripcion';
 export * from './servicios/auditoria';
+export * from './servicios/traslados';

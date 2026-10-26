@@ -7,6 +7,7 @@ export interface UserAuthLookup {
   rol: string;
   sucursalId: string;
   accesoGlobal?: boolean;
+  sucursalesPermitidas?: string[]; // IDs de las sucursales que este usuario puede ver/cambiar
 }
 
 export interface Suscripcion {
@@ -133,6 +134,43 @@ export interface ItemCompra {
   nombreProducto: string;
   cantidad: number;
   costoUnitario: number;
+}
+
+export type EstadoTraslado = 'en_transito' | 'recibido' | 'cancelado';
+
+export interface ItemTraslado {
+  productoOrigenId: string;
+  productoDestinoId?: string;
+  nombreProducto: string;
+  nombreProductoDestino?: string;
+  cantidad: number;
+  costoUnitario: number;
+  costoTotal: number;
+  precioVenta?: number;
+}
+
+export interface TrasladoInterSucursal {
+  id: string;
+  idTraslado: number;
+  sucursalOrigenId: string;
+  sucursalOrigenNombre: string;
+  sucursalDestinoId: string;
+  sucursalDestinoNombre: string;
+  sucursalesIds: string[]; // [origenId, destinoId] para consultas array-contains eficientes
+  fechaEnvio: Timestamp;
+  fechaRecepcion?: Timestamp;
+  usuarioEnvioId: string;
+  usuarioEnvioNombre?: string;
+  usuarioRecepcionId?: string;
+  usuarioRecepcionNombre?: string;
+  estado: EstadoTraslado;
+  items: ItemTraslado[];
+  costoTotalTraslado: number;
+  cantidadTotalItems: number;
+  observacionesEnvio?: string;
+  observacionesRecepcion?: string;
+  idCompraGeneradaDestino?: string;
+  estadoLiquidacion?: 'pendiente' | 'liquidado';
 }
 
 export interface Venta {
@@ -308,9 +346,12 @@ export interface UsuarioSucursal {
   authUid: string;
   nombre: string;
   email: string;
+  rol?: string;
+  sucursalId?: string;
   roles: string[]; // Array de IDs de roles
   permisosExtra?: string[];
   accesoGlobal?: boolean;
+  sucursalesPermitidas?: string[]; // IDs de las sucursales que este usuario puede ver/cambiar
 }
 
 // Este tipo es para el estado de caja que se lee en el frontend
@@ -370,6 +411,7 @@ export interface CuadreSemanal {
     totalIngresosEfectivo: number;
     totalIngresosTarjeta: number;
     totalIngresosTragamonedas: number;
+    totalIngresosTraslados?: number;
     totalCompras: number;
     totalGastos: number;
     balanceNetoCalculado: number;
@@ -385,6 +427,7 @@ export interface CuadreSemanal {
     ingresosEfectivo: string[];
     ingresosTarjeta: string[];
     ingresosTragamonedas: string[];
+    ingresosTraslados?: string[];
     compras: string[];
     gastos: string[];
   };

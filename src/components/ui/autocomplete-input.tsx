@@ -52,11 +52,22 @@ export const AutocompleteInput = React.forwardRef<
   const internalInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const valueRef = useRef(value);
+  valueRef.current = value;
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+
   React.useImperativeHandle(ref, () => internalInputRef.current as HTMLInputElement);
 
   useEffect(() => {
+    valueRef.current = value;
+    optionsRef.current = options;
     const selectedOption = options.find(option => option.value === value);
-    setSearchText(selectedOption ? selectedOption.label : '');
+    if (selectedOption) {
+      setSearchText(selectedOption.label);
+    } else if (!value) {
+      setSearchText('');
+    }
   }, [value, options]);
   
   useEffect(() => {
@@ -84,6 +95,11 @@ export const AutocompleteInput = React.forwardRef<
   }, [filteredOptions]);
 
   const selectOption = (selectedValue: string) => {
+    valueRef.current = selectedValue;
+    const selectedOption = optionsRef.current.find(option => option.value === selectedValue);
+    if (selectedOption) {
+      setSearchText(selectedOption.label);
+    }
     onValueChange(selectedValue);
     setIsOpen(false);
     onEnterKey?.();
@@ -165,8 +181,14 @@ export const AutocompleteInput = React.forwardRef<
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setTimeout(() => {
       if (containerRef.current && !containerRef.current.contains(document.activeElement)) {
-        const selectedOption = options.find(option => option.value === value);
-        setSearchText(selectedOption ? selectedOption.label : '');
+        const curVal = valueRef.current;
+        const curOptions = optionsRef.current;
+        const selectedOption = curOptions.find(option => option.value === curVal);
+        if (selectedOption) {
+          setSearchText(selectedOption.label);
+        } else if (!curVal) {
+          setSearchText('');
+        }
         setIsOpen(false);
       }
     }, 150);

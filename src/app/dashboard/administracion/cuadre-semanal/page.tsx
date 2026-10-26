@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { collection, query, where, Timestamp } from 'firebase/firestore';
 import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
-import type { CierreCaja, Compra, Gasto as GastoType, Cuenta, CuadreTragamonedas } from '@/lib/tipos';
+import type { CierreCaja, Compra, Gasto as GastoType, Cuenta, CuadreTragamonedas, TrasladoInterSucursal } from '@/lib/tipos';
 import { 
     Loader2, 
     History,
@@ -20,6 +20,7 @@ import { useSucursal } from '@/hooks/use-sucursal';
 import { EncabezadoSemanal } from './_components/encabezado-semanal';
 import { IngresosFisicos } from './_components/ingresos-fisicos';
 import { IngresosTarjeta } from './_components/ingresos-tarjeta';
+import { ListaTrasladosCobro } from './_components/lista-traslados-cobro';
 import { ListaCompras } from './_components/lista-compras';
 import { ListaGastos } from './_components/lista-gastos';
 import { BarraResumen } from './_components/barra-resumen';
@@ -39,6 +40,7 @@ export default function CuadreSemanalPage() {
   const [selectedIngresosEfectivo, setSelectedIngresosEfectivo] = useState<Set<string>>(new Set());
   const [selectedIngresosTarjeta, setSelectedIngresosTarjeta] = useState<Set<string>>(new Set());
   const [selectedIngresosTragamonedas, setSelectedIngresosTragamonedas] = useState<Set<string>>(new Set());
+  const [selectedIngresosTraslados, setSelectedIngresosTraslados] = useState<Set<string>>(new Set());
   const [selectedCompras, setSelectedCompras] = useState<Set<string>>(new Set());
   const [selectedGastos, setSelectedGastos] = useState<Set<string>>(new Set());
   
@@ -68,6 +70,14 @@ export default function CuadreSemanalPage() {
     return query(collection(firestore, `sucursales/${sucursalId}/cuadre_tragamonedas`), where('estado', '==', 'pendiente'));
   }, [firestore, sucursalId]);
 
+  const trasladosCobroQuery = useMemoFirebase(() => {
+    if (!firestore || !sucursalId) return null;
+    return query(
+      collection(firestore, 'traslados'),
+      where('sucursalOrigenId', '==', sucursalId)
+    );
+  }, [firestore, sucursalId]);
+
   const comprasQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
     return query(collection(firestore, `sucursales/${sucursalId}/compras`), where('estado', '==', 'Pendiente'));
@@ -87,6 +97,7 @@ export default function CuadreSemanalPage() {
   const { data: ingresosEfectivoData, isLoading: isLoadingEfectivo } = useCollection<CierreCajaConId>(ingresosEfectivoQuery);
   const { data: ingresosTarjetaData, isLoading: isLoadingTarjeta } = useCollection<CierreCajaConId>(ingresosTarjetaQuery);
   const { data: ingresosTragamonedasData, isLoading: isLoadingTragamonedas } = useCollection<CuadreTragamonedasConId>(ingresosTragamonedasQuery);
+  const { data: rawTraslados, isLoading: isLoadingTraslados } = useCollection<TrasladoInterSucursal>(trasladosCobroQuery);
   const { data: comprasData, isLoading: isLoadingCompras } = useCollection<Compra>(comprasQuery);
   const { data: gastosData, isLoading: isLoadingGastos } = useCollection<GastoType>(gastosQuery);
   const { data: cuentas, isLoading: isLoadingCuentas } = useCollection<Cuenta>(cuentasQuery);
@@ -96,6 +107,17 @@ export default function CuadreSemanalPage() {
   const ingresosTarjetaPendientes = useMemo(() => (ingresosTarjetaData || []).sort((a,b) => b.fecha.toDate().getTime() - a.fecha.toDate().getTime()), [ingresosTarjetaData]);
   const ingresosTragamonedasPendientes = useMemo(() => (ingresosTragamonedasData || []), [ingresosTragamonedasData]);
   
+  const trasladosCobroPendientes = useMemo(() => {
+    if (!rawTraslados) return [];
+    return rawTraslados
+      .filter((t) => t.estado !== 'cancelado' && (t.estadoLiquidacion === 'pendiente' || !t.estadoLiquidacion))
+      .sort((a, b) => {
+        const timeA = a.fechaEnvio?.toMillis ? a.fechaEnvio.toMillis() : 0;
+        const timeB = b.fechaEnvio?.toMillis ? b.fechaEnvio.toMillis() : 0;
+        return timeB - timeA;
+      });
+  }, [rawTraslados]);
+
   const ingresosFisicosPendientes = useMemo(() => {
     const ef = ingresosEfectivoPendientes.map(i => ({ ...i, tipoItem: 'caja' as const }));
     const tr = ingresosTragamonedasPendientes.map(i => ({ ...i, tipoItem: 'tragamonedas' as const }));
@@ -106,11 +128,12 @@ export default function CuadreSemanalPage() {
   const gastosPendientes = useMemo((): GastoPendiente[] => (gastosData || []).map(g => ({...g, docId: g.id})).sort((a,b) => b.fecha.toDate().getTime() - a.fecha.toDate().getTime()), [gastosData]);
 
   // Handlers
-  const handleSelect = (id: string, isSelected: boolean, type: 'ingresoEfectivo' | 'ingresoTarjeta' | 'ingresoTragamonedas' | 'compra' | 'gasto') => {
+  const handleSelect = (id: string, isSelected: boolean, type: 'ingresoEfectivo' | 'ingresoTarjeta' | 'ingresoTragamonedas' | 'ingresoTraslado' | 'compra' | 'gasto') => {
     const setters: any = {
         ingresoEfectivo: setSelectedIngresosEfectivo,
         ingresoTarjeta: setSelectedIngresosTarjeta,
         ingresoTragamonedas: setSelectedIngresosTragamonedas,
+        ingresoTraslado: setSelectedIngresosTraslados,
         compra: setSelectedCompras,
         gasto: setSelectedGastos
     };
@@ -134,6 +157,15 @@ export default function CuadreSemanalPage() {
     }
   };
 
+  const handleSelectAllTraslados = () => {
+    const allIds = trasladosCobroPendientes.map(t => t.id);
+    if (selectedIngresosTraslados.size === allIds.length && allIds.length > 0) {
+      setSelectedIngresosTraslados(new Set());
+    } else {
+      setSelectedIngresosTraslados(new Set(allIds));
+    }
+  };
+
   const handleSelectAll = (type: 'ingresoTarjeta' | 'compra' | 'gasto') => {
     const sources: any = {
         ingresoTarjeta: ingresosTarjetaPendientes.map(i => i.id),
@@ -152,15 +184,16 @@ export default function CuadreSemanalPage() {
     const ingEf = ingresosEfectivoPendientes.filter(c => selectedIngresosEfectivo.has(c.id)).reduce((acc, c) => acc + c.totalLiquidado, 0);
     const ingTr = ingresosTarjetaPendientes.filter(c => selectedIngresosTarjeta.has(c.id)).reduce((acc, c) => acc + c.pagosTarjeta, 0);
     const ingTg = ingresosTragamonedasPendientes.filter(c => selectedIngresosTragamonedas.has(c.id)).reduce((acc, c) => acc + c.gananciaATrasladar, 0);
+    const ingTrs = trasladosCobroPendientes.filter(t => selectedIngresosTraslados.has(t.id)).reduce((acc, t) => acc + (t.costoTotalTraslado || 0), 0);
     const egCo = comprasPendientes.filter(c => selectedCompras.has(c.docId)).reduce((acc, c) => acc + c.montoTotal, 0);
     const egGa = gastosPendientes.filter(g => selectedGastos.has(g.docId)).reduce((acc, g) => acc + g.monto, 0);
 
-    const ingresos = ingEf + ingTr + ingTg;
+    const ingresos = ingEf + ingTr + ingTg + ingTrs;
     const egresos = egCo + egGa;
     const balanceNeto = ingresos - egresos;
 
     return { ingresos, egresos, balanceNeto };
-  }, [selectedIngresosEfectivo, selectedIngresosTarjeta, selectedIngresosTragamonedas, selectedCompras, selectedGastos, ingresosEfectivoPendientes, ingresosTarjetaPendientes, ingresosTragamonedasPendientes, comprasPendientes, gastosPendientes]);
+  }, [selectedIngresosEfectivo, selectedIngresosTarjeta, selectedIngresosTragamonedas, selectedIngresosTraslados, selectedCompras, selectedGastos, ingresosEfectivoPendientes, ingresosTarjetaPendientes, ingresosTragamonedasPendientes, trasladosCobroPendientes, comprasPendientes, gastosPendientes]);
 
   useEffect(() => {
     setBalanceALiquidar(totalesCalculados.balanceNeto);
@@ -186,6 +219,7 @@ export default function CuadreSemanalPage() {
         totalIngresosEfectivo: ingresosEfectivoPendientes.filter(c => selectedIngresosEfectivo.has(c.id)).reduce((acc, c) => acc + c.totalLiquidado, 0),
         totalIngresosTarjeta: ingresosTarjetaPendientes.filter(c => selectedIngresosTarjeta.has(c.id)).reduce((acc, c) => acc + c.pagosTarjeta, 0),
         totalIngresosTragamonedas: ingresosTragamonedasPendientes.filter(c => selectedIngresosTragamonedas.has(c.id)).reduce((acc, c) => acc + c.gananciaATrasladar, 0),
+        totalIngresosTraslados: trasladosCobroPendientes.filter(t => selectedIngresosTraslados.has(t.id)).reduce((acc, t) => acc + (t.costoTotalTraslado || 0), 0),
         totalCompras: comprasPendientes.filter(c => selectedCompras.has(c.docId)).reduce((acc, c) => acc + c.montoTotal, 0),
         totalGastos: gastosPendientes.filter(g => selectedGastos.has(g.docId)).reduce((acc, g) => acc + g.monto, 0),
         balanceNetoCalculado: totalesCalculados.balanceNeto,
@@ -196,6 +230,7 @@ export default function CuadreSemanalPage() {
         ingresosEfectivo: Array.from(selectedIngresosEfectivo),
         ingresosTarjeta: Array.from(selectedIngresosTarjeta),
         ingresosTragamonedas: Array.from(selectedIngresosTragamonedas),
+        ingresosTraslados: Array.from(selectedIngresosTraslados),
         compras: Array.from(selectedCompras),
         gastos: Array.from(selectedGastos),
       },
@@ -208,6 +243,7 @@ export default function CuadreSemanalPage() {
       setSelectedIngresosEfectivo(new Set());
       setSelectedIngresosTarjeta(new Set());
       setSelectedIngresosTragamonedas(new Set());
+      setSelectedIngresosTraslados(new Set());
       setSelectedCompras(new Set());
       setSelectedGastos(new Set());
       setObservaciones('');
@@ -219,8 +255,8 @@ export default function CuadreSemanalPage() {
     }
   };
 
-  const isLoading = isLoadingEfectivo || isLoadingTarjeta || isLoadingTragamonedas || isLoadingCompras || isLoadingGastos || isLoadingCuentas || isLoadingSucursal;
-  const hayDatosPendientes = ingresosFisicosPendientes.length > 0 || ingresosTarjetaPendientes.length > 0 || comprasPendientes.length > 0 || gastosPendientes.length > 0;
+  const isLoading = isLoadingEfectivo || isLoadingTarjeta || isLoadingTragamonedas || isLoadingTraslados || isLoadingCompras || isLoadingGastos || isLoadingCuentas || isLoadingSucursal;
+  const hayDatosPendientes = ingresosFisicosPendientes.length > 0 || ingresosTarjetaPendientes.length > 0 || trasladosCobroPendientes.length > 0 || comprasPendientes.length > 0 || gastosPendientes.length > 0;
 
   if (isLoading) return <div className="flex justify-center items-center h-64"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
 
@@ -262,6 +298,13 @@ export default function CuadreSemanalPage() {
               sucursalId={sucursalId!}
             />
 
+            <ListaTrasladosCobro 
+              items={trasladosCobroPendientes} 
+              selected={selectedIngresosTraslados} 
+              onSelect={(id, isSel) => handleSelect(id, isSel, 'ingresoTraslado')} 
+              onSelectAll={handleSelectAllTraslados} 
+            />
+
             <ListaCompras 
               items={comprasPendientes} 
               selected={selectedCompras} 
@@ -291,7 +334,7 @@ export default function CuadreSemanalPage() {
             setObservaciones={setObservaciones}
             isProcessing={isProcessing}
             onProcess={() => setIsConfirmOpen(true)}
-            disabled={isProcessing || (!selectedIngresosEfectivo.size && !selectedIngresosTarjeta.size && !selectedIngresosTragamonedas.size && !selectedCompras.size && !selectedGastos.size)}
+            disabled={isProcessing || (!selectedIngresosEfectivo.size && !selectedIngresosTarjeta.size && !selectedIngresosTragamonedas.size && !selectedIngresosTraslados.size && !selectedCompras.size && !selectedGastos.size)}
           />
         </div>
       )}

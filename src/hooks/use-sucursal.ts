@@ -26,6 +26,18 @@ export function useSucursal() {
       // Intentar obtener la sucursal seleccionada manualmente en el menú
       id = typeof window !== 'undefined' ? localStorage.getItem('selectedSucursalId') : null;
       
+      // Si el usuario tiene una lista restringida de sucursales permitidas (y no es Super Admin)
+      if (id && !isAdmin && profile?.sucursalesPermitidas && profile.sucursalesPermitidas.length > 0) {
+        if (!profile.sucursalesPermitidas.includes(id)) {
+          id = profile.sucursalId && profile.sucursalesPermitidas.includes(profile.sucursalId)
+            ? profile.sucursalId
+            : profile.sucursalesPermitidas[0];
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('selectedSucursalId', id);
+          }
+        }
+      }
+
       // Si no hay selección manual pero hay un perfil, usar la sucursal del perfil como base
       if (!id && profile?.sucursalId) {
         id = profile.sucursalId;
@@ -40,8 +52,8 @@ export function useSucursal() {
       }
     }
     
-    setSucursalId(id);
-    setIsLoading(false);
+    setSucursalId(prev => (prev !== id ? id : prev));
+    setIsLoading(prev => (prev !== false ? false : prev));
 
   }, [isAdmin, profile, isUserLoading, pathname]);
   

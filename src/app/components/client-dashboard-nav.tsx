@@ -9,7 +9,7 @@ import {
   TableProperties,
   Truck, Scale, History, HandCoins, Landmark, BookUser, CalendarDays, 
   Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2, Info,
-  BarChart3
+  BarChart3, ArrowLeftRight
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -73,9 +73,10 @@ export const navItems: NavItemType[] = [
   {
     label: 'Administración',
     icon: Landmark,
-    anyPermission: ['compras.gestionar', 'gastos.gestionar', 'tragamonedas.cuadre', 'cuadre.semanal', 'cuadre.mensual'],
+    anyPermission: ['compras.gestionar', 'gastos.gestionar', 'tragamonedas.cuadre', 'cuadre.semanal', 'cuadre.mensual', 'inventario.ver'],
     items: [
         { href: '/dashboard/compras', label: 'Compras', icon: Truck, permission: 'compras.gestionar', feature: 'compras' },
+        { href: '/dashboard/administracion/traslados', label: 'Traslados', icon: ArrowLeftRight, permission: 'inventario.ver', feature: 'adminInventario' },
         { href: '/dashboard/gastos', label: 'Gastos', icon: DollarSign, permission: 'gastos.gestionar', feature: 'adminGastos' },
         { href: '/dashboard/administracion/cuadre-tragamonedas', label: 'Cuadre Tragamonedas', icon: PiggyBank, permission: 'tragamonedas.cuadre', feature: 'adminCuadreTraga' },
         { href: '/dashboard/administracion/cuadre-semanal', label: 'Cuadre Semanal', icon: CalendarDays, permission: 'cuadre.semanal', feature: 'adminCuadreSemanal' },
@@ -337,6 +338,17 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
   , [firestore, puedeSaltar]);
   const { data: todasLasSucursales } = useCollection<Sucursal>(sucursalesQuery);
 
+  // Filtrar sucursales según la lista autorizada del perfil si no es Super Admin
+  const permitidasKey = profile?.sucursalesPermitidas ? profile.sucursalesPermitidas.join(',') : '';
+  const sucursalesVisibles = React.useMemo(() => {
+    if (!todasLasSucursales) return [];
+    if (isSuperAdmin) return todasLasSucursales;
+    if (profile?.sucursalesPermitidas && profile.sucursalesPermitidas.length > 0) {
+      return todasLasSucursales.filter((s) => profile.sucursalesPermitidas!.includes(s.id));
+    }
+    return todasLasSucursales;
+  }, [todasLasSucursales, isSuperAdmin, permitidasKey]);
+
   const branchFeatures = React.useMemo(() => sucursalData?.features || {}, [sucursalData]);
 
   const handleNavigate = () => {
@@ -444,7 +456,7 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                   <p className="text-[10px] font-bold text-muted-foreground px-2 py-1 tracking-wider">
                     Cambiar de sucursal
                   </p>
-                  {(todasLasSucursales || []).map((s) => (
+                  {(sucursalesVisibles || []).map((s) => (
                     <button
                       key={s.id}
                       type="button"
@@ -503,7 +515,7 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <ScrollArea className="h-64">
-                  {(todasLasSucursales || []).map(s => (
+                  {(sucursalesVisibles || []).map(s => (
                     <DropdownMenuItem 
                       key={s.id} 
                       className={cn(

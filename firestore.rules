@@ -39,15 +39,13 @@ service cloud.firestore {
 
     // 1. Aislamiento de Sucursales
     match /sucursales/{sucursalId} {
-      // Lectura de info de sucursal: Solo Super Admin o usuarios con Acceso Global pueden listar todas.
-      // Usuarios locales pueden hacer 'get' de su propia sucursal.
-      allow list: if isSuperAdmin() || (getUserProfile() != null && getUserProfile().accesoGlobal == true);
-      allow get: if belongsToBranch(sucursalId);
+      // Lectura de info de sucursal: permitida a cualquier usuario autenticado para listados y selección entre sucursales
+      allow read: if isSignedIn();
       
       // Gestión de estructura de sucursales: Operación exclusiva de Super Administrador
       allow create, update, delete: if isSuperAdmin();
 
-      // TODAS las subcolecciones
+      // TODAS las subcolecciones (aislamiento estricto por sucursal)
       match /{allSubPath=**} {
         allow read, write: if belongsToBranch(sucursalId);
       }
@@ -55,7 +53,7 @@ service cloud.firestore {
     
     // 2. Correlativos Globales
     match /correlativos/{document=**} {
-      allow read, write: if isSuperAdmin();
+      allow read, write: if isSignedIn();
     }
     
     // 3. Lookup de Autenticación (user_auth_lookup)
@@ -75,8 +73,14 @@ service cloud.firestore {
         ))
       );
     }
+
+    // 5. Traslados Inter-Sucursales
+    match /traslados/{trasladoId} {
+      allow read, create, update: if isSignedIn();
+      allow delete: if isSuperAdmin();
+    }
     
-    // 5. Denegación por defecto
+    // 6. Denegación por defecto
     match /{document=**} {
       allow read, write: if false;
     }

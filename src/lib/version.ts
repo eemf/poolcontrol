@@ -12,9 +12,39 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 309,
+    fecha: "2026-10-26",
+    estado: "publicada_actual",
+    tipo: "Menor",
+    tagGit: "v1.0.0-b309",
+    descripcion: "Sistema integral de traslados de inventario entre sucursales, homologación de catálogo en recepción, liquidación en cuadre semanal y control de permisos de usuario.",
+    cambios: [
+      "Módulo de Traslados de Inventario Inter-sucursal: Envío, tránsito y recepción de productos entre sucursales garantizando compras independientes y cuentas por pagar separadas.",
+      "Homologación y mapeo de catálogo en recepción: Al recibir un traslado, el operador puede asociar productos con diferente denominación local (ej. Nachos -> Bolsitas) o crearlos como nuevo producto.",
+      "Cobro y liquidación en Cuadre Semanal: Integración de traslados en el cuadre semanal de la sucursal emisora para cobro como ingreso en efectivo, con liquidación atómica y consulta en el historial.",
+      "Gestión de permisos multi-sucursal: Visualización y control de sucursales autorizadas por usuario en el panel de administración.",
+      "Optimización de selectores y UX: Selector nativo en recepción de traslados con filtro local en tiempo real y persistencia del nombre de producto seleccionado en el autocompletado."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 308,
+    fecha: "2026-10-21",
+    estado: "publicada_anterior",
+    tipo: "Parche",
+    tagGit: "v1.0.0-b308",
+    descripcion: "Flujo de monedas desacoplado de pagos, auditoría de despachos y simplificación de interfaz en monitoreo integral.",
+    cambios: [
+      "Flujo de monedas desacoplado: Flujo independiente de monedas en monitoreo integral.",
+      "Auditoría de despachos: Registro y visualización detallada de despachos en el módulo de auditoría.",
+      "Simplificación de interfaz en monitoreo integral y servicios de inventario."
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 307,
     fecha: "2026-10-13",
-    estado: "publicada_actual",
+    estado: "archivada",
     tipo: "Parche",
     tagGit: "v1.0.0-b307",
     descripcion: "Corrección de persistencia en efectivoAcumuladoMonedas: congelación durante el período operativo y actualización exclusiva en cierre de caja y cuadre de máquinas.",
@@ -784,9 +814,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 307,
-  date: "2026-10-13",
-  publicadaActual: releaseHistory[0], // Build 307
-  publicadaAnterior: releaseHistory[1], // Build 306
+  build: 309,
+  date: "2026-10-26",
+  publicadaActual: releaseHistory[0], // Build 309
+  publicadaAnterior: releaseHistory[1], // Build 308
   historial: releaseHistory
 };

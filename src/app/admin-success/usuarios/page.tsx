@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo, FormEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Loader2, Save, Trash2, Edit, PlusCircle, Search, UserCheck, ShieldCheck, KeyRound } from "lucide-react"
+import { Loader2, Save, Trash2, Edit, PlusCircle, Search, UserCheck, ShieldCheck, KeyRound, Building2, ArrowLeftRight, Check } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Switch } from "@/components/ui/switch"
+import { Checkbox } from "@/components/ui/checkbox"
 import { DialogoCambiarPassword } from "@/components/usuarios/DialogoCambiarPassword"
 import { cambiarPasswordUsuario } from "@/lib/firebase/servicios/usuarios-auth"
 
@@ -31,6 +32,7 @@ type Usuario = {
   sucursalId: string;
   roles?: string[];
   accesoGlobal?: boolean;
+  sucursalesPermitidas?: string[];
 };
 
 type Rol = {
@@ -67,6 +69,7 @@ export default function PaginaUsuarios() {
   const [password, setPassword] = useState('');
   const [rol, setRol] = useState('');
   const [accesoGlobal, setAccesoGlobal] = useState(false);
+  const [sucursalesPermitidas, setSucursalesPermitidas] = useState<string[]>([]);
   const [selectedSucursalId, setSelectedSucursalId] = useState('');
 
   const sucursalesQuery = useMemoFirebase(() => {
@@ -88,44 +91,67 @@ export default function PaginaUsuarios() {
   const { data: sucursales, isLoading: isLoadingSucursales } = useCollection<Sucursal>(sucursalesQuery);
   const { data: roles, isLoading: isLoadingRoles } = useCollection<Rol>(rolesQuery);
 
+  const selectedSucursalNombre = useMemo(() => {
+    return sucursales?.find(s => s.id === selectedSucursalId)?.nombre || '';
+  }, [sucursales, selectedSucursalId]);
+
+  // Autoseleccionar la primera sucursal si aún no se ha seleccionado ninguna
+  useEffect(() => {
+    if (sucursales && sucursales.length > 0) {
+      setSelectedSucursalId(prev => prev || sucursales[0].id);
+    }
+  }, [sucursales]);
+
   const resetForm = () => {
     setNombre('');
     setEmail('');
     setPassword('');
     setRol('');
     setAccesoGlobal(false);
+    setSucursalesPermitidas([]);
     setEditingUser(null);
   };
   
   useEffect(() => {
     if (editingUser) {
-        setNombre(editingUser.nombre);
-        setEmail(editingUser.email);
+        setNombre(editingUser.nombre || '');
+        setEmail(editingUser.email || '');
         setAccesoGlobal(editingUser.accesoGlobal || false);
+        if (editingUser.sucursalesPermitidas && editingUser.sucursalesPermitidas.length > 0) {
+          setSucursalesPermitidas(editingUser.sucursalesPermitidas);
+        } else if (editingUser.accesoGlobal) {
+          setSucursalesPermitidas((sucursales || []).map(s => s.id));
+        } else {
+          setSucursalesPermitidas(selectedSucursalId ? [selectedSucursalId] : []);
+        }
         const initialRolId = editingUser.roles && editingUser.roles.length > 0 
           ? editingUser.roles[0] 
           : (roles?.find(r => r.nombre === editingUser.rol) as any)?.id || '';
         setRol(initialRolId);
         setPassword('');
-    } else {
-        resetForm();
     }
-  }, [editingUser, roles]);
+  }, [editingUser]);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
   
   const handleOpenModal = (user: UsuarioConDocId | null) => {
-    setEditingUser(user);
+    if (user) {
+      setEditingUser(user);
+    } else {
+      resetForm();
+      if (selectedSucursalId) {
+        setSucursalesPermitidas([selectedSucursalId]);
+      }
+    }
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setEditingUser(null);
     setIsModalOpen(false);
     resetForm();
-  }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -161,6 +187,10 @@ export default function PaginaUsuarios() {
       const selectedRole = roles?.find(r => (r as any).id === rol);
       const roleName = selectedRole?.nombre || 'Sin Rol';
 
+      const finalSucursalesPermitidas = accesoGlobal
+        ? Array.from(new Set([...(sucursalesPermitidas.length > 0 ? sucursalesPermitidas : (sucursales || []).map(s => s.id)), selectedSucursalId]))
+        : [];
+
       if (editingUser) {
         const userInSucursalRef = doc(firestore, 'sucursales', selectedSucursalId, 'usuarios', editingUser.authUid);
         const userAuthLookupRef = doc(firestore, 'user_auth_lookup', editingUser.authUid);
@@ -169,10 +199,17 @@ export default function PaginaUsuarios() {
           nombre, 
           rol: roleName,
           roles: [rol],
-          accesoGlobal
+          accesoGlobal,
+          sucursalesPermitidas: finalSucursalesPermitidas
         };
         batch.update(userInSucursalRef, dataToUpdate);
-        batch.update(userAuthLookupRef, { nombre, rol: roleName, sucursalId: selectedSucursalId, accesoGlobal });
+        batch.update(userAuthLookupRef, {
+          nombre,
+          rol: roleName,
+          sucursalId: selectedSucursalId,
+          accesoGlobal,
+          sucursalesPermitidas: finalSucursalesPermitidas
+        });
 
         // Si se suministró una nueva contraseña al editar
         if (password.trim()) {
@@ -212,9 +249,17 @@ export default function PaginaUsuarios() {
             rol: roleName,
             sucursalId: selectedSucursalId,
             roles: [rol],
-            accesoGlobal
+            accesoGlobal,
+            sucursalesPermitidas: finalSucursalesPermitidas
         };
-        const lookupData = { nombre, email, rol: roleName, sucursalId: selectedSucursalId, accesoGlobal };
+        const lookupData = {
+          nombre,
+          email,
+          rol: roleName,
+          sucursalId: selectedSucursalId,
+          accesoGlobal,
+          sucursalesPermitidas: finalSucursalesPermitidas
+        };
         
         batch.set(userInSucursalRef, finalData);
         batch.set(userAuthLookupRef, lookupData);
@@ -352,20 +397,29 @@ export default function PaginaUsuarios() {
             ) : filteredUsuarios.length > 0 ? (
                  <div className="space-y-2 pt-2">
                     {filteredUsuarios.map((usuario) => (
-                        <div key={usuario.docId} className="flex flex-col sm:flex-row items-start sm:items-center p-4 border rounded-xl bg-background hover:bg-muted/50 transition-colors shadow-sm">
-                           <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
-                                <div className="sm:col-span-2">
-                                    <p className="font-bold text-foreground truncate flex items-center gap-2">
-                                      {usuario.nombre}
-                                      {usuario.accesoGlobal && <ShieldCheck className="h-3.5 w-3.5 text-primary" title="Acceso Global" />}
-                                    </p>
-                                    <p className="text-muted-foreground text-xs font-body">{usuario.email}</p>
+                        <div key={usuario.docId} className="flex flex-col p-4 border rounded-xl bg-background hover:bg-muted/40 transition-all shadow-sm space-y-3">
+                           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="font-bold text-foreground text-sm truncate">{usuario.nombre}</p>
+                                  <Badge variant={'outline'} className={cn('font-body rounded-full px-2.5 py-0.5 text-[10px] tracking-wider', getRolBadge(usuario.rol))}>
+                                    {usuario.rol}
+                                  </Badge>
+                                  {usuario.accesoGlobal ? (
+                                    <Badge className="bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 text-[10px] font-semibold flex items-center gap-1">
+                                      <ArrowLeftRight className="h-3 w-3" />
+                                      Cambio de Sucursales Activo
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="text-muted-foreground text-[10px] border-border/60">
+                                      Solo sucursal base
+                                    </Badge>
+                                  )}
                                 </div>
-                                <div className="flex sm:justify-center">
-                                    <Badge variant={'outline'} className={cn('font-body rounded-full px-3 text-[10px] tracking-wider', getRolBadge(usuario.rol))}>{usuario.rol}</Badge>
-                                </div>
-                            </div>
-                           <div className="flex items-center gap-2 shrink-0 pt-4 sm:pt-0 sm:ml-auto">
+                                <p className="text-muted-foreground text-xs font-body mt-0.5">{usuario.email}</p>
+                              </div>
+
+                              <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
                                 <Button 
                                     variant="ghost" 
                                     size="icon" 
@@ -384,6 +438,61 @@ export default function PaginaUsuarios() {
                                     <Trash2 className="h-4 w-4" />
                                     <span className="sr-only">Eliminar</span>
                                 </Button>
+                              </div>
+                           </div>
+
+                           {/* Sección visible de sucursales autorizadas */}
+                           <div className="p-2.5 rounded-lg bg-muted/20 border border-border/50 flex flex-wrap items-center gap-1.5 text-xs">
+                             <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1 mr-1">
+                               <Building2 className="h-3.5 w-3.5 text-primary" />
+                               Sucursales que puede ver en la opción:
+                             </span>
+                             {(() => {
+                               if (!usuario.accesoGlobal) {
+                                 const sucBase = sucursales?.find(s => s.id === usuario.sucursalId);
+                                 return (
+                                   <Badge variant="outline" className="bg-background text-muted-foreground border-border/60 text-[10px]">
+                                     Únicamente sucursal base ({sucBase?.nombre || selectedSucursalNombre})
+                                   </Badge>
+                                 );
+                               }
+
+                               const permitidas = usuario.sucursalesPermitidas;
+                               const esTodas = !permitidas || permitidas.length === 0 || permitidas.length >= (sucursales || []).length;
+
+                               if (esTodas) {
+                                 return (
+                                   <div className="flex items-center gap-1.5 flex-wrap">
+                                     <Badge className="bg-primary/15 text-primary border-primary/30 text-[10px] font-bold">
+                                       Todas las sucursales ({sucursales?.length || 0})
+                                     </Badge>
+                                     {(sucursales || []).map(s => (
+                                       <span key={s.id} className="text-[10px] text-muted-foreground bg-background px-2 py-0.5 rounded border border-border/40">
+                                         {s.nombre}
+                                       </span>
+                                     ))}
+                                   </div>
+                                 );
+                               }
+
+                               return permitidas.map((sId) => {
+                                 const suc = sucursales?.find(s => s.id === sId);
+                                 const esBase = sId === usuario.sucursalId;
+                                 return (
+                                   <Badge
+                                     key={sId}
+                                     variant="outline"
+                                     className={cn(
+                                       "text-[10px] font-medium flex items-center gap-1",
+                                       esBase ? "border-primary/40 text-primary bg-primary/10 font-bold" : "border-border/60 text-foreground bg-background"
+                                     )}
+                                   >
+                                     {suc?.nombre || `Sucursal ${sId}`}
+                                     {esBase && <span className="text-[8px] bg-primary text-primary-foreground px-1 rounded-sm">Base</span>}
+                                   </Badge>
+                                 );
+                               });
+                             })()}
                            </div>
                         </div>
                     ))}
@@ -461,20 +570,96 @@ export default function PaginaUsuarios() {
                                 </Select>
                             </div>
 
-                            <div className="pt-4 mt-4 border-t border-dashed">
+                            <div className="pt-4 mt-4 border-t border-dashed space-y-3">
                                 <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/20">
                                     <div className="space-y-0.5">
                                         <Label htmlFor="acceso-global" className="font-bold flex items-center gap-2">
-                                            <ShieldCheck className="h-4 w-4 text-primary" /> Acceso Global
+                                            <ShieldCheck className="h-4 w-4 text-primary" /> Acceso Multi-sucursal (Cambio de Sucursales)
                                         </Label>
-                                        <p className="text-[10px] text-muted-foreground font-medium">Permitir saltar entre sucursales</p>
+                                        <p className="text-[10px] text-muted-foreground font-medium">Permite al usuario visualizar y saltar entre distintas sucursales</p>
                                     </div>
                                     <Switch
                                         id="acceso-global"
                                         checked={accesoGlobal}
-                                        onCheckedChange={setAccesoGlobal}
+                                        onCheckedChange={(checked) => {
+                                          setAccesoGlobal(checked);
+                                          if (checked && sucursalesPermitidas.length === 0) {
+                                            setSucursalesPermitidas((sucursales || []).map(s => s.id));
+                                          }
+                                        }}
                                     />
                                 </div>
+
+                                {accesoGlobal && (
+                                  <div className="p-4 bg-muted/20 rounded-2xl border border-border/60 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                      <div>
+                                        <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                                          <Building2 className="h-3.5 w-3.5 text-primary" />
+                                          Sucursales que podrá ver en su opción
+                                        </Label>
+                                        <p className="text-[10px] text-muted-foreground">
+                                          Selecciona las sucursales a las que este usuario tendrá permiso de cambiar.
+                                        </p>
+                                      </div>
+                                      <div className="flex items-center gap-1.5">
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="sm"
+                                          className="h-6 text-[10px] px-2.5 rounded-full"
+                                          onClick={() => setSucursalesPermitidas((sucursales || []).map(s => s.id))}
+                                        >
+                                          Todas
+                                        </Button>
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 text-[10px] px-2 text-muted-foreground"
+                                          onClick={() => setSucursalesPermitidas(selectedSucursalId ? [selectedSucursalId] : [])}
+                                        >
+                                          Solo base
+                                        </Button>
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 max-h-48 overflow-y-auto pr-1">
+                                      {(sucursales || []).map((s) => {
+                                        const isChecked = sucursalesPermitidas.includes(s.id);
+                                        const isBase = s.id === selectedSucursalId;
+                                        return (
+                                          <button
+                                            type="button"
+                                            key={s.id}
+                                            onClick={() => {
+                                              setSucursalesPermitidas(prev => 
+                                                prev.includes(s.id) ? prev.filter(id => id !== s.id) : [...prev, s.id]
+                                              );
+                                            }}
+                                            className={cn(
+                                              "flex items-center gap-2.5 p-2 rounded-xl border text-xs cursor-pointer transition-colors text-left w-full",
+                                              isChecked
+                                                ? "bg-primary/10 border-primary/30 text-foreground font-medium"
+                                                : "bg-background border-border/50 text-muted-foreground hover:bg-muted/40"
+                                            )}
+                                          >
+                                            <div className={cn(
+                                              "h-4 w-4 rounded flex items-center justify-center border transition-colors shrink-0",
+                                              isChecked ? "bg-primary border-primary text-primary-foreground" : "border-muted-foreground/40 bg-transparent"
+                                            )}>
+                                              {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
+                                            </div>
+                                            <div className="min-w-0 flex-1 truncate">
+                                              <span className="truncate block">{s.nombre}</span>
+                                              {isBase && <span className="text-[9px] text-primary font-semibold block">Sucursal Base</span>}
+                                            </div>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
                             </div>
                         </div>
                     </ScrollArea>

@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { InputNumero } from '@/components/ui/input-numero';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Loader2, Boxes, Search, AlertTriangle, Save, ClipboardCheck, ChevronLeft, ChevronRight, History, Pencil, ArrowLeft, MapPin } from 'lucide-react';
+import { Loader2, Boxes, Search, AlertTriangle, Save, ClipboardCheck, ChevronLeft, ChevronRight, History, Pencil, ArrowLeft, MapPin, ArrowLeftRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSucursal } from '@/hooks/use-sucursal';
 import { Badge } from '@/components/ui/badge';
@@ -196,11 +196,19 @@ export default function PaginaInventario() {
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto justify-center">
           {!isRevisionMode ? (
-            <PermissionGuard permission="inventario.revisar">
-              <Button onClick={() => setIsRevisionMode(true)} className="w-auto rounded-full font-medium">
-                <ClipboardCheck className="mr-2 h-4 w-4" /> Hacer revisión
+            <div className="flex items-center gap-2">
+              <Button variant="outline" asChild className="w-auto rounded-full font-medium">
+                <Link href="/dashboard/administracion/traslados">
+                  <ArrowLeftRight className="mr-2 h-4 w-4 text-primary" />
+                  Traslados
+                </Link>
               </Button>
-            </PermissionGuard>
+              <PermissionGuard permission="inventario.revisar">
+                <Button onClick={() => setIsRevisionMode(true)} className="w-auto rounded-full font-medium">
+                  <ClipboardCheck className="mr-2 h-4 w-4" /> Hacer revisión
+                </Button>
+              </PermissionGuard>
+            </div>
           ) : (
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button variant="outline" onClick={() => setIsRevisionMode(false)} className="flex-1 sm:w-auto rounded-full font-medium">

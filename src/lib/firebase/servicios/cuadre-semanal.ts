@@ -10,6 +10,7 @@ export interface CuadreSemanalData {
     totalIngresosEfectivo: number;
     totalIngresosTarjeta: number;
     totalIngresosTragamonedas: number;
+    totalIngresosTraslados?: number;
     totalCompras: number;
     totalGastos: number;
     balanceNetoCalculado: number;
@@ -23,6 +24,7 @@ export interface CuadreSemanalData {
     ingresosEfectivo: string[];
     ingresosTarjeta: string[];
     ingresosTragamonedas: string[];
+    ingresosTraslados?: string[];
     compras: string[];
     gastos: string[];
   };
@@ -107,6 +109,18 @@ export async function realizarCuadreSemanal(
     for (const id of data.idsProcesados.gastos) {
       const gastoRef = doc(firestore, `sucursales/${sucursalId}/gastos`, id);
       transaction.update(gastoRef, { estado: 'procesado' });
+    }
+
+    // Actualizar estado de traslados inter-sucursales liquidados (cobrados por el emisor)
+    if (data.idsProcesados.ingresosTraslados && data.idsProcesados.ingresosTraslados.length > 0) {
+      for (const id of data.idsProcesados.ingresosTraslados) {
+        const trasladoRef = doc(firestore, 'traslados', id);
+        transaction.update(trasladoRef, {
+          estadoLiquidacion: 'liquidado',
+          fechaLiquidacion: Timestamp.now(),
+          idCuadreSemanalOrigen: nuevoIdCuadre.toString()
+        });
+      }
     }
     
     // Actualizar saldos de cuentas si hay un balance a liquidar

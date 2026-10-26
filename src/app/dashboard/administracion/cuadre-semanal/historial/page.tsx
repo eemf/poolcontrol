@@ -22,7 +22,7 @@ import { Label } from '@/components/ui/label';
 
 type CuadreSemanalConId = CuadreSemanal & { id: string };
 
-const DetalleRegistrosProcesados = ({ ids, firestore, sucursalId, tipo, titulo }: { ids: string[], firestore: Firestore, sucursalId: string | null, tipo: 'movimiento' | 'compra' | 'gasto' | 'tragamonedas', titulo: string }) => {
+const DetalleRegistrosProcesados = ({ ids, firestore, sucursalId, tipo, titulo }: { ids: string[], firestore: Firestore, sucursalId: string | null, tipo: 'movimiento' | 'compra' | 'gasto' | 'tragamonedas' | 'traslado', titulo: string }) => {
     const [detalles, setDetalles] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +35,10 @@ const DetalleRegistrosProcesados = ({ ids, firestore, sucursalId, tipo, titulo }
         const fetchDetalles = async () => {
             setIsLoading(true);
             const detallesPromises = ids.map(id => {
+                if (tipo === 'traslado') {
+                    const docRef = doc(firestore, 'traslados', id);
+                    return getDoc(docRef);
+                }
                 let collectionName = '';
                 switch (tipo) {
                     case 'movimiento': collectionName = 'cierre_caja'; break;
@@ -66,19 +70,24 @@ const DetalleRegistrosProcesados = ({ ids, firestore, sucursalId, tipo, titulo }
             {isLoading ? <div className="flex justify-center p-2"><Loader2 className="h-4 w-4 animate-spin"/></div> 
             : (
                 <div className="space-y-2">
-                    {detalles.map(item => (
-                        <div key={item.id} className="flex justify-between items-center text-xs p-2.5 !bg-[#1d283a] rounded-lg border !border-[#324157]">
-                            <div>
-                                <p className="font-semibold text-foreground truncate max-w-40">
-                                    {tipo === 'movimiento' ? `Cierre Caja #${item.idCuadre}` : 
-                                     tipo === 'tragamonedas' ? `Cierre Tragamonedas #${item.idCuadre}` :
-                                     item.descripcion || item.proveedorNombre || `ID: ${item.id}`}
-                                </p>
-                                <p className="text-muted-foreground text-[11px]">{format(item.fecha.toDate(), "dd/MM/yy hh:mm a", { locale: es })}</p>
+                    {detalles.map(item => {
+                        const fechaDoc = item.fecha || item.fechaEnvio;
+                        const fechaStr = fechaDoc?.toDate ? format(fechaDoc.toDate(), "dd/MM/yy hh:mm a", { locale: es }) : 'N/A';
+                        return (
+                            <div key={item.id} className="flex justify-between items-center text-xs p-2.5 !bg-[#1d283a] rounded-lg border !border-[#324157]">
+                                <div>
+                                    <p className="font-semibold text-foreground truncate max-w-40">
+                                        {tipo === 'movimiento' ? `Cierre Caja #${item.idCuadre}` : 
+                                         tipo === 'tragamonedas' ? `Cierre Tragamonedas #${item.idCuadre}` :
+                                         tipo === 'traslado' ? `Traslado #TR-${item.idTraslado} a ${item.sucursalDestinoNombre}` :
+                                         item.descripcion || item.proveedorNombre || `ID: ${item.id}`}
+                                    </p>
+                                    <p className="text-muted-foreground text-[11px]">{fechaStr}</p>
+                                </div>
+                                <p className="font-bold text-foreground">Q{((item.totalLiquidado ?? item.pagosTarjeta ?? item.monto ?? item.montoTotal ?? item.gananciaATrasladar ?? item.costoTotalTraslado) ?? 0).toFixed(2)}</p>
                             </div>
-                            <p className="font-bold text-foreground">Q{((item.totalLiquidado ?? item.pagosTarjeta ?? item.monto ?? item.montoTotal ?? item.gananciaATrasladar) ?? 0).toFixed(2)}</p>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>
@@ -264,11 +273,12 @@ export default function HistorialCuadresSemanalesPage() {
                                                     <CardHeader className="p-0 pb-3"><p className="text-sm font-bold font-headline text-foreground">Registros Procesados</p></CardHeader>
                                                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 p-0">
                                                         <div className="space-y-4">
-                                                            <h4 className="text-[11px] font-bold text-emerald-400 flex items-center gap-2 tracking-wide"><ArrowUp size={14}/>Ingresos (Q{(cuadre.resumen.totalIngresosEfectivo + cuadre.resumen.totalIngresosTarjeta + (cuadre.resumen.totalIngresosTragamonedas || 0)).toFixed(2)})</h4>
+                                                            <h4 className="text-[11px] font-bold text-emerald-400 flex items-center gap-2 tracking-wide"><ArrowUp size={14}/>Ingresos (Q{(cuadre.resumen.totalIngresosEfectivo + cuadre.resumen.totalIngresosTarjeta + (cuadre.resumen.totalIngresosTragamonedas || 0) + (cuadre.resumen.totalIngresosTraslados || 0)).toFixed(2)})</h4>
                                                             <div className="space-y-4 border-l-2 !border-emerald-500/30 pl-4 ml-1">
                                                                 <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosEfectivo} firestore={firestore} sucursalId={sucursalId} tipo="movimiento" titulo="Cajas (Efectivo)" />
                                                                 <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTarjeta} firestore={firestore} sucursalId={sucursalId} tipo="movimiento" titulo="Cajas (Tarjeta)" />
                                                                 <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTragamonedas || []} firestore={firestore} sucursalId={sucursalId} tipo="tragamonedas" titulo="Tragamonedas" />
+                                                                <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTraslados || []} firestore={firestore} sucursalId={sucursalId} tipo="traslado" titulo="Cobros por Traslados" />
                                                             </div>
                                                         </div>
                                                         <div className="space-y-4">
