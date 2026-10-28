@@ -30,7 +30,8 @@ import {
   Boxes,
   Loader2,
   Calendar,
-  AlertTriangle
+  AlertTriangle,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -237,21 +238,25 @@ export default function PaginaTraslados() {
   return (
     <div className="space-y-6 font-body pb-10">
       {/* Cabecera Principal */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            <ArrowLeftRight className="h-6 w-6 text-primary" />
-            Traslados de Inventario entre Sucursales
-          </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Mueve existencias entre sucursales garantizando compras independientes y cuadres semanales transparentes.
-          </p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+            <ArrowLeftRight className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Traslados de Inventario entre Sucursales
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Mueve existencias entre sucursales garantizando compras independientes y cuadres semanales transparentes.
+            </p>
+          </div>
         </div>
 
         <PermissionGuard permission="inventario.ver">
           <Button
             onClick={() => setIsNuevoOpen(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full text-xs h-10 px-4 shadow-lg shadow-primary/20 flex items-center gap-2"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full text-xs h-10 px-5 shadow-md shadow-primary/20 flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Nuevo Traslado
@@ -259,124 +264,126 @@ export default function PaginaTraslados() {
         </PermissionGuard>
       </div>
 
-      {/* Tarjetas de Métricas Resumen */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Tarjetas de Métricas Resumen (Cuadrícula 2x2 en móvil para máxima ergonomía) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <Card
           onClick={() => setActiveTab('pendientes')}
-          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-amber-500/50 ${
+          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-amber-500/50 rounded-xl ${
             activeTab === 'pendientes' ? 'ring-2 ring-amber-500/40 border-amber-500/60' : ''
           }`}
         >
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
+            <div className="space-y-0.5 sm:space-y-1 min-w-0">
+              <span className="text-[11px] font-semibold text-slate-300 block truncate">
                 Por Recibir (Entrantes)
               </span>
-              <p className="text-2xl font-bold text-amber-400">{pendientesRecibir.length}</p>
-              <span className="text-[10px] text-slate-400">Envíos dirigidos a esta sucursal</span>
+              <p className="text-xl sm:text-2xl font-bold text-amber-400">{pendientesRecibir.length}</p>
+              <span className="text-[10px] text-slate-400 hidden sm:block truncate">Envíos dirigidos a esta sucursal</span>
             </div>
-            <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <PackageCheck className="h-6 w-6" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+              <PackageCheck className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
 
         <Card
           onClick={() => setActiveTab('en_transito')}
-          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-sky-500/50 ${
+          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-sky-500/50 rounded-xl ${
             activeTab === 'en_transito' ? 'ring-2 ring-sky-500/40 border-sky-500/60' : ''
           }`}
         >
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
+            <div className="space-y-0.5 sm:space-y-1 min-w-0">
+              <span className="text-[11px] font-semibold text-slate-300 block truncate">
                 En Tránsito (Salientes)
               </span>
-              <p className="text-2xl font-bold text-sky-400">{enviadosEnTransito.length}</p>
-              <span className="text-[10px] text-slate-400">Despachados desde esta sucursal</span>
+              <p className="text-xl sm:text-2xl font-bold text-sky-400">{enviadosEnTransito.length}</p>
+              <span className="text-[10px] text-slate-400 hidden sm:block truncate">Despachados desde esta sucursal</span>
             </div>
-            <div className="h-12 w-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
-              <Truck className="h-6 w-6" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+              <Truck className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
 
         <Card
           onClick={() => setActiveTab('todos')}
-          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-emerald-500/50 ${
+          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-emerald-500/50 rounded-xl ${
             activeTab === 'todos' ? 'ring-2 ring-emerald-500/40 border-emerald-500/60' : ''
           }`}
         >
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
+            <div className="space-y-0.5 sm:space-y-1 min-w-0">
+              <span className="text-[11px] font-semibold text-slate-300 block truncate">
                 Completados
               </span>
-              <p className="text-2xl font-bold text-emerald-400">{completados.length}</p>
-              <span className="text-[10px] text-slate-400">Recibidos y liquidados</span>
+              <p className="text-xl sm:text-2xl font-bold text-emerald-400">{completados.length}</p>
+              <span className="text-[10px] text-slate-400 hidden sm:block truncate">Recibidos y liquidados</span>
             </div>
-            <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <CheckCircle2 className="h-6 w-6" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+              <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#2d3e55] bg-[#1d283a]">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+        <Card className="border-[#2d3e55] bg-[#1d283a] rounded-xl">
+          <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
+            <div className="space-y-0.5 sm:space-y-1 min-w-0">
+              <span className="text-[11px] font-semibold text-slate-300 block truncate">
                 Total Movilizado
               </span>
-              <p className="text-2xl font-bold text-white">Q{totalValorMovilizado.toFixed(2)}</p>
-              <span className="text-[10px] text-slate-400">Costo total de mercancías</span>
+              <p className="text-xl sm:text-2xl font-bold text-white">Q{totalValorMovilizado.toFixed(2)}</p>
+              <span className="text-[10px] text-slate-400 hidden sm:block truncate">Costo total de mercancías</span>
             </div>
-            <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-              <DollarSign className="h-6 w-6" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+              <DollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Panel Principal de Listados con Tabs y Búsqueda */}
-      <Card className="border-[#2d3e55] bg-[#182330] shadow-sm overflow-hidden">
-        <CardHeader className="p-4 pb-3 border-b border-[#2d3e55] bg-[#1d283a]/60">
+      <Card className="border-[#2d3e55] bg-[#182330] shadow-sm overflow-hidden rounded-xl">
+        <CardHeader className="p-3 sm:p-4 pb-3 border-b border-[#2d3e55] bg-[#1d283a]/60">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            {/* Tabs */}
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full sm:w-auto">
-              <TabsList className="bg-[#182330] border border-[#2d3e55] p-1 rounded-xl h-10">
-                <TabsTrigger
-                  value="pendientes"
-                  className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5"
-                >
-                  <PackageCheck className="h-3.5 w-3.5" />
-                  Pendientes de Recepción
-                  {pendientesRecibir.length > 0 && (
-                    <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-black font-extrabold">
-                      {pendientesRecibir.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger
-                  value="en_transito"
-                  className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5"
-                >
-                  <Truck className="h-3.5 w-3.5" />
-                  Enviados en Tránsito
-                  {enviadosEnTransito.length > 0 && (
-                    <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-sky-500 text-white font-extrabold">
-                      {enviadosEnTransito.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger
-                  value="todos"
-                  className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5"
-                >
-                  <Boxes className="h-3.5 w-3.5" />
-                  Historial General
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            {/* Tabs con scroll horizontal nativo en mobile */}
+            <div className="w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full sm:w-auto">
+                <TabsList className="bg-[#182330] border border-[#2d3e55] p-1 rounded-xl h-10 flex min-w-max gap-1">
+                  <TabsTrigger
+                    value="pendientes"
+                    className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5 px-3"
+                  >
+                    <PackageCheck className="h-3.5 w-3.5 shrink-0" />
+                    <span>Pendientes de Recepción</span>
+                    {pendientesRecibir.length > 0 && (
+                      <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-black font-extrabold">
+                        {pendientesRecibir.length}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="en_transito"
+                    className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5 px-3"
+                  >
+                    <Truck className="h-3.5 w-3.5 shrink-0" />
+                    <span>Enviados en Tránsito</span>
+                    {enviadosEnTransito.length > 0 && (
+                      <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-sky-500 text-white font-extrabold">
+                        {enviadosEnTransito.length}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="todos"
+                    className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5 px-3"
+                  >
+                    <Boxes className="h-3.5 w-3.5 shrink-0" />
+                    <span>Historial General</span>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
 
             {/* Buscador */}
             <div className="relative w-full sm:w-64">
@@ -392,7 +399,110 @@ export default function PaginaTraslados() {
         </CardHeader>
 
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          {/* Vista Móvil: Tarjetas Adaptativas */}
+          <div className="block md:hidden divide-y divide-[#2d3e55]">
+            {listaFiltrada.length === 0 ? (
+              <div className="text-center py-12 px-4 text-slate-400 text-xs">
+                <Truck className="h-8 w-8 mx-auto text-slate-500 opacity-40 mb-2" />
+                <span>No hay traslados en esta sección.</span>
+              </div>
+            ) : (
+              listaFiltrada.map((t) => {
+                const esDestino = t.sucursalDestinoId === sucursalId;
+                const esOrigen = t.sucursalOrigenId === sucursalId;
+                const puedeRecibir = esDestino && t.estado === 'en_transito';
+                const puedeCancelar = esOrigen && t.estado === 'en_transito';
+
+                const fechaStr = t.fechaEnvio?.toDate
+                  ? format(t.fechaEnvio.toDate(), 'dd/MM/yyyy hh:mm a', { locale: es })
+                  : 'N/A';
+
+                return (
+                  <div key={t.id} className="p-3.5 space-y-3 bg-[#182330] hover:bg-[#1d283a] transition-colors">
+                    {/* Encabezado: Folio, Fecha y Estado */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-white">#TR-{t.idTraslado}</span>
+                        <span className="text-[11px] text-slate-400 font-medium">({fechaStr})</span>
+                      </div>
+                      <div>{renderBadgeEstado(t.estado)}</div>
+                    </div>
+
+                    {/* Ruta de Envío: Origen -> Destino */}
+                    <div className="p-2.5 rounded-xl bg-[#1d283a] border border-[#2d3e55] flex items-center justify-between text-xs gap-2">
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] text-slate-400 block font-medium">Origen</span>
+                        <span className={`font-semibold truncate block ${esOrigen ? 'text-primary' : 'text-slate-200'}`}>
+                          {t.sucursalOrigenNombre}
+                        </span>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-slate-500 shrink-0 mx-1" />
+                      <div className="flex-1 min-w-0 text-right">
+                        <span className="text-[10px] text-slate-400 block font-medium">Destino</span>
+                        <span className={`font-semibold truncate block ${esDestino ? 'text-emerald-400' : 'text-slate-200'}`}>
+                          {t.sucursalDestinoNombre}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Datos del Traslado: Unidades y Costo Total */}
+                    <div className="flex items-center justify-between text-xs px-0.5">
+                      <div>
+                        <span className="text-slate-400">Productos: </span>
+                        <strong className="text-white">{t.cantidadTotalItems} uds</strong>
+                        <span className="text-slate-400 text-[11px] ml-1">({t.items?.length || 0} ítems)</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Total: </span>
+                        <strong className="text-emerald-400 text-sm font-bold">Q{(t.costoTotalTraslado || 0).toFixed(2)}</strong>
+                      </div>
+                    </div>
+
+                    {/* Botones de Acción Móviles */}
+                    <div className="flex items-center gap-2 pt-0.5">
+                      {puedeRecibir && (
+                        <Button
+                          size="sm"
+                          onClick={() => setTrasladoParaRecibir(t)}
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs h-9 font-semibold shadow-sm flex items-center justify-center gap-1.5"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                          Recibir Traslado
+                        </Button>
+                      )}
+
+                      {puedeCancelar && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setTrasladoParaCancelar(t)}
+                          className="flex-1 border-rose-500/40 text-rose-300 hover:bg-rose-950/40 rounded-xl text-xs h-9 flex items-center justify-center gap-1.5"
+                        >
+                          <Undo2 className="h-3.5 w-3.5" />
+                          Cancelar
+                        </Button>
+                      )}
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setTrasladoParaDetalle(t)}
+                        className={`border-[#2d3e55] text-slate-300 hover:text-white hover:bg-[#2c3b4f] rounded-xl text-xs h-9 px-3 flex items-center justify-center gap-1.5 ${
+                          !puedeRecibir && !puedeCancelar ? 'w-full' : ''
+                        }`}
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        Ver Detalle
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Vista Escritorio: Tabla Completa */}
+          <div className="hidden md:block overflow-x-auto">
             <Table>
               <TableHeader className="bg-[#1d283a]">
                 <TableRow className="border-[#2d3e55] hover:bg-transparent">

@@ -120,7 +120,7 @@ function SelectorProductoDestino({
             </SelectItem>
             <SelectSeparator className="bg-[#2d3e55]" />
             <SelectGroup>
-              <SelectLabel className="text-[10px] uppercase text-slate-400 font-semibold px-2 py-1">
+              <SelectLabel className="text-[10px] text-slate-400 font-semibold px-2 py-1">
                 Vincular a producto existente en esta sucursal:
               </SelectLabel>
               {productosFiltrados.length === 0 ? (
@@ -241,7 +241,7 @@ export function RecibirTrasladoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-6 font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100">
         <DialogHeader className="space-y-1 pb-3 border-b border-[#2c3b4f]">
           <DialogTitle className="text-xl font-bold flex items-center gap-2 text-white">
             <CheckCircle2 className="h-5 w-5 text-emerald-400" />

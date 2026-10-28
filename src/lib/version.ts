@@ -12,9 +12,26 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
+    build: 310,
+    fecha: "2026-10-27",
+    estado: "publicada_actual",
+    tipo: "Parche",
+    tagGit: "v1.0.0-b310",
+    descripcion: "Diseño responsivo móvil y estandarización visual en el módulo de traslados de inventario.",
+    cambios: [
+      "Diseño móvil adaptativo: Implementación de tarjetas móviles (MobileTrasladoCard) para listados de traslados en pantallas pequeñas con desglose ergonómico de ruta, productos y acciones táctiles.",
+      "Métricas 2x2 en móvil: Reorganización de las 4 tarjetas de resumen en cuadrícula de dos columnas para dispositivos móviles.",
+      "Estandarización de cabecera: Aplicación del estándar oficial con contenedor responsive, icono en círculo traslúcido y botón de ancho adaptable.",
+      "Cumplimiento de reglas de diseño: Eliminación total de textos en mayúsculas sostenidas (ALL CAPS / uppercase) en tarjetas y selectores, aplicando Tipo Título.",
+      "Pestañas móviles con scroll suave: Contenedor horizontal con scroll nativo para pestañas de filtrado de traslados sin cortes de texto.",
+      "Modales optimizados para móvil: Ajuste de espaciado interior (p-4 sm:p-6) y radios redondeados en modales de traslado."
+    ]
+  },
+  {
+    version: "1.0.0",
     build: 309,
     fecha: "2026-10-26",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Menor",
     tagGit: "v1.0.0-b309",
     descripcion: "Sistema integral de traslados de inventario entre sucursales, homologación de catálogo en recepción, liquidación en cuadre semanal y control de permisos de usuario.",
@@ -30,7 +47,7 @@ export const releaseHistory: ReleaseItem[] = [
     version: "1.0.0",
     build: 308,
     fecha: "2026-10-21",
-    estado: "publicada_anterior",
+    estado: "archivada",
     tipo: "Parche",
     tagGit: "v1.0.0-b308",
     descripcion: "Flujo de monedas desacoplado de pagos, auditoría de despachos y simplificación de interfaz en monitoreo integral.",
@@ -814,9 +831,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "1.0.0",
-  build: 309,
-  date: "2026-10-26",
-  publicadaActual: releaseHistory[0], // Build 309
-  publicadaAnterior: releaseHistory[1], // Build 308
+  build: 310,
+  date: "2026-10-27",
+  publicadaActual: releaseHistory[0], // Build 310
+  publicadaAnterior: releaseHistory[1], // Build 309
   historial: releaseHistory
 };

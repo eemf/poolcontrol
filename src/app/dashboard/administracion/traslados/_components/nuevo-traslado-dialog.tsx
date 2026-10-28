@@ -323,7 +323,7 @@ export function NuevoTrasladoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-6 font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100">
         <DialogHeader className="space-y-1 pb-3 border-b border-[#2c3b4f]">
           <DialogTitle className="text-xl font-bold flex items-center gap-2 text-white">
             <Truck className="h-5 w-5 text-primary" />
