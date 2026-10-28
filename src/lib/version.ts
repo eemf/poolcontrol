@@ -12,9 +12,40 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "1.0.0",
-    build: 310,
+    build: 312,
     fecha: "2026-10-27",
     estado: "publicada_actual",
+    tipo: "Parche",
+    tagGit: "v1.0.0-b312",
+    descripcion: "Ajuste de legibilidad: Breve descripción de cabecera en Traslados y badges numéricos nítidos de alto contraste en pestañas.",
+    cambios: [
+      "Descripción concisa en cabecera: Incorporación de 'Envío y recepción de inventario entre sucursales' bajo el título.",
+      "Corrección de forma y geometría de badges: Reemplazo del formato achatado por cápsulas circulares simétricas nítidas (min-w-[20px] h-5 rounded-full).",
+      "Alto contraste de color en conteos: Badge blanco puro con números oscuros para 'Enviados' y ámbar dorado para 'Pendientes', resolviendo la mezcla de color sobre fondos azules."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 311,
+    fecha: "2026-10-27",
+    estado: "publicada_anterior",
+    tipo: "Parche",
+    tagGit: "v1.0.0-b311",
+    descripcion: "Rediseño integral de Traslados: tarjetas responsivas, paleta oficial (#1d283a, #283244, #324157), pestañas estándar y botones píldora.",
+    cambios: [
+      "Simplificación del encabezado: Título directo 'Traslados' sin descripción adicional.",
+      "Eliminación de tarjetas de métricas: Maximización del área de trabajo eliminando contadores redundantes.",
+      "Pestañas estándar tipo píldora (rounded-full): Nombres simplificados a 'Pendientes', 'Enviados' e 'Historial' con badges de conteo integrados y barra #283244.",
+      "Paleta oficial de contenedores: Contenedor principal en #1d283a, bordes en #324157, buscador y tarjetas en #283244.",
+      "Formato de tarjetas responsivas: Reemplazo de tablas rígidas por tarjetas móviles y adaptables que eliminan el desbordamiento horizontal.",
+      "Botones píldora redondeados (rounded-full): Estandarización visual de los botones Recibir, Cancelar y Ver Detalle."
+    ]
+  },
+  {
+    version: "1.0.0",
+    build: 310,
+    fecha: "2026-10-27",
+    estado: "publicada_anterior",
     tipo: "Parche",
     tagGit: "v1.0.0-b310",
     descripcion: "Diseño responsivo móvil y estandarización visual en el módulo de traslados de inventario.",

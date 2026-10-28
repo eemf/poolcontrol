@@ -22,23 +22,18 @@ import {
   XCircle,
   Plus,
   Search,
-  Filter,
   Eye,
   Undo2,
-  Building2,
-  DollarSign,
   Boxes,
   Loader2,
-  Calendar,
   AlertTriangle,
   ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -136,16 +131,6 @@ export default function PaginaTraslados() {
     );
   }, [todosTraslados, sucursalId]);
 
-  const completados = useMemo(() => {
-    return todosTraslados.filter((t) => t.estado === 'recibido');
-  }, [todosTraslados]);
-
-  const totalValorMovilizado = useMemo(() => {
-    return todosTraslados
-      .filter((t) => t.estado !== 'cancelado')
-      .reduce((acc, t) => acc + (t.costoTotalTraslado || 0), 0);
-  }, [todosTraslados]);
-
   // Lista según pestaña y búsqueda
   const listaFiltrada = useMemo(() => {
     let base = todosTraslados;
@@ -202,27 +187,27 @@ export default function PaginaTraslados() {
     switch (estado) {
       case 'en_transito':
         return (
-          <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 flex items-center gap-1 w-fit text-[11px]">
+          <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] px-2.5 py-0.5">
             <Clock className="h-3 w-3" />
-            En Tránsito
+            <span>En Tránsito</span>
           </Badge>
         );
       case 'recibido':
         return (
-          <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 flex items-center gap-1 w-fit text-[11px]">
+          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] px-2.5 py-0.5">
             <CheckCircle2 className="h-3 w-3" />
-            Recibido
+            <span>Recibido</span>
           </Badge>
         );
       case 'cancelado':
         return (
-          <Badge className="bg-rose-500/20 text-rose-300 border-rose-500/30 flex items-center gap-1 w-fit text-[11px]">
+          <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] px-2.5 py-0.5">
             <XCircle className="h-3 w-3" />
-            Cancelado
+            <span>Cancelado</span>
           </Badge>
         );
       default:
-        return <Badge variant="outline">{estado}</Badge>;
+        return <Badge variant="outline" className="rounded-full text-[11px]">{estado}</Badge>;
     }
   };
 
@@ -236,19 +221,19 @@ export default function PaginaTraslados() {
   }
 
   return (
-    <div className="space-y-6 font-body pb-10">
+    <div className="space-y-4 font-body pb-10">
       {/* Cabecera Principal */}
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+          <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
             <ArrowLeftRight className="h-5 w-5" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Traslados de Inventario entre Sucursales
+              Traslados
             </h1>
             <p className="text-xs text-slate-400 mt-0.5">
-              Mueve existencias entre sucursales garantizando compras independientes y cuadres semanales transparentes.
+              Envío y recepción de inventario entre sucursales.
             </p>
           </div>
         </div>
@@ -256,7 +241,7 @@ export default function PaginaTraslados() {
         <PermissionGuard permission="inventario.ver">
           <Button
             onClick={() => setIsNuevoOpen(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full text-xs h-10 px-5 shadow-md shadow-primary/20 flex items-center justify-center gap-2 w-full sm:w-auto"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full text-xs h-9 px-4 shadow-md shadow-primary/20 flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Nuevo Traslado
@@ -264,150 +249,71 @@ export default function PaginaTraslados() {
         </PermissionGuard>
       </div>
 
-      {/* Tarjetas de Métricas Resumen (Cuadrícula 2x2 en móvil para máxima ergonomía) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-        <Card
-          onClick={() => setActiveTab('pendientes')}
-          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-amber-500/50 rounded-xl ${
-            activeTab === 'pendientes' ? 'ring-2 ring-amber-500/40 border-amber-500/60' : ''
-          }`}
-        >
-          <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
-            <div className="space-y-0.5 sm:space-y-1 min-w-0">
-              <span className="text-[11px] font-semibold text-slate-300 block truncate">
-                Por Recibir (Entrantes)
-              </span>
-              <p className="text-xl sm:text-2xl font-bold text-amber-400">{pendientesRecibir.length}</p>
-              <span className="text-[10px] text-slate-400 hidden sm:block truncate">Envíos dirigidos a esta sucursal</span>
-            </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
-              <PackageCheck className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card
-          onClick={() => setActiveTab('en_transito')}
-          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-sky-500/50 rounded-xl ${
-            activeTab === 'en_transito' ? 'ring-2 ring-sky-500/40 border-sky-500/60' : ''
-          }`}
-        >
-          <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
-            <div className="space-y-0.5 sm:space-y-1 min-w-0">
-              <span className="text-[11px] font-semibold text-slate-300 block truncate">
-                En Tránsito (Salientes)
-              </span>
-              <p className="text-xl sm:text-2xl font-bold text-sky-400">{enviadosEnTransito.length}</p>
-              <span className="text-[10px] text-slate-400 hidden sm:block truncate">Despachados desde esta sucursal</span>
-            </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
-              <Truck className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card
-          onClick={() => setActiveTab('todos')}
-          className={`cursor-pointer transition-all border-[#2d3e55] bg-[#1d283a] hover:border-emerald-500/50 rounded-xl ${
-            activeTab === 'todos' ? 'ring-2 ring-emerald-500/40 border-emerald-500/60' : ''
-          }`}
-        >
-          <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
-            <div className="space-y-0.5 sm:space-y-1 min-w-0">
-              <span className="text-[11px] font-semibold text-slate-300 block truncate">
-                Completados
-              </span>
-              <p className="text-xl sm:text-2xl font-bold text-emerald-400">{completados.length}</p>
-              <span className="text-[10px] text-slate-400 hidden sm:block truncate">Recibidos y liquidados</span>
-            </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-              <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-[#2d3e55] bg-[#1d283a] rounded-xl">
-          <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
-            <div className="space-y-0.5 sm:space-y-1 min-w-0">
-              <span className="text-[11px] font-semibold text-slate-300 block truncate">
-                Total Movilizado
-              </span>
-              <p className="text-xl sm:text-2xl font-bold text-white">Q{totalValorMovilizado.toFixed(2)}</p>
-              <span className="text-[10px] text-slate-400 hidden sm:block truncate">Costo total de mercancías</span>
-            </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-              <DollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Panel Principal de Listados con Tabs y Búsqueda */}
-      <Card className="border-[#2d3e55] bg-[#182330] shadow-sm overflow-hidden rounded-xl">
-        <CardHeader className="p-3 sm:p-4 pb-3 border-b border-[#2d3e55] bg-[#1d283a]/60">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            {/* Tabs con scroll horizontal nativo en mobile */}
-            <div className="w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
-              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full sm:w-auto">
-                <TabsList className="bg-[#182330] border border-[#2d3e55] p-1 rounded-xl h-10 flex min-w-max gap-1">
+      {/* Contenedor Principal de Listado */}
+      <Card className="border !border-[#324157] !bg-[#1d283a] shadow-sm overflow-hidden rounded-xl">
+        <CardHeader className="p-3 sm:p-4 border-b !border-[#324157] !bg-[#1d283a]">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            {/* Pestañas en formato píldora estándar */}
+            <div className="w-full md:w-auto">
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+                <TabsList className="grid grid-cols-3 w-full md:w-[420px] h-11 p-1 bg-[#283244] rounded-full border border-[#324157] gap-1">
                   <TabsTrigger
                     value="pendientes"
-                    className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5 px-3"
+                    className="rounded-full text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-1.5 px-2 transition-all"
                   >
                     <PackageCheck className="h-3.5 w-3.5 shrink-0" />
-                    <span>Pendientes de Recepción</span>
+                    <span>Pendientes</span>
                     {pendientesRecibir.length > 0 && (
-                      <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-black font-extrabold">
+                      <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-black leading-none bg-amber-400 text-slate-950 shadow-sm shrink-0">
                         {pendientesRecibir.length}
                       </span>
                     )}
                   </TabsTrigger>
                   <TabsTrigger
                     value="en_transito"
-                    className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5 px-3"
+                    className="rounded-full text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-1.5 px-2 transition-all"
                   >
                     <Truck className="h-3.5 w-3.5 shrink-0" />
-                    <span>Enviados en Tránsito</span>
+                    <span>Enviados</span>
                     {enviadosEnTransito.length > 0 && (
-                      <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-sky-500 text-white font-extrabold">
+                      <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-black leading-none bg-white text-slate-950 shadow-sm shrink-0">
                         {enviadosEnTransito.length}
                       </span>
                     )}
                   </TabsTrigger>
                   <TabsTrigger
                     value="todos"
-                    className="rounded-lg text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-1.5 px-3"
+                    className="rounded-full text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-1.5 px-2 transition-all"
                   >
                     <Boxes className="h-3.5 w-3.5 shrink-0" />
-                    <span>Historial General</span>
+                    <span>Historial</span>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
 
-            {/* Buscador */}
-            <div className="relative w-full sm:w-64">
+            {/* Buscador redondeado */}
+            <div className="relative w-full md:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <Input
                 placeholder="Buscar por #, sucursal, producto..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
-                className="pl-9 bg-[#182330] border-[#2d3e55] text-white text-xs h-9 rounded-full"
+                className="pl-9 bg-[#283244] border-[#324157] text-white placeholder:text-slate-400 text-xs h-10 rounded-full focus-visible:ring-1 focus-visible:ring-primary"
               />
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="p-0">
-          {/* Vista Móvil: Tarjetas Adaptativas */}
-          <div className="block md:hidden divide-y divide-[#2d3e55]">
-            {listaFiltrada.length === 0 ? (
-              <div className="text-center py-12 px-4 text-slate-400 text-xs">
-                <Truck className="h-8 w-8 mx-auto text-slate-500 opacity-40 mb-2" />
-                <span>No hay traslados en esta sección.</span>
-              </div>
-            ) : (
-              listaFiltrada.map((t) => {
+        <CardContent className="p-3 sm:p-4 !bg-[#1d283a]">
+          {listaFiltrada.length === 0 ? (
+            <div className="text-center py-12 px-4 text-slate-400 text-xs">
+              <Truck className="h-8 w-8 mx-auto text-slate-500 opacity-40 mb-2" />
+              <span>No hay traslados en esta sección.</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {listaFiltrada.map((t) => {
                 const esDestino = t.sucursalDestinoId === sucursalId;
                 const esOrigen = t.sucursalOrigenId === sucursalId;
                 const puedeRecibir = esDestino && t.estado === 'en_transito';
@@ -418,56 +324,61 @@ export default function PaginaTraslados() {
                   : 'N/A';
 
                 return (
-                  <div key={t.id} className="p-3.5 space-y-3 bg-[#182330] hover:bg-[#1d283a] transition-colors">
-                    {/* Encabezado: Folio, Fecha y Estado */}
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-white">#TR-{t.idTraslado}</span>
-                        <span className="text-[11px] text-slate-400 font-medium">({fechaStr})</span>
+                  <div
+                    key={t.id}
+                    className="rounded-xl border !border-[#324157] !bg-[#283244] p-3.5 space-y-3 shadow-sm hover:border-slate-500/60 transition-all flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      {/* Encabezado: Folio, Fecha y Estado */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xs font-bold text-white shrink-0">#TR-{t.idTraslado}</span>
+                          <span className="text-[11px] text-slate-400 font-medium truncate">({fechaStr})</span>
+                        </div>
+                        <div className="shrink-0">{renderBadgeEstado(t.estado)}</div>
                       </div>
-                      <div>{renderBadgeEstado(t.estado)}</div>
+
+                      {/* Ruta de Envío: Origen -> Destino */}
+                      <div className="p-2.5 rounded-xl !bg-[#1d283a] border !border-[#324157] flex items-center justify-between text-xs gap-2">
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[10px] text-slate-400 block font-medium">Origen</span>
+                          <span className={`font-semibold truncate block ${esOrigen ? 'text-primary' : 'text-slate-200'}`}>
+                            {t.sucursalOrigenNombre}
+                          </span>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-slate-400 shrink-0 mx-1" />
+                        <div className="flex-1 min-w-0 text-right">
+                          <span className="text-[10px] text-slate-400 block font-medium">Destino</span>
+                          <span className={`font-semibold truncate block ${esDestino ? 'text-emerald-400' : 'text-slate-200'}`}>
+                            {t.sucursalDestinoNombre}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Datos del Traslado: Unidades y Costo Total */}
+                      <div className="flex items-center justify-between text-xs px-0.5">
+                        <div>
+                          <span className="text-slate-400">Productos: </span>
+                          <strong className="text-white">{t.cantidadTotalItems} uds</strong>
+                          <span className="text-slate-400 text-[11px] ml-1">({t.items?.length || 0} ítems)</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400">Total: </span>
+                          <strong className="text-emerald-400 text-sm font-bold">Q{(t.costoTotalTraslado || 0).toFixed(2)}</strong>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Ruta de Envío: Origen -> Destino */}
-                    <div className="p-2.5 rounded-xl bg-[#1d283a] border border-[#2d3e55] flex items-center justify-between text-xs gap-2">
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[10px] text-slate-400 block font-medium">Origen</span>
-                        <span className={`font-semibold truncate block ${esOrigen ? 'text-primary' : 'text-slate-200'}`}>
-                          {t.sucursalOrigenNombre}
-                        </span>
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-slate-500 shrink-0 mx-1" />
-                      <div className="flex-1 min-w-0 text-right">
-                        <span className="text-[10px] text-slate-400 block font-medium">Destino</span>
-                        <span className={`font-semibold truncate block ${esDestino ? 'text-emerald-400' : 'text-slate-200'}`}>
-                          {t.sucursalDestinoNombre}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Datos del Traslado: Unidades y Costo Total */}
-                    <div className="flex items-center justify-between text-xs px-0.5">
-                      <div>
-                        <span className="text-slate-400">Productos: </span>
-                        <strong className="text-white">{t.cantidadTotalItems} uds</strong>
-                        <span className="text-slate-400 text-[11px] ml-1">({t.items?.length || 0} ítems)</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400">Total: </span>
-                        <strong className="text-emerald-400 text-sm font-bold">Q{(t.costoTotalTraslado || 0).toFixed(2)}</strong>
-                      </div>
-                    </div>
-
-                    {/* Botones de Acción Móviles */}
-                    <div className="flex items-center gap-2 pt-0.5">
+                    {/* Botones de Acción Estilizados */}
+                    <div className="flex items-center gap-2 pt-2 border-t border-[#324157]/60">
                       {puedeRecibir && (
                         <Button
                           size="sm"
                           onClick={() => setTrasladoParaRecibir(t)}
-                          className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs h-9 font-semibold shadow-sm flex items-center justify-center gap-1.5"
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-xs h-8 px-3 font-semibold shadow-sm flex items-center justify-center gap-1.5 transition-all"
                         >
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          Recibir Traslado
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                          <span>Recibir</span>
                         </Button>
                       )}
 
@@ -476,10 +387,10 @@ export default function PaginaTraslados() {
                           size="sm"
                           variant="outline"
                           onClick={() => setTrasladoParaCancelar(t)}
-                          className="flex-1 border-rose-500/40 text-rose-300 hover:bg-rose-950/40 rounded-xl text-xs h-9 flex items-center justify-center gap-1.5"
+                          className="flex-1 border-rose-500/40 text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 rounded-full text-xs h-8 px-3 flex items-center justify-center gap-1.5 transition-all"
                         >
-                          <Undo2 className="h-3.5 w-3.5" />
-                          Cancelar
+                          <Undo2 className="h-3.5 w-3.5 shrink-0" />
+                          <span>Cancelar</span>
                         </Button>
                       )}
 
@@ -487,131 +398,19 @@ export default function PaginaTraslados() {
                         size="sm"
                         variant="outline"
                         onClick={() => setTrasladoParaDetalle(t)}
-                        className={`border-[#2d3e55] text-slate-300 hover:text-white hover:bg-[#2c3b4f] rounded-xl text-xs h-9 px-3 flex items-center justify-center gap-1.5 ${
+                        className={`border-[#324157] bg-[#1d283a] text-slate-300 hover:text-white hover:bg-[#283244] rounded-full text-xs h-8 px-3.5 flex items-center justify-center gap-1.5 transition-all ${
                           !puedeRecibir && !puedeCancelar ? 'w-full' : ''
                         }`}
                       >
-                        <Eye className="h-3.5 w-3.5" />
-                        Ver Detalle
+                        <Eye className="h-3.5 w-3.5 shrink-0" />
+                        <span>Ver Detalle</span>
                       </Button>
                     </div>
                   </div>
                 );
-              })
-            )}
-          </div>
-
-          {/* Vista Escritorio: Tabla Completa */}
-          <div className="hidden md:block overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-[#1d283a]">
-                <TableRow className="border-[#2d3e55] hover:bg-transparent">
-                  <TableHead className="text-slate-300 text-xs py-3">Folio</TableHead>
-                  <TableHead className="text-slate-300 text-xs py-3">Fecha Envío</TableHead>
-                  <TableHead className="text-slate-300 text-xs py-3">Sucursal Origen</TableHead>
-                  <TableHead className="text-slate-300 text-xs py-3">Sucursal Destino</TableHead>
-                  <TableHead className="text-slate-300 text-xs text-center py-3">Productos</TableHead>
-                  <TableHead className="text-slate-300 text-xs text-right py-3">Valor Total</TableHead>
-                  <TableHead className="text-slate-300 text-xs text-center py-3">Estado</TableHead>
-                  <TableHead className="text-slate-300 text-xs text-right py-3 pr-4">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {listaFiltrada.length === 0 ? (
-                  <TableRow className="border-[#2d3e55]">
-                    <TableCell colSpan={8} className="text-center py-12 text-slate-400 text-xs">
-                      <div className="flex flex-col items-center justify-center space-y-2">
-                        <Truck className="h-8 w-8 text-slate-500 opacity-40" />
-                        <span>No hay traslados en esta sección.</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  listaFiltrada.map((t) => {
-                    const esDestino = t.sucursalDestinoId === sucursalId;
-                    const esOrigen = t.sucursalOrigenId === sucursalId;
-                    const puedeRecibir = esDestino && t.estado === 'en_transito';
-                    const puedeCancelar = esOrigen && t.estado === 'en_transito';
-
-                    const fechaStr = t.fechaEnvio?.toDate
-                      ? format(t.fechaEnvio.toDate(), 'dd/MM/yyyy hh:mm a', { locale: es })
-                      : 'N/A';
-
-                    return (
-                      <TableRow key={t.id} className="border-[#2d3e55] hover:bg-[#202d3e]">
-                        <TableCell className="py-3 text-xs font-bold text-white">
-                          #TR-{t.idTraslado}
-                        </TableCell>
-                        <TableCell className="py-3 text-xs text-slate-300 whitespace-nowrap">
-                          {fechaStr}
-                        </TableCell>
-                        <TableCell className="py-3 text-xs font-medium text-slate-200">
-                          <span className={esOrigen ? 'text-primary font-bold' : ''}>
-                            {t.sucursalOrigenNombre}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-3 text-xs font-medium text-slate-200">
-                          <span className={esDestino ? 'text-emerald-400 font-bold' : ''}>
-                            {t.sucursalDestinoNombre}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-3 text-xs text-center text-slate-300">
-                          <span className="font-semibold text-white">{t.cantidadTotalItems} uds</span>
-                          <span className="text-[10px] text-slate-400 block">
-                            ({t.items?.length || 0} prod.)
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-3 text-xs text-right font-bold text-emerald-400 whitespace-nowrap">
-                          Q{(t.costoTotalTraslado || 0).toFixed(2)}
-                        </TableCell>
-                        <TableCell className="py-3 text-center">
-                          <div className="flex justify-center">
-                            {renderBadgeEstado(t.estado)}
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-3 text-right pr-4">
-                          <div className="flex items-center justify-end gap-1.5">
-                            {puedeRecibir && (
-                              <Button
-                                size="sm"
-                                onClick={() => setTrasladoParaRecibir(t)}
-                                className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-xs h-7 px-3 font-semibold shadow-sm"
-                              >
-                                <CheckCircle2 className="h-3 w-3 mr-1" />
-                                Recibir
-                              </Button>
-                            )}
-
-                            {puedeCancelar && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setTrasladoParaCancelar(t)}
-                                className="border-rose-500/40 text-rose-300 hover:bg-rose-950/40 rounded-full text-xs h-7 px-2.5"
-                              >
-                                <Undo2 className="h-3 w-3 mr-1" />
-                                Cancelar
-                              </Button>
-                            )}
-
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setTrasladoParaDetalle(t)}
-                              className="text-slate-300 hover:text-white hover:bg-[#2c3b4f] rounded-full text-xs h-7 px-2.5"
-                            >
-                              <Eye className="h-3 w-3 mr-1" />
-                              Ver
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          </div>
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
 
