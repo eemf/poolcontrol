@@ -342,7 +342,7 @@ export async function pasarACuenta(firestore: Firestore, sucursalId: string, usu
             idDetalle: siguienteIdDetalle++, idProducto: consumo.idProducto, nombreProducto: consumo.nombreProducto, 
             cantidad: consumo.cantidad, precioUnitario: consumo.precioUnitario, subtotal: consumo.total, 
             saldo: consumo.total, pagadoEfectivo: 0, pagadoTarjeta: 0, metodoPago: null, estado: 'Pendiente de pago', 
-            fechaAgregado: Timestamp.now(), esVirtual: !!consumo.esVirtual,
+            fechaAgregado: consumo.fechaAgregado || Timestamp.now(), esVirtual: !!consumo.esVirtual,
             metadata: { tipo: 'consumo' }
         }));
         
@@ -351,7 +351,7 @@ export async function pasarACuenta(firestore: Firestore, sucursalId: string, usu
             const ms = mesa.horaInicio ? Math.max(0, ahoraSincronizada - toDate(mesa.horaInicio).getTime()) : 0;
             const tStr = formatMsToTime(ms);
             const labelEstacion = mesa.tipoDeMesa === 'Consola' ? 'Consola' : 'Mesa';
-            nuevosDetalles.push({ 
+            nuevosDetalles.unshift({ 
                 idDetalle: siguienteIdDetalle++, idProducto: `mesa-${mesa.id}`, 
                 nombreProducto: `Tiempo ${labelEstacion} #${mesa.numeroMesa} (${tStr})`, 
                 cantidad: 1, precioUnitario: costoAlquilerFinal, subtotal: costoAlquilerFinal, 
@@ -367,6 +367,9 @@ export async function pasarACuenta(firestore: Firestore, sucursalId: string, usu
             });
         }
         
+        const ordenarPorFechaDesc = (items: DetalleVenta[]) =>
+            [...items].sort((a, b) => toDate(b.fechaAgregado).getTime() - toDate(a.fechaAgregado).getTime());
+
         const totalNuevosItems = nuevosDetalles.reduce((sum, item) => sum + item.subtotal, 0);
         if (querySnapshot.empty) {
             const corrVDoc = await transaction.get(doc(firestore, `sucursales/${sid}/correlativos`, 'ventas'));
@@ -380,13 +383,14 @@ export async function pasarACuenta(firestore: Firestore, sucursalId: string, usu
                 saldo: totalNuevosItems, 
                 tipoVenta: 'POS', 
                 estado: 'Pendiente de pago', 
-                detalles: nuevosDetalles 
+                detalles: ordenarPorFechaDesc(nuevosDetalles) 
             });
             transaction.set(corrVDoc.ref, { correlativo: nuevoIdV }, { merge: true });
         } else {
             const vDoc = querySnapshot.docs[0];
             const vData = vDoc.data() as Venta;
-            transaction.update(vDoc.ref, { total: increment(totalNuevosItems), saldo: increment(totalNuevosItems), detalles: [...vData.detalles, ...nuevosDetalles] });
+            const detallesCombinados = ordenarPorFechaDesc([...nuevosDetalles, ...(vData.detalles || [])]);
+            transaction.update(vDoc.ref, { total: increment(totalNuevosItems), saldo: increment(totalNuevosItems), detalles: detallesCombinados });
         }
         
         transaction.set(corrDetalleDoc.ref, { correlativo: siguienteIdDetalle - 1 }, { merge: true });
@@ -715,13 +719,16 @@ export async function procesarPagoDivision(
         };
         
         if (metodo === 'A Cuenta' && vSnap && !vSnap.empty) {
-            // SI YA EXISTE UNA CUENTA ABIERTA: Actualizarla
+            // SI YA EXISTE UNA CUENTA ABIERTA: Actualizarla en orden cronológico (más reciente primero)
             const vDoc = vSnap.docs[0];
             const vData = vDoc.data() as Venta;
+            const detallesOrdenados = [det, ...(vData.detalles || [])].sort(
+                (a, b) => toDate(b.fechaAgregado).getTime() - toDate(a.fechaAgregado).getTime()
+            );
             transaction.update(vDoc.ref, { 
                 total: increment(monto), 
                 saldo: increment(monto), 
-                detalles: [...vData.detalles, det] 
+                detalles: detallesOrdenados 
             });
         } else {
             // SI ES PAGO EN SITIO O NO HAY CUENTA ABIERTA: Crear nueva venta

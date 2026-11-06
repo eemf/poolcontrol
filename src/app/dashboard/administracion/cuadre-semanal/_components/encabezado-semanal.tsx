@@ -1,29 +1,32 @@
 'use client';
 
+import { PageHeader } from "@/components/comunes";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, History } from "lucide-react";
 import Link from "next/link";
 
 interface EncabezadoSemanalProps {
-  hayDatosPendientes: boolean;
+  hayDatosPendientes?: boolean;
 }
 
-export function EncabezadoSemanal({ hayDatosPendientes }: EncabezadoSemanalProps) {
+export function EncabezadoSemanal({ }: EncabezadoSemanalProps) {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight font-headline flex items-center justify-center sm:justify-start gap-2 text-foreground">
-          <CalendarDays className="h-6 w-6 text-primary" />
-          Cuadre Semanal
-        </h1>
-        <p className="text-sm text-muted-foreground hidden sm:block">Consolida los ingresos y egresos pendientes para generar un reporte.</p>
-      </div>
-      <Link href="/dashboard/administracion/cuadre-semanal/historial" className="w-full sm:w-auto">
-        <Button variant="outline" className="w-full sm:w-auto rounded-full h-10 px-6 font-bold shadow-xs">
-          <History className="mr-2 h-4 w-4" /> 
-          Historial
+    <PageHeader
+      title="Cuadre Semanal"
+      description="Consolidación y liquidación de ingresos, egresos y traslados pendientes."
+      icon={CalendarDays}
+      action={
+        <Button
+          variant="outline"
+          asChild
+          className="w-full sm:w-auto rounded-full h-9 px-4 text-xs font-semibold border-[#324157] bg-[#283244] text-slate-200 hover:text-white"
+        >
+          <Link href="/dashboard/administracion/cuadre-semanal/historial">
+            <History className="mr-1.5 h-3.5 w-3.5 text-primary" />
+            Historial
+          </Link>
         </Button>
-      </Link>
-    </div>
+      }
+    />
   );
 }

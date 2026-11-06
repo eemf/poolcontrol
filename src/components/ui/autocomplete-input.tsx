@@ -232,26 +232,29 @@ export const AutocompleteInput = React.forwardRef<
           </button>
         )}
         {isOpen && hasContentToShow && (
-            <div className="absolute top-full z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95">
+            <div className="absolute top-full z-50 mt-1.5 w-full rounded-2xl border border-[#324157] bg-[#1d283a] text-slate-200 shadow-2xl outline-none animate-in fade-in-0 zoom-in-95 overflow-hidden">
               <ScrollArea className="max-h-60">
-                <div className="p-1">
+                <div className="p-1.5 space-y-0.5">
                   {filteredOptions.map((option, index) => (
                       <div
                         key={option.value}
+                        onMouseEnter={() => setHighlightedIndex(index)}
                         onMouseDown={(e) => {
                           e.preventDefault();
                           selectOption(option.value);
                         }}
                         className={cn(
-                          "flex cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-sm outline-none transition-colors",
-                          highlightedIndex === index ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                          "flex cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-sm outline-none transition-colors",
+                          highlightedIndex === index
+                            ? "bg-sky-500/20 text-sky-300"
+                            : "text-slate-200 hover:bg-sky-500/20 hover:text-sky-300"
                         )}
                       >
                         <div className="flex flex-col items-start min-w-0">
                           <div className="flex items-center gap-2 w-full">
-                            <span className="truncate">{option.label}</span>
+                            <span className="truncate font-medium">{option.label}</span>
                             {option.badge && (
-                              <Badge variant="secondary" className="h-4 px-1.5 text-[9px] font-bold uppercase rounded-full shrink-0">
+                              <Badge variant="secondary" className="h-4 px-1.5 text-[10px] font-semibold rounded-full shrink-0 bg-sky-500/20 text-sky-300 border border-sky-500/30">
                                 {option.badge}
                               </Badge>
                             )}
@@ -259,7 +262,7 @@ export const AutocompleteInput = React.forwardRef<
                           {option.description && (
                             <span className={cn(
                               "text-xs transition-colors truncate w-full",
-                              highlightedIndex === index ? "text-primary-foreground/90" : "text-muted-foreground"
+                              highlightedIndex === index ? "text-sky-200/80" : "text-slate-400"
                             )}>{option.description}</span>
                           )}
                         </div>
@@ -271,7 +274,7 @@ export const AutocompleteInput = React.forwardRef<
                                     onOptionAction(option);
                                 }}
                                 className={cn(
-                                  "p-1.5 rounded-full transition-all shadow-sm bg-destructive text-white hover:bg-destructive/90 ml-2"
+                                  "p-1.5 rounded-full transition-all shadow-sm bg-rose-500/15 text-rose-400 hover:bg-rose-600 hover:text-white ml-2"
                                 )}
                             >
                                 <Trash2 className="h-3.5 w-3.5"/>
@@ -282,19 +285,20 @@ export const AutocompleteInput = React.forwardRef<
 
                   {showCreateOption && (
                     <div
+                      onMouseEnter={() => setHighlightedIndex(filteredOptions.length)}
                       onMouseDown={(e) => {
                         e.preventDefault();
                         createNewOption();
                       }}
                       className={cn(
-                        "flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors font-bold",
+                        "flex cursor-pointer items-center rounded-xl px-3 py-2 text-sm outline-none transition-colors font-semibold",
                         highlightedIndex === filteredOptions.length 
-                          ? "bg-primary text-primary-foreground" 
-                          : "text-primary hover:bg-muted"
+                          ? "bg-sky-500/20 text-sky-300" 
+                          : "text-sky-400 hover:bg-sky-500/20 hover:text-sky-300"
                       )}
                     >
                       <PlusCircle className="mr-2 h-4 w-4 inline" />
-                      Crear "{searchText.trim()}"
+                      Crear &quot;{searchText.trim()}&quot;
                     </div>
                   )}
                 </div>

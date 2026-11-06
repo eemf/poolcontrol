@@ -9,7 +9,7 @@ import {
   TableProperties,
   Truck, Scale, History, HandCoins, Landmark, BookUser, CalendarDays, 
   Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2, Info,
-  BarChart3, ArrowLeftRight
+  BarChart3, ArrowLeftRight, Sliders
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -112,6 +112,7 @@ export const navItems: NavItemType[] = [
     icon: FlaskConical,
     permission: 'pruebas.ver',
     items: [
+      { href: '/dashboard/pruebas/controles-estandar', label: 'Controles Estándar', icon: Sliders },
       { href: '/dashboard/pruebas/monitoreo-integral', label: 'Monitoreo Integral', icon: MonitorCheck },
       { href: '/dashboard/pruebas/solucion-pago-unificado', label: 'Pago Unificado', icon: TableProperties },
       { href: '/dashboard/pruebas/diseno-botones', label: 'Diseño Botones', icon: Palette },

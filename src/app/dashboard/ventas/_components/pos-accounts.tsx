@@ -1,15 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from '@/components/ui/card';
+import { SurfaceCard, PillTabs } from '@/components/comunes';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Button } from "@/components/ui/button";
 import { 
-  Search, 
   FileClock, 
   CreditCard, 
   Coins, 
@@ -171,217 +166,290 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
   }, [state.ventasACredito, state.ventasPendientes, cuentasFiltradas, state.filtroCuentas]);
 
   return (
-    <Tabs value={state.vistaCuentas} onValueChange={(value) => actions.setVistaCuentas(value as any)} className="w-full font-body">
-      <Card className="border shadow-sm">
-        <div className="p-4 pb-0">
-          <div className="flex w-full items-center h-10 rounded-full border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <Input
-              ref={refs.filtroCuentasInputRef}
-              type="search"
-              placeholder="Buscar cuenta..."
-              className="flex-1 border-0 bg-transparent p-0 pl-2 mr-2 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              value={state.filtroCuentas}
-              onChange={(e) => actions.setFiltroCuentas(e.target.value)}
-              tabIndex={-1}
-            />
-            <TabsList className="bg-transparent p-0 h-auto flex gap-1 rounded-full">
-              <TabsTrigger value="pendientes" className="relative h-8 w-8 bg-transparent p-0 border-0 rounded-full text-muted-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
-                <FileClock className="h-5 w-5"/>
-                {state.ventasPendientes.length > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                    {state.ventasPendientes.length}
-                  </span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="credito" className="relative h-8 w-8 bg-transparent p-0 border-0 rounded-full text-muted-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
-                <CreditCard className="h-5 w-5"/>
-                {state.ventasACredito.length > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                    {state.ventasACredito.length}
-                  </span>
-                )}
-              </TabsTrigger>
-            </TabsList>
+    <SurfaceCard variant="panel" className="w-full p-4 space-y-3.5 font-body">
+      {/* Pestañas Oficiales con Lupa Expandible Integrada */}
+      <PillTabs
+        value={state.vistaCuentas}
+        onValueChange={(value) => actions.setVistaCuentas(value as 'pendientes' | 'credito')}
+        searchValue={state.filtroCuentas}
+        onSearchChange={actions.setFiltroCuentas}
+        searchPlaceholder="Buscar cuenta o cliente..."
+        searchInputRef={refs.filtroCuentasInputRef}
+        tabs={[
+          {
+            id: 'pendientes',
+            label: 'Pendientes',
+            icon: FileClock,
+            count: state.ventasPendientes.length,
+            badgeVariant: state.vistaCuentas === 'pendientes' ? 'amber' : 'sky',
+          },
+          {
+            id: 'credito',
+            label: 'Crédito',
+            icon: CreditCard,
+            count: state.ventasACredito.length,
+            badgeVariant: state.vistaCuentas === 'credito' ? 'amber' : 'sky',
+          },
+        ]}
+      />
+
+      {/* Resumen de Total a Crédito / Deuda por Cliente */}
+      {state.vistaCuentas === 'credito' && state.ventasACredito.length > 0 && (
+        <SurfaceCard variant="surface" className="flex items-center justify-between p-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div
+              className={cn(
+                'w-8 h-8 rounded-full flex items-center justify-center shrink-0 border',
+                resumenCredito.hayFiltro
+                  ? 'bg-sky-500/15 border-sky-500/30 text-sky-400'
+                  : 'bg-amber-500/15 border-amber-500/30 text-amber-400'
+              )}
+            >
+              {resumenCredito.hayFiltro ? (
+                <User className="w-4 h-4" />
+              ) : (
+                <CreditCard className="w-4 h-4" />
+              )}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-bold text-slate-100 truncate">
+                {resumenCredito.titulo}
+              </span>
+              <span className="text-[11px] text-slate-400 truncate">
+                {resumenCredito.subtitulo}
+              </span>
+            </div>
           </div>
+          <div className="flex flex-col items-end shrink-0 pl-2">
+            <span className="text-base font-bold text-sky-400 tabular-nums tracking-tight">
+              Q{resumenCredito.monto.toFixed(2)}
+            </span>
+            {resumenCredito.deudaTotalGlobal !== null && (
+              <span className="text-[10px] text-slate-400 font-medium">
+                Total:{' '}
+                <span className="text-amber-400 font-bold tabular-nums">
+                  Q{resumenCredito.deudaTotalGlobal.toFixed(2)}
+                </span>
+              </span>
+            )}
+          </div>
+        </SurfaceCard>
+      )}
+
+      {cuentasFiltradas.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 text-center text-slate-400 gap-2">
+          <div className="w-12 h-12 rounded-full bg-[#283244] border border-[#324157] flex items-center justify-center text-slate-500">
+            {state.vistaCuentas === 'pendientes' ? (
+              <FileClock className="h-5 w-5" />
+            ) : (
+              <CreditCard className="h-5 w-5" />
+            )}
+          </div>
+          <p className="text-xs">
+            No hay cuentas {state.vistaCuentas === 'pendientes' ? 'pendientes' : 'a crédito'}.
+          </p>
         </div>
-        <CardContent className='p-0'>
-          <TabsContent value={state.vistaCuentas} className="mt-2">
-            {/* Resumen de Total a Crédito / Deuda por Cliente */}
-            {state.vistaCuentas === 'credito' && state.ventasACredito.length > 0 && (
-              <div className="px-4 pb-2.5">
-                <div className="flex items-center justify-between p-2.5 px-3 rounded-lg bg-[#17202e] border border-[#324157] shadow-sm">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border",
-                      resumenCredito.hayFiltro 
-                        ? "bg-cyan-500/15 border-cyan-400/30 text-cyan-400" 
-                        : "bg-blue-500/15 border-blue-400/30 text-blue-400"
-                    )}>
-                      {resumenCredito.hayFiltro ? (
-                        <User className="w-4 h-4" />
-                      ) : (
-                        <CreditCard className="w-4 h-4" />
+      ) : (
+        <Accordion type="single" collapsible className="w-full space-y-2.5">
+          {cuentasFiltradas.map((venta) => {
+            const tieneCredito = state.clientesConCreditoIds.has(venta.clienteId);
+            const permiteConsumoInterno = state.clientesConConsumoInternoIds.has(venta.clienteId);
+            const totalMonedas = venta.detalles
+              .filter((d) => d.esVirtual)
+              .reduce((acc, item) => acc + item.subtotal, 0);
+            const saldoMonedas = venta.detalles
+              .filter((d) => d.esVirtual)
+              .reduce((acc, item) => acc + item.saldo, 0);
+            const pagadoMonedas = totalMonedas - saldoMonedas;
+            const totalConsumo = venta.detalles
+              .filter((d) => !d.esVirtual)
+              .reduce((acc, item) => acc + item.subtotal, 0);
+            const saldoConsumo = venta.detalles
+              .filter((d) => !d.esVirtual)
+              .reduce((acc, item) => acc + item.saldo, 0);
+            const pagadoConsumo = totalConsumo - saldoConsumo;
+            const esVentaCredito = venta.estado === 'credito';
+
+            // Lógica para mostrar totales cuando hay crédito asociado
+            const mostrarDesgloseDeuda = state.vistaCuentas === 'pendientes' && tieneCredito;
+            const saldoCredito = mostrarDesgloseDeuda
+              ? state.ventasACredito
+                  .filter((v) => v.clienteId === venta.clienteId)
+                  .reduce((acc, v) => acc + v.saldo, 0)
+              : 0;
+
+            return (
+              <AccordionItem
+                value={venta.id}
+                key={venta.id}
+                className={cn(
+                  'border rounded-xl transition-all overflow-hidden',
+                  state.idVentaActiva === venta.id
+                    ? 'border-sky-500 bg-sky-500/10'
+                    : 'bg-[#283244] border-[#324157]'
+                )}
+              >
+                <AccordionTrigger
+                  className="p-3.5 hover:no-underline transition-colors"
+                  onDoubleClick={esVentaCredito ? undefined : () => actions.manejarClickEditar(venta)}
+                  handleTap={esVentaCredito ? undefined : () => actions.handleTap(venta)}
+                >
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 w-full text-left pr-2">
+                    <div className="col-span-2 space-y-0.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <User className="h-4 w-4 text-sky-400 shrink-0" />
+                          <p className="text-sm font-bold text-slate-100 truncate leading-tight">
+                            {venta.nombreCliente}
+                          </p>
+                        </div>
+                        <p className="text-sm font-bold text-sky-400 tabular-nums leading-tight shrink-0">
+                          Q{venta.saldo.toFixed(2)}
+                        </p>
+                      </div>
+
+                      {mostrarDesgloseDeuda && (
+                        <>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <CreditCard className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                              <span className="text-xs font-semibold text-slate-300 leading-tight">
+                                Crédito
+                              </span>
+                            </div>
+                            <span className="text-xs font-bold text-amber-400 tabular-nums leading-tight">
+                              Q{saldoCredito.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex justify-end py-0.5">
+                            <Separator className="w-16 bg-[#324157]" />
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <Sigma className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                              <span className="text-xs font-bold text-slate-100 leading-tight">
+                                Total
+                              </span>
+                            </div>
+                            <span className="text-sm font-bold text-emerald-400 tabular-nums leading-tight">
+                              Q{(venta.saldo + saldoCredito).toFixed(2)}
+                            </span>
+                          </div>
+                        </>
                       )}
                     </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-bold text-slate-100 truncate">
-                        {resumenCredito.titulo}
+
+                    <div className="col-span-1 flex flex-col text-xs text-slate-400 mt-0.5">
+                      <span>Venta #{venta.idVenta}</span>
+                      <span className="flex items-center gap-1 tabular-nums">
+                        <Coins className="h-3 w-3 text-amber-400" /> {pagadoMonedas.toFixed(2)}/
+                        {totalMonedas.toFixed(2)}
                       </span>
-                      <span className="text-[11px] text-slate-400 truncate">
-                        {resumenCredito.subtitulo}
+                    </div>
+                    <div className="col-span-1 flex flex-col text-xs text-slate-400 items-end mt-0.5">
+                      <span>{format(toDate(venta.fecha), 'dd/MM/yy', { locale: es })}</span>
+                      <span className="flex items-center gap-1 tabular-nums">
+                        <GlassWater className="h-3 w-3 text-sky-400" /> {pagadoConsumo.toFixed(2)}/
+                        {totalConsumo.toFixed(2)}
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end shrink-0 pl-2">
-                    <span className={cn(
-                      "text-base font-bold font-mono tracking-tight",
-                      resumenCredito.hayFiltro ? "text-cyan-400" : "text-blue-400"
-                    )}>
-                      Q{resumenCredito.monto.toFixed(2)}
-                    </span>
-                    {resumenCredito.deudaTotalGlobal !== null && (
-                      <span className="text-[10px] text-slate-400 font-medium">
-                        Total: <span className="text-indigo-400 font-bold font-mono">Q{resumenCredito.deudaTotalGlobal.toFixed(2)}</span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+                </AccordionTrigger>
+                <AccordionContent className="px-3.5 pb-3.5 pt-0">
+                  <div className="border-t border-[#324157] pt-3 space-y-3">
+                    <div className="flex items-center justify-center gap-1.5 flex-nowrap w-full">
+                      {permiteConsumoInterno && (
+                        <Button
+                          type="button"
+                          className="h-7 px-2.5 rounded-full text-[11px] font-semibold bg-violet-500/20 hover:bg-violet-600 text-violet-300 hover:text-white border border-violet-500/35 shadow-sm transition-colors shrink-0"
+                          onClick={() => actions.abrirDialogoConsumoInterno(venta)}
+                          disabled={state.idVentaActiva === venta.id}
+                        >
+                          <Gift className="mr-1 h-3 w-3 shrink-0" />
+                          Cortesía
+                        </Button>
+                      )}
 
-            {cuentasFiltradas.length === 0 ? (
-              <div className="flex items-center justify-center h-48 border-2 border-dashed border-muted-foreground/30 rounded-lg m-4">
-                <p className="text-muted-foreground italic text-sm">No hay cuentas {state.vistaCuentas === 'pendientes' ? 'pendientes' : 'a crédito'}.</p>
-              </div>
-            ) : (
-              <Accordion type="single" collapsible className="w-full space-y-2 px-4 pb-4">
-                {cuentasFiltradas.map(venta => {
-                  const tieneCredito = state.clientesConCreditoIds.has(venta.clienteId);
-                  const permiteConsumoInterno = state.clientesConConsumoInternoIds.has(venta.clienteId);
-                  const totalMonedas = venta.detalles.filter(d => d.esVirtual).reduce((acc, item) => acc + item.subtotal, 0);
-                  const saldoMonedas = venta.detalles.filter(d => d.esVirtual).reduce((acc, item) => acc + item.saldo, 0);
-                  const pagadoMonedas = totalMonedas - saldoMonedas;
-                  const totalConsumo = venta.detalles.filter(d => !d.esVirtual).reduce((acc, item) => acc + item.subtotal, 0);
-                  const saldoConsumo = venta.detalles.filter(d => !d.esVirtual).reduce((acc, item) => acc + item.saldo, 0);
-                  const pagadoConsumo = totalConsumo - saldoConsumo;
-                  const esVentaCredito = venta.estado === 'credito';
-                  
-                  // Lógica para mostrar totales cuando hay crédito asociado
-                  const mostrarDesgloseDeuda = state.vistaCuentas === 'pendientes' && tieneCredito;
-                  const saldoCredito = mostrarDesgloseDeuda 
-                    ? state.ventasACredito.filter(v => v.clienteId === venta.clienteId).reduce((acc, v) => acc + v.saldo, 0)
-                    : 0;
-                  
-                  return (
-                    <AccordionItem value={venta.id} key={venta.id} className={cn("border rounded-lg transition-all", state.idVentaActiva === venta.id ? "border-primary bg-primary/10" : "bg-card-foreground/5")}>
-                      <AccordionTrigger 
-                        className="p-4 hover:no-underline transition-colors active:bg-primary/20"
-                        onDoubleClick={esVentaCredito ? undefined : () => actions.manejarClickEditar(venta)}
-                        handleTap={esVentaCredito ? undefined : () => actions.handleTap(venta)}
+                      {esVentaCredito ? (
+                        <PermissionGuard permission="ventas.editar_credito">
+                          <Button
+                            type="button"
+                            className="h-7 px-2.5 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0"
+                            onClick={() => actions.manejarClickEditar(venta)}
+                            disabled={state.idVentaActiva === venta.id}
+                          >
+                            <PencilIcon className="mr-1 h-3 w-3 shrink-0" />
+                            Editar
+                          </Button>
+                        </PermissionGuard>
+                      ) : (
+                        <Button
+                          type="button"
+                          className="h-7 px-2.5 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0"
+                          onClick={() => actions.manejarClickEditar(venta)}
+                          disabled={state.idVentaActiva === venta.id}
+                        >
+                          <PencilIcon className="mr-1 h-3 w-3 shrink-0" />
+                          Editar
+                        </Button>
+                      )}
+
+                      {!esVentaCredito && (
+                        <Button
+                          type="button"
+                          className="h-7 px-2.5 rounded-full text-[11px] font-semibold bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border border-amber-500/35 shadow-sm transition-colors shrink-0"
+                          onClick={() => actions.manejarClickPasarACredito(venta)}
+                          disabled={
+                            state.procesandoCredito === venta.id || state.idVentaActiva === venta.id
+                          }
+                        >
+                          {state.procesandoCredito === venta.id ? (
+                            <Clock className="mr-1 h-3 w-3 animate-spin shrink-0" />
+                          ) : (
+                            <CreditCard className="mr-1 h-3 w-3 shrink-0" />
+                          )}
+                          Crédito
+                        </Button>
+                      )}
+
+                      <Button
+                        type="button"
+                        className="h-7 px-3 rounded-full text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shrink-0"
+                        onClick={() => actions.abrirDialogoPago(venta)}
+                        disabled={state.idVentaActiva === venta.id}
                       >
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 w-full text-left">
-                          <div className="col-span-1 flex flex-col">
-                            <div className="flex items-center gap-2 h-5">
-                              <User className="h-4 w-4 text-indigo-500 shrink-0" />
-                              <p className="text-sm font-bold truncate">{venta.nombreCliente}</p>
-                            </div>
-                            {mostrarDesgloseDeuda && (
-                                <>
-                                    <div className="flex items-center gap-2 h-5 mt-1">
-                                        <CreditCard className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                                        <span className="text-sm font-bold text-foreground leading-tight">Crédito</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 h-5 mt-1">
-                                        <Sigma className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                                        <span className="text-sm font-bold text-foreground leading-tight">Total</span>
-                                    </div>
-                                </>
-                            )}
-                          </div>
-                          
-                          <div className="col-span-1 flex flex-col items-end">
-                            <p className="text-sm font-bold text-primary leading-tight h-5">Q{venta.saldo.toFixed(2)}</p>
-                            {mostrarDesgloseDeuda && (
-                                <>
-                                    <span className="text-sm font-bold text-rose-600 leading-tight h-5 mt-1 flex items-center">Q{saldoCredito.toFixed(2)}</span>
-                                    <div className="w-full flex justify-end py-1">
-                                      <Separator className="w-16 bg-muted-foreground/30" />
-                                    </div>
-                                    <span className="text-sm font-bold text-indigo-600 leading-tight h-5 flex items-center">Q{(venta.saldo + saldoCredito).toFixed(2)}</span>
-                                </>
-                            )}
-                          </div>
+                        <CheckCircle className="mr-1 h-3 w-3 shrink-0" />
+                        Pagar
+                      </Button>
+                    </div>
 
-                          <div className="col-span-1 flex flex-col text-xs text-muted-foreground mt-1">
-                            <span>Venta # {venta.idVenta}</span>
-                            <span className="flex items-center gap-1"><Coins className="h-3 w-3 text-amber-500"/> {pagadoMonedas.toFixed(2)}/{totalMonedas.toFixed(2)}</span>
-                          </div>
-                          <div className="col-span-1 flex flex-col text-xs text-muted-foreground items-end mt-1">
-                            <span>{format(toDate(venta.fecha), 'dd/MM/yy', { locale: es })}</span>
-                            <span className="flex items-center gap-1"><GlassWater className="h-3 w-3 text-sky-500"/> {pagadoConsumo.toFixed(2)}/{totalConsumo.toFixed(2)}</span>
-                          </div>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="p-4 pt-0">
-                        <div className="border-t pt-4 space-y-4">
-                          <div className="flex justify-center gap-2 flex-wrap pt-2">
-                            {permiteConsumoInterno && (
-                              <Button size="icon" className="h-9 w-9 bg-orange-600 hover:bg-orange-700 text-white border-none shadow-sm" onClick={() => actions.abrirDialogoConsumoInterno(venta)} disabled={state.idVentaActiva === venta.id}>
-                                <Gift className="h-4 w-4"/>
-                              </Button>
+                    <ul className="divide-y divide-[#324157]">
+                      {venta.detalles.map((detalle) => (
+                        <li
+                          key={detalle.idDetalle}
+                          className="flex justify-between items-center py-2 px-1 first:pt-1 last:pb-0"
+                        >
+                          <div className="flex-1 min-w-0">{renderizarItemVenta(detalle)}</div>
+                          <span
+                            className={cn(
+                              'text-xs font-bold tabular-nums ml-2 shrink-0',
+                              detalle.estado === 'Pagada'
+                                ? 'line-through text-slate-500'
+                                : 'text-sky-400'
                             )}
-                            
-                            {esVentaCredito ? (
-                              <PermissionGuard permission="ventas.editar_credito">
-                                <Button size="icon" className="h-9 w-9 bg-sky-600 hover:bg-sky-700 text-white border-none shadow-sm" onClick={() => actions.manejarClickEditar(venta)} disabled={state.idVentaActiva === venta.id}>
-                                  <PencilIcon className="h-4 w-4"/>
-                                </Button>
-                              </PermissionGuard>
-                            ) : (
-                              <Button size="icon" className="h-9 w-9 bg-sky-600 hover:bg-sky-700 text-white border-none shadow-sm" onClick={() => actions.manejarClickEditar(venta)} disabled={state.idVentaActiva === venta.id}>
-                                <PencilIcon className="h-4 w-4"/>
-                              </Button>
-                            )}
-
-                            {!esVentaCredito && (
-                              <Button size="icon" className="h-9 w-9 bg-teal-600 hover:bg-teal-700 text-white border-none shadow-sm" onClick={() => actions.manejarClickPasarACredito(venta)} disabled={state.procesandoCredito === venta.id || state.idVentaActiva === venta.id}>
-                                {state.procesandoCredito === venta.id ? <Clock className="h-4 w-4 animate-spin"/> : <CreditCard className="h-4 w-4"/>}
-                              </Button>
-                            )}
-
-                            <Button variant="default" className="h-9" size="sm" onClick={() => actions.abrirDialogoPago(venta)} disabled={state.idVentaActiva === venta.id}>
-                              <CheckCircle className="mr-2 h-4 w-4"/>
-                              Pagar
-                            </Button>
-                          </div>
-                          <ul className="space-y-1 pr-2">
-                            {venta.detalles.map(detalle => (
-                              <li key={detalle.idDetalle} className={cn(
-                                "flex justify-between items-center py-2 border-b last:border-none p-2 rounded-md",
-                                detalle.estado === 'Pagada' && "bg-green-500/10",
-                                (detalle.saldo > 0 && detalle.saldo < detalle.subtotal) && "bg-amber-500/10",
-                                (detalle.estado === 'Pendiente de pago' && detalle.saldo === detalle.subtotal) && "bg-red-500/10"
-                              )}>
-                                <div className='flex-1'>
-                                  {renderizarItemVenta(detalle)}
-                                </div>
-                                <span className={cn('text-sm font-semibold', detalle.estado === 'Pagada' && 'line-through text-muted-foreground')}>
-                                  Q{detalle.subtotal.toFixed(2)}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  );
-                })}
-              </Accordion>
-            )}
-          </TabsContent>
-        </CardContent>
-      </Card>
-    </Tabs>
+                          >
+                            Q{detalle.subtotal.toFixed(2)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      )}
+    </SurfaceCard>
   );
 }

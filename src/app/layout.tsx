@@ -1,12 +1,20 @@
-import type {Metadata} from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
 import { ThemeProvider } from '@/context/theme-provider';
+import { MobileKeyboardHandler } from '@/components/comunes';
 
 export const metadata: Metadata = {
   title: 'Pool Control 1.0',
   description: 'Manage your pool hall with ease.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  interactiveWidget: 'resizes-content',
 };
 
 export default function RootLayout({
@@ -30,6 +38,7 @@ export default function RootLayout({
         >
           <FirebaseClientProvider>
             {children}
+            <MobileKeyboardHandler />
           </FirebaseClientProvider>
           <Toaster />
         </ThemeProvider>

@@ -1,7 +1,7 @@
 'use client';
 import { doc, runTransaction, Timestamp, Firestore, collection, query, where, getDocs, increment, updateDoc, getDoc, DocumentSnapshot, limit } from 'firebase/firestore';
 import type { Venta, DetalleVenta, Pago, Producto, ProductoVirtual } from '@/lib/tipos';
-import { getFullGenerales, validarSucursal } from './utils';
+import { getFullGenerales, toDate, validarSucursal } from './utils';
 import { registrarMovimientoInventario } from './historial-inventario';
 import { registrarAuditoria } from './auditoria';
 import { analizarComando, type ComandoAnalizado } from '@/lib/utils/analizar-comando';
@@ -81,19 +81,21 @@ export async function guardarVentaYActualizarStock(
 
         const idVentaFinal = ventaExistente ? ventaExistente.idVenta : siguienteIdVenta;
 
-        const detallesProcesados = ventaData.detalles.map(d => {
-            const idDetalle = d.idDetalle === 0 ? siguienteIdDetalle++ : d.idDetalle;
-            return {
-                ...d,
-                idDetalle,
-                subtotal: d.subtotal ?? 0,
-                saldo: d.saldo ?? d.subtotal ?? 0,
-                pagadoEfectivo: d.pagadoEfectivo ?? 0,
-                pagadoTarjeta: d.pagadoTarjeta ?? 0,
-                metodoPago: d.metodoPago ?? null,
-                estado: d.estado ?? 'Pendiente de pago',
-            } as DetalleVenta;
-        });
+        const detallesProcesados = ventaData.detalles
+            .map(d => {
+                const idDetalle = d.idDetalle === 0 ? siguienteIdDetalle++ : d.idDetalle;
+                return {
+                    ...d,
+                    idDetalle,
+                    subtotal: d.subtotal ?? 0,
+                    saldo: d.saldo ?? d.subtotal ?? 0,
+                    pagadoEfectivo: d.pagadoEfectivo ?? 0,
+                    pagadoTarjeta: d.pagadoTarjeta ?? 0,
+                    metodoPago: d.metodoPago ?? null,
+                    estado: d.estado ?? 'Pendiente de pago',
+                } as DetalleVenta;
+            })
+            .sort((a, b) => toDate(b.fechaAgregado).getTime() - toDate(a.fechaAgregado).getTime());
 
         const totalVenta = detallesProcesados.reduce((acc, item) => acc + item.subtotal, 0);
         const saldoVenta = detallesProcesados.reduce((acc, item) => acc + item.saldo, 0);
@@ -322,13 +324,17 @@ export async function eliminarProductoDeVenta(
         // C. Actualizar correlativo de historial
         transaction.set(correlativoHistorialRef, { correlativo: siguienteIdHistorial - 1 }, { merge: true });
 
-        // D. Actualizar documento de venta
-        transaction.update(ventaRef, {
-            detalles: nuevosDetalles,
-            total: nuevoTotal,
-            saldo: nuevoSaldo,
-            estado: nuevoEstado,
-        });
+        // D. Actualizar o eliminar documento de venta si quedó sin detalles
+        if (nuevosDetalles.length === 0) {
+            transaction.delete(ventaRef);
+        } else {
+            transaction.update(ventaRef, {
+                detalles: nuevosDetalles,
+                total: nuevoTotal,
+                saldo: nuevoSaldo,
+                estado: nuevoEstado,
+            });
+        }
 
         // E. Registrar Auditoría
         const precioUnitario = itemAEliminar.precioUnitario || 0;

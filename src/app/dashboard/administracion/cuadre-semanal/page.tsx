@@ -1,22 +1,22 @@
-'use client'
+'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { collection, query, where, Timestamp } from 'firebase/firestore';
-import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
-import type { CierreCaja, Compra, Gasto as GastoType, Cuenta, CuadreTragamonedas, TrasladoInterSucursal } from '@/lib/tipos';
-import { 
-    Loader2, 
-    History,
-    CalendarDays
-} from "lucide-react";
+import React from 'react';
 import Link from 'next/link';
+import { CalendarDays, History, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { realizarCuadreSemanal, type CuadreSemanalData } from '@/lib/firebase/servicios/cuadre-semanal';
-import { useToast } from '@/hooks/use-toast';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useSucursal } from '@/hooks/use-sucursal';
+import { SurfaceCard } from '@/components/comunes';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
-// Componentes modulares en español
+import { useCuadreSemanal } from './_hooks/use-cuadre-semanal';
 import { EncabezadoSemanal } from './_components/encabezado-semanal';
 import { IngresosFisicos } from './_components/ingresos-fisicos';
 import { IngresosTarjeta } from './_components/ingresos-tarjeta';
@@ -25,302 +25,125 @@ import { ListaCompras } from './_components/lista-compras';
 import { ListaGastos } from './_components/lista-gastos';
 import { BarraResumen } from './_components/barra-resumen';
 
-type CierreCajaConId = CierreCaja & { id: string };
-type CompraPendiente = Compra & { docId: string };
-type GastoPendiente = GastoType & { docId: string };
-type CuadreTragamonedasConId = CuadreTragamonedas & { id: string };
-
 export default function CuadreSemanalPage() {
-  const { firestore } = useFirebase();
-  const { user } = useUser();
-  const { toast } = useToast();
-  const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
+  const {
+    firestore,
+    sucursalId,
+    isLoading,
+    hayDatosPendientes,
+    ingresosFisicosPendientes,
+    ingresosTarjetaPendientes,
+    trasladosCobroPendientes,
+    comprasPendientes,
+    gastosPendientes,
+    selectedIngresosEfectivo,
+    selectedIngresosTarjeta,
+    selectedIngresosTragamonedas,
+    selectedIngresosTraslados,
+    selectedCompras,
+    selectedGastos,
+    totalesCalculados,
+    balanceALiquidar,
+    setBalanceALiquidar,
+    cuentaOrigenId,
+    setCuentaOrigenId,
+    cuentaDestinoId,
+    setCuentaDestinoId,
+    cuentas,
+    isLoadingCuentas,
+    observaciones,
+    setObservaciones,
+    isProcessing,
+    isConfirmOpen,
+    setIsConfirmOpen,
+    handleSelect,
+    handleSelectAllFisico,
+    handleSelectAllTraslados,
+    handleSelectAll,
+    handleProcess,
+  } = useCuadreSemanal();
 
-  // Estados de selección
-  const [selectedIngresosEfectivo, setSelectedIngresosEfectivo] = useState<Set<string>>(new Set());
-  const [selectedIngresosTarjeta, setSelectedIngresosTarjeta] = useState<Set<string>>(new Set());
-  const [selectedIngresosTragamonedas, setSelectedIngresosTragamonedas] = useState<Set<string>>(new Set());
-  const [selectedIngresosTraslados, setSelectedIngresosTraslados] = useState<Set<string>>(new Set());
-  const [selectedCompras, setSelectedCompras] = useState<Set<string>>(new Set());
-  const [selectedGastos, setSelectedGastos] = useState<Set<string>>(new Set());
-  
-  // Estados de formulario
-  const [balanceALiquidar, setBalanceALiquidar] = useState<number | ''>('');
-  const [cuentaOrigenId, setCuentaOrigenId] = useState('');
-  const [cuentaDestinoId, setCuentaDestinoId] = useState('');
-  const [observaciones, setObservaciones] = useState('');
-  
-  // Estados de control
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-
-  // --- Consultas Firestore ---
-  const ingresosEfectivoQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null;
-    return query(collection(firestore, `sucursales/${sucursalId}/cierre_caja`), where('estadoEfectivo', '==', 'pendiente'));
-  }, [firestore, sucursalId]);
-  
-  const ingresosTarjetaQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null;
-    return query(collection(firestore, `sucursales/${sucursalId}/cierre_caja`), where('estadoTarjeta', '==', 'pendiente'));
-  }, [firestore, sucursalId]);
-
-  const ingresosTragamonedasQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null;
-    return query(collection(firestore, `sucursales/${sucursalId}/cuadre_tragamonedas`), where('estado', '==', 'pendiente'));
-  }, [firestore, sucursalId]);
-
-  const trasladosCobroQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null;
-    return query(
-      collection(firestore, 'traslados'),
-      where('sucursalOrigenId', '==', sucursalId)
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64 space-y-3 flex-col">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <span className="text-xs text-slate-400">Cargando cuadre semanal...</span>
+      </div>
     );
-  }, [firestore, sucursalId]);
+  }
 
-  const comprasQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null;
-    return query(collection(firestore, `sucursales/${sucursalId}/compras`), where('estado', '==', 'Pendiente'));
-  }, [firestore, sucursalId]);
-
-  const gastosQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null;
-    return query(collection(firestore, `sucursales/${sucursalId}/gastos`), where('estado', '==', 'pendiente'));
-  }, [firestore, sucursalId]);
-  
-  const cuentasQuery = useMemoFirebase(() => {
-      if(!firestore || !sucursalId) return null;
-      return query(collection(firestore, `sucursales/${sucursalId}/cuentas`));
-  }, [firestore, sucursalId]);
-
-  // Carga de datos
-  const { data: ingresosEfectivoData, isLoading: isLoadingEfectivo } = useCollection<CierreCajaConId>(ingresosEfectivoQuery);
-  const { data: ingresosTarjetaData, isLoading: isLoadingTarjeta } = useCollection<CierreCajaConId>(ingresosTarjetaQuery);
-  const { data: ingresosTragamonedasData, isLoading: isLoadingTragamonedas } = useCollection<CuadreTragamonedasConId>(ingresosTragamonedasQuery);
-  const { data: rawTraslados, isLoading: isLoadingTraslados } = useCollection<TrasladoInterSucursal>(trasladosCobroQuery);
-  const { data: comprasData, isLoading: isLoadingCompras } = useCollection<Compra>(comprasQuery);
-  const { data: gastosData, isLoading: isLoadingGastos } = useCollection<GastoType>(gastosQuery);
-  const { data: cuentas, isLoading: isLoadingCuentas } = useCollection<Cuenta>(cuentasQuery);
-
-  // Mapeo y ordenamiento de pendientes
-  const ingresosEfectivoPendientes = useMemo(() => (ingresosEfectivoData || []), [ingresosEfectivoData]);
-  const ingresosTarjetaPendientes = useMemo(() => (ingresosTarjetaData || []).sort((a,b) => b.fecha.toDate().getTime() - a.fecha.toDate().getTime()), [ingresosTarjetaData]);
-  const ingresosTragamonedasPendientes = useMemo(() => (ingresosTragamonedasData || []), [ingresosTragamonedasData]);
-  
-  const trasladosCobroPendientes = useMemo(() => {
-    if (!rawTraslados) return [];
-    return rawTraslados
-      .filter((t) => t.estado !== 'cancelado' && (t.estadoLiquidacion === 'pendiente' || !t.estadoLiquidacion))
-      .sort((a, b) => {
-        const timeA = a.fechaEnvio?.toMillis ? a.fechaEnvio.toMillis() : 0;
-        const timeB = b.fechaEnvio?.toMillis ? b.fechaEnvio.toMillis() : 0;
-        return timeB - timeA;
-      });
-  }, [rawTraslados]);
-
-  const ingresosFisicosPendientes = useMemo(() => {
-    const ef = ingresosEfectivoPendientes.map(i => ({ ...i, tipoItem: 'caja' as const }));
-    const tr = ingresosTragamonedasPendientes.map(i => ({ ...i, tipoItem: 'tragamonedas' as const }));
-    return [...ef, ...tr].sort((a, b) => b.fecha.toDate().getTime() - a.fecha.toDate().getTime());
-  }, [ingresosEfectivoPendientes, ingresosTragamonedasPendientes]);
-
-  const comprasPendientes = useMemo((): CompraPendiente[] => (comprasData || []).map(c => ({...c, docId: c.id})).sort((a,b) => b.fecha.toDate().getTime() - a.fecha.toDate().getTime()), [comprasData]);
-  const gastosPendientes = useMemo((): GastoPendiente[] => (gastosData || []).map(g => ({...g, docId: g.id})).sort((a,b) => b.fecha.toDate().getTime() - a.fecha.toDate().getTime()), [gastosData]);
-
-  // Handlers
-  const handleSelect = (id: string, isSelected: boolean, type: 'ingresoEfectivo' | 'ingresoTarjeta' | 'ingresoTragamonedas' | 'ingresoTraslado' | 'compra' | 'gasto') => {
-    const setters: any = {
-        ingresoEfectivo: setSelectedIngresosEfectivo,
-        ingresoTarjeta: setSelectedIngresosTarjeta,
-        ingresoTragamonedas: setSelectedIngresosTragamonedas,
-        ingresoTraslado: setSelectedIngresosTraslados,
-        compra: setSelectedCompras,
-        gasto: setSelectedGastos
-    };
-    setters[type]((prev: Set<string>) => {
-      const newSet = new Set(prev);
-      if (isSelected) newSet.add(id);
-      else newSet.delete(id);
-      return newSet;
-    });
-  };
-  
-  const handleSelectAllFisico = () => {
-    const allIdsEfectivo = ingresosEfectivoPendientes.map(i => i.id);
-    const allIdsTragamonedas = ingresosTragamonedasPendientes.map(i => i.id);
-    if (selectedIngresosEfectivo.size === allIdsEfectivo.length && selectedIngresosTragamonedas.size === allIdsTragamonedas.length) {
-      setSelectedIngresosEfectivo(new Set());
-      setSelectedIngresosTragamonedas(new Set());
-    } else {
-      setSelectedIngresosEfectivo(new Set(allIdsEfectivo));
-      setSelectedIngresosTragamonedas(new Set(allIdsTragamonedas));
-    }
-  };
-
-  const handleSelectAllTraslados = () => {
-    const allIds = trasladosCobroPendientes.map(t => t.id);
-    if (selectedIngresosTraslados.size === allIds.length && allIds.length > 0) {
-      setSelectedIngresosTraslados(new Set());
-    } else {
-      setSelectedIngresosTraslados(new Set(allIds));
-    }
-  };
-
-  const handleSelectAll = (type: 'ingresoTarjeta' | 'compra' | 'gasto') => {
-    const sources: any = {
-        ingresoTarjeta: ingresosTarjetaPendientes.map(i => i.id),
-        compra: comprasPendientes.map(c => c.docId),
-        gasto: gastosPendientes.map(g => g.docId)
-    };
-    const currentSet: any = { ingresoTarjeta: selectedIngresosTarjeta, compra: selectedCompras, gasto: selectedGastos }[type];
-    const setter: any = { ingresoTarjeta: setSelectedIngresosTarjeta, compra: setSelectedCompras, gasto: setSelectedGastos }[type];
-
-    if (currentSet.size === sources[type].length) setter(new Set());
-    else setter(new Set(sources[type]));
-  };
-
-  // Cálculos de Resumen
-  const totalesCalculados = useMemo(() => {
-    const ingEf = ingresosEfectivoPendientes.filter(c => selectedIngresosEfectivo.has(c.id)).reduce((acc, c) => acc + c.totalLiquidado, 0);
-    const ingTr = ingresosTarjetaPendientes.filter(c => selectedIngresosTarjeta.has(c.id)).reduce((acc, c) => acc + c.pagosTarjeta, 0);
-    const ingTg = ingresosTragamonedasPendientes.filter(c => selectedIngresosTragamonedas.has(c.id)).reduce((acc, c) => acc + c.gananciaATrasladar, 0);
-    const ingTrs = trasladosCobroPendientes.filter(t => selectedIngresosTraslados.has(t.id)).reduce((acc, t) => acc + (t.costoTotalTraslado || 0), 0);
-    const egCo = comprasPendientes.filter(c => selectedCompras.has(c.docId)).reduce((acc, c) => acc + c.montoTotal, 0);
-    const egGa = gastosPendientes.filter(g => selectedGastos.has(g.docId)).reduce((acc, g) => acc + g.monto, 0);
-
-    const ingresos = ingEf + ingTr + ingTg + ingTrs;
-    const egresos = egCo + egGa;
-    const balanceNeto = ingresos - egresos;
-
-    return { ingresos, egresos, balanceNeto };
-  }, [selectedIngresosEfectivo, selectedIngresosTarjeta, selectedIngresosTragamonedas, selectedIngresosTraslados, selectedCompras, selectedGastos, ingresosEfectivoPendientes, ingresosTarjetaPendientes, ingresosTragamonedasPendientes, trasladosCobroPendientes, comprasPendientes, gastosPendientes]);
-
-  useEffect(() => {
-    setBalanceALiquidar(totalesCalculados.balanceNeto);
-  }, [totalesCalculados.balanceNeto]);
-
-  useEffect(() => {
-    if (cuentas && cuentas.length > 0) {
-      if (!cuentaOrigenId) setCuentaOrigenId(cuentas[0].id);
-      if (!cuentaDestinoId) setCuentaDestinoId(cuentas.length > 1 ? cuentas[1].id : cuentas[0].id);
-    }
-  }, [cuentas, cuentaOrigenId, cuentaDestinoId]);
-
-  const handleProcess = async () => {
-    if (!firestore || !user || !sucursalId || !cuentaOrigenId || !cuentaDestinoId) {
-      toast({ title: "Error", description: "Faltan datos de configuración.", variant: "destructive" });
-      return;
-    }
-    setIsProcessing(true);
-
-    const data: CuadreSemanalData = {
-      usuarioId: user.uid,
-      resumen: {
-        totalIngresosEfectivo: ingresosEfectivoPendientes.filter(c => selectedIngresosEfectivo.has(c.id)).reduce((acc, c) => acc + c.totalLiquidado, 0),
-        totalIngresosTarjeta: ingresosTarjetaPendientes.filter(c => selectedIngresosTarjeta.has(c.id)).reduce((acc, c) => acc + c.pagosTarjeta, 0),
-        totalIngresosTragamonedas: ingresosTragamonedasPendientes.filter(c => selectedIngresosTragamonedas.has(c.id)).reduce((acc, c) => acc + c.gananciaATrasladar, 0),
-        totalIngresosTraslados: trasladosCobroPendientes.filter(t => selectedIngresosTraslados.has(t.id)).reduce((acc, t) => acc + (t.costoTotalTraslado || 0), 0),
-        totalCompras: comprasPendientes.filter(c => selectedCompras.has(c.docId)).reduce((acc, c) => acc + c.montoTotal, 0),
-        totalGastos: gastosPendientes.filter(g => selectedGastos.has(g.docId)).reduce((acc, g) => acc + g.monto, 0),
-        balanceNetoCalculado: totalesCalculados.balanceNeto,
-        balanceLiquidado: Number(balanceALiquidar) || 0,
-      },
-      cuentas: { origenId: cuentaOrigenId, destinoId: cuentaDestinoId },
-      idsProcesados: {
-        ingresosEfectivo: Array.from(selectedIngresosEfectivo),
-        ingresosTarjeta: Array.from(selectedIngresosTarjeta),
-        ingresosTragamonedas: Array.from(selectedIngresosTragamonedas),
-        ingresosTraslados: Array.from(selectedIngresosTraslados),
-        compras: Array.from(selectedCompras),
-        gastos: Array.from(selectedGastos),
-      },
-      observaciones,
-    };
-    
-    try {
-      await realizarCuadreSemanal(firestore, sucursalId, data);
-      toast({ title: "Éxito", description: "Cuadre semanal procesado." });
-      setSelectedIngresosEfectivo(new Set());
-      setSelectedIngresosTarjeta(new Set());
-      setSelectedIngresosTragamonedas(new Set());
-      setSelectedIngresosTraslados(new Set());
-      setSelectedCompras(new Set());
-      setSelectedGastos(new Set());
-      setObservaciones('');
-    } catch (error: any) {
-      toast({ title: "Error al Procesar", description: error.message, variant: "destructive" });
-    } finally {
-      setIsProcessing(false);
-      setIsConfirmOpen(false);
-    }
-  };
-
-  const isLoading = isLoadingEfectivo || isLoadingTarjeta || isLoadingTragamonedas || isLoadingTraslados || isLoadingCompras || isLoadingGastos || isLoadingCuentas || isLoadingSucursal;
-  const hayDatosPendientes = ingresosFisicosPendientes.length > 0 || ingresosTarjetaPendientes.length > 0 || trasladosCobroPendientes.length > 0 || comprasPendientes.length > 0 || gastosPendientes.length > 0;
-
-  if (isLoading) return <div className="flex justify-center items-center h-64"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
+  const hasAnySelected =
+    Boolean(selectedIngresosEfectivo.size) ||
+    Boolean(selectedIngresosTarjeta.size) ||
+    Boolean(selectedIngresosTragamonedas.size) ||
+    Boolean(selectedIngresosTraslados.size) ||
+    Boolean(selectedCompras.size) ||
+    Boolean(selectedGastos.size);
 
   return (
-    <div className="space-y-6 font-body">
+    <div className="space-y-4 font-body pb-10">
       <EncabezadoSemanal hayDatosPendientes={hayDatosPendientes} />
 
       {!hayDatosPendientes ? (
-        <div className="p-12 text-center border-2 border-dashed rounded-xl bg-card/40 space-y-4">
+        <SurfaceCard variant="panel" className="p-12 text-center border-dashed border-[#324157] space-y-4">
           <CalendarDays className="h-12 w-12 mx-auto text-primary/40" />
           <div className="space-y-1">
-            <p className="font-semibold text-lg text-foreground">No hay registros pendientes de procesar</p>
-            <p className="text-sm text-muted-foreground">Todos los ingresos, egresos y gastos semanales están al día.</p>
+            <p className="font-semibold text-lg text-white">No hay registros pendientes de procesar</p>
+            <p className="text-xs text-slate-400">Todos los ingresos, egresos y traslados semanales están liquidados al día.</p>
           </div>
           <Link href="/dashboard/administracion/cuadre-semanal/historial" className="inline-block pt-1">
-            <Button variant="outline" className="rounded-full px-6 font-semibold gap-2 shadow-xs">
-              <History className="h-4 w-4" />
+            <Button
+              variant="outline"
+              className="rounded-full px-6 font-semibold text-xs h-9 gap-2 border-[#324157] bg-[#283244] text-slate-200 hover:text-white"
+            >
+              <History className="h-3.5 w-3.5 text-primary" />
               Ver Historial de Cuadres Semanales
             </Button>
           </Link>
-        </div>
+        </SurfaceCard>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          <div className="lg:col-span-2 space-y-6">
-            <IngresosFisicos 
-              items={ingresosFisicosPendientes} 
-              selectedEfectivo={selectedIngresosEfectivo} 
-              selectedTragamonedas={selectedIngresosTragamonedas} 
-              onSelect={handleSelect} 
-              onSelectAll={handleSelectAllFisico} 
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+          <div className="lg:col-span-2 space-y-4">
+            <IngresosFisicos
+              items={ingresosFisicosPendientes}
+              selectedEfectivo={selectedIngresosEfectivo}
+              selectedTragamonedas={selectedIngresosTragamonedas}
+              onSelect={handleSelect}
+              onSelectAll={handleSelectAllFisico}
             />
-            
-            <IngresosTarjeta 
-              items={ingresosTarjetaPendientes} 
-              selected={selectedIngresosTarjeta} 
-              onSelect={(id, isSel) => handleSelect(id, isSel, 'ingresoTarjeta')} 
+
+            <IngresosTarjeta
+              items={ingresosTarjetaPendientes}
+              selected={selectedIngresosTarjeta}
+              onSelect={(id, isSel) => handleSelect(id, isSel, 'ingresoTarjeta')}
               onSelectAll={() => handleSelectAll('ingresoTarjeta')}
               firestore={firestore}
               sucursalId={sucursalId!}
             />
 
-            <ListaTrasladosCobro 
-              items={trasladosCobroPendientes} 
-              selected={selectedIngresosTraslados} 
-              onSelect={(id, isSel) => handleSelect(id, isSel, 'ingresoTraslado')} 
-              onSelectAll={handleSelectAllTraslados} 
+            <ListaTrasladosCobro
+              items={trasladosCobroPendientes}
+              selected={selectedIngresosTraslados}
+              onSelect={(id, isSel) => handleSelect(id, isSel, 'ingresoTraslado')}
+              onSelectAll={handleSelectAllTraslados}
             />
 
-            <ListaCompras 
-              items={comprasPendientes} 
-              selected={selectedCompras} 
-              onSelect={(id, isSel) => handleSelect(id, isSel, 'compra')} 
-              onSelectAll={() => handleSelectAll('compra')} 
+            <ListaCompras
+              items={comprasPendientes}
+              selected={selectedCompras}
+              onSelect={(id, isSel) => handleSelect(id, isSel, 'compra')}
+              onSelectAll={() => handleSelectAll('compra')}
             />
 
-            <ListaGastos 
-              items={gastosPendientes} 
-              selected={selectedGastos} 
-              onSelect={(id, isSel) => handleSelect(id, isSel, 'gasto')} 
-              onSelectAll={() => handleSelectAll('gasto')} 
+            <ListaGastos
+              items={gastosPendientes}
+              selected={selectedGastos}
+              onSelect={(id, isSel) => handleSelect(id, isSel, 'gasto')}
+              onSelectAll={() => handleSelectAll('gasto')}
             />
           </div>
 
-          <BarraResumen 
+          <BarraResumen
             totals={totalesCalculados}
             balanceALiquidar={balanceALiquidar}
             setBalanceALiquidar={setBalanceALiquidar}
@@ -328,26 +151,38 @@ export default function CuadreSemanalPage() {
             setCuentaOrigenId={setCuentaOrigenId}
             cuentaDestinoId={cuentaDestinoId}
             setCuentaDestinoId={setCuentaDestinoId}
-            cuentas={cuentas || []}
+            cuentas={cuentas}
             isLoadingCuentas={isLoadingCuentas}
             observaciones={observaciones}
             setObservaciones={setObservaciones}
             isProcessing={isProcessing}
             onProcess={() => setIsConfirmOpen(true)}
-            disabled={isProcessing || (!selectedIngresosEfectivo.size && !selectedIngresosTarjeta.size && !selectedIngresosTragamonedas.size && !selectedIngresosTraslados.size && !selectedCompras.size && !selectedGastos.size)}
+            disabled={isProcessing || !hasAnySelected}
           />
         </div>
       )}
 
+      {/* Modal de Confirmación */}
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <AlertDialogContent className="rounded-3xl font-body">
+        <AlertDialogContent className="rounded-2xl font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-headline text-xl">Confirmar Cuadre Semanal</AlertDialogTitle>
-            <AlertDialogDescription>Esta acción procesará los ítems seleccionados y moverá el balance entre las cuentas. Es definitiva.</AlertDialogDescription>
+            <AlertDialogTitle className="text-lg font-bold text-white">
+              Confirmar Cuadre Semanal
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-xs text-slate-300">
+              Esta acción procesará los ítems seleccionados, actualizará su estado a liquidado y registrará los movimientos de balance correspondientes.
+            </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-full h-11 px-8 font-bold">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleProcess} className="rounded-full h-11 px-10 font-bold shadow-lg">Sí, procesar cuadre</AlertDialogAction>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="rounded-full h-9 px-6 font-semibold text-xs border-[#324157] bg-[#283244] text-slate-300 hover:text-white">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleProcess}
+              className="rounded-full h-9 px-6 font-semibold text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
+            >
+              Sí, procesar cuadre
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

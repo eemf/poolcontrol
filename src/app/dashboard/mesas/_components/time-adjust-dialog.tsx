@@ -2,11 +2,20 @@
 
 import React from 'react';
 import type { Mesa } from '@/lib/tipos';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Loader2, Timer, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const intervalosDeTiempo = [
   { label: '30 min', minutos: 30 },
@@ -43,33 +52,87 @@ export function TimeAdjustDialog({
   onConfirm,
   processingAjuste,
 }: TimeAdjustDialogProps) {
+  const isConsola = mesaParaAjuste?.tipoDeMesa === 'Consola';
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Ajustar Tiempo para Mesa {mesaParaAjuste?.numeroMesa}</DialogTitle>
-          <DialogDescription>Añade tiempo extra a la sesión de juego actual.</DialogDescription>
-        </DialogHeader>
-        <div className="py-4 space-y-4">
-          <p className="text-sm">Selecciona cuánto tiempo deseas añadir:</p>
-          <ScrollArea className="h-48">
-            <div className="grid grid-cols-3 gap-2 p-1">
-              {intervalosDeTiempo.map((intervalo) => (
-                <Button key={intervalo.minutos} variant={tiempoParaAnadir === intervalo.minutos ? 'default' : 'outline'} onClick={() => setTiempoParaAnadir(intervalo.minutos)}>
-                  {intervalo.label}
-                </Button>
-              ))}
+      <DialogContent className="sm:max-w-md bg-[#1d283a] border-[#324157] text-slate-100 rounded-xl sm:rounded-lg font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl">
+        <DialogHeader className="shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+              <Timer className="w-5 h-5" />
             </div>
-          </ScrollArea>
-          <div className="flex items-center space-x-2 pt-4">
-            <Checkbox id="pagar-ajuste-contado" checked={pagarTiempoAnadido} onCheckedChange={(checked) => setPagarTiempoAnadido(checked as boolean)} />
-            <label htmlFor="pagar-ajuste-contado" className="text-sm font-medium">Pagado de Contado</label>
+            <div className="text-left">
+              <DialogTitle className="font-headline text-lg font-bold text-slate-100 leading-tight">
+                Ajustar Tiempo: {isConsola ? 'Consola' : 'Mesa'} #{mesaParaAjuste?.numeroMesa}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-400 mt-0.5">
+                Añade tiempo extra a la sesión de juego actual.
+              </DialogDescription>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground">Si no marcas "Pagar de Contado", el costo del tiempo adicional se cargará a la cuenta de la mesa para ser cobrado al final.</p>
+        </DialogHeader>
+
+        <div className="flex-1 overflow-y-auto min-h-0 py-3 px-0.5 space-y-3">
+          <Label className="text-xs font-medium text-slate-200 ml-1 block">
+            Selecciona el Intervalo
+          </Label>
+          <div className="grid grid-cols-3 gap-2">
+            {intervalosDeTiempo.map((intervalo) => (
+              <Button
+                key={intervalo.minutos}
+                type="button"
+                onClick={() => setTiempoParaAnadir(intervalo.minutos)}
+                className={cn(
+                  'rounded-full h-9 font-semibold text-xs transition-all',
+                  tiempoParaAnadir === intervalo.minutos
+                    ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
+                    : 'bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]'
+                )}
+              >
+                {intervalo.label}
+              </Button>
+            ))}
+          </div>
+
+          <div className="flex items-center space-x-2.5 p-3.5 bg-[#283244] rounded-xl border border-[#324157]">
+            <Checkbox
+              id="pagar-ajuste-contado"
+              checked={pagarTiempoAnadido}
+              onCheckedChange={(checked) => setPagarTiempoAnadido(checked as boolean)}
+            />
+            <Label
+              htmlFor="pagar-ajuste-contado"
+              className="text-xs font-semibold text-slate-200 cursor-pointer"
+            >
+              Pagado de Contado
+            </Label>
+          </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={onConfirm} disabled={processingAjuste}>{processingAjuste && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Confirmar Ajuste</Button>
+
+        <DialogFooter className="pt-2 shrink-0 flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0">
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="secondary"
+              className="rounded-full px-5 font-medium h-10 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+            >
+              Cancelar
+            </Button>
+          </DialogClose>
+          <Button
+            type="button"
+            onClick={onConfirm}
+            disabled={processingAjuste}
+            className="rounded-full px-6 font-semibold h-10 bg-sky-600 hover:bg-sky-500 text-white shadow-md"
+          >
+            {processingAjuste ? (
+              <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+            ) : (
+              <Check className="mr-1.5 h-4 w-4" />
+            )}
+            Confirmar Ajuste
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

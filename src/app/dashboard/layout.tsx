@@ -7,11 +7,10 @@ import {
   Sidebar,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from "@/components/ui/alert-dialog"
 import DashboardNav from "@/app/components/dashboard-nav"
 import { useUser, useCollection, useMemoFirebase, useDoc } from '@/firebase'
 import { SESION_ACTIVA_KEY } from '@/firebase/provider'
-import { Loader2, AlertTriangle, CalendarX, ShieldAlert, CreditCard, CloudOff, RefreshCw, LogOut } from 'lucide-react'
+import { Loader2, AlertTriangle, CalendarX, ShieldAlert, CloudOff, RefreshCw, LogOut, Timer, Check } from 'lucide-react'
 import { collection, doc, query, updateDoc, where, Timestamp } from 'firebase/firestore'
 import { signOut } from 'firebase/auth'
 import { useFirebase } from '@/firebase'
@@ -152,6 +151,25 @@ export default function LayoutDashboard({
   }, [firestore, user, sucursalId]);
   
   const { data: mesasOcupadas } = useCollection<Mesa>(mesasQuery);
+  const [ackedAlarmIds, setAckedAlarmIds] = useState<Record<string, number>>({});
+
+  // Limpiar IDs reconocidos localmente cuando la sesión cambie o ya venga marcada desde Firestore
+  useEffect(() => {
+    if (!mesasOcupadas) return;
+    setAckedAlarmIds((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      Object.keys(next).forEach((id) => {
+        const m = mesasOcupadas.find((x) => x.id === id);
+        const fInicio = m?.horaInicio ? toDate(m.horaInicio).getTime() : 0;
+        if (!m || m.alarmaAck || fInicio !== next[id]) {
+          delete next[id];
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [mesasOcupadas]);
   
   const mesasEnAlarma = useMemo(() => {
     if (!mesasOcupadas || isWakingUp) return []; 
@@ -160,10 +178,11 @@ export default function LayoutDashboard({
         if (mesa.modoJuego !== 'definido' || mesa.alarmaAck || !mesa.horaInicio || !mesa.tiempoDefinido) return false;
         const fechaInicio = toDate(mesa.horaInicio);
         if (fechaInicio.getTime() <= 0) return false; 
+        if (ackedAlarmIds[mesa.id] === fechaInicio.getTime()) return false;
         const fechaFinMillis = fechaInicio.getTime() + (mesa.tiempoDefinido * 1000);
         return ahoraSincronizada >= fechaFinMillis;
     });
-  }, [mesasOcupadas, serverOffset, isWakingUp, currentTime]);
+  }, [mesasOcupadas, serverOffset, isWakingUp, currentTime, ackedAlarmIds]);
 
   const handleAudioEnded = useCallback(() => {
     if (mesasEnAlarma.length > 0) {
@@ -194,16 +213,35 @@ export default function LayoutDashboard({
     }
   }, [mesasEnAlarma.length, isAlarmPlaying]);
 
-  const handleAcceptAlert = async () => {
+  const handleAcceptAlert = useCallback(async () => {
     if (mesasEnAlarma.length === 0 || !firestore || !sucursalId) return;
     const mesaActual = mesasEnAlarma[0];
+    const inicioMillis = mesaActual.horaInicio ? toDate(mesaActual.horaInicio).getTime() : 0;
+
+    // Reconocimiento optimista inmediato para cerrar el aviso sin demoras ni bloqueos de otros modales
+    setAckedAlarmIds((prev) => ({ ...prev, [mesaActual.id]: inicioMillis }));
+
     const mesaRef = doc(firestore, `sucursales/${sucursalId}/mesas_de_billar`, mesaActual.id);
     try {
-        await updateDoc(mesaRef, { alarmaAck: true });
+      await updateDoc(mesaRef, { alarmaAck: true });
     } catch (error) {
-        console.error("Error acknowledging alarm:", error);
+      console.error("Error acknowledging alarm:", error);
     }
-  };
+  }, [mesasEnAlarma, firestore, sucursalId]);
+
+  // Permitir cerrar la alerta de tiempo culminado con Enter o Escape en fase de captura sin cerrar modales subyacentes
+  useEffect(() => {
+    if (mesasEnAlarma.length === 0) return;
+    const handleKeyDownCapture = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+        handleAcceptAlert();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDownCapture, true);
+    return () => window.removeEventListener('keydown', handleKeyDownCapture, true);
+  }, [mesasEnAlarma.length, handleAcceptAlert]);
   
   const handleInitialInteraction = () => {
     if (!hasInteracted.current && audioRef.current) {
@@ -246,7 +284,7 @@ export default function LayoutDashboard({
                         <CardContent className="p-6 space-y-4">
                             <div className="flex items-center gap-3 text-left">
                                 <div className="h-2 w-2 rounded-full bg-amber-500 animate-ping" />
-                                <p className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest">Estado: Reintentando vínculo...</p>
+                                <p className="text-xs font-bold text-slate-600 dark:text-slate-300 tracking-wide">Estado: Reintentando vínculo...</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -277,7 +315,7 @@ export default function LayoutDashboard({
   return (
     <SidebarProvider>
       <Header />
-      <div className="flex flex-col flex-1 h-[calc(100vh-auto-3.5rem)] md:h-[calc(100vh-3.5rem)]">
+      <div className="flex flex-col flex-1 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
         {subInfo.isExpiringSoon && (
             <div className="bg-amber-100 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 p-2 text-center flex items-center justify-center gap-3 animate-in slide-in-from-top duration-500">
                 <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
@@ -316,24 +354,57 @@ export default function LayoutDashboard({
       </div>
 
       <audio ref={audioRef} src="/alarm.mp3" preload="auto" onEnded={handleAudioEnded}></audio>
-      <AlertDialog open={mesasEnAlarma.length > 0}>
-        <AlertDialogContent onEscapeKeyDown={handleAcceptAlert} className="rounded-3xl font-body">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-xl font-headline">
-              <AlertTriangle className="h-6 w-6 text-yellow-500" />
-              ¡Tiempo culminado!
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-                <div className="text-sm">
-                    El tiempo para la sesión de juego de la <span className="font-bold text-foreground">Mesa {primeraMesaEnAlarma?.numeroMesa}</span> ha finalizado.
-                </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={handleAcceptAlert} className="rounded-full px-10 font-bold">Entendido</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {primeraMesaEnAlarma && (
+        <div
+          data-global-alert="true"
+          onPointerDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="fixed inset-0 z-[100] pointer-events-auto flex items-center justify-center bg-black/75 backdrop-blur-[2px] p-4 font-body animate-in fade-in duration-150"
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+                <Timer className="w-5 h-5" />
+              </div>
+              <div className="text-left min-w-0">
+                <h3 className="font-headline text-base font-bold text-slate-100 leading-tight">
+                  ¡Tiempo Culminado!
+                </h3>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  El tiempo para la sesión de juego de la{' '}
+                  <strong className="text-slate-100 font-semibold">
+                    {primeraMesaEnAlarma.tipoDeMesa === 'Consola' ? 'Consola' : 'Mesa'} #
+                    {primeraMesaEnAlarma.numeroMesa}
+                  </strong>{' '}
+                  ha finalizado.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end pt-0.5">
+              <Button
+                type="button"
+                onClick={handleAcceptAlert}
+                className="rounded-full h-9 px-6 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md"
+              >
+                <Check className="mr-1.5 h-3.5 w-3.5" />
+                Entendido
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </SidebarProvider>
   )
 }

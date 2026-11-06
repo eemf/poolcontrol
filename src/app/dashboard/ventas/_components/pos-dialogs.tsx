@@ -1,48 +1,46 @@
 'use client';
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Check, 
-  CreditCard, 
-  Coins, 
-  CheckCircle, 
-  Gift, 
-  AlertTriangle, 
-  Coins as CoinsIcon, 
-  Loader2, 
-  X, 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { SurfaceCard } from '@/components/comunes';
+import {
+  CreditCard,
+  Coins,
+  CheckCircle,
+  Gift,
+  AlertTriangle,
+  Loader2,
   Trash2,
-  CheckCircle2,
-  History
+  History,
+  Check,
+  FileClock,
+  Sigma,
+  User,
 } from 'lucide-react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter, 
-  DialogClose 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
-import { 
-  AlertDialog, 
-  AlertDialogAction, 
-  AlertDialogCancel, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogTitle 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { InputNumero } from '@/components/ui/input-numero';
 import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
 import type { Venta } from '@/lib/tipos';
 
 interface POSDialogsProps {
@@ -118,376 +116,829 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
   return (
     <>
       {/* Diálogo de Pago Principal - Pago Unificado */}
-      <Dialog open={state.dialogoPagoAbierto} onOpenChange={actions.setDialogoPagoAbierto}>
-        <DialogContent className="p-0 sm:max-w-md rounded-2xl overflow-hidden font-body border-none shadow-2xl flex flex-col h-[85vh] sm:h-[650px] gap-0">
-          
-          {/* Encabezado con Total Unificado */}
-          <div className="p-6 bg-primary/5 text-center space-y-4 border-b border-primary/10 shrink-0">
-            <div className="flex justify-center gap-2">
-              <DialogTitle asChild>
-                <Badge className="bg-primary/10 text-primary border-none font-bold text-[11px] h-6 rounded-full px-4">
-                  {esVentaCredito ? `Liquidar Crédito: ${state.ventaParaPagar?.nombreCliente}` : `Cuenta de ${state.ventaParaPagar?.nombreCliente}`}
-                </Badge>
-              </DialogTitle>
+      <Dialog
+        open={state.dialogoPagoAbierto}
+        onOpenChange={(open) => {
+          if (state.procesandoGuardado) return;
+          if (!open && state.dialogoAbonoAbierto) {
+            actions.setDialogoAbonoAbierto(false);
+            return;
+          }
+          if (!open && state.vistaDialogo === 'confirmarTarjeta') {
+            actions.setVistaDialogo('pago');
+            return;
+          }
+          actions.setDialogoPagoAbierto(open);
+        }}
+      >
+        <DialogContent
+          onPointerDownOutside={(e) => {
+            if (state.procesandoGuardado) e.preventDefault();
+          }}
+          onEscapeKeyDown={(e) => {
+            if (state.procesandoGuardado) {
+              e.preventDefault();
+              return;
+            }
+            if (state.dialogoAbonoAbierto) {
+              e.preventDefault();
+              actions.setDialogoAbonoAbierto(false);
+              return;
+            }
+            if (state.vistaDialogo === 'confirmarTarjeta') {
+              e.preventDefault();
+              actions.setVistaDialogo('pago');
+              return;
+            }
+          }}
+          className="p-5 sm:p-6 sm:max-w-lg rounded-xl sm:rounded-lg overflow-hidden font-body bg-[#1d283a] border-[#324157] text-slate-100 shadow-2xl flex flex-col max-h-[90vh] gap-4"
+        >
+          <DialogHeader className="shrink-0">
+            <div className="flex items-center justify-between gap-3 pr-6">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Coins className="w-5 h-5" />
+                </div>
+                <div className="text-left min-w-0">
+                  <DialogTitle className="font-headline text-base sm:text-lg font-bold text-slate-100 leading-tight truncate">
+                    {esVentaCredito
+                      ? `Liquidar Crédito: ${state.ventaParaPagar?.nombreCliente}`
+                      : `Cobro de Cuenta: ${state.ventaParaPagar?.nombreCliente}`}
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-slate-400 mt-0.5 truncate">
+                    Selecciona los artículos a liquidar o registra un abono.
+                  </DialogDescription>
+                </div>
+              </div>
               {state.incluirCreditoEnPago && (
-                <Badge className="bg-orange-100 text-orange-700 border-none font-bold text-[10px] h-6 rounded-full px-3">
+                <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-[10px] h-5 rounded-full px-2.5 shrink-0">
                   Incluye Deuda
                 </Badge>
               )}
             </div>
-            <div className="space-y-0.5">
-              <p className="text-5xl font-bold text-blue-500 tabular-nums tracking-tighter">
-                Q{state.montoAPagarDialogo.toFixed(2)}
-              </p>
-              <p className="text-[11px] font-semibold text-muted-foreground">Total a Liquidar</p>
-            </div>
-          </div>
-          
-          {/* Cuerpo con Ítems y Bloque de Deuda Histórica */}
-          <div className="flex-1 min-h-0 bg-background p-4 sm:p-6 flex flex-col overflow-hidden">
-            <ScrollArea className="flex-1 h-full -mr-2 pr-4">
-              <div className="space-y-6">
-                
-                {/* SECCIÓN: VENTA ACTUAL */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between px-1">
-                    <h3 className="font-bold text-xs text-muted-foreground tracking-widest">
-                      {esVentaCredito ? 'Artículos en Deuda' : 'Venta del Turno'}
-                    </h3>
-                    {!esVentaCredito && itemsPendientes.length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Checkbox 
-                          id="select-all-items"
-                          checked={todosSeleccionados}
-                          onCheckedChange={(checked) => toggleSeleccionarTodo(checked as boolean)}
-                          className="h-4 w-4 rounded-sm"
-                        />
-                        <Label htmlFor="select-all-items" className="text-[10px] font-bold text-muted-foreground cursor-pointer">
-                          Todos
-                        </Label>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    {itemsPendientes.map(detalle => (
-                      <div 
-                        key={detalle.idDetalle} 
-                        className={cn(
-                          "flex justify-between items-center py-2.5 border border-transparent transition-all px-4 rounded-xl group",
-                          !esVentaCredito && (state.itemsSeleccionadosParaPagar.has(detalle.idDetalle) ? "bg-primary/5 border-primary/10" : "hover:bg-muted/5"),
-                          !esVentaCredito && "cursor-pointer",
-                          esVentaCredito && "opacity-80"
-                        )}
-                        onClick={esVentaCredito ? undefined : () => {
-                          actions.setItemsSeleccionadosParaPagar((prev: Set<number>) => {
-                            const newSet = new Set(prev);
-                            if (newSet.has(detalle.idDetalle)) newSet.delete(detalle.idDetalle);
-                            else newSet.add(detalle.idDetalle);
-                            return newSet;
-                          });
-                        }}
-                      >
-                        <div className="flex items-center gap-4 min-w-0">
-                          {!esVentaCredito && (
-                            <Checkbox 
-                              className="rounded-md h-5 w-5" 
-                              checked={state.itemsSeleccionadosParaPagar.has(detalle.idDetalle)}
-                              onCheckedChange={() => {}} 
-                            />
-                          )}
-                          <div className="flex flex-col min-w-0">
-                            <Label className={cn("text-sm font-bold text-foreground/80 truncate", !esVentaCredito && "cursor-pointer")}>
-                              {detalle.cantidad}x {detalle.nombreProducto}
-                            </Label>
-                            {detalle.saldo < detalle.subtotal && (
-                              <span className="text-[9px] font-bold text-orange-600">Saldo: Q{detalle.saldo.toFixed(2)}</span>
-                            )}
-                          </div>
-                        </div>
-                        <span className="font-bold text-foreground tabular-nums text-sm ml-2">Q{detalle.saldo.toFixed(2)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </ScrollArea>
+          </DialogHeader>
+
+          {/* Total a Liquidar directo en el lienzo */}
+          <div className="text-center py-0.5 shrink-0">
+            <p className="text-xs font-medium text-slate-400 mb-0.5">Total a Liquidar</p>
+            <p className="text-4xl sm:text-5xl font-bold text-sky-400 tabular-nums tracking-tight">
+              Q{state.montoAPagarDialogo.toFixed(2)}
+            </p>
           </div>
 
-          {/* SECCIÓN: DEUDA HISTÓRICA (FIJA SOBRE EL FOOTER) */}
-          {tieneDeudaCredito && !esVentaCredito && (
-            <div className="px-6 py-3 border-t border-muted-foreground/10 bg-card/95 backdrop-blur-sm shrink-0">
-              <div 
-                className={cn(
-                  "flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer shadow-sm",
-                  state.incluirCreditoEnPago ? "bg-orange-50 dark:bg-orange-950/20 border-orange-400 ring-1 ring-orange-200 dark:ring-orange-900/40" : "bg-muted/10 border-muted/60 hover:bg-muted/20"
-                )}
-                onClick={() => actions.setIncluirCreditoEnPago(!state.incluirCreditoEnPago)}
-              >
-                <div className="flex items-center gap-3">
-                  <Checkbox checked={state.incluirCreditoEnPago} onCheckedChange={() => {}} className="h-5 w-5 rounded-md" />
-                  <div>
-                    <p className={cn("text-sm font-bold", state.incluirCreditoEnPago ? "text-orange-700 dark:text-orange-400" : "")}>Total créditos</p>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <History className="h-3 w-3 text-muted-foreground" />
-                      <p className="text-[10px] text-muted-foreground font-bold tracking-tight">Cierres anteriores</p>
+          {/* Lista de Artículos de la Cuenta */}
+          <SurfaceCard variant="surface" className="p-3.5 space-y-2.5 flex flex-col min-h-0">
+            <div className="flex items-center justify-between px-0.5 shrink-0">
+              <span className="font-semibold text-xs text-slate-300">
+                {esVentaCredito ? 'Artículos en Deuda' : 'Artículos de la Cuenta'}
+              </span>
+              {!esVentaCredito && itemsPendientes.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="select-all-items"
+                    checked={todosSeleccionados}
+                    onCheckedChange={(checked) => toggleSeleccionarTodo(checked as boolean)}
+                  />
+                  <Label
+                    htmlFor="select-all-items"
+                    className="text-xs font-semibold text-slate-300 cursor-pointer"
+                  >
+                    Todos
+                  </Label>
+                </div>
+              )}
+            </div>
+
+            <div className="max-h-[220px] overflow-y-auto custom-scrollbar divide-y divide-[#324157] pr-1">
+              {itemsPendientes.map((detalle) => {
+                const isSelected = state.itemsSeleccionadosParaPagar.has(detalle.idDetalle);
+                return (
+                  <div
+                    key={detalle.idDetalle}
+                    className={cn(
+                      'flex justify-between items-center py-2.5 px-2 transition-colors',
+                      !esVentaCredito && 'cursor-pointer hover:bg-[#1d283a]/60 rounded-lg',
+                      esVentaCredito && 'opacity-90'
+                    )}
+                    onClick={
+                      esVentaCredito
+                        ? undefined
+                        : () => {
+                            actions.setItemsSeleccionadosParaPagar((prev: Set<number>) => {
+                              const newSet = new Set(prev);
+                              if (newSet.has(detalle.idDetalle)) newSet.delete(detalle.idDetalle);
+                              else newSet.add(detalle.idDetalle);
+                              return newSet;
+                            });
+                          }
+                    }
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {!esVentaCredito && (
+                        <Checkbox checked={isSelected} onCheckedChange={() => {}} />
+                      )}
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs sm:text-sm font-semibold text-slate-100 truncate">
+                          {detalle.cantidad}x {detalle.nombreProducto}
+                        </span>
+                        {detalle.saldo < detalle.subtotal && (
+                          <span className="text-[10px] font-semibold text-amber-400">
+                            Saldo parcial: Q{detalle.saldo.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    <span className="font-bold text-sky-400 tabular-nums text-xs sm:text-sm ml-2 shrink-0">
+                      Q{detalle.saldo.toFixed(2)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Opción integrada para incluir deuda histórica */}
+            {tieneDeudaCredito && !esVentaCredito && (
+              <div
+                onClick={() => actions.setIncluirCreditoEnPago(!state.incluirCreditoEnPago)}
+                className={cn(
+                  'flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer mt-1',
+                  state.incluirCreditoEnPago
+                    ? 'bg-amber-500/15 border-amber-500/40'
+                    : 'bg-[#1d283a] border-[#324157] hover:border-slate-500'
+                )}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Checkbox checked={state.incluirCreditoEnPago} onCheckedChange={() => {}} />
+                  <div>
+                    <p
+                      className={cn(
+                        'text-xs font-bold leading-tight',
+                        state.incluirCreditoEnPago ? 'text-amber-300' : 'text-slate-200'
+                      )}
+                    >
+                      Incluir Total Créditos
+                    </p>
+                    <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                      <History className="h-3 w-3 text-amber-400" /> Cierres anteriores
+                    </p>
                   </div>
                 </div>
-                <span className={cn("font-bold tabular-nums text-base", state.incluirCreditoEnPago ? "text-orange-700 dark:text-orange-400" : "text-foreground")}>
+                <span
+                  className={cn(
+                    'font-bold tabular-nums text-sm',
+                    state.incluirCreditoEnPago ? 'text-amber-300' : 'text-slate-200'
+                  )}
+                >
                   Q{state.saldoCreditoCliente.toFixed(2)}
                 </span>
+              </div>
+            )}
+          </SurfaceCard>
+
+          {/* Pie de Modal con Botones Estándar en Píldora */}
+          <DialogFooter className="pt-1 shrink-0">
+            <div className="grid grid-cols-3 gap-2.5 w-full">
+              <Button
+                type="button"
+                variant="secondary"
+                className="rounded-full h-10 font-semibold text-xs bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border border-amber-500/30 transition-colors"
+                onClick={() => {
+                  actions.setMontoAbono('');
+                  actions.setDialogoAbonoAbierto(true);
+                  setTimeout(() => {
+                    refs.abonoInputRef.current?.focus();
+                    refs.abonoInputRef.current?.select();
+                  }, 60);
+                }}
+                disabled={state.montoAPagarDialogo <= 0 || state.procesandoGuardado}
+              >
+                <Coins className="mr-1.5 h-4 w-4" /> Abono
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                className="rounded-full h-10 font-semibold text-xs bg-[#283244] hover:bg-[#324157] text-slate-100 border border-[#324157]"
+                disabled={state.montoAPagarDialogo <= 0 || state.procesandoGuardado}
+                onClick={() => actions.setVistaDialogo('confirmarTarjeta')}
+              >
+                <CreditCard className="mr-1.5 h-4 w-4 text-sky-400" /> Tarjeta
+              </Button>
+              <Button
+                type="button"
+                className="rounded-full h-10 font-semibold text-xs bg-emerald-600 hover:bg-emerald-500 text-white shadow-md"
+                disabled={state.montoAPagarDialogo <= 0 || state.procesandoGuardado}
+                onClick={() => actions.procederConPago('Efectivo')}
+              >
+                {state.procesandoGuardado ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> Procesando...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="mr-1.5 h-4 w-4" /> Efectivo
+                  </>
+                )}
+              </Button>
+            </div>
+          </DialogFooter>
+
+          {/* Sub-modal interno: Confirmar Pago con Tarjeta */}
+          {state.vistaDialogo === 'confirmarTarjeta' && (
+            <div
+              className="absolute inset-0 z-50 flex items-center justify-center rounded-xl sm:rounded-lg bg-black/75 backdrop-blur-[2px] p-4 animate-in fade-in duration-150"
+              onClick={() => {
+                if (!state.procesandoGuardado) actions.setVistaDialogo('pago');
+              }}
+            >
+              <div
+                className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+                    <CreditCard className="w-4 h-4" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <h3 className="font-headline text-base font-bold text-slate-100 leading-tight">
+                      ¿Confirmar Pago con Tarjeta?
+                    </h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                      {state.ventaParaPagar?.nombreCliente} • Verifica antes de procesar
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-lg bg-[#283244] border border-[#324157] p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium text-slate-300">
+                      Monto a cobrar con tarjeta
+                    </span>
+                    <span className="text-sm font-bold text-sky-400 tabular-nums shrink-0">
+                      Q{state.montoAPagarDialogo.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="pt-2 border-t border-[#324157] text-[11px] text-slate-400 leading-snug">
+                    El cobro se registrará como pago con tarjeta y no sumará al efectivo en caja.
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 pt-0.5">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={state.procesandoGuardado}
+                    onClick={() => actions.setVistaDialogo('pago')}
+                    className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={state.procesandoGuardado}
+                    onClick={() => actions.procederConPago('Tarjeta')}
+                    className="rounded-full h-9 px-5 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md"
+                  >
+                    {state.procesandoGuardado ? (
+                      <>
+                        <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Procesando...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-1.5 h-3.5 w-3.5" /> Confirmar Pago
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Footer: Acciones de Pago */}
-          <DialogFooter className="p-4 sm:p-6 bg-muted/5 shrink-0 border-t border-muted-foreground/10">
-            {state.vistaDialogo === 'pago' ? (
-              <div className="grid gap-3 w-full grid-cols-3">
-                <Button 
-                  className="rounded-2xl h-16 flex-col bg-orange-600 hover:bg-orange-700 gap-1 font-bold text-[11px] shadow-md border-none text-white transition-transform active:scale-95"
-                  onClick={() => actions.setDialogoAbonoAbierto(true)}
-                  disabled={state.montoAPagarDialogo <= 0}
+          {/* Sub-modal interno: Realizar un Abono */}
+          {state.dialogoAbonoAbierto && (() => {
+            const saldoCuentaActual = esVentaCredito ? 0 : (state.ventaParaPagar?.saldo || 0);
+            const saldoCredito = esVentaCredito
+              ? (state.ventaParaPagar?.saldo || 0)
+              : state.saldoCreditoCliente;
+            const deudaTotal = saldoCuentaActual + saldoCredito;
+            const abonoIngresado = Number(state.montoAbono) || 0;
+            const saldoRestante = Math.max(0, deudaTotal - abonoIngresado);
+
+            return (
+              <div
+                className="absolute inset-0 z-50 flex items-center justify-center rounded-xl sm:rounded-lg bg-black/75 backdrop-blur-[2px] p-4 animate-in fade-in duration-150"
+                onClick={() => {
+                  if (!state.procesandoGuardado) actions.setDialogoAbonoAbierto(false);
+                }}
+              >
+                <div
+                  className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <CoinsIcon className="h-5 w-5" /> Abono
-                </Button>
-                <Button 
-                  className="rounded-2xl h-16 flex-col bg-blue-600 hover:bg-blue-700 gap-1 font-bold text-[11px] shadow-md border-none text-white transition-transform active:scale-95" 
-                  disabled={state.montoAPagarDialogo <= 0}
-                  onClick={() => actions.setVistaDialogo('confirmarTarjeta')}
-                >
-                  <CreditCard className="h-5 w-5" /> Tarjeta
-                </Button>
-                <Button 
-                  className="rounded-2xl h-16 flex-col bg-emerald-600 hover:bg-emerald-700 gap-1 font-bold text-[11px] shadow-md border-none text-white transition-transform active:scale-95" 
-                  disabled={state.montoAPagarDialogo <= 0}
-                  onClick={() => actions.procederConPago('Efectivo')}
-                >
-                  <CheckCircle className="h-5 w-5" /> Efectivo
-                </Button>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                      <Coins className="w-4 h-4" />
+                    </div>
+                    <div className="text-left min-w-0">
+                      <h3 className="font-headline text-base font-bold text-slate-100 leading-tight">
+                        Registrar Abono
+                      </h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                        Abono a la cuenta de {state.ventaParaPagar?.nombreCliente}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tarjeta Unificada de Desglose de Saldos */}
+                  <div className="rounded-xl bg-[#283244] border border-[#324157] overflow-hidden">
+                    {saldoCredito > 0 && !esVentaCredito ? (
+                      <>
+                        <div className="grid grid-cols-2 divide-x divide-[#324157]">
+                          <div className="p-2.5 text-center space-y-0.5">
+                            <div className="flex items-center justify-center gap-1 text-[11px] font-medium text-slate-400">
+                              <FileClock className="h-3 w-3 text-sky-400 shrink-0" />
+                              <span>Cuenta Actual</span>
+                            </div>
+                            <p className="text-sm font-bold text-slate-100 tabular-nums">
+                              Q{saldoCuentaActual.toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="p-2.5 text-center space-y-0.5">
+                            <div className="flex items-center justify-center gap-1 text-[11px] font-medium text-slate-400">
+                              <CreditCard className="h-3 w-3 text-amber-400 shrink-0" />
+                              <span>Crédito</span>
+                            </div>
+                            <p className="text-sm font-bold text-amber-400 tabular-nums">
+                              Q{saldoCredito.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="px-3.5 py-2 border-t border-[#324157] bg-[#1d283a]/40 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <Sigma className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                            <span className="text-xs font-bold text-slate-200">Deuda Total</span>
+                          </div>
+                          <span className="text-sm font-bold text-sky-400 tabular-nums">
+                            Q{deudaTotal.toFixed(2)}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="px-3.5 py-2.5 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          {esVentaCredito ? (
+                            <CreditCard className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                          ) : (
+                            <FileClock className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                          )}
+                          <span className="text-xs font-semibold text-slate-300">
+                            {esVentaCredito ? 'Saldo en Crédito' : 'Saldo de la Cuenta'}
+                          </span>
+                        </div>
+                        <span className="text-sm font-bold text-sky-400 tabular-nums">
+                          Q{deudaTotal.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+
+                    {abonoIngresado > 0 && (
+                      <div className="px-3.5 py-1.5 border-t border-[#324157] bg-emerald-500/10 flex items-center justify-between text-xs animate-in fade-in duration-150">
+                        <span className="font-medium text-emerald-300">Restante tras abono</span>
+                        <span className="font-bold text-emerald-400 tabular-nums">
+                          Q{saldoRestante.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Input de Tamaño Estándar */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="monto-abono" className="text-xs font-medium text-slate-300 ml-1 block">
+                      Monto a Recibir (Q)
+                    </Label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-sky-400 pointer-events-none">
+                        Q
+                      </span>
+                      <InputNumero
+                        id="monto-abono"
+                        ref={refs.abonoInputRef}
+                        value={state.montoAbono}
+                        onChange={(e) =>
+                          actions.setMontoAbono(e.target.value === '' ? '' : Number(e.target.value))
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            actions.manejarConfirmarAbono();
+                          }
+                        }}
+                        placeholder="0.00"
+                        className="h-10 pl-8 pr-4 text-sm font-semibold text-center tabular-nums"
+                        autoFocus
+                        onFocus={(e) => e.target.select()}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-0.5">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={state.procesandoGuardado}
+                      onClick={() => actions.setDialogoAbonoAbierto(false)}
+                      className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={actions.manejarConfirmarAbono}
+                      disabled={!state.montoAbono || Number(state.montoAbono) <= 0 || state.procesandoGuardado}
+                      className="rounded-full h-9 px-5 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md"
+                    >
+                      {state.procesandoGuardado ? (
+                        <>
+                          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                          Procesando...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="mr-1.5 h-3.5 w-3.5" />
+                          Confirmar Abono
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="space-y-4 w-full animate-in fade-in zoom-in-95 duration-200">
-                <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-2xl">
-                  <p className="text-sm font-bold text-blue-900 dark:text-blue-300">
-                    Confirmar pago con tarjeta por <span className="text-lg">Q{state.montoAPagarDialogo.toFixed(2)}</span>
+            );
+          })()}
+
+          {/* Capa de Bloqueo y Animación de Carga al Procesar Pago */}
+          {state.procesandoGuardado && (
+            <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/75 backdrop-blur-[2px] rounded-xl sm:rounded-lg animate-in fade-in duration-150">
+              <div className="p-5 rounded-2xl bg-[#1d283a] border border-[#324157] shadow-2xl flex flex-col items-center gap-3 text-center animate-in zoom-in-95 duration-150">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+                <div>
+                  <h4 className="font-headline text-sm font-bold text-slate-100">
+                    Procesando Pago...
+                  </h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Registrando transacción y actualizando caja
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1 rounded-full h-11 font-bold" onClick={() => actions.setVistaDialogo('pago')}>Volver</Button>
-                  <Button className="flex-1 rounded-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold" onClick={() => actions.procederConPago('Tarjeta')}>Confirmar</Button>
-                </div>
               </div>
-            )}
-          </DialogFooter>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
-      <Dialog open={state.dialogoAbonoAbierto} onOpenChange={state.procesandoGuardado ? undefined : actions.setDialogoAbonoAbierto}>
-        <DialogContent className="rounded-2xl font-body border-none shadow-2xl p-0 overflow-hidden max-w-sm">
-          <DialogHeader className="p-6 pb-2">
-            <DialogTitle className="font-headline text-xl font-bold">Realizar un abono</DialogTitle>
-            <DialogDescription className="text-sm font-medium text-muted-foreground">
-              Abono a la cuenta de {state.ventaParaPagar?.nombreCliente}.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="p-6 pt-2 space-y-4">
-            {(state.saldoCreditoCliente > 0 || state.incluirCreditoEnPago) && (
-              <div className="rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 p-3 text-xs space-y-1">
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Cuenta actual:</span>
-                  <span className="font-bold text-foreground">Q{(state.ventaParaPagar?.saldo || 0).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Ventas a crédito:</span>
-                  <span className="font-bold text-orange-700 dark:text-orange-400">Q{state.saldoCreditoCliente.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold pt-1 border-t border-orange-200 dark:border-orange-900/30 text-foreground">
-                  <span>Deuda total:</span>
-                  <span className="text-primary font-black">
-                    Q{((state.ventaParaPagar?.saldo || 0) + state.saldoCreditoCliente).toFixed(2)}
-                  </span>
-                </div>
+      {/* Diálogo de Consumo Interno */}
+      <Dialog
+        open={state.dialogoConsumoInternoAbierto}
+        onOpenChange={actions.setDialogoConsumoInternoAbierto}
+      >
+        <DialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border-[#324157] text-slate-100 p-5 shadow-2xl gap-4">
+          <DialogHeader>
+            <div className="flex items-center gap-3 pr-6">
+              <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                <Gift className="w-5 h-5" />
               </div>
-            )}
-            <div className="rounded-2xl bg-muted/20 p-6 border border-muted/40 flex flex-col items-center">
-              <Label htmlFor="monto-abono" className="text-[10px] font-bold tracking-widest text-muted-foreground mb-3">Monto a recibir (Q)</Label>
-              <InputNumero 
-                id="monto-abono" 
-                ref={refs.abonoInputRef}
-                value={state.montoAbono} 
-                onChange={(e) => actions.setMontoAbono(e.target.value === '' ? '' : Number(e.target.value))} 
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); actions.manejarConfirmarAbono(); } }}
-                placeholder="0.00" 
-                className="h-14 text-3xl font-bold text-center rounded-xl border-muted/40 bg-background tabular-nums text-primary"
+              <div className="text-left min-w-0">
+                <DialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
+                  Consumo Interno
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-400 mt-0.5 truncate">
+                  Introduce el PIN del cliente autorizado.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between gap-2 p-3 bg-[#283244] border border-[#324157] rounded-lg">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-100 truncate">
+                  {state.ventaParaConsumo?.nombreCliente}
+                </p>
+                <p className="text-[11px] text-slate-400">Monto en cortesía</p>
+              </div>
+              <span className="text-sm font-bold text-amber-400 tabular-nums shrink-0">
+                Q{(state.ventaParaConsumo?.saldo ?? 0).toFixed(2)}
+              </span>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="pin-consumo"
+                className="text-center block text-xs font-medium text-slate-300"
+              >
+                PIN de Autorización
+              </Label>
+              <Input
+                id="pin-consumo"
+                type="password"
+                value={state.pinConsumo}
+                onChange={(e) => actions.setPinConsumo(e.target.value)}
+                className="text-center rounded-full h-11 text-xl font-bold tracking-[0.5em]"
+                placeholder="••••"
+                maxLength={4}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    actions.confirmarConsumoInterno();
+                  }
+                }}
                 autoFocus
-                onFocus={(e) => e.target.select()}
               />
             </div>
           </div>
-          <DialogFooter className="p-6 bg-muted/5 sm:justify-between flex-col-reverse sm:flex-row gap-3">
-            <Button type="button" variant="outline" onClick={() => actions.setDialogoAbonoAbierto(false)} className="rounded-full h-10 px-6 font-bold">Cancelar</Button>
-            <Button 
-              type="button" 
-              onClick={actions.manejarConfirmarAbono} 
-              disabled={!state.montoAbono || Number(state.montoAbono) <= 0}
-              className="rounded-full h-10 px-8 font-bold bg-orange-500 hover:bg-orange-600 text-white shadow-md"
+
+          <DialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0 pt-1">
+            <Button
+              type="button"
+              variant="secondary"
+              className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+              onClick={() => actions.setDialogoConsumoInternoAbierto(false)}
             >
-              Confirmar abono
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={actions.confirmarConsumoInterno}
+              className="rounded-full h-9 px-5 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md"
+            >
+              <Check className="mr-1.5 h-3.5 w-3.5" />
+              Liquidar Cuenta
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Diálogo de Consumo Interno */}
-      <Dialog open={state.dialogoConsumoInternoAbierto} onOpenChange={actions.setDialogoConsumoInternoAbierto}>
-        <DialogContent className="rounded-2xl font-body border-none shadow-2xl p-0 overflow-hidden max-w-sm">
-          <DialogHeader className="p-6 pb-2 border-none">
-            <DialogTitle className="font-headline text-xl font-bold">Consumo Interno</DialogTitle>
-            <DialogDescription className="text-sm font-medium text-muted-foreground">Introduce el PIN del cliente autorizado.</DialogDescription>
-          </DialogHeader>
-          <div className="p-6 pt-2 space-y-6">
-            <div className="flex items-center gap-4 p-4 bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30 rounded-2xl">
-              <div className="h-10 w-10 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0">
-                <Gift className="h-5 w-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-orange-900 dark:text-orange-300 truncate">{state.ventaParaConsumo?.nombreCliente}</p>
-                <p className="text-[10px] font-medium text-orange-700 dark:text-orange-400">Cortesía: Q{(state.ventaParaConsumo?.saldo ?? 0).toFixed(2)}</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="pin-consumo" className="text-center block text-[10px] font-bold tracking-widest text-muted-foreground">Pin de Autorización</Label>
-              <Input 
-                id="pin-consumo" 
-                type="password" 
-                value={state.pinConsumo} 
-                onChange={(e) => actions.setPinConsumo(e.target.value)} 
-                className="text-center rounded-xl h-12 text-2xl font-bold tracking-[0.5em] border-muted-foreground/20 bg-muted/5"
-                placeholder="••••"
-                maxLength={4}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); actions.confirmarConsumoInterno(); } }}
-                autoFocus
-              />
-            </div>
-          </div>
-          <DialogFooter className="p-6 bg-muted/5 sm:justify-between flex-col-reverse sm:flex-row gap-3 border-none">
-            <Button type="button" variant="outline" className="rounded-full h-10 font-bold" onClick={() => actions.setDialogoConsumoInternoAbierto(false)}>Cancelar</Button>
-            <Button type="button" onClick={actions.confirmarConsumoInterno} className="rounded-full h-10 px-8 font-bold bg-orange-500 hover:bg-orange-600 text-white">Liquidar Cuenta</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog 
-        open={state.alertaCancelarVentaAbierta} 
+      {/* Confirmación: ¿Descartar Cambios? */}
+      <AlertDialog
+        open={state.alertaCancelarVentaAbierta}
         onOpenChange={(abierta) => {
           if (!abierta) actions.manejarPermanecerEnVenta?.();
           actions.setAlertaCancelarVentaAbierta(abierta);
         }}
       >
-        <AlertDialogContent className="rounded-2xl font-body border-none shadow-2xl">
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-headline text-xl font-bold flex items-center gap-3">
-              <AlertTriangle className="h-6 w-6 text-amber-500" /> ¿Descartar cambios?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm font-medium">
-              Hay artículos nuevos en el carrito sin guardar. Si continúas, se descartarán únicamente los artículos nuevos y volverán al stock automáticamente sin alterar la venta previa.
-            </AlertDialogDescription>
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+              <div className="text-left min-w-0">
+                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
+                  ¿Descartar Cambios?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Se descartarán los artículos nuevos sin guardar y se devolverán automáticamente al
+                  stock.
+                </AlertDialogDescription>
+              </div>
+            </div>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6 flex-col sm:flex-row gap-3">
-            <AlertDialogCancel onClick={actions.manejarPermanecerEnVenta} className="rounded-full h-10 px-6 font-bold">Permanecer</AlertDialogCancel>
-            <AlertDialogAction onClick={actions.manejarConfirmarCancelacion} className="rounded-full h-10 px-8 font-bold bg-destructive text-white hover:bg-destructive/90">Sí, descartar</AlertDialogAction>
+          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
+            <AlertDialogCancel
+              onClick={actions.manejarPermanecerEnVenta}
+              className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200"
+            >
+              Permanecer
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={actions.manejarConfirmarCancelacion}
+              className="rounded-full h-9 px-5 text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-md"
+            >
+              Sí, Descartar
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={state.alertaEliminarAbierta} onOpenChange={state.procesandoGuardado ? undefined : actions.setAlertaEliminarAbierta}>
-        <AlertDialogContent className="rounded-3xl font-body border-none shadow-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-headline text-2xl font-bold text-destructive flex items-center gap-3">
-              <Trash2 className="h-7 w-7" /> ¿Eliminar cliente?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm font-medium text-muted-foreground mt-2 leading-relaxed">
-              Estás a punto de borrar permanentemente el registro de <span className="font-black text-foreground">"{state.clienteParaEliminar?.nombre}"</span>. Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6 flex-col sm:flex-row gap-3">
-            <AlertDialogCancel className="rounded-full h-10 px-6 font-bold">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={actions.manejarConfirmarEliminarCliente} className="bg-destructive text-white hover:bg-destructive/90 rounded-full h-10 px-8 font-bold">Eliminar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={state.alertaCreditoMonedasAbierta} onOpenChange={actions.setAlertaCreditoMonedasAbierta}>
-        <AlertDialogContent className="rounded-3xl font-body border-none shadow-2xl">
-            <AlertDialogHeader>
-                <AlertDialogTitle className="font-headline text-xl font-bold flex items-center gap-3">
-                    <CreditCard className="h-6 w-6 text-primary" /> Confirmar Crédito
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-sm font-medium mt-2">
-                    ¿Deseas mover esta cuenta a crédito? Se sumará al contador de crédito en tu balance de caja.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="mt-6 flex-col sm:flex-row gap-3">
-                <AlertDialogCancel className="rounded-full h-11 px-8 font-bold">Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={() => state.ventaParaPagar && actions.confirmarPasarACredito(state.ventaParaPagar)} className="rounded-full h-11 px-10 font-bold bg-primary shadow-lg shadow-primary/20">Confirmar Crédito</AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={state.alertaClienteConCreditoAbierta} onOpenChange={actions.setAlertaClienteConCreditoAbierta}>
-        <AlertDialogContent className="rounded-3xl font-body border-none shadow-2xl">
-            <AlertDialogHeader>
-                <AlertDialogTitle className="font-headline text-xl font-bold flex items-center gap-3 text-orange-600">
-                    <AlertTriangle className="h-6 w-6" /> Cliente con Deuda
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-sm font-medium mt-2">
-                    Este cliente ya tiene una deuda activa. ¿Deseas abrir una nueva cuenta por separado o prefieres liquidar la deuda anterior primero?
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="mt-6 flex flex-col sm:flex-row gap-3">
-                <AlertDialogCancel className="rounded-full h-11 px-8 font-bold">Revisar Deuda</AlertDialogCancel>
-                <AlertDialogAction onClick={actions.procederAGuardarVenta} className="rounded-full h-11 px-10 font-bold bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-500/20">Continuar Nueva Venta</AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog 
-        open={state.alertaEliminarItemAbierta} 
-        onOpenChange={state.procesandoEliminarItem ? undefined : actions.setAlertaEliminarItemAbierta}
+      {/* Confirmación: ¿Eliminar Cliente? */}
+      <AlertDialog
+        open={state.alertaEliminarAbierta}
+        onOpenChange={state.procesandoGuardado ? undefined : actions.setAlertaEliminarAbierta}
       >
-        <AlertDialogContent className="rounded-xl font-body bg-card border border-border shadow-2xl">
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-headline text-xl font-bold text-destructive flex items-center gap-3">
-              <Trash2 className="h-6 w-6" /> ¿Eliminar Producto de la Venta?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm font-medium text-muted-foreground mt-2 leading-relaxed">
-              ¿Estás Seguro de que Deseas Eliminar <span className="font-bold text-foreground">"{state.itemParaEliminar?.item.nombreProducto}"</span> de Esta Venta?
-              {state.itemParaEliminar?.item.idDetalle !== 0 && (
-                <span className="block mt-2 text-xs text-rose-500 font-semibold bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/20">
-                  • Se Reintegrará el Stock al Inventario y el Movimiento Quedará Registrado en el Kardex y en la Auditoría.
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0 mt-0.5">
+                <Trash2 className="w-4 h-4" />
+              </div>
+              <div className="text-left min-w-0">
+                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
+                  ¿Eliminar Cliente?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Se borrará permanentemente el registro de{' '}
+                  <strong className="text-slate-100 font-semibold">
+                    {state.clienteParaEliminar?.nombre}
+                  </strong>
+                  . Esta acción no se puede deshacer.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
+            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={actions.manejarConfirmarEliminarCliente}
+              className="bg-rose-600 hover:bg-rose-500 text-white rounded-full h-9 px-5 text-xs font-semibold shadow-md"
+            >
+              <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+              Sí, Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirmación: Confirmar Crédito */}
+      <AlertDialog
+        open={state.alertaCreditoMonedasAbierta}
+        onOpenChange={actions.setAlertaCreditoMonedasAbierta}
+      >
+        <AlertDialogContent className="sm:max-w-sm rounded-2xl font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-4 sm:p-5 gap-3 shadow-2xl">
+          <AlertDialogHeader className="space-y-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="relative flex items-center justify-center shrink-0">
+                <span className="absolute -inset-1 rounded-full bg-amber-400/25 animate-ping opacity-60" />
+                <span className="absolute -inset-1.5 rounded-full bg-amber-500/15 animate-pulse" />
+                <div className="relative w-9 h-9 rounded-full bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-md shadow-amber-500/10">
+                  <CreditCard className="w-4 h-4 animate-pulse" />
+                </div>
+              </div>
+              <div className="text-left min-w-0">
+                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
+                  ¿Mover Cuenta a Crédito?
+                </AlertDialogTitle>
+                <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                  Autorización de traslado a cuentas por cobrar
+                </p>
+              </div>
+            </div>
+
+            <AlertDialogDescription asChild>
+              <div className="space-y-2.5 text-left">
+                {/* Resumen Compacto en 1 sola fila */}
+                <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#283244] border border-[#324157]">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <User className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <span className="text-xs font-bold text-slate-100 truncate">
+                      {state.ventaParaPagar?.nombreCliente || 'Cliente'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                    <span className="text-[11px] text-slate-400">Saldo:</span>
+                    <span className="text-sm font-bold text-amber-400 tabular-nums">
+                      Q{(state.ventaParaPagar?.saldo ?? state.ventaParaPagar?.total ?? 0).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Explicación Compacta */}
+                <p className="text-xs text-slate-300 leading-snug">
+                  La cuenta se moverá a <strong className="text-amber-400 font-semibold">Créditos Activos</strong> para liquidación posterior.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
+            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() =>
+                state.ventaParaPagar && actions.confirmarPasarACredito(state.ventaParaPagar)
+              }
+              className="rounded-full h-9 px-5 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md inline-flex items-center gap-1.5 transition-colors"
+            >
+              <CreditCard className="w-3.5 h-3.5" />
+              Confirmar Crédito
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirmación: Cliente con Deuda */}
+      <AlertDialog
+        open={state.alertaClienteConCreditoAbierta}
+        onOpenChange={actions.setAlertaClienteConCreditoAbierta}
+      >
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
+          <AlertDialogHeader>
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+              <div className="text-left min-w-0">
+                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
+                  Cliente con Deuda Activa
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Este cliente ya tiene un crédito pendiente. ¿Deseas abrir una nueva cuenta por
+                  separado?
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
+            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200">
+              Revisar Deuda
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={actions.procederAGuardarVenta}
+              className="rounded-full h-9 px-5 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md"
+            >
+              Continuar Venta
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirmación: ¿Eliminar Producto de la Venta? */}
+      <AlertDialog
+        open={state.alertaEliminarItemAbierta}
+        onOpenChange={
+          state.procesandoEliminarItem ? undefined : actions.setAlertaEliminarItemAbierta
+        }
+      >
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                <Trash2 className="w-4 h-4" />
+              </div>
+              <div className="text-left min-w-0">
+                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
+                  ¿Eliminar Producto?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-[11px] text-slate-400 mt-0.5 truncate">
+                  Confirma la eliminación del artículo de la venta
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+
+          <div className="rounded-lg bg-[#283244] border border-[#324157] p-3 space-y-2">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-100 truncate">
+                  {state.itemParaEliminar?.item.nombreProducto}
+                </p>
+                {state.itemParaEliminar?.item.cantidad !== undefined && (
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {state.itemParaEliminar.item.cantidad} &times; Q
+                    {Number(state.itemParaEliminar.item.precioUnitario ?? 0).toFixed(2)} c/u
+                  </p>
+                )}
+              </div>
+              {state.itemParaEliminar?.item.subtotal !== undefined && (
+                <span className="text-xs font-bold text-sky-400 tabular-nums shrink-0 mt-0.5">
+                  Q{Number(state.itemParaEliminar.item.subtotal || 0).toFixed(2)}
                 </span>
               )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6 flex flex-col sm:flex-row gap-3">
-            <AlertDialogCancel 
+            </div>
+
+            {state.itemParaEliminar?.item.idDetalle !== 0 && (
+              <div className="pt-2 border-t border-[#324157] text-[11px] text-slate-300 leading-snug">
+                {state.itemParaEliminar?.item.idProducto === 'item-manual' ||
+                state.itemParaEliminar?.item.idProducto?.startsWith('mesa-') ||
+                state.itemParaEliminar?.item.idProducto?.startsWith('division-mesa-')
+                  ? 'El cargo se descontará inmediatamente del saldo de la cuenta.'
+                  : 'Se reintegrará el stock al inventario y el movimiento quedará registrado en el Kardex.'}
+              </div>
+            )}
+          </div>
+
+          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-0.5 sm:space-x-0">
+            <AlertDialogCancel
               disabled={state.procesandoEliminarItem}
-              className="rounded-xl h-10 px-6 font-bold"
+              className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200"
             >
               Cancelar
             </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={actions.confirmarEliminarItem} 
+            <AlertDialogAction
+              onClick={actions.confirmarEliminarItem}
               disabled={state.procesandoEliminarItem}
-              className="bg-destructive text-white hover:bg-destructive/90 rounded-xl h-10 px-8 font-bold"
+              className="bg-rose-600 hover:bg-rose-500 text-white rounded-full h-9 px-5 text-xs font-semibold shadow-md"
             >
               {state.procesandoEliminarItem ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Eliminando...
-                </span>
+                <>
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Eliminando...
+                </>
               ) : (
-                "Sí, Eliminar Producto"
+                <>
+                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                  Sí, Eliminar
+                </>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

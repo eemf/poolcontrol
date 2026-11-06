@@ -23,6 +23,11 @@ export default {
         code: ['monospace'],
       },
       colors: {
+        app: {
+          panel: '#1d283a',       // Fondo de contenedores principales y listados
+          surface: '#283244',     // Fondo de tarjetas secundarias, acordeones e inputs
+          border: '#324157',      // Bordes oficiales de contenedores y controles
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
