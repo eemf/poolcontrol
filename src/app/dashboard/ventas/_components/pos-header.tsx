@@ -18,7 +18,7 @@ export function POSHeader() {
             variant="secondary"
             size="icon"
             asChild
-            className="rounded-full h-9 w-9 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157] shadow-sm transition-colors"
+            className="rounded-full h-9 w-9 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e] shadow-sm transition-colors"
             title="Sala de Juegos"
             aria-label="Sala de Juegos"
           >
@@ -31,7 +31,7 @@ export function POSHeader() {
             variant="secondary"
             size="icon"
             asChild
-            className="rounded-full h-9 w-9 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157] shadow-sm transition-colors"
+            className="rounded-full h-9 w-9 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e] shadow-sm transition-colors"
             title="Tragamonedas"
             aria-label="Tragamonedas"
           >
@@ -44,7 +44,7 @@ export function POSHeader() {
             variant="secondary"
             size="icon"
             asChild
-            className="rounded-full h-9 w-9 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157] shadow-sm transition-colors"
+            className="rounded-full h-9 w-9 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e] shadow-sm transition-colors"
             title="Historial de Ventas"
             aria-label="Historial de Ventas"
           >

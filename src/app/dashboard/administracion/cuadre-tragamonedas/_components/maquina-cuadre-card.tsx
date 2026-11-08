@@ -21,7 +21,7 @@ export function MaquinaCuadreCard({
   const totalExtraidoMaquina = manual + extraccionNeta - base - deuda
 
   return (
-    <Card className="flex flex-col bg-[#283244] border-[#324157] text-white shadow-sm hover:border-slate-500 transition-colors">
+    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-white shadow-sm hover:border-slate-500 transition-colors">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-bold text-white">{maquina.nombre}</CardTitle>
       </CardHeader>
@@ -36,7 +36,7 @@ export function MaquinaCuadreCard({
             value={montoManual}
             onChange={(e) => onMontoManualChange(maquina.id, e.target.value)}
             placeholder="0.00"
-            className="text-center font-bold bg-[#1d283a] border-[#324157] text-white rounded-full h-10"
+            className="text-center font-bold bg-[#1e1e1e] border-[#2e2e2e] text-white rounded-full h-10"
           />
         </div>
 
@@ -62,7 +62,7 @@ export function MaquinaCuadreCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-3 bg-[#1d283a] border-t border-[#324157] rounded-b-xl">
+      <CardFooter className="p-3 bg-[#1e1e1e] border-t border-[#2e2e2e] rounded-b-xl">
         <div className="w-full text-center">
           <p className="text-xs font-medium text-slate-400">Total Extraído de Máquina</p>
           <p className="text-lg font-bold text-emerald-400 mt-0.5">Q{totalExtraidoMaquina.toFixed(2)}</p>

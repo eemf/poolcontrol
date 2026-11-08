@@ -119,7 +119,7 @@ export function PremioForm({ maquinas, sucursalId, usuarioId }: PremioFormProps)
             </Select>
           </div>
 
-          <div className="flex items-center justify-center p-1.5 bg-[#283244] rounded-full border border-app-border">
+          <div className="flex items-center justify-center p-1.5 bg-[#252526] rounded-full border border-app-border">
             <RadioGroup
               value={tipoPremio}
               onValueChange={(v) => setTipoPremio(v as 'total' | 'parcial')}

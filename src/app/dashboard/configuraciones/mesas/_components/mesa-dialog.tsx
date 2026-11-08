@@ -30,7 +30,7 @@ export function MesaDialog({
 }: MesaDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-2xl bg-[#1d283a] border-[#324157] text-white">
+      <DialogContent className="sm:max-w-md rounded-2xl bg-[#1e1e1e] border-[#2e2e2e] text-white">
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-white">
@@ -51,7 +51,7 @@ export function MesaDialog({
                 onChange={e => setMesaForm(p => ({ ...p, numeroMesa: Number(e.target.value) }))}
                 disabled={!!editingMesa}
                 required
-                className="rounded-full text-center text-lg font-bold bg-[#283244] border-[#324157] text-white"
+                className="rounded-full text-center text-lg font-bold bg-[#252526] border-[#2e2e2e] text-white"
               />
             </div>
 
@@ -62,10 +62,10 @@ export function MesaDialog({
                   value={mesaForm.tipoDeMesa}
                   onValueChange={(v: any) => setMesaForm(p => ({ ...p, tipoDeMesa: v }))}
                 >
-                  <SelectTrigger className="rounded-full bg-[#283244] border-[#324157] text-white">
+                  <SelectTrigger className="rounded-full bg-[#252526] border-[#2e2e2e] text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#283244] border-[#324157] text-white">
+                  <SelectContent className="bg-[#252526] border-[#2e2e2e] text-white">
                     <SelectItem value="Billar Pool">Pool</SelectItem>
                     <SelectItem value="Carambola">Carambola</SelectItem>
                     <SelectItem value="Consola">Videojuegos</SelectItem>
@@ -79,10 +79,10 @@ export function MesaDialog({
                   value={mesaForm.tarifaId}
                   onValueChange={v => setMesaForm(p => ({ ...p, tarifaId: v }))}
                 >
-                  <SelectTrigger className="rounded-full bg-[#283244] border-[#324157] text-white">
+                  <SelectTrigger className="rounded-full bg-[#252526] border-[#2e2e2e] text-white">
                     <SelectValue placeholder="Elegir..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#283244] border-[#324157] text-white">
+                  <SelectContent className="bg-[#252526] border-[#2e2e2e] text-white">
                     {tarifas.map(t => (
                       <SelectItem key={t.docId} value={t.docId}>{t.nombre}</SelectItem>
                     ))}
@@ -92,9 +92,9 @@ export function MesaDialog({
             </div>
           </div>
 
-          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2 border-t border-[#324157]">
+          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2 border-t border-[#2e2e2e]">
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="rounded-full w-full sm:w-auto border-[#324157] text-slate-300 hover:bg-[#283244]">
+              <Button type="button" variant="outline" className="rounded-full w-full sm:w-auto border-[#2e2e2e] text-slate-300 hover:bg-[#252526]">
                 Cancelar
               </Button>
             </DialogClose>

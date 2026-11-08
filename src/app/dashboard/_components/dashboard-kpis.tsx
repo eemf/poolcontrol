@@ -47,14 +47,14 @@ export function DashboardKPIs({ metrics }: DashboardKPIsProps) {
               <span className="text-slate-300 font-medium">Mesas de Billar</span>
               <span className="font-mono font-bold text-slate-100">{metrics.ocupadasBillar} / {metrics.totalBillar}</span>
             </div>
-            <Progress value={metrics.percBillar} className="h-2 bg-[#283244]" />
+            <Progress value={metrics.percBillar} className="h-2 bg-[#252526]" />
           </div>
           <div className="space-y-1">
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-300 font-medium">Consolas de Videojuegos</span>
               <span className="font-mono font-bold text-slate-100">{metrics.ocupadasConsola} / {metrics.totalConsola}</span>
             </div>
-            <Progress value={metrics.percConsola} className="h-2 bg-[#283244]" />
+            <Progress value={metrics.percConsola} className="h-2 bg-[#252526]" />
           </div>
         </div>
       </SurfaceCard>
@@ -109,7 +109,7 @@ export function DashboardKPIs({ metrics }: DashboardKPIsProps) {
           {metrics.bajoStock > 0 && (
             <div className="mt-2 space-y-1.5 max-h-[110px] overflow-y-auto pr-1">
               {metrics.productosBajoStock.map((p) => (
-                <div key={p.id} className="flex justify-between items-center text-xs bg-[#283244] p-1.5 rounded-lg border border-app-border">
+                <div key={p.id} className="flex justify-between items-center text-xs bg-[#252526] p-1.5 rounded-lg border border-app-border">
                   <span className="font-medium text-slate-200 truncate max-w-[130px]">{p.nombre}</span>
                   <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-bold border-amber-500/40 text-amber-400 bg-amber-500/10 rounded-full">
                     {p.existencia} / {p.existenciaMinima || 0}

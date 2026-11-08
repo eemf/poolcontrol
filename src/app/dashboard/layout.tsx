@@ -371,7 +371,7 @@ export default function LayoutDashboard({
           <div
             role="alertdialog"
             aria-modal="true"
-            className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
+            className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
           >
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">

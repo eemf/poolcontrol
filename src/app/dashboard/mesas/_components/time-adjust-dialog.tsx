@@ -56,7 +56,7 @@ export function TimeAdjustDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#1d283a] border-[#324157] text-slate-100 rounded-xl sm:rounded-lg font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl">
+      <DialogContent className="sm:max-w-md bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-xl sm:rounded-lg font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl">
         <DialogHeader className="shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
@@ -87,7 +87,7 @@ export function TimeAdjustDialog({
                   'rounded-full h-9 font-semibold text-xs transition-all',
                   tiempoParaAnadir === intervalo.minutos
                     ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
-                    : 'bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]'
+                    : 'bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]'
                 )}
               >
                 {intervalo.label}
@@ -95,7 +95,7 @@ export function TimeAdjustDialog({
             ))}
           </div>
 
-          <div className="flex items-center space-x-2.5 p-3.5 bg-[#283244] rounded-xl border border-[#324157]">
+          <div className="flex items-center space-x-2.5 p-3.5 bg-[#252526] rounded-xl border border-[#2e2e2e]">
             <Checkbox
               id="pagar-ajuste-contado"
               checked={pagarTiempoAnadido}
@@ -115,7 +115,7 @@ export function TimeAdjustDialog({
             <Button
               type="button"
               variant="secondary"
-              className="rounded-full px-5 font-medium h-10 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+              className="rounded-full px-5 font-medium h-10 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
             >
               Cancelar
             </Button>

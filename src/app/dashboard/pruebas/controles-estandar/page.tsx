@@ -74,7 +74,7 @@ const PALETA_SISTEMA: ColorItem[] = [
   {
     nombre: 'Panel Principal',
     token: 'bg-app-panel',
-    hexOscuro: '#1d283a',
+    hexOscuro: '#1e1e1e',
     hexClaro: '#ffffff',
     descripcion: 'Contenedores principales, barras laterales, encabezados y modales',
     uso: 'Sidebar, Modales, Tableros, Tarjetas base'
@@ -82,7 +82,7 @@ const PALETA_SISTEMA: ColorItem[] = [
   {
     nombre: 'Superficie de Control (Surface)',
     token: 'bg-app-surface',
-    hexOscuro: '#283244',
+    hexOscuro: '#252526',
     hexClaro: '#f1f5f9',
     descripcion: 'Fondo para inputs, acordeones, tarjetas secundarias y barras de herramientas',
     uso: 'Inputs, Selects, Sub-tarjetas, Tab-bar'
@@ -90,7 +90,7 @@ const PALETA_SISTEMA: ColorItem[] = [
   {
     nombre: 'Bordes Nítidos (Border)',
     token: 'border-app-border',
-    hexOscuro: '#324157',
+    hexOscuro: '#2e2e2e',
     hexClaro: '#cbd5e1',
     descripcion: 'Línea de 1px de alta definición para delimitar controles y tarjetas sin halos',
     uso: 'border-app-border, divisores, inputs'
@@ -177,7 +177,7 @@ export default function ControlesEstandarPage() {
 
       {/* SECCIÓN A: PALETA DE COLORES (MODO OSCURO ANTIGRAVITY & MODO CLARO) */}
       <SurfaceCard variant="panel" className="p-5 border-sky-500/30 space-y-5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-[#324157]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-[#2e2e2e]">
           <div>
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400">
@@ -193,7 +193,7 @@ export default function ControlesEstandarPage() {
           </div>
 
           {/* Selector de Pestañas de Vista de Paleta */}
-          <div className="inline-flex items-center p-1 rounded-full bg-[#182330] border border-[#324157] shrink-0 self-start md:self-auto">
+          <div className="inline-flex items-center p-1 rounded-full bg-[#182330] border border-[#2e2e2e] shrink-0 self-start md:self-auto">
             <button
               type="button"
               onClick={() => setVistaPaleta('oscuro')}
@@ -248,7 +248,7 @@ export default function ControlesEstandarPage() {
               <div
                 key={idx}
                 onClick={() => copiarAlPortapapeles(item.hexOscuro)}
-                className="group relative p-3.5 rounded-2xl bg-[#182330] hover:bg-[#1f293b] border border-[#324157] hover:border-sky-500/60 cursor-pointer transition-all duration-200 space-y-2.5 shadow-sm"
+                className="group relative p-3.5 rounded-2xl bg-[#182330] hover:bg-[#1f293b] border border-[#2e2e2e] hover:border-sky-500/60 cursor-pointer transition-all duration-200 space-y-2.5 shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-slate-200">{item.nombre}</span>
@@ -282,7 +282,7 @@ export default function ControlesEstandarPage() {
                   {item.descripcion}
                 </p>
 
-                <div className="pt-1.5 border-t border-[#324157]/50 flex items-center justify-between text-[10px] text-slate-500">
+                <div className="pt-1.5 border-t border-[#2e2e2e]/50 flex items-center justify-between text-[10px] text-slate-500">
                   <span>Uso:</span>
                   <span className="font-mono text-slate-300">{item.uso}</span>
                 </div>
@@ -343,9 +343,9 @@ export default function ControlesEstandarPage() {
 
         {/* Vista: Comparativa Lado a Lado */}
         {vistaPaleta === 'comparativa' && (
-          <div className="overflow-x-auto rounded-2xl border border-[#324157]">
+          <div className="overflow-x-auto rounded-2xl border border-[#2e2e2e]">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#182330] text-slate-300 font-semibold border-b border-[#324157]">
+              <thead className="bg-[#182330] text-slate-300 font-semibold border-b border-[#2e2e2e]">
                 <tr>
                   <th className="p-3">Elemento / Token</th>
                   <th className="p-3">Modo Oscuro (Antigravity IDE)</th>
@@ -353,9 +353,9 @@ export default function ControlesEstandarPage() {
                   <th className="p-3">Uso Recomendado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#324157] bg-[#1d283a]">
+              <tbody className="divide-y divide-[#2e2e2e] bg-[#1e1e1e]">
                 {PALETA_SISTEMA.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-[#283244]/50 transition-colors">
+                  <tr key={idx} className="hover:bg-[#252526]/50 transition-colors">
                     <td className="p-3">
                       <span className="font-bold text-slate-100 block">{item.nombre}</span>
                       <span className="text-[11px] font-mono text-sky-400">{item.token}</span>
@@ -364,7 +364,7 @@ export default function ControlesEstandarPage() {
                       <button
                         type="button"
                         onClick={() => copiarAlPortapapeles(item.hexOscuro)}
-                        className="inline-flex items-center gap-2.5 p-1.5 pr-3 rounded-full bg-[#182330] border border-[#324157] hover:border-sky-500 transition-colors"
+                        className="inline-flex items-center gap-2.5 p-1.5 pr-3 rounded-full bg-[#182330] border border-[#2e2e2e] hover:border-sky-500 transition-colors"
                       >
                         <span
                           className="w-6 h-6 rounded-full border border-white/10 shrink-0"
@@ -398,7 +398,7 @@ export default function ControlesEstandarPage() {
         )}
 
         {/* DEMO VIVO: Simulador Interactivo de Tema */}
-        <div className="p-4 rounded-2xl bg-[#182330] border border-[#324157] space-y-3">
+        <div className="p-4 rounded-2xl bg-[#182330] border border-[#2e2e2e] space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-bold text-slate-200 block">
@@ -409,7 +409,7 @@ export default function ControlesEstandarPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 bg-[#12151b] px-3 py-1.5 rounded-full border border-[#324157]">
+            <div className="flex items-center gap-2 bg-[#12151b] px-3 py-1.5 rounded-full border border-[#2e2e2e]">
               <span className={`text-xs ${temaDemoVivo === 'oscuro' ? 'text-sky-400 font-bold' : 'text-slate-400'}`}>
                 Oscuro
               </span>
@@ -427,7 +427,7 @@ export default function ControlesEstandarPage() {
           <div
             className={`p-5 rounded-2xl border transition-all duration-300 ${
               temaDemoVivo === 'oscuro'
-                ? 'bg-[#12151b] border-[#324157] text-slate-100'
+                ? 'bg-[#12151b] border-[#2e2e2e] text-slate-100'
                 : 'bg-[#f8fafc] border-slate-200 text-slate-900 shadow-sm'
             }`}
           >
@@ -446,7 +446,7 @@ export default function ControlesEstandarPage() {
                     defaultValue="250.00"
                     className={`flex h-10 w-full rounded-full pl-9 pr-4 text-sm font-semibold transition-colors focus:outline-none ${
                       temaDemoVivo === 'oscuro'
-                        ? 'bg-[#283244] border border-[#324157] text-slate-100 focus:border-sky-500 focus:ring-1 focus:ring-sky-500'
+                        ? 'bg-[#252526] border border-[#2e2e2e] text-slate-100 focus:border-sky-500 focus:ring-1 focus:ring-sky-500'
                         : 'bg-white border border-slate-300 text-slate-900 focus:border-sky-600 focus:ring-1 focus:ring-sky-600 shadow-sm'
                     }`}
                   />
@@ -456,19 +456,19 @@ export default function ControlesEstandarPage() {
               {/* Select en tema vivo */}
               <div className="space-y-1.5">
                 <label className={`text-xs font-medium ml-1 block ${temaDemoVivo === 'oscuro' ? 'text-slate-200' : 'text-slate-700'}`}>
-                  Select ({temaDemoVivo === 'oscuro' ? 'bg-[#283244]' : 'bg-white'})
+                  Select ({temaDemoVivo === 'oscuro' ? 'bg-[#252526]' : 'bg-white'})
                 </label>
                 <Select defaultValue="mesa1">
                   <SelectTrigger
                     className={`h-10 rounded-full px-4 text-sm font-medium ${
                       temaDemoVivo === 'oscuro'
-                        ? 'bg-[#283244] border-[#324157] text-slate-100 focus:ring-1 focus:ring-sky-500'
+                        ? 'bg-[#252526] border-[#2e2e2e] text-slate-100 focus:ring-1 focus:ring-sky-500'
                         : 'bg-white border-slate-300 text-slate-900 focus:ring-1 focus:ring-sky-600 shadow-sm'
                     }`}
                   >
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className={temaDemoVivo === 'oscuro' ? 'bg-[#1d283a] border-[#324157] text-slate-200' : 'bg-white border-slate-200 text-slate-800'}>
+                  <SelectContent className={temaDemoVivo === 'oscuro' ? 'bg-[#1e1e1e] border-[#2e2e2e] text-slate-200' : 'bg-white border-slate-200 text-slate-800'}>
                     <SelectItem value="mesa1" className="rounded-full">Mesa 1 (Pool Estándar)</SelectItem>
                     <SelectItem value="mesa2" className="rounded-full">Mesa 2 (Carambola)</SelectItem>
                   </SelectContent>
@@ -482,7 +482,7 @@ export default function ControlesEstandarPage() {
                 </Button>
                 <div className={`flex items-center gap-2 px-3 py-2 rounded-full border ${
                   temaDemoVivo === 'oscuro'
-                    ? 'bg-[#1d283a] border-[#324157] text-slate-200'
+                    ? 'bg-[#1e1e1e] border-[#2e2e2e] text-slate-200'
                     : 'bg-white border-slate-300 text-slate-800 shadow-sm'
                 }`}>
                   <span className="text-xs">Turno</span>
@@ -522,7 +522,7 @@ export default function ControlesEstandarPage() {
               <input
                 type="text"
                 defaultValue="0.00"
-                className="flex h-9 w-full rounded-full border border-input bg-[#283244] px-3 py-2 text-sm text-center text-slate-200 ring-offset-2 ring-offset-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                className="flex h-9 w-full rounded-full border border-input bg-[#252526] px-3 py-2 text-sm text-center text-slate-200 ring-offset-2 ring-offset-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
               />
             </div>
 
@@ -537,7 +537,7 @@ export default function ControlesEstandarPage() {
           </div>
 
           {/* Caso 2: Estandarizado Oficial (Captura 1 Perfeccionada) */}
-          <div className="p-4 rounded-2xl bg-[#1d283a] border border-emerald-500/40 space-y-3">
+          <div className="p-4 rounded-2xl bg-[#1e1e1e] border border-emerald-500/40 space-y-3">
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
                 <Check className="w-4 h-4" /> Estándar Oficial Aprobado
@@ -554,7 +554,7 @@ export default function ControlesEstandarPage() {
                 <input
                   type="text"
                   defaultValue="150.00"
-                  className="flex h-10 w-full rounded-full border border-[#324157] bg-[#283244] pl-9 pr-4 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors shadow-sm"
+                  className="flex h-10 w-full rounded-full border border-[#2e2e2e] bg-[#252526] pl-9 pr-4 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors shadow-sm"
                 />
               </div>
             </div>
@@ -579,13 +579,13 @@ export default function ControlesEstandarPage() {
             1. Inputs de Texto y Búsqueda
           </h2>
           <p className="text-xs text-slate-400">
-            Fondo corporativo <code className="text-sky-300">#283244</code>, borde <code className="text-sky-300">#324157</code>, foco <code className="text-sky-300">sky-500</code>, padding ergonómico <code className="text-sky-300">px-4</code> y altura <code className="text-sky-300">h-10</code>.
+            Fondo corporativo <code className="text-sky-300">#252526</code>, borde <code className="text-sky-300">#2e2e2e</code>, foco <code className="text-sky-300">sky-500</code>, padding ergonómico <code className="text-sky-300">px-4</code> y altura <code className="text-sky-300">h-10</code>.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Input Normal */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2">
             <Label htmlFor="input-ejemplo-texto" className="text-xs font-medium text-slate-200 ml-1">
               Nombre de Cliente
             </Label>
@@ -595,13 +595,13 @@ export default function ControlesEstandarPage() {
               value={textoNormal}
               onChange={(e) => setTextoNormal(e.target.value)}
               placeholder="Escribe un nombre..."
-              className="flex h-10 w-full rounded-full border border-[#324157] bg-[#1d283a] px-4 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
+              className="flex h-10 w-full rounded-full border border-[#2e2e2e] bg-[#1e1e1e] px-4 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
             />
             <span className="text-[11px] text-slate-400 ml-1 block">Input estándar con relleno suave</span>
           </div>
 
           {/* Buscador con Icono y Botón de Limpiar */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2">
             <Label htmlFor="input-ejemplo-buscar" className="text-xs font-medium text-slate-200 ml-1">
               Buscador Rápido
             </Label>
@@ -613,7 +613,7 @@ export default function ControlesEstandarPage() {
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 placeholder="Buscar producto, cliente o folio..."
-                className="flex h-10 w-full rounded-full border border-[#324157] bg-[#1d283a] pl-10 pr-9 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
+                className="flex h-10 w-full rounded-full border border-[#2e2e2e] bg-[#1e1e1e] pl-10 pr-9 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
               />
               {busqueda && (
                 <button
@@ -630,7 +630,7 @@ export default function ControlesEstandarPage() {
           </div>
 
           {/* Input Numérico con Prefijo Moneda */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2">
             <Label htmlFor="input-ejemplo-monto" className="text-xs font-medium text-slate-200 ml-1">
               Monto en Quetzales (Q)
             </Label>
@@ -645,14 +645,14 @@ export default function ControlesEstandarPage() {
                 onChange={(e) => setMonto(e.target.value === '' ? '' : Number(e.target.value))}
                 step="0.01"
                 min="0"
-                className="flex h-10 w-full rounded-full border border-[#324157] bg-[#1d283a] pl-9 pr-4 py-2 text-sm font-semibold text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors"
+                className="flex h-10 w-full rounded-full border border-[#2e2e2e] bg-[#1e1e1e] pl-9 pr-4 py-2 text-sm font-semibold text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors"
               />
             </div>
             <span className="text-[11px] text-slate-400 ml-1 block">Alineación natural, sin flechas molestas</span>
           </div>
 
           {/* Input con Error de Validación */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2">
             <Label htmlFor="input-ejemplo-error" className="text-xs font-medium text-rose-300 ml-1 flex items-center gap-1">
               Campo Obligatorio <span className="text-rose-400">*</span>
             </Label>
@@ -663,7 +663,7 @@ export default function ControlesEstandarPage() {
                 value={valorInvalido}
                 onChange={(e) => setValorInvalido(e.target.value)}
                 placeholder="Ingresa un valor válido..."
-                className="flex h-10 w-full rounded-full border border-rose-500/70 bg-[#1d283a] px-4 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 pr-9 transition-colors"
+                className="flex h-10 w-full rounded-full border border-rose-500/70 bg-[#1e1e1e] px-4 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 pr-9 transition-colors"
               />
               <AlertCircle className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-400" />
             </div>
@@ -671,7 +671,7 @@ export default function ControlesEstandarPage() {
           </div>
 
           {/* Input Deshabilitado */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2 opacity-60">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2 opacity-60">
             <Label htmlFor="input-ejemplo-disabled" className="text-xs font-medium text-slate-300 ml-1">
               Folio de Sistema (Bloqueado)
             </Label>
@@ -680,13 +680,13 @@ export default function ControlesEstandarPage() {
               type="text"
               disabled
               value="FOL-2026-08992"
-              className="flex h-10 w-full rounded-full border border-[#324157] bg-[#182330] px-4 py-2 text-sm text-slate-400 cursor-not-allowed select-none"
+              className="flex h-10 w-full rounded-full border border-[#2e2e2e] bg-[#182330] px-4 py-2 text-sm text-slate-400 cursor-not-allowed select-none"
             />
             <span className="text-[11px] text-slate-500 ml-1 block">Estado deshabilitado</span>
           </div>
 
           {/* Input con Botón de Acción Integrado */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2">
             <Label htmlFor="input-ejemplo-codigo" className="text-xs font-medium text-slate-200 ml-1">
               Código de Barras / Escáner
             </Label>
@@ -695,7 +695,7 @@ export default function ControlesEstandarPage() {
                 id="input-ejemplo-codigo"
                 type="text"
                 placeholder="Escanear o teclear..."
-                className="flex h-10 w-full rounded-full border border-[#324157] bg-[#1d283a] pl-4 pr-24 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
+                className="flex h-10 w-full rounded-full border border-[#2e2e2e] bg-[#1e1e1e] pl-4 pr-24 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
               />
               <Button
                 type="button"
@@ -718,19 +718,19 @@ export default function ControlesEstandarPage() {
             2. Desplegables (Selects) Estándar
           </h2>
           <p className="text-xs text-slate-400">
-            Cápsula de disparo alineada con los inputs (`h-10 rounded-full`), y menú desplegable estilizado con bordes nítidos sobre `#1d283a`.
+            Cápsula de disparo alineada con los inputs (`h-10 rounded-full`), y menú desplegable estilizado con bordes nítidos sobre `#1e1e1e`.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Select Normal */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2">
             <Label className="text-xs font-medium text-slate-200 ml-1">Categoría de Producto</Label>
             <Select value={categoria} onValueChange={setCategoria}>
-              <SelectTrigger className="h-10 rounded-full border-[#324157] bg-[#1d283a] text-slate-100 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 px-4">
+              <SelectTrigger className="h-10 rounded-full border-[#2e2e2e] bg-[#1e1e1e] text-slate-100 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 px-4">
                 <SelectValue placeholder="Selecciona una categoría" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1d283a] border-[#324157] text-slate-200 rounded-2xl shadow-2xl p-1">
+              <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-slate-200 rounded-2xl shadow-2xl p-1">
                 <SelectItem value="bebidas" className="rounded-full focus:bg-sky-600/30 focus:text-white cursor-pointer py-2">
                   Bebidas y Licores
                 </SelectItem>
@@ -749,13 +749,13 @@ export default function ControlesEstandarPage() {
           </div>
 
           {/* Select Secundario / Estado */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2">
             <Label className="text-xs font-medium text-slate-200 ml-1">Estado de Operación</Label>
             <Select defaultValue="activo">
-              <SelectTrigger className="h-10 rounded-full border-[#324157] bg-[#1d283a] text-slate-100 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 px-4">
+              <SelectTrigger className="h-10 rounded-full border-[#2e2e2e] bg-[#1e1e1e] text-slate-100 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 px-4">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#1d283a] border-[#324157] text-slate-200 rounded-2xl shadow-2xl p-1">
+              <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-slate-200 rounded-2xl shadow-2xl p-1">
                 <SelectItem value="activo" className="rounded-full focus:bg-emerald-600/30 focus:text-emerald-300 cursor-pointer py-2">
                   <span className="inline-flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Activo
@@ -777,13 +777,13 @@ export default function ControlesEstandarPage() {
           </div>
 
           {/* Select Deshabilitado */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] space-y-2 opacity-60">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2 opacity-60">
             <Label className="text-xs font-medium text-slate-300 ml-1">Sucursal Fija (Solo Lectura)</Label>
             <Select defaultValue="central" disabled>
-              <SelectTrigger className="h-10 rounded-full border-[#324157] bg-[#182330] text-slate-400 cursor-not-allowed px-4">
+              <SelectTrigger className="h-10 rounded-full border-[#2e2e2e] bg-[#182330] text-slate-400 cursor-not-allowed px-4">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#1d283a] border-[#324157]">
+              <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e]">
                 <SelectItem value="central">Sucursal Central</SelectItem>
               </SelectContent>
             </Select>
@@ -805,7 +805,7 @@ export default function ControlesEstandarPage() {
         </div>
 
         {/* Variantes Principales */}
-        <div className="p-4 rounded-xl bg-[#283244] border border-[#324157] space-y-3">
+        <div className="p-4 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-3">
           <span className="text-xs font-semibold text-slate-300 block">Variantes Semánticas (Altura Estándar h-9)</span>
           <div className="flex flex-wrap items-center gap-3">
             {/* Primario */}
@@ -814,7 +814,7 @@ export default function ControlesEstandarPage() {
             </Button>
 
             {/* Secundario */}
-            <Button variant="secondary" className="h-9 px-4 rounded-full bg-[#1d283a] hover:bg-[#2e3e57] text-slate-200 border border-[#324157] font-medium">
+            <Button variant="secondary" className="h-9 px-4 rounded-full bg-[#1e1e1e] hover:bg-[#2e3e57] text-slate-200 border border-[#2e2e2e] font-medium">
               <RefreshCw className="w-4 h-4 mr-1.5" /> Secundario (Filtrar)
             </Button>
 
@@ -829,7 +829,7 @@ export default function ControlesEstandarPage() {
             </Button>
 
             {/* Contorno */}
-            <Button variant="outline" className="h-9 px-4 rounded-full border-[#324157] hover:bg-[#1d283a] text-slate-200">
+            <Button variant="outline" className="h-9 px-4 rounded-full border-[#2e2e2e] hover:bg-[#1e1e1e] text-slate-200">
               <Eye className="w-4 h-4 mr-1.5" /> Ver Detalle
             </Button>
 
@@ -841,7 +841,7 @@ export default function ControlesEstandarPage() {
         </div>
 
         {/* Escala de Tamaños */}
-        <div className="p-4 rounded-xl bg-[#283244] border border-[#324157] space-y-3">
+        <div className="p-4 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-3">
           <span className="text-xs font-semibold text-slate-300 block">Escala de Tamaños Estandarizados</span>
           <div className="flex flex-wrap items-center gap-4">
             {/* Pequeño */}
@@ -870,7 +870,7 @@ export default function ControlesEstandarPage() {
 
             {/* Botón Icono */}
             <div className="flex items-center gap-2">
-              <Button size="icon" className="h-9 w-9 rounded-full bg-[#1d283a] hover:bg-[#324157] text-slate-200 border border-[#324157]">
+              <Button size="icon" className="h-9 w-9 rounded-full bg-[#1e1e1e] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]">
                 <Pencil className="w-4 h-4" />
               </Button>
               <Button size="icon" className="h-9 w-9 rounded-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30">
@@ -896,7 +896,7 @@ export default function ControlesEstandarPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Ejemplo Tipografía */}
-          <div className="p-4 rounded-xl bg-[#283244] border border-[#324157] space-y-2">
+          <div className="p-4 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-2">
             <span className="text-xs font-semibold text-slate-200 block">Jerarquía de Textos en Formularios</span>
             <div className="space-y-1.5 border-l-2 border-sky-500 pl-3">
               <p className="text-sm font-bold text-slate-100">Título de Sección (text-sm font-bold)</p>
@@ -907,14 +907,14 @@ export default function ControlesEstandarPage() {
           </div>
 
           {/* Badges Numéricos de Alto Contraste */}
-          <div className="p-4 rounded-xl bg-[#283244] border border-[#324157] space-y-3">
+          <div className="p-4 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-3">
             <span className="text-xs font-semibold text-slate-200 block">Badges Circulares de Alto Contraste</span>
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 bg-[#1d283a] px-3 py-1.5 rounded-full border border-[#324157]">
+              <div className="flex items-center gap-2 bg-[#1e1e1e] px-3 py-1.5 rounded-full border border-[#2e2e2e]">
                 <span className="text-xs text-slate-300">Pendientes</span>
                 <CountBadge count={3} variant="amber" />
               </div>
-              <div className="flex items-center gap-2 bg-[#1d283a] px-3 py-1.5 rounded-full border border-[#324157]">
+              <div className="flex items-center gap-2 bg-[#1e1e1e] px-3 py-1.5 rounded-full border border-[#2e2e2e]">
                 <span className="text-xs text-slate-300">Completados</span>
                 <CountBadge count={18} variant="emerald" />
               </div>
@@ -922,7 +922,7 @@ export default function ControlesEstandarPage() {
                 <span className="text-xs font-medium">Pestaña Activa</span>
                 <CountBadge count={5} variant="white" />
               </div>
-              <div className="flex items-center gap-2 bg-[#1d283a] px-3 py-1.5 rounded-full border border-[#324157]">
+              <div className="flex items-center gap-2 bg-[#1e1e1e] px-3 py-1.5 rounded-full border border-[#2e2e2e]">
                 <span className="text-xs text-slate-300">Totales</span>
                 <CountBadge count={42} variant="sky" />
               </div>
@@ -954,7 +954,7 @@ export default function ControlesEstandarPage() {
               </Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[480px] bg-[#1d283a] border-[#324157] text-slate-100 rounded-3xl p-6 shadow-2xl">
+            <DialogContent className="sm:max-w-[480px] bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-3xl p-6 shadow-2xl">
               <DialogHeader className="space-y-1">
                 <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 mb-1">
                   <Sliders className="w-5 h-5" />
@@ -977,7 +977,7 @@ export default function ControlesEstandarPage() {
                     id="modal-nombre"
                     type="text"
                     defaultValue="Premio Especial Tragamonedas"
-                    className="flex h-10 w-full rounded-full border border-[#324157] bg-[#283244] px-4 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
+                    className="flex h-10 w-full rounded-full border border-[#2e2e2e] bg-[#252526] px-4 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
                   />
                 </div>
 
@@ -986,10 +986,10 @@ export default function ControlesEstandarPage() {
                   <div className="space-y-1.5">
                     <Label className="text-xs font-medium text-slate-200 ml-1">Categoría</Label>
                     <Select defaultValue="premios">
-                      <SelectTrigger className="h-10 rounded-full border-[#324157] bg-[#283244] text-slate-100 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 px-4">
+                      <SelectTrigger className="h-10 rounded-full border-[#2e2e2e] bg-[#252526] text-slate-100 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 px-4">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1d283a] border-[#324157] text-slate-200 rounded-2xl">
+                      <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-slate-200 rounded-2xl">
                         <SelectItem value="premios" className="rounded-full">Premios</SelectItem>
                         <SelectItem value="gastos" className="rounded-full">Gastos</SelectItem>
                         <SelectItem value="retiros" className="rounded-full">Retiros</SelectItem>
@@ -1009,14 +1009,14 @@ export default function ControlesEstandarPage() {
                         id="modal-monto"
                         type="number"
                         defaultValue="250.00"
-                        className="flex h-10 w-full rounded-full border border-[#324157] bg-[#283244] pl-9 pr-4 py-2 text-sm font-semibold text-slate-100 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors"
+                        className="flex h-10 w-full rounded-full border border-[#2e2e2e] bg-[#252526] pl-9 pr-4 py-2 text-sm font-semibold text-slate-100 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Switch interactivo */}
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#283244] border border-[#324157]">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#252526] border border-[#2e2e2e]">
                   <div className="space-y-0.5">
                     <span className="text-xs font-medium text-slate-200 block">Afecta Cuadre Diario</span>
                     <span className="text-[11px] text-slate-400 block">Descuenta del saldo en efectivo de la caja</span>
@@ -1030,7 +1030,7 @@ export default function ControlesEstandarPage() {
                   type="button"
                   variant="secondary"
                   onClick={() => setModalAbierto(false)}
-                  className="h-10 px-5 rounded-full bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                  className="h-10 px-5 rounded-full bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                 >
                   Cancelar
                 </Button>

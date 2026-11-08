@@ -78,7 +78,7 @@ export function DetalleRegistrosProcesados({
             const fechaDoc = item.fecha || item.fechaEnvio
             const fechaStr = fechaDoc?.toDate ? format(fechaDoc.toDate(), "dd/MM/yy hh:mm a", { locale: es }) : 'N/A'
             return (
-              <div key={item.id} className="flex justify-between items-center text-xs p-2.5 bg-[#1d283a] rounded-lg border border-[#324157]">
+              <div key={item.id} className="flex justify-between items-center text-xs p-2.5 bg-[#1e1e1e] rounded-lg border border-[#2e2e2e]">
                 <div>
                   <p className="font-semibold text-white truncate max-w-44">
                     {tipo === 'movimiento' ? `Cierre Caja #${item.idCuadre}` :

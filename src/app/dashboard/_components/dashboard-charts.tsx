@@ -82,7 +82,7 @@ export function DashboardCharts({
                   if (active && payload && payload.length) {
                     const data = payload[0].payload as ChartItemSemanal;
                     return (
-                      <div className="bg-[#283244] border border-app-border rounded-xl shadow-xl p-3 space-y-1.5 text-xs">
+                      <div className="bg-[#252526] border border-app-border rounded-xl shadow-xl p-3 space-y-1.5 text-xs">
                         <p className="font-semibold text-slate-300 border-b border-app-border pb-1">
                           {format(data.fecha, 'dd MMMM', { locale: es })}
                         </p>
@@ -137,7 +137,7 @@ export function DashboardCharts({
                   if (active && payload && payload.length) {
                     const data = payload[0].payload as ChartItemEstaciones;
                     return (
-                      <div className="bg-[#283244] border border-app-border rounded-xl shadow-xl p-2.5 space-y-1 text-xs">
+                      <div className="bg-[#252526] border border-app-border rounded-xl shadow-xl p-2.5 space-y-1 text-xs">
                         <p className="font-semibold text-slate-300 border-b border-app-border pb-1">
                           {format(data.fecha, 'dd MMM', { locale: es })}
                         </p>
@@ -187,7 +187,7 @@ export function DashboardCharts({
                     if (active && payload && payload.length) {
                       const data = payload[0].payload as ChartItemSemanal;
                       return (
-                        <div className="bg-[#283244] border border-app-border rounded-xl shadow-xl p-2.5 text-xs">
+                        <div className="bg-[#252526] border border-app-border rounded-xl shadow-xl p-2.5 text-xs">
                           <p className="font-semibold text-slate-300 border-b border-app-border pb-1">
                             {format(data.fecha, 'dd MMM', { locale: es })}
                           </p>
@@ -242,7 +242,7 @@ export function DashboardCharts({
                     if (active && payload && payload.length) {
                       const data = payload[0].payload as ChartItemMensual;
                       return (
-                        <div className="bg-[#283244] border border-app-border rounded-xl shadow-xl p-2.5 text-xs space-y-1">
+                        <div className="bg-[#252526] border border-app-border rounded-xl shadow-xl p-2.5 text-xs space-y-1">
                           <p className="font-semibold text-slate-300 border-b border-app-border pb-1">
                             {format(data.fecha, 'MMMM yyyy', { locale: es })}
                           </p>

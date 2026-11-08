@@ -40,8 +40,8 @@ export function PanelConfiguracionRango({
 }: PanelConfiguracionRangoProps) {
   return (
     <div className="space-y-6">
-      <Card className="bg-[#283244] border-[#324157] text-white shadow-sm overflow-hidden">
-        <CardHeader className="pb-3 border-b border-[#324157]">
+      <Card className="bg-[#252526] border-[#2e2e2e] text-white shadow-sm overflow-hidden">
+        <CardHeader className="pb-3 border-b border-[#2e2e2e]">
           <CardTitle className="text-base font-bold text-white">Configurar Rango</CardTitle>
           <CardDescription className="text-xs text-slate-400">
             Indica el intervalo de IDs de venta que deseas remover permanentemente.
@@ -59,7 +59,7 @@ export function PanelConfiguracionRango({
                 placeholder="100"
                 value={desdeId}
                 onChange={e => setDesdeId(e.target.value === '' ? '' : Number(e.target.value))}
-                className="rounded-full h-10 text-center font-bold bg-[#1d283a] border-[#324157] text-white"
+                className="rounded-full h-10 text-center font-bold bg-[#1e1e1e] border-[#2e2e2e] text-white"
                 disabled={procesando}
               />
             </div>
@@ -72,16 +72,16 @@ export function PanelConfiguracionRango({
                 placeholder="500"
                 value={hastaId}
                 onChange={e => setHastaId(e.target.value === '' ? '' : Number(e.target.value))}
-                className="rounded-full h-10 text-center font-bold bg-[#1d283a] border-[#324157] text-white"
+                className="rounded-full h-10 text-center font-bold bg-[#1e1e1e] border-[#2e2e2e] text-white"
                 disabled={procesando}
               />
             </div>
           </div>
 
-          <div className="space-y-3 pt-3 border-t border-[#324157]">
+          <div className="space-y-3 pt-3 border-t border-[#2e2e2e]">
             <p className="text-xs font-bold text-slate-300">Reglas de Seguridad</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex items-center space-x-3 p-3 rounded-xl border border-[#324157] bg-[#1d283a]">
+              <div className="flex items-center space-x-3 p-3 rounded-xl border border-[#2e2e2e] bg-[#1e1e1e]">
                 <Checkbox
                   id="excluir-credito"
                   checked={excluirCredito}
@@ -92,7 +92,7 @@ export function PanelConfiguracionRango({
                   Excluir ventas a Crédito
                 </Label>
               </div>
-              <div className="flex items-center space-x-3 p-3 rounded-xl border border-[#324157] bg-[#1d283a]">
+              <div className="flex items-center space-x-3 p-3 rounded-xl border border-[#2e2e2e] bg-[#1e1e1e]">
                 <Checkbox
                   id="excluir-pendientes"
                   checked={excluirPendientes}
@@ -107,12 +107,12 @@ export function PanelConfiguracionRango({
           </div>
 
           {procesando && (
-            <div className="space-y-2 pt-3 border-t border-[#324157] animate-in fade-in">
+            <div className="space-y-2 pt-3 border-t border-[#2e2e2e] animate-in fade-in">
               <div className="flex justify-between items-center text-xs font-semibold text-sky-400">
                 <span>Procesando eliminación...</span>
                 <span>{progreso}%</span>
               </div>
-              <Progress value={progreso} className="h-2 bg-[#1d283a]" />
+              <Progress value={progreso} className="h-2 bg-[#1e1e1e]" />
               <p className="text-[11px] text-center text-slate-400 italic">
                 Por favor, no cierres esta ventana hasta que el proceso finalice.
               </p>
@@ -120,7 +120,7 @@ export function PanelConfiguracionRango({
           )}
         </CardContent>
 
-        <CardFooter className="bg-[#1d283a]/60 border-t border-[#324157] p-3 flex justify-end">
+        <CardFooter className="bg-[#1e1e1e]/60 border-t border-[#2e2e2e] p-3 flex justify-end">
           <Button
             variant="destructive"
             disabled={!puedeEjecutar || procesando}
@@ -134,7 +134,7 @@ export function PanelConfiguracionRango({
       </Card>
 
       {resultado !== null && (
-        <div className="bg-[#1d283a] border border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3 animate-in zoom-in-95 duration-200">
+        <div className="bg-[#1e1e1e] border border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3 animate-in zoom-in-95 duration-200">
           <div className="h-10 w-10 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0">
             <CheckCircle2 className="h-5 w-5" />
           </div>

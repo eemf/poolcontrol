@@ -65,7 +65,7 @@ export function DetalleCuadresSemanales({ ids, firestore, sucursalId }: DetalleC
           {detalles.map(item => (
             <div
               key={item.id}
-              className="flex justify-between items-center text-xs p-2.5 bg-[#1d283a] rounded-lg border border-[#324157]"
+              className="flex justify-between items-center text-xs p-2.5 bg-[#1e1e1e] rounded-lg border border-[#2e2e2e]"
             >
               <div>
                 <p className="font-semibold text-white truncate max-w-44">

@@ -29,7 +29,7 @@ export function DialogoConfirmarPurga({
 }: DialogoConfirmarPurgaProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="rounded-2xl bg-[#1d283a] border-[#324157] text-white">
+      <AlertDialogContent className="rounded-2xl bg-[#1e1e1e] border-[#2e2e2e] text-white">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-lg font-bold text-rose-400 flex items-center gap-2">
             <AlertTriangle className="h-5 w-5" /> ¿Confirmar purga de datos?
@@ -40,8 +40,8 @@ export function DialogoConfirmarPurga({
             Esta acción afectará directamente al historial financiero y no se puede deshacer.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col sm:flex-row gap-2 pt-2 border-t border-[#324157]">
-          <AlertDialogCancel className="rounded-full border-[#324157] text-slate-300 hover:bg-[#283244]">
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2 pt-2 border-t border-[#2e2e2e]">
+          <AlertDialogCancel className="rounded-full border-[#2e2e2e] text-slate-300 hover:bg-[#252526]">
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction

@@ -97,7 +97,7 @@ export default function PaginaCierreCaja() {
               placeholder="0.00" 
               value={montoApertura} 
               onChange={e => setMontoApertura(e.target.value === '' ? '' : Number(e.target.value))} 
-              className="h-12 text-xl text-center font-bold font-mono bg-[#1d283a] border-app-border rounded-full" 
+              className="h-12 text-xl text-center font-bold font-mono bg-[#1e1e1e] border-app-border rounded-full" 
             />
           </div>
           <div className="space-y-2">
@@ -109,7 +109,7 @@ export default function PaginaCierreCaja() {
               placeholder="0" 
               value={existenciaMonedasInit} 
               onChange={e => setExistenciaMonedasInit(e.target.value === '' ? '' : Number(e.target.value))} 
-              className="h-12 text-xl text-center font-bold font-mono bg-[#1d283a] border-app-border rounded-full" 
+              className="h-12 text-xl text-center font-bold font-mono bg-[#1e1e1e] border-app-border rounded-full" 
             />
           </div>
           <Button 
@@ -230,7 +230,7 @@ export default function PaginaCierreCaja() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:justify-between">
-            <AlertDialogCancel disabled={procesandoCierre} className="rounded-full bg-[#1d283a] border-app-border text-slate-200 text-xs h-8">
+            <AlertDialogCancel disabled={procesandoCierre} className="rounded-full bg-[#1e1e1e] border-app-border text-slate-200 text-xs h-8">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction 

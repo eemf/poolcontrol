@@ -45,7 +45,7 @@ export function CuadreMensualItemAcordeon({
   return (
     <AccordionItem
       value={cuadre.id}
-      className="border border-[#324157] rounded-xl bg-[#283244] overflow-hidden mb-3 shadow-sm transition-all hover:border-slate-500"
+      className="border border-[#2e2e2e] rounded-xl bg-[#252526] overflow-hidden mb-3 shadow-sm transition-all hover:border-slate-500"
     >
       <AccordionTrigger className="p-4 hover:no-underline text-white">
         <div className="flex flex-1 items-center justify-between w-full pr-2">
@@ -72,9 +72,9 @@ export function CuadreMensualItemAcordeon({
       </AccordionTrigger>
 
       <AccordionContent className="p-4 pt-0">
-        <div className="border-t border-[#324157] pt-5 space-y-5">
+        <div className="border-t border-[#2e2e2e] pt-5 space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Card className="text-center bg-[#1d283a] border-[#324157]">
+            <Card className="text-center bg-[#1e1e1e] border-[#2e2e2e]">
               <CardHeader className="pb-1">
                 <p className="text-xs font-medium text-slate-400">Balance Neto</p>
               </CardHeader>
@@ -85,7 +85,7 @@ export function CuadreMensualItemAcordeon({
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-[#1d283a] border-sky-500/40">
+            <Card className="text-center bg-[#1e1e1e] border-sky-500/40">
               <CardHeader className="pb-1">
                 <p className="text-xs font-medium text-sky-400">Balance Liquidado</p>
               </CardHeader>
@@ -97,7 +97,7 @@ export function CuadreMensualItemAcordeon({
             </Card>
           </div>
 
-          <div className="flex items-center justify-center gap-4 text-center p-3.5 border border-[#324157] rounded-xl bg-[#1d283a]">
+          <div className="flex items-center justify-center gap-4 text-center p-3.5 border border-[#2e2e2e] rounded-xl bg-[#1e1e1e]">
             <div className="flex-1">
               <p className="text-xs text-slate-400">Origen</p>
               <p className="font-semibold text-sm text-white">{cuadre.cuentas.origenNombre}</p>
@@ -110,7 +110,7 @@ export function CuadreMensualItemAcordeon({
           </div>
 
           {isOpen && firestore && (
-            <Card className="border-[#324157] bg-[#1d283a]/70 p-4 rounded-xl">
+            <Card className="border-[#2e2e2e] bg-[#1e1e1e]/70 p-4 rounded-xl">
               <CardHeader className="p-0 pb-3">
                 <p className="text-sm font-bold text-white">Desglose de Cuadres Semanales</p>
               </CardHeader>
@@ -127,7 +127,7 @@ export function CuadreMensualItemAcordeon({
           {cuadre.observaciones && (
             <div className="mt-3">
               <p className="text-xs font-medium text-slate-400 mb-1.5">Observaciones:</p>
-              <div className="bg-[#1d283a] p-3 rounded-lg border border-dashed border-[#324157] italic text-xs text-slate-300 leading-relaxed">
+              <div className="bg-[#1e1e1e] p-3 rounded-lg border border-dashed border-[#2e2e2e] italic text-xs text-slate-300 leading-relaxed">
                 "{cuadre.observaciones}"
               </div>
             </div>

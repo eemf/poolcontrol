@@ -68,7 +68,7 @@ export function BalanceTurno({
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-300">
       {/* Banner de estado contable */}
-      <div className="p-4 rounded-2xl bg-[#17202e] border border-[#324157] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-[#17202e] border border-[#2e2e2e] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
             <Scale className="h-5 w-5" />
@@ -90,7 +90,7 @@ export function BalanceTurno({
         </div>
 
         {duracionTexto && (
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-[#283244] px-3 py-1.5 rounded-full border border-[#324157]">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-[#252526] px-3 py-1.5 rounded-full border border-[#2e2e2e]">
             <Clock className="h-3.5 w-3.5 text-primary" />
             <span>{duracionTexto}</span>
           </div>
@@ -100,8 +100,8 @@ export function BalanceTurno({
       {/* Grid de 3 pilares del balance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Pilar 1: Gaveta de Efectivo */}
-        <Card className="bg-[#283244] border-[#324157] shadow-sm rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-[#324157] bg-[#17202e]/60 flex items-center justify-between">
+        <Card className="bg-[#252526] border-[#2e2e2e] shadow-sm rounded-xl overflow-hidden">
+          <div className="p-4 border-b border-[#2e2e2e] bg-[#17202e]/60 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Banknote className="h-4 w-4 text-emerald-400" />
               <span className="text-xs font-bold text-white">Gaveta de consumo</span>
@@ -128,7 +128,7 @@ export function BalanceTurno({
               <span className="font-mono font-medium text-blue-400">+Q{resumenGaveta.alquileres.toFixed(2)}</span>
             </div>
 
-            <div className="pt-2 border-t border-[#324157] flex justify-between items-center">
+            <div className="pt-2 border-t border-[#2e2e2e] flex justify-between items-center">
               <span className="text-xs font-bold text-white">Subtotal gaveta:</span>
               <span className="text-base font-black font-mono text-emerald-400">
                 Q{resumenGaveta.totalGaveta.toFixed(2)}
@@ -138,8 +138,8 @@ export function BalanceTurno({
         </Card>
 
         {/* Pilar 2: Flujo de Monedas */}
-        <Card className="bg-[#283244] border-[#324157] shadow-sm rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-[#324157] bg-[#17202e]/60 flex items-center justify-between">
+        <Card className="bg-[#252526] border-[#2e2e2e] shadow-sm rounded-xl overflow-hidden">
+          <div className="p-4 border-b border-[#2e2e2e] bg-[#17202e]/60 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Coins className="h-4 w-4 text-purple-400" />
               <span className="text-xs font-bold text-white">Flujo de monedas</span>
@@ -166,7 +166,7 @@ export function BalanceTurno({
               <span className="font-mono font-medium text-white">{totalMonedasVendidas} uds.</span>
             </div>
 
-            <div className="pt-2 border-t border-[#324157] flex justify-between items-center">
+            <div className="pt-2 border-t border-[#2e2e2e] flex justify-between items-center">
               <span className="text-xs font-bold text-white">Neto de monedas:</span>
               <span className={cn(
                 "text-base font-black font-mono",
@@ -181,7 +181,7 @@ export function BalanceTurno({
         {/* Pilar 3: Arqueo Teórico Total */}
         <Card className="bg-[#17202e] border-primary/30 shadow-md rounded-xl overflow-hidden relative">
           <div className="absolute top-0 right-0 w-28 h-28 bg-primary/5 rounded-full -mr-8 -mt-8 pointer-events-none" />
-          <div className="p-4 border-b border-[#324157] bg-primary/10 flex items-center justify-between">
+          <div className="p-4 border-b border-[#2e2e2e] bg-primary/10 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-xs font-bold text-white">Arqueo físico esperado</span>
@@ -206,7 +206,7 @@ export function BalanceTurno({
               <span className="font-mono font-bold text-purple-300">{monedasFinales} unidades</span>
             </div>
 
-            <div className="pt-2 border-t border-[#324157] flex justify-between items-center">
+            <div className="pt-2 border-t border-[#2e2e2e] flex justify-between items-center">
               <span className="text-xs font-bold text-white">Total efectivo en caja:</span>
               <span className="text-lg font-black font-mono text-emerald-400">
                 Q{totalEfectivoCaja.toFixed(2)}
@@ -217,7 +217,7 @@ export function BalanceTurno({
       </div>
 
       {/* Tarjeta de resumen de inventario físico y monedas */}
-      <div className="p-4 rounded-xl bg-[#283244] border border-[#324157] grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+      <div className="p-4 rounded-xl bg-[#252526] border border-[#2e2e2e] grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
         <div className="p-2">
           <p className="text-[11px] text-muted-foreground">Fondo inicial</p>
           <p className="text-base font-bold font-mono text-white mt-0.5">Q{resumenGaveta.inicial.toFixed(2)}</p>

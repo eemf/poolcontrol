@@ -102,7 +102,7 @@ export function HistorialModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-center justify-between p-3 bg-[#1d283a] rounded-xl border border-app-border my-2 text-xs">
+        <div className="flex items-center justify-between p-3 bg-[#1e1e1e] rounded-xl border border-app-border my-2 text-xs">
           <Label htmlFor="mostrar-todo-switch" className="text-slate-200 font-medium cursor-pointer">
             Ver historial completo de turnos anteriores
           </Label>
@@ -130,7 +130,7 @@ export function HistorialModal({
                   className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs ${
                     item.anulado 
                       ? "bg-rose-950/20 border-rose-500/30 opacity-60" 
-                      : "bg-[#1d283a] border-app-border"
+                      : "bg-[#1e1e1e] border-app-border"
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -172,7 +172,7 @@ export function HistorialModal({
         </ScrollArea>
 
         <div className="flex justify-end pt-2 border-t border-app-border">
-          <Button variant="outline" size="sm" onClick={onClose} className="rounded-full bg-[#1d283a] border-app-border text-slate-200">
+          <Button variant="outline" size="sm" onClick={onClose} className="rounded-full bg-[#1e1e1e] border-app-border text-slate-200">
             Cerrar
           </Button>
         </div>

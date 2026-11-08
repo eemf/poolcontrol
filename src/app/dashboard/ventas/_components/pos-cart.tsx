@@ -71,7 +71,7 @@ export function POSCart({ carrito, clienteSeleccionadoId, manejarEliminarDelCarr
           </p>
         </div>
       ) : (
-        <div className="divide-y divide-[#324157]">
+        <div className="divide-y divide-[#2e2e2e]">
           {carrito.map((item, index) => {
             const tieneAbono = item.estado === 'Pagada' || item.saldo < item.subtotal;
             return (

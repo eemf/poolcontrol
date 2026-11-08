@@ -37,7 +37,7 @@ export function TarifaDialog({
 }: TarifaDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-2xl bg-[#1d283a] border-[#324157] text-white">
+      <DialogContent className="sm:max-w-md rounded-2xl bg-[#1e1e1e] border-[#2e2e2e] text-white">
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-white">
@@ -58,7 +58,7 @@ export function TarifaDialog({
                   onChange={e => setTarifaForm(p => ({ ...p, nombre: e.target.value }))}
                   required
                   placeholder="Ej. Estándar Billar"
-                  className="rounded-full bg-[#283244] border-[#324157] text-white"
+                  className="rounded-full bg-[#252526] border-[#2e2e2e] text-white"
                 />
               </div>
 
@@ -69,10 +69,10 @@ export function TarifaDialog({
                     value={tarifaForm.tipoDeMesa}
                     onValueChange={(v: any) => setTarifaForm(p => ({ ...p, tipoDeMesa: v }))}
                   >
-                    <SelectTrigger className="rounded-full bg-[#283244] border-[#324157] text-white">
+                    <SelectTrigger className="rounded-full bg-[#252526] border-[#2e2e2e] text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#283244] border-[#324157] text-white">
+                    <SelectContent className="bg-[#252526] border-[#2e2e2e] text-white">
                       <SelectItem value="Billar Pool">Pool</SelectItem>
                       <SelectItem value="Carambola">Carambola</SelectItem>
                       <SelectItem value="Consola">Videojuegos</SelectItem>
@@ -86,10 +86,10 @@ export function TarifaDialog({
                     value={tarifaForm.tipoDeCalculo}
                     onValueChange={(v: any) => setTarifaForm(p => ({ ...p, tipoDeCalculo: v }))}
                   >
-                    <SelectTrigger className="rounded-full bg-[#283244] border-[#324157] text-white">
+                    <SelectTrigger className="rounded-full bg-[#252526] border-[#2e2e2e] text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#283244] border-[#324157] text-white">
+                    <SelectContent className="bg-[#252526] border-[#2e2e2e] text-white">
                       <SelectItem value="Por minuto">Por Minuto</SelectItem>
                       <SelectItem value="Por intervalo">Por Intervalo</SelectItem>
                     </SelectContent>
@@ -107,7 +107,7 @@ export function TarifaDialog({
                         type="number"
                         value={tarifaForm.controlesBase}
                         onChange={e => setTarifaForm(p => ({ ...p, controlesBase: Number(e.target.value) }))}
-                        className="rounded-full text-center bg-[#283244] border-[#324157] text-white"
+                        className="rounded-full text-center bg-[#252526] border-[#2e2e2e] text-white"
                       />
                     </div>
                     <div className="space-y-1">
@@ -117,7 +117,7 @@ export function TarifaDialog({
                         step="0.01"
                         value={tarifaForm.costoControlExtra}
                         onChange={e => setTarifaForm(p => ({ ...p, costoControlExtra: Number(e.target.value) }))}
-                        className="rounded-full text-center bg-[#283244] border-[#324157] text-white"
+                        className="rounded-full text-center bg-[#252526] border-[#2e2e2e] text-white"
                       />
                     </div>
                   </div>
@@ -132,11 +132,11 @@ export function TarifaDialog({
                     step="0.01"
                     value={tarifaForm.costoPorMinuto}
                     onChange={e => setTarifaForm(p => ({ ...p, costoPorMinuto: Number(e.target.value) }))}
-                    className="rounded-full text-center font-bold bg-[#283244] border-[#324157] text-white"
+                    className="rounded-full text-center font-bold bg-[#252526] border-[#2e2e2e] text-white"
                   />
                 </div>
               ) : (
-                <div className="space-y-3 rounded-xl border border-[#324157] p-3.5 bg-[#283244]/50">
+                <div className="space-y-3 rounded-xl border border-[#2e2e2e] p-3.5 bg-[#252526]/50">
                   <Label className="text-xs font-bold text-slate-300">Intervalos de Precios</Label>
                   <div className="flex gap-2 items-end">
                     <div className="flex-1 space-y-1">
@@ -145,7 +145,7 @@ export function TarifaDialog({
                         type="number"
                         value={nuevoIntervalo.duracionMinutos}
                         onChange={e => setNuevoIntervalo(p => ({ ...p, duracionMinutos: Number(e.target.value) }))}
-                        className="rounded-full h-8 bg-[#1d283a] border-[#324157] text-white text-xs"
+                        className="rounded-full h-8 bg-[#1e1e1e] border-[#2e2e2e] text-white text-xs"
                       />
                     </div>
                     <div className="flex-1 space-y-1">
@@ -155,7 +155,7 @@ export function TarifaDialog({
                         step="0.01"
                         value={nuevoIntervalo.precio}
                         onChange={e => setNuevoIntervalo(p => ({ ...p, precio: Number(e.target.value) }))}
-                        className="rounded-full h-8 bg-[#1d283a] border-[#324157] text-white text-xs"
+                        className="rounded-full h-8 bg-[#1e1e1e] border-[#2e2e2e] text-white text-xs"
                       />
                     </div>
                     <Button
@@ -170,7 +170,7 @@ export function TarifaDialog({
 
                   <div className="space-y-1.5">
                     {(tarifaForm.intervalos || []).map((int, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs p-2 bg-[#1d283a] border border-[#324157] rounded-lg">
+                      <div key={i} className="flex items-center justify-between text-xs p-2 bg-[#1e1e1e] border border-[#2e2e2e] rounded-lg">
                         <span className="font-medium text-slate-200">{int.duracionMinutos} min por Q{int.precio.toFixed(2)}</span>
                         <Button
                           type="button"
@@ -189,9 +189,9 @@ export function TarifaDialog({
             </div>
           </ScrollArea>
 
-          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2 border-t border-[#324157]">
+          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2 border-t border-[#2e2e2e]">
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="rounded-full w-full sm:w-auto border-[#324157] text-slate-300 hover:bg-[#283244]">
+              <Button type="button" variant="outline" className="rounded-full w-full sm:w-auto border-[#2e2e2e] text-slate-300 hover:bg-[#252526]">
                 Cancelar
               </Button>
             </DialogClose>

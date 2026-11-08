@@ -47,7 +47,7 @@ export function PageHeader({
             size="icon"
             asChild
             className={cn(
-              "rounded-full h-9 w-9 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157] shrink-0 shadow-sm z-10",
+              "rounded-full h-9 w-9 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e] shrink-0 shadow-sm z-10",
               !action && "absolute left-0 sm:relative sm:left-auto"
             )}
             title="Regresar"

@@ -39,7 +39,7 @@ export function ControlPagosCard({
       case 'Consumo Interno':
         return 'bg-purple-600/90 text-white';
       default:
-        return 'bg-[#1d283a] text-slate-300 border-app-border';
+        return 'bg-[#1e1e1e] text-slate-300 border-app-border';
     }
   };
 
@@ -48,7 +48,7 @@ export function ControlPagosCard({
       value={pago.id}
       className="border border-app-border rounded-xl bg-app-surface hover:border-sky-500/40 transition-all overflow-hidden shadow-xs"
     >
-      <AccordionTrigger className="p-3.5 sm:p-4 hover:no-underline font-body transition-colors data-[state=open]:bg-[#1d283a]/60">
+      <AccordionTrigger className="p-3.5 sm:p-4 hover:no-underline font-body transition-colors data-[state=open]:bg-[#1e1e1e]/60">
         <div className="flex flex-1 items-center justify-between w-full pr-2 sm:pr-4 gap-3">
           {/* Identificación: ID Pago, Cliente y Ventas */}
           <div className="min-w-0 text-left space-y-1">
@@ -66,7 +66,7 @@ export function ControlPagosCard({
                   Cubrió {pago.ventas.length} ventas ({pago.ventas.map(v => `#${v.idVenta}`).join(', ')})
                 </Badge>
               ) : (
-                <Badge variant="outline" className="text-[10px] font-medium border-app-border text-muted-foreground bg-[#1d283a] rounded-full hidden sm:inline-flex">
+                <Badge variant="outline" className="text-[10px] font-medium border-app-border text-muted-foreground bg-[#1e1e1e] rounded-full hidden sm:inline-flex">
                   Venta #{pago.ventas[0]?.idVenta}
                 </Badge>
               )}
@@ -143,7 +143,7 @@ export function ControlPagosCard({
                 const esVentaLiquidadaTotal = v.ventaTotal && Math.abs(v.montoPagadoVenta - v.ventaTotal) < 0.05;
 
                 return (
-                  <div key={v.idVenta} className="rounded-xl border border-app-border bg-[#1d283a] p-3.5 space-y-3">
+                  <div key={v.idVenta} className="rounded-xl border border-app-border bg-[#1e1e1e] p-3.5 space-y-3">
                     {/* Encabezado de la Venta */}
                     <div className="flex items-center justify-between pb-2 border-b border-app-border/60 flex-wrap gap-2">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -196,7 +196,7 @@ export function ControlPagosCard({
                               )}
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
-                                <span className="font-bold text-slate-100 bg-[#1d283a] px-2 py-0.5 rounded-full text-[11px] border border-app-border">
+                                <span className="font-bold text-slate-100 bg-[#1e1e1e] px-2 py-0.5 rounded-full text-[11px] border border-app-border">
                                   {it.cantidad || 1}x
                                 </span>
                                 <div className="min-w-0">
@@ -245,7 +245,7 @@ export function ControlPagosCard({
               variant="outline"
               size="sm"
               onClick={() => onImprimirTicket(pago)}
-              className="h-8 rounded-full text-xs font-medium bg-[#1d283a] border-app-border text-slate-100 hover:bg-app-surface gap-1.5"
+              className="h-8 rounded-full text-xs font-medium bg-[#1e1e1e] border-app-border text-slate-100 hover:bg-app-surface gap-1.5"
             >
               <Printer className="h-3.5 w-3.5 text-sky-400" />
               <span>Imprimir comprobante unificado</span>

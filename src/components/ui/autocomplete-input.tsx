@@ -232,7 +232,7 @@ export const AutocompleteInput = React.forwardRef<
           </button>
         )}
         {isOpen && hasContentToShow && (
-            <div className="absolute top-full z-50 mt-1.5 w-full rounded-2xl border border-[#324157] bg-[#1d283a] text-slate-200 shadow-2xl outline-none animate-in fade-in-0 zoom-in-95 overflow-hidden">
+            <div className="absolute top-full z-50 mt-1.5 w-full rounded-2xl border border-[#2e2e2e] bg-[#1e1e1e] text-slate-200 shadow-2xl outline-none animate-in fade-in-0 zoom-in-95 overflow-hidden">
               <ScrollArea className="max-h-60">
                 <div className="p-1.5 space-y-0.5">
                   {filteredOptions.map((option, index) => (

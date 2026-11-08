@@ -36,7 +36,7 @@ export function DashboardTopStations({
       </div>
 
       <div className="pt-3 space-y-3">
-        <div className="flex items-start gap-3 p-2 rounded-lg bg-[#283244] border border-app-border">
+        <div className="flex items-start gap-3 p-2 rounded-lg bg-[#252526] border border-app-border">
           <div className="h-8 w-8 rounded-full bg-sky-500/10 border border-sky-500/30 flex items-center justify-center shrink-0">
             <TrendingUp className="h-4 w-4 text-sky-400" />
           </div>
@@ -47,7 +47,7 @@ export function DashboardTopStations({
           </div>
         </div>
 
-        <div className="flex items-start gap-3 p-2 rounded-lg bg-[#283244] border border-app-border">
+        <div className="flex items-start gap-3 p-2 rounded-lg bg-[#252526] border border-app-border">
           <div className="h-8 w-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
             <CalendarDays className="h-4 w-4 text-emerald-400" />
           </div>
@@ -58,7 +58,7 @@ export function DashboardTopStations({
           </div>
         </div>
 
-        <div className="flex items-start gap-3 p-2 rounded-lg bg-[#283244] border border-app-border">
+        <div className="flex items-start gap-3 p-2 rounded-lg bg-[#252526] border border-app-border">
           <div className="h-8 w-8 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center shrink-0">
             <Clock className="h-4 w-4 text-indigo-400" />
           </div>

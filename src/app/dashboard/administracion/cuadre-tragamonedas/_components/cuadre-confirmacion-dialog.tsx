@@ -16,7 +16,7 @@ export function CuadreConfirmacionDialog({
 }: CuadreConfirmacionDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="rounded-2xl bg-[#1d283a] border-[#324157] text-white">
+      <AlertDialogContent className="rounded-2xl bg-[#1e1e1e] border-[#2e2e2e] text-white">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-white">Confirmar Cierre de Tragamonedas</AlertDialogTitle>
           <AlertDialogDescription className="text-slate-300 text-xs leading-relaxed">
@@ -24,7 +24,7 @@ export function CuadreConfirmacionDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2 pt-2">
-          <AlertDialogCancel disabled={procesando} className="rounded-full border-[#324157] text-slate-300 hover:bg-[#283244]">
+          <AlertDialogCancel disabled={procesando} className="rounded-full border-[#2e2e2e] text-slate-300 hover:bg-[#252526]">
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction

@@ -25,7 +25,7 @@ export function InventarioFiltros({
   ubicacionesDisponibles,
 }: InventarioFiltrosProps) {
   return (
-    <div className="p-3 sm:p-4 border-b border-app-border bg-[#1d283a]">
+    <div className="p-3 sm:p-4 border-b border-app-border bg-[#1e1e1e]">
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />

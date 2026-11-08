@@ -240,7 +240,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
           }
         }}
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
           <AlertDialogHeader>
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
@@ -258,7 +258,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
             </div>
           </AlertDialogHeader>
 
-          <div className="rounded-lg bg-[#283244] border border-[#324157] p-3 space-y-2">
+          <div className="rounded-lg bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-100 truncate">
@@ -278,7 +278,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
               )}
             </div>
 
-            <div className="pt-2 border-t border-[#324157] text-[11px] text-slate-300 leading-snug">
+            <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
               {confirmarEliminarConsumo?.idProducto !== 'item-manual' ? (
                 <span>
                   Se devolverá{' '}
@@ -295,7 +295,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
           </div>
 
           <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-0.5">
-            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200">
+            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction

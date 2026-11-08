@@ -7,10 +7,10 @@ interface SurfaceCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Contenedores estándar de Pool Control.
- * - panel: Fondo principal #1d283a con borde #324157 (para listados y bloques principales).
- * - surface: Fondo secundario #283244 con borde #324157 (para tarjetas individuales, items).
- * - subcard: Fondo interior #1d283a con borde #324157 (para bloques internos como rutas origen-destino).
+ * Contenedores estándar de Pool Control (Antigravity IDE Dark Theme).
+ * - panel: Fondo principal #1e1e1e con borde #2e2e2e (para listados y bloques principales).
+ * - surface: Fondo secundario #252526 con borde #2e2e2e (para tarjetas individuales, items).
+ * - subcard: Fondo interior recesivo #141414 con borde #2e2e2e (para bloques internos como rutas origen-destino).
  */
 export function SurfaceCard({
   variant = 'panel',
@@ -20,9 +20,9 @@ export function SurfaceCard({
 }: SurfaceCardProps) {
   const baseStyles = 'rounded-xl border transition-all';
   const variantStyles = {
-    panel: 'bg-[#1d283a] border-[#324157] shadow-sm overflow-hidden',
-    surface: 'bg-[#283244] border-[#324157] shadow-sm hover:border-slate-500/60',
-    subcard: 'bg-[#1d283a] border-[#324157]',
+    panel: 'bg-[#1e1e1e] border-[#2e2e2e] shadow-md overflow-hidden',
+    surface: 'bg-[#252526] border-[#2e2e2e] shadow-sm hover:border-[#383838]',
+    subcard: 'bg-[#141414] border-[#2e2e2e]',
   };
 
   return (

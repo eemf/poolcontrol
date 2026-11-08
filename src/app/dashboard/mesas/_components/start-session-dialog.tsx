@@ -62,7 +62,7 @@ export function StartSessionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#1d283a] border-[#324157] text-slate-100 rounded-xl sm:rounded-lg font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl">
+      <DialogContent className="sm:max-w-md bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-xl sm:rounded-lg font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl">
         <DialogHeader className="shrink-0">
           <div className="flex items-center gap-3 pr-6">
             <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
@@ -95,7 +95,7 @@ export function StartSessionDialog({
                       'rounded-full font-semibold h-9 transition-all',
                       numControles === n
                         ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
-                        : 'bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]'
+                        : 'bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]'
                     )}
                   >
                     {n}
@@ -114,7 +114,7 @@ export function StartSessionDialog({
                 'flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all',
                 modoJuego === 'libre'
                   ? 'border-sky-500 bg-sky-500/15 text-sky-400 shadow-sm'
-                  : 'border-[#324157] bg-[#283244] text-slate-300 hover:bg-[#324157]/60'
+                  : 'border-[#2e2e2e] bg-[#252526] text-slate-300 hover:bg-[#2e2e2e]/60'
               )}
             >
               <Clock className="h-5 w-5" />
@@ -127,7 +127,7 @@ export function StartSessionDialog({
                 'flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all',
                 modoJuego === 'definido'
                   ? 'border-sky-500 bg-sky-500/15 text-sky-400 shadow-sm'
-                  : 'border-[#324157] bg-[#283244] text-slate-300 hover:bg-[#324157]/60'
+                  : 'border-[#2e2e2e] bg-[#252526] text-slate-300 hover:bg-[#2e2e2e]/60'
               )}
             >
               <Timer className="h-5 w-5" />
@@ -146,7 +146,7 @@ export function StartSessionDialog({
             )}
           >
             <div className="overflow-hidden px-0.5 -mx-0.5 pb-0.5">
-              <div className="space-y-3 pt-3 border-t border-[#324157]">
+              <div className="space-y-3 pt-3 border-t border-[#2e2e2e]">
                 <Label className="text-xs font-medium text-slate-200 ml-1 block">
                   Selecciona el Intervalo
                 </Label>
@@ -161,14 +161,14 @@ export function StartSessionDialog({
                         'rounded-full h-9 font-semibold text-xs transition-all',
                         selectedInterval === intervalo.minutos
                           ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
-                          : 'bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]'
+                          : 'bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]'
                       )}
                     >
                       {intervalo.label}
                     </Button>
                   ))}
                 </div>
-                <div className="flex items-center space-x-2.5 p-3.5 bg-[#283244] rounded-xl border border-[#324157]">
+                <div className="flex items-center space-x-2.5 p-3.5 bg-[#252526] rounded-xl border border-[#2e2e2e]">
                   <Checkbox
                     id="pagado-contado"
                     tabIndex={modoJuego === 'definido' ? 0 : -1}
@@ -192,7 +192,7 @@ export function StartSessionDialog({
             <Button
               type="button"
               variant="secondary"
-              className="rounded-full px-5 font-medium h-10 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+              className="rounded-full px-5 font-medium h-10 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
             >
               Cancelar
             </Button>

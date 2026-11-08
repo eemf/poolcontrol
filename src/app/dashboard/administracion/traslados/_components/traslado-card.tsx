@@ -113,7 +113,7 @@ export function TrasladoCard({
       </div>
 
       {/* Botones de Acción Estilizados */}
-      <div className="flex items-center gap-2 pt-2 border-t border-[#324157]/60">
+      <div className="flex items-center gap-2 pt-2 border-t border-[#2e2e2e]/60">
         {puedeRecibir && (
           <Button
             size="sm"
@@ -141,7 +141,7 @@ export function TrasladoCard({
           size="sm"
           variant="outline"
           onClick={() => onVerDetalle(traslado)}
-          className={`border-[#324157] bg-[#1d283a] text-slate-300 hover:text-white hover:bg-[#283244] rounded-full text-xs h-8 px-3.5 flex items-center justify-center gap-1.5 transition-all ${
+          className={`border-[#2e2e2e] bg-[#1e1e1e] text-slate-300 hover:text-white hover:bg-[#252526] rounded-full text-xs h-8 px-3.5 flex items-center justify-center gap-1.5 transition-all ${
             !puedeRecibir && !puedeCancelar ? 'w-full' : ''
           }`}
         >

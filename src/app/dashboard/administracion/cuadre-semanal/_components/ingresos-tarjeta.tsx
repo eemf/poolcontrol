@@ -64,15 +64,15 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
 
   return (
     <Card 
-      className="shadow-sm overflow-hidden font-body !bg-[#1d283a] border !border-[#324157]"
-      style={{ backgroundColor: '#1d283a', borderColor: '#324157' }}
+      className="shadow-sm overflow-hidden font-body !bg-[#1e1e1e] border !border-[#2e2e2e]"
+      style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
         <CardTitle className="font-bold text-base sm:text-lg text-foreground">Ingresos por Tarjeta</CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-1">
         <div className="space-y-3">
-          <div className="flex items-center p-2 border-b !border-[#324157]">
+          <div className="flex items-center p-2 border-b !border-[#2e2e2e]">
             <Checkbox 
               id="select-all-tarjeta" 
               checked={selected.size === items.length && items.length > 0} 
@@ -87,8 +87,8 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
               <AccordionItem 
                 value={cierre.id} 
                 key={cierre.id} 
-                style={{ backgroundColor: '#283244', borderColor: '#324157' }}
-                className="border-b-0 rounded-xl border !border-[#324157] !bg-[#283244] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
+                style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
+                className="border-b-0 rounded-xl border !border-[#2e2e2e] !bg-[#252526] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
               >
                 {/* Checkbox anclado a la cabecera del acordeón */}
                 <div className="absolute left-3 top-6 -translate-y-1/2 z-20 flex items-center justify-center">
@@ -129,7 +129,7 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
                 </AccordionTrigger>
 
                 <AccordionContent className="px-3 pb-3">
-                  <div className="pt-2 border-t !border-[#324157]">
+                  <div className="pt-2 border-t !border-[#2e2e2e]">
                     <DetalleVentasTarjeta 
                       firestore={firestore} 
                       sucursalId={sucursalId} 

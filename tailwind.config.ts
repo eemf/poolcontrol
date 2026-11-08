@@ -24,9 +24,9 @@ export default {
       },
       colors: {
         app: {
-          panel: '#1d283a',       // Fondo de contenedores principales y listados
-          surface: '#283244',     // Fondo de tarjetas secundarias, acordeones e inputs
-          border: '#324157',      // Bordes oficiales de contenedores y controles
+          panel: '#1e1e1e',       // Fondo de contenedores principales y listados estilo Antigravity IDE
+          surface: '#252526',     // Fondo de tarjetas secundarias, acordeones e inputs estilo Antigravity IDE
+          border: '#2e2e2e',      // Bordes oficiales estilo Antigravity IDE
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

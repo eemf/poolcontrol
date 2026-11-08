@@ -53,12 +53,12 @@ export function CierreLiquidacionCard({
             placeholder="0" 
             value={cajaSiguienteTurno} 
             onChange={e => setCajaSiguienteTurno(Number(e.target.value))} 
-            className="h-11 text-lg text-center font-bold font-mono bg-[#1d283a] border-app-border rounded-full" 
+            className="h-11 text-lg text-center font-bold font-mono bg-[#1e1e1e] border-app-border rounded-full" 
           />
         </div>
 
         {typeof efectivoFinalContado === 'number' && typeof cajaSiguienteTurno === 'number' && (
-          <div className="p-4 rounded-xl bg-[#1d283a] border border-app-border text-center space-y-1">
+          <div className="p-4 rounded-xl bg-[#1e1e1e] border border-app-border text-center space-y-1">
             <Label className="text-xs font-semibold text-muted-foreground">Total a Liquidar</Label>
             <p className="text-3xl font-black text-sky-400 font-mono">Q{retiro.toFixed(2)}</p>
             <p className="text-[11px] text-muted-foreground">(Total Físico - Efectivo Siguiente)</p>
@@ -70,7 +70,7 @@ export function CierreLiquidacionCard({
             Cuenta destino de la liquidación
           </Label>
           <Select value={cuentaDestinoId} onValueChange={setCuentaDestinoId}>
-            <SelectTrigger className="h-11 text-xs bg-[#1d283a] border-app-border rounded-full text-slate-100">
+            <SelectTrigger className="h-11 text-xs bg-[#1e1e1e] border-app-border rounded-full text-slate-100">
               <SelectValue placeholder="Seleccione la cuenta destino..." />
             </SelectTrigger>
             <SelectContent className="bg-app-surface border-app-border text-foreground">
@@ -90,7 +90,7 @@ export function CierreLiquidacionCard({
             value={observaciones} 
             onChange={e => setObservaciones(e.target.value)} 
             placeholder="Ej: Cierre de fin de semana..."
-            className="bg-[#1d283a] border-app-border text-xs rounded-xl"
+            className="bg-[#1e1e1e] border-app-border text-xs rounded-xl"
           />
         </div>
 

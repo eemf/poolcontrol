@@ -73,7 +73,7 @@ export function HistorialPagosTarjeta({
             Total en período: <span className="font-bold text-sky-400 font-mono">Q{totalGeneralTarjeta.toFixed(2)}</span>
           </p>
         </div>
-        <Button variant="ghost" size="icon" onClick={onCerrar} className="rounded-full h-8 w-8 hover:bg-[#1d283a]">
+        <Button variant="ghost" size="icon" onClick={onCerrar} className="rounded-full h-8 w-8 hover:bg-[#1e1e1e]">
           <X className="h-4 w-4 text-muted-foreground" />
         </Button>
       </div>
@@ -92,8 +92,8 @@ export function HistorialPagosTarjeta({
         ) : (
           <Accordion type="single" collapsible className="w-full space-y-2.5">
             {pagosTarjeta.map(pago => (
-              <AccordionItem value={pago.id} key={pago.id} className="border border-app-border rounded-xl bg-[#1d283a] overflow-hidden">
-                <AccordionTrigger className="p-3.5 hover:no-underline text-sm hover:bg-[#283244]/50">
+              <AccordionItem value={pago.id} key={pago.id} className="border border-app-border rounded-xl bg-[#1e1e1e] overflow-hidden">
+                <AccordionTrigger className="p-3.5 hover:no-underline text-sm hover:bg-[#252526]/50">
                   <div className="grid grid-cols-[1fr,auto] sm:grid-cols-[auto,1fr,auto] gap-x-3 items-center w-full text-left">
                     <div className="hidden sm:block bg-sky-500/10 text-sky-400 p-2 rounded-full row-span-2">
                       <CreditCard className="h-4 w-4" />

@@ -12,14 +12,14 @@ interface TarifaCardProps {
 
 export function TarifaCard({ tarifa, onEdit, onDelete }: TarifaCardProps) {
   return (
-    <Card className="flex flex-col bg-[#283244] border-[#324157] text-white shadow-sm hover:border-slate-500 transition-colors">
+    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-white shadow-sm hover:border-slate-500 transition-colors">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div>
             <CardTitle className="text-base font-bold text-white">{tarifa.nombre}</CardTitle>
             <CardDescription className="text-xs text-slate-400">{tarifa.tipoDeMesa}</CardDescription>
           </div>
-          <Badge variant="secondary" className="text-[11px] font-medium bg-[#1d283a] text-slate-200 border-[#324157]">
+          <Badge variant="secondary" className="text-[11px] font-medium bg-[#1e1e1e] text-slate-200 border-[#2e2e2e]">
             {tarifa.tipoDeCalculo}
           </Badge>
         </div>
@@ -27,14 +27,14 @@ export function TarifaCard({ tarifa, onEdit, onDelete }: TarifaCardProps) {
       
       <CardContent className="flex-grow space-y-3">
         {tarifa.tipoDeCalculo === 'Por minuto' ? (
-          <div className="text-center p-3 bg-[#1d283a] rounded-xl border border-[#324157]">
+          <div className="text-center p-3 bg-[#1e1e1e] rounded-xl border border-[#2e2e2e]">
             <p className="text-2xl font-black text-sky-400">Q{(tarifa.costoPorMinuto || 0).toFixed(2)}</p>
             <p className="text-xs font-medium text-slate-400 mt-0.5">Precio por minuto</p>
           </div>
         ) : (
           <div className="space-y-1.5">
             {(tarifa.intervalos || []).map((int, i) => (
-              <div key={i} className="flex justify-between items-center text-xs p-2 bg-[#1d283a] rounded-lg border border-[#324157]">
+              <div key={i} className="flex justify-between items-center text-xs p-2 bg-[#1e1e1e] rounded-lg border border-[#2e2e2e]">
                 <span className="font-medium text-slate-300">{int.duracionMinutos} min</span>
                 <span className="font-bold text-sky-400">Q{int.precio.toFixed(2)}</span>
               </div>
@@ -59,7 +59,7 @@ export function TarifaCard({ tarifa, onEdit, onDelete }: TarifaCardProps) {
         )}
       </CardContent>
 
-      <CardFooter className="justify-end gap-2 border-t border-[#324157] bg-[#1d283a]/50 p-2.5">
+      <CardFooter className="justify-end gap-2 border-t border-[#2e2e2e] bg-[#1e1e1e]/50 p-2.5">
         <Button
           variant="ghost"
           size="icon"

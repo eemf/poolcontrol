@@ -47,7 +47,7 @@ export function AuditoriaFeedItem({
   return (
     <div
       onClick={() => onSelect(registro)}
-      className="group p-3.5 bg-app-surface hover:bg-[#324157]/40 transition-colors border border-app-border rounded-xl shadow-xs cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+      className="group p-3.5 bg-app-surface hover:bg-[#2e2e2e]/40 transition-colors border border-app-border rounded-xl shadow-xs cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
     >
       <div className="flex items-start gap-3.5 min-w-0">
         {/* Ícono de categoría */}
@@ -85,7 +85,7 @@ export function AuditoriaFeedItem({
                       ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
                       : it.tipo === 'devuelto'
                       ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
-                      : "bg-[#1d283a] text-slate-200 border-app-border"
+                      : "bg-[#1e1e1e] text-slate-200 border-app-border"
                   )}
                 >
                   <span className={cn(
@@ -130,7 +130,7 @@ export function AuditoriaFeedItem({
             )}
 
             {/* Identificación de Computadora, Tablet o Teléfono */}
-            <span className="flex items-center gap-1.5 text-muted-foreground font-medium bg-[#1d283a] px-2 py-0.5 rounded-full border border-app-border text-[11px]">
+            <span className="flex items-center gap-1.5 text-muted-foreground font-medium bg-[#1e1e1e] px-2 py-0.5 rounded-full border border-app-border text-[11px]">
               <DeviceIcon className={cn("h-3 w-3 shrink-0", deviceMeta.color)} />
               <span className="text-slate-200 font-medium">{equipoNombre}</span>
               <span className="text-[10px] text-muted-foreground font-normal">
@@ -149,7 +149,7 @@ export function AuditoriaFeedItem({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 text-xs text-muted-foreground group-hover:text-foreground group-hover:bg-[#1d283a] rounded-full"
+          className="h-8 text-xs text-muted-foreground group-hover:text-foreground group-hover:bg-[#1e1e1e] rounded-full"
         >
           <Eye className="h-3.5 w-3.5 mr-1" />
           Detalles

@@ -19,7 +19,7 @@ export function EncabezadoSemanal({ }: EncabezadoSemanalProps) {
         <Button
           variant="outline"
           asChild
-          className="w-full sm:w-auto rounded-full h-9 px-4 text-xs font-semibold border-[#324157] bg-[#283244] text-slate-200 hover:text-white"
+          className="w-full sm:w-auto rounded-full h-9 px-4 text-xs font-semibold border-[#2e2e2e] bg-[#252526] text-slate-200 hover:text-white"
         >
           <Link href="/dashboard/administracion/cuadre-semanal/historial">
             <History className="mr-1.5 h-3.5 w-3.5 text-primary" />

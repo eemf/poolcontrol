@@ -176,7 +176,7 @@ export function ConsumptionDialog({
             if (!eliminandoItem) setItemAEliminar(null);
           }
         }}
-        className="sm:max-w-2xl font-body rounded-xl sm:rounded-lg overflow-visible bg-[#1d283a] border-[#324157] text-slate-100 p-5 sm:p-6 flex flex-col max-h-[90vh] gap-4 shadow-2xl"
+        className="sm:max-w-2xl font-body rounded-xl sm:rounded-lg overflow-visible bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 p-5 sm:p-6 flex flex-col max-h-[90vh] gap-4 shadow-2xl"
       >
         <DialogHeader className="shrink-0">
           <div className="flex items-center justify-between gap-4 pr-6">
@@ -223,7 +223,7 @@ export function ConsumptionDialog({
                         value={cantidadConsumo}
                         onChange={(e) => setCantidadConsumo(Number(e.target.value) || 1)}
                         onFocus={(e) => e.target.select()}
-                        className="rounded-full text-center h-10 px-2 bg-[#1d283a] border-[#324157] text-slate-100"
+                        className="rounded-full text-center h-10 px-2 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
@@ -234,7 +234,7 @@ export function ConsumptionDialog({
                     </div>
                     <div className="sm:hidden flex flex-col items-center gap-1 shrink-0">
                       <Label className="text-xs font-medium text-slate-200">Manual</Label>
-                      <div className="flex items-center justify-center px-3 h-10 border border-[#324157] rounded-full bg-[#1d283a]">
+                      <div className="flex items-center justify-center px-3 h-10 border border-[#2e2e2e] rounded-full bg-[#1e1e1e]">
                         <Switch checked={isConsumoManual} onCheckedChange={setIsConsumoManual} />
                       </div>
                     </div>
@@ -253,7 +253,7 @@ export function ConsumptionDialog({
                       onChange={(e) => setDescripcionConsumoManual(e.target.value)}
                       onFocus={(e) => e.target.select()}
                       placeholder="Descripción..."
-                      className="rounded-full h-10 px-3.5 bg-[#1d283a] border-[#324157] text-slate-100"
+                      className="rounded-full h-10 px-3.5 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
@@ -284,7 +284,7 @@ export function ConsumptionDialog({
                         }
                         onFocus={(e) => e.target.select()}
                         placeholder="0.00"
-                        className="rounded-full h-10 pl-7 pr-3 bg-[#1d283a] border-[#324157] text-slate-100"
+                        className="rounded-full h-10 pl-7 pr-3 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
@@ -349,7 +349,7 @@ export function ConsumptionDialog({
                         value={cantidadConsumo}
                         onChange={(e) => setCantidadConsumo(Number(e.target.value) || 1)}
                         onFocus={(e) => e.target.select()}
-                        className="rounded-full text-center h-10 px-2 bg-[#1d283a] border-[#324157] text-slate-100"
+                        className="rounded-full text-center h-10 px-2 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
                         disabled={!mesaParaConsumo}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -361,7 +361,7 @@ export function ConsumptionDialog({
                     </div>
                     <div className="sm:hidden flex flex-col items-center gap-1 shrink-0">
                       <Label className="text-xs font-medium text-slate-200">Manual</Label>
-                      <div className="flex items-center justify-center px-3 h-10 border border-[#324157] rounded-full bg-[#1d283a]">
+                      <div className="flex items-center justify-center px-3 h-10 border border-[#2e2e2e] rounded-full bg-[#1e1e1e]">
                         <Switch checked={isConsumoManual} onCheckedChange={setIsConsumoManual} />
                       </div>
                     </div>
@@ -384,7 +384,7 @@ export function ConsumptionDialog({
                       disabled={isLoadingProductos || !mesaParaConsumo}
                       onEnterKey={onProductoEnter}
                       onFocus={(e) => e.target.select()}
-                      className="rounded-full h-10 bg-[#1d283a] border-[#324157] text-slate-100"
+                      className="rounded-full h-10 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
                     />
                   </div>
 
@@ -425,7 +425,7 @@ export function ConsumptionDialog({
                 <div
                   ref={preparacionesContainerRef}
                   tabIndex={0}
-                  className="mt-1 focus:outline-none focus:ring-1 focus:ring-sky-500 rounded-md p-2 bg-muted/5 border border-dashed border-[#324157]"
+                  className="mt-1 focus:outline-none focus:ring-1 focus:ring-sky-500 rounded-md p-2 bg-muted/5 border border-dashed border-[#2e2e2e]"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -486,7 +486,7 @@ export function ConsumptionDialog({
                 <p className="font-medium">Añade productos al carrito</p>
               </div>
             ) : (
-              <div className="divide-y divide-[#324157]">
+              <div className="divide-y divide-[#2e2e2e]">
                 {carritoConsumoTemporal.map((item, index) => {
                   const esItemManual = item.idProducto === 'item-manual';
                   return (
@@ -541,7 +541,7 @@ export function ConsumptionDialog({
             <Button
               type="button"
               variant="secondary"
-              className="rounded-full h-10 px-5 font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+              className="rounded-full h-10 px-5 font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
             >
               Cancelar
             </Button>
@@ -571,7 +571,7 @@ export function ConsumptionDialog({
             }}
           >
             <div
-              className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+              className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2.5">
@@ -588,7 +588,7 @@ export function ConsumptionDialog({
                 </div>
               </div>
 
-              <div className="rounded-lg bg-[#283244] border border-[#324157] p-3 space-y-2">
+              <div className="rounded-lg bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-slate-100 truncate">
@@ -611,7 +611,7 @@ export function ConsumptionDialog({
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-[#324157] text-[11px] text-slate-300 leading-snug">
+                <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
                   {itemAEliminar.idProducto !== 'item-manual' ? (
                     <span>
                       Se devolverá{' '}
@@ -633,7 +633,7 @@ export function ConsumptionDialog({
                   variant="secondary"
                   disabled={eliminandoItem}
                   onClick={() => setItemAEliminar(null)}
-                  className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                  className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                 >
                   Cancelar
                 </Button>

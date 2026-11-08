@@ -23,7 +23,7 @@ export function InventarioPaginacion({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-app-border p-3 sm:p-4 bg-[#1d283a]">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-app-border p-3 sm:p-4 bg-[#1e1e1e]">
       <div className="flex items-center space-x-2">
         <p className="text-xs font-medium text-slate-400">Filas por página</p>
         <Select
@@ -33,7 +33,7 @@ export function InventarioPaginacion({
           <SelectTrigger className="h-8 w-[70px] text-xs rounded-full bg-app-surface border-app-border text-white">
             <SelectValue placeholder={itemsPerPage} />
           </SelectTrigger>
-          <SelectContent side="top" className="bg-[#1d283a] border-app-border text-white text-xs">
+          <SelectContent side="top" className="bg-[#1e1e1e] border-app-border text-white text-xs">
             {[10, 20, 50, 100].map((pageSize) => (
               <SelectItem key={pageSize} value={`${pageSize}`}>
                 {pageSize}

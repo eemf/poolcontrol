@@ -22,7 +22,7 @@ export function EliminarDialogs({
   return (
     <>
       <AlertDialog open={!!tarifaToDelete} onOpenChange={o => !o && onCancelTarifa()}>
-        <AlertDialogContent className="rounded-2xl bg-[#1d283a] border-[#324157] text-white">
+        <AlertDialogContent className="rounded-2xl bg-[#1e1e1e] border-[#2e2e2e] text-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-rose-400 flex items-center gap-2">
               <Trash2 className="h-5 w-5" /> ¿Eliminar tarifa?
@@ -32,7 +32,7 @@ export function EliminarDialogs({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="rounded-full border-[#324157] text-slate-300 hover:bg-[#283244]" onClick={onCancelTarifa}>
+            <AlertDialogCancel className="rounded-full border-[#2e2e2e] text-slate-300 hover:bg-[#252526]" onClick={onCancelTarifa}>
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction onClick={onConfirmTarifa} className="bg-rose-600 hover:bg-rose-500 rounded-full font-bold text-white">
@@ -43,7 +43,7 @@ export function EliminarDialogs({
       </AlertDialog>
 
       <AlertDialog open={!!mesaToDelete} onOpenChange={o => !o && onCancelMesa()}>
-        <AlertDialogContent className="rounded-2xl bg-[#1d283a] border-[#324157] text-white">
+        <AlertDialogContent className="rounded-2xl bg-[#1e1e1e] border-[#2e2e2e] text-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-rose-400 flex items-center gap-2">
               <Trash2 className="h-5 w-5" /> ¿Eliminar estación?
@@ -53,7 +53,7 @@ export function EliminarDialogs({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="rounded-full border-[#324157] text-slate-300 hover:bg-[#283244]" onClick={onCancelMesa}>
+            <AlertDialogCancel className="rounded-full border-[#2e2e2e] text-slate-300 hover:bg-[#252526]" onClick={onCancelMesa}>
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction onClick={onConfirmMesa} className="bg-rose-600 hover:bg-rose-500 rounded-full font-bold text-white">

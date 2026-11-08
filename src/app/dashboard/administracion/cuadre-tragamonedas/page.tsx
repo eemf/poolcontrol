@@ -50,7 +50,7 @@ export default function PaginaCuadreTragamonedas() {
         description="Control y cierre de las operaciones de las máquinas tragamonedas."
         icon={PiggyBank}
         action={
-          <Button variant="outline" asChild className="rounded-full h-9 px-5 border-[#324157] text-white hover:bg-[#283244] w-full sm:w-auto">
+          <Button variant="outline" asChild className="rounded-full h-9 px-5 border-[#2e2e2e] text-white hover:bg-[#252526] w-full sm:w-auto">
             <Link href="/dashboard/administracion/cuadre-tragamonedas/historial">
               <History className="mr-2 h-4 w-4" />
               Historial

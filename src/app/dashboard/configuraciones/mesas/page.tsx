@@ -102,7 +102,7 @@ export default function PaginaConfiguracionMesasUnificada() {
         </div>
       ) : tab === 'mesas' ? (
         <SurfaceCard variant="panel" className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#324157]">
+          <div className="flex items-center justify-between pb-2 border-b border-[#2e2e2e]">
             <div>
               <h2 className="text-base font-bold text-white">Inventario de Estaciones</h2>
               <p className="text-xs text-slate-400">Mesas de billar pool, carambola y consolas de videojuegos registradas.</p>
@@ -110,7 +110,7 @@ export default function PaginaConfiguracionMesasUnificada() {
           </div>
 
           {mesasConDocId.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-[#324157] rounded-xl bg-[#283244]/40">
+            <div className="text-center py-12 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40">
               <p className="text-slate-400 text-sm">No hay estaciones registradas aún.</p>
               <Button onClick={abrirNuevaMesa} size="sm" className="rounded-full mt-3 bg-sky-600 hover:bg-sky-500 text-white">
                 <PlusCircle className="mr-1.5 h-4 w-4" />
@@ -133,7 +133,7 @@ export default function PaginaConfiguracionMesasUnificada() {
         </SurfaceCard>
       ) : (
         <SurfaceCard variant="panel" className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#324157]">
+          <div className="flex items-center justify-between pb-2 border-b border-[#2e2e2e]">
             <div>
               <h2 className="text-base font-bold text-white">Tarifas de Cobro</h2>
               <p className="text-xs text-slate-400">Reglas de facturación por minuto, intervalos y controles adicionales.</p>
@@ -141,7 +141,7 @@ export default function PaginaConfiguracionMesasUnificada() {
           </div>
 
           {tarifasConDocId.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-[#324157] rounded-xl bg-[#283244]/40">
+            <div className="text-center py-12 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40">
               <p className="text-slate-400 text-sm">No hay tarifas registradas aún.</p>
               <Button onClick={abrirNuevaTarifa} size="sm" className="rounded-full mt-3 bg-sky-600 hover:bg-sky-500 text-white">
                 <PlusCircle className="mr-1.5 h-4 w-4" />

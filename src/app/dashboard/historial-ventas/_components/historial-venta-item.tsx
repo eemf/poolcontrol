@@ -67,6 +67,10 @@ export function HistorialVentaItem({
 
   const fechaUltimoPago = pagos[0]?.fecha;
   const esVentaLiquidada = saldoActual <= 0.01;
+  const nombreMostrado =
+    clienteNombre?.trim() ||
+    ventaOriginal?.clienteNombre?.trim() ||
+    'Consumidor Final';
 
   // Lista de artículos consumidos en la venta
   const articulosConsumidos =
@@ -77,43 +81,59 @@ export function HistorialVentaItem({
   return (
     <AccordionItem
       value={ventaDocId}
-      className="border border-[#324157] rounded-xl overflow-hidden bg-[#283244] shadow-sm transition-colors"
+      className="border border-[#2e2e2e] rounded-xl overflow-hidden bg-[#252526] shadow-sm transition-colors"
     >
-      {/* Encabezado Principal Compacto y Organizado */}
-      <AccordionTrigger className="px-3.5 py-2.5 sm:px-4 sm:py-3 hover:no-underline hover:bg-[#324157]/30 transition-colors data-[state=open]:border-b data-[state=open]:border-[#324157]">
-        <div className="flex flex-col w-full pr-2 sm:pr-3 gap-1.5 text-left">
-          {/* Fila 1: Cliente y badges a la izquierda / Estado y Total a la derecha */}
-          <div className="flex items-center justify-between gap-2 w-full">
-            <div className="flex items-center gap-1.5 min-w-0 flex-1">
-              <User className="h-4 w-4 text-sky-400 shrink-0" />
-              <span className="font-bold text-sm sm:text-base leading-tight text-slate-100 truncate">
-                {clienteNombre}
+      {/* Encabezado Principal en 2 Columnas Estructuradas */}
+      <AccordionTrigger className="px-3.5 py-3 sm:px-4 sm:py-3.5 hover:no-underline hover:bg-[#2e2e2e]/30 transition-colors data-[state=open]:border-b data-[state=open]:border-[#2e2e2e]">
+        <div className="grid grid-cols-[1fr_auto] gap-2.5 sm:gap-4 w-full pr-1.5 sm:pr-2.5 text-left">
+          {/* Columna 1: Información de Venta y Registro */}
+          <div className="flex flex-col justify-between gap-1.5 min-w-0">
+            {/* Fila 1: Nombre del cliente y a la par la venta */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <User className="h-4 w-4 text-sky-400 shrink-0" />
+                <span className="font-bold text-sm sm:text-base text-slate-100 leading-tight">
+                  {nombreMostrado}
+                </span>
+              </div>
+              <span className="font-mono bg-[#1e1e1e] px-2 py-0.5 rounded-full border border-[#2e2e2e] text-[10px] font-bold text-sky-400 shrink-0">
+                Venta {idVenta}
               </span>
+            </div>
+
+            {/* Fila 2: Turno y cortesía */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {ultimoTurnoLabel && ultimoTurnoLabel === 'Turno actual' ? (
+                <Badge className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[10px] font-medium h-5 rounded-full px-2 shrink-0">
+                  Turno Actual
+                </Badge>
+              ) : (
+                <span className="text-[11px] text-slate-400 font-medium">
+                  {ultimoTurnoLabel || 'Turno anterior'}
+                </span>
+              )}
               {esConsumoInterno && (
-                <Badge className="bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[10px] font-semibold h-4.5 rounded-full px-2 shrink-0 inline-flex items-center gap-1">
+                <Badge className="bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[10px] font-semibold h-5 rounded-full px-2 shrink-0 inline-flex items-center gap-1">
                   <Gift className="h-2.5 w-2.5" />
                   Cortesía
                 </Badge>
               )}
-              {ultimoTurnoLabel && ultimoTurnoLabel === 'Turno actual' && (
-                <Badge className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[10px] font-medium h-4.5 rounded-full px-2 shrink-0">
-                  Turno Actual
-                </Badge>
-              )}
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              {esVentaLiquidada ? (
-                <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] sm:text-[11px] font-semibold h-5 rounded-full px-2 inline-flex items-center gap-1">
-                  <CheckCircle2 className="h-3 w-3" />
-                  Pagada
-                </Badge>
-              ) : (
-                <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] sm:text-[11px] font-semibold h-5 rounded-full px-2 inline-flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  Pendiente: Q{saldoActual.toFixed(2)}
-                </Badge>
-              )}
+            {/* Fila 3: Fecha y hora */}
+            {fechaUltimoPago && (
+              <span className="flex items-center gap-1 text-[11px] text-slate-400 truncate">
+                <CalendarDays className="h-3 w-3 text-slate-500 shrink-0" />
+                {format(toDate(fechaUltimoPago), 'dd/MM/yyyy • hh:mm a', { locale: es })}
+              </span>
+            )}
+          </div>
+
+          {/* Columna 2: Cifras y Estado de Pago */}
+          <div className="flex flex-col justify-between items-end gap-1.5 shrink-0 text-right">
+            {/* Fila 1: Total */}
+            <div className="flex items-baseline gap-1">
+              <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">Total:</span>
               <span
                 className={cn(
                   'font-bold text-sm sm:text-base tabular-nums',
@@ -123,38 +143,47 @@ export function HistorialVentaItem({
                 Q{ventaTotal.toFixed(2)}
               </span>
             </div>
-          </div>
 
-          {/* Fila 2: Folio de venta y fecha a la izquierda / Monto abonado a la derecha si no está saldada */}
-          <div className="flex items-center justify-between text-xs text-slate-400 gap-2 w-full pt-0.5">
-            <div className="flex items-center gap-2 min-w-0 truncate text-[11px]">
-              <span className="font-mono bg-[#1d283a] px-2 py-0.5 rounded-full border border-[#324157] text-[10px] font-bold text-sky-400 shrink-0">
-                Venta {idVenta}
-              </span>
-              {fechaUltimoPago && (
-                <span className="flex items-center gap-1 truncate text-slate-400">
-                  <CalendarDays className="h-3 w-3 text-slate-500 shrink-0" />
-                  {format(toDate(fechaUltimoPago), 'dd/MM/yyyy • hh:mm a', { locale: es })}
+            {/* Fila 2: Pendiente */}
+            <div className="text-xs">
+              {!esVentaLiquidada ? (
+                <span className="text-amber-400 font-semibold tabular-nums text-[11px]">
+                  Pendiente: Q{saldoActual.toFixed(2)}
+                </span>
+              ) : (
+                <span className="text-slate-400 text-[11px] tabular-nums">
+                  Pendiente: Q0.00
                 </span>
               )}
             </div>
 
-            {!esVentaLiquidada && totalPagadoPeriodo > 0 && (
-              <span className="text-[11px] font-semibold text-emerald-400 tabular-nums shrink-0">
-                Abonado: Q{totalPagadoPeriodo.toFixed(2)}
-              </span>
-            )}
+            {/* Fila 3: Estado */}
+            <div>
+              {esVentaLiquidada ? (
+                <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold h-5 rounded-full px-2 inline-flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Pagada
+                </Badge>
+              ) : (
+                <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-semibold h-5 rounded-full px-2 inline-flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {totalPagadoPeriodo > 0
+                    ? `Abonado Q${totalPagadoPeriodo.toFixed(2)}`
+                    : 'Por Cobrar'}
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
       </AccordionTrigger>
 
       {/* Contenido Expandido: Dos Bloques Limpios Sin Duplicidad */}
-      <AccordionContent className="p-3.5 sm:p-4 bg-[#1d283a] space-y-3.5">
+      <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e] space-y-3.5">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
           {/* Bloque 1: Artículos Consumidos con indicación directa de pago */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] flex flex-col justify-between">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-2 border-b border-[#324157]">
+              <div className="flex items-center justify-between pb-2 border-b border-[#2e2e2e]">
                 <h4 className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
                   <ShoppingBag className="h-3.5 w-3.5 text-sky-400" />
                   Artículos Consumidos
@@ -164,7 +193,7 @@ export function HistorialVentaItem({
                 </span>
               </div>
 
-              <div className="divide-y divide-[#324157]/40 my-1 text-xs">
+              <div className="divide-y divide-[#2e2e2e]/40 my-1 text-xs">
                 {articulosConsumidos ? (
                   articulosConsumidos.map((det, idx) => {
                     const subtotal = det.subtotal || det.precioUnitario * det.cantidad;
@@ -237,7 +266,7 @@ export function HistorialVentaItem({
               </div>
             </div>
 
-            <div className="pt-2.5 border-t border-[#324157] flex justify-between items-center text-xs">
+            <div className="pt-2.5 border-t border-[#2e2e2e] flex justify-between items-center text-xs">
               <span className="text-slate-400 font-medium">Total Consumo:</span>
               <span className="font-bold text-slate-100 text-sm tabular-nums">
                 Q{ventaTotal.toFixed(2)}
@@ -246,9 +275,9 @@ export function HistorialVentaItem({
           </div>
 
           {/* Bloque 2: Comprobantes de Pago Directos (Sin repetir lista de productos) */}
-          <div className="p-3.5 rounded-xl bg-[#283244] border border-[#324157] flex flex-col justify-between">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-[#2e2e2e] flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-2 border-b border-[#324157]">
+              <div className="flex items-center justify-between pb-2 border-b border-[#2e2e2e]">
                 <h4 className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
                   <Receipt className="h-3.5 w-3.5 text-emerald-400" />
                   Historial de Pagos y Abonos
@@ -258,7 +287,7 @@ export function HistorialVentaItem({
                 </span>
               </div>
 
-              <div className="divide-y divide-[#324157]/40 my-1 text-xs">
+              <div className="divide-y divide-[#2e2e2e]/40 my-1 text-xs">
                 {pagos.map((pago) => {
                   const esPagoCortesia = pago.metodoPago === 'Consumo Interno';
                   const esEfectivo = pago.metodoPago === 'Efectivo';
@@ -338,7 +367,7 @@ export function HistorialVentaItem({
             </div>
 
             {/* Balance Financiero Final */}
-            <div className="pt-2.5 border-t border-[#324157] space-y-1 text-xs">
+            <div className="pt-2.5 border-t border-[#2e2e2e] space-y-1 text-xs">
               <div className="flex justify-between items-center text-slate-300">
                 <span className="font-medium">Total Cobrado:</span>
                 <span className="font-bold text-emerald-400 tabular-nums">
@@ -363,7 +392,7 @@ export function HistorialVentaItem({
         </div>
 
         {/* Acciones Generales de la Venta */}
-        <div className="flex justify-end pt-2 border-t border-[#324157]">
+        <div className="flex justify-end pt-2 border-t border-[#2e2e2e]">
           <PermissionGuard permission="ventas.anular">
             <Button
               type="button"

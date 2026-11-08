@@ -209,7 +209,7 @@ export function useHistorialVentas() {
         groups.set(pago.ventaDocId, {
           ventaDocId: pago.ventaDocId,
           idVenta: pago.idVenta,
-          clienteNombre: pago.clienteNombre,
+          clienteNombre: pago.clienteNombre || vOriginal?.clienteNombre || 'Consumidor Final',
           totalPagadoPeriodo: 0,
           ventaTotal: vOriginal?.total ?? pago.ventaTotal ?? 0,
           saldoActual: vOriginal?.saldo ?? 0,
@@ -221,6 +221,13 @@ export function useHistorialVentas() {
       }
       
       const group = groups.get(pago.ventaDocId)!;
+
+      if (!group.clienteNombre || group.clienteNombre.trim() === '' || group.clienteNombre === 'Consumidor Final') {
+        const nombreRecuperado = vOriginal?.clienteNombre || pago.clienteNombre;
+        if (nombreRecuperado && nombreRecuperado.trim() !== '') {
+          group.clienteNombre = nombreRecuperado;
+        }
+      }
 
       if (!group.ventaOriginal && vOriginal) {
         group.ventaOriginal = vOriginal;

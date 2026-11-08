@@ -25,7 +25,7 @@ export function TragamonedasCard({ maquina, onEdit, onDelete }: TragamonedasCard
   }
 
   return (
-    <Card className="flex flex-col bg-[#283244] border-[#324157] text-white shadow-sm hover:border-slate-500 transition-colors">
+    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-white shadow-sm hover:border-slate-500 transition-colors">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
@@ -44,12 +44,12 @@ export function TragamonedasCard({ maquina, onEdit, onDelete }: TragamonedasCard
       </CardHeader>
 
       <CardContent className="flex-grow flex items-center justify-center py-6">
-        <div className="h-14 w-14 rounded-2xl bg-[#1d283a] border border-[#324157] flex items-center justify-center text-slate-500">
+        <div className="h-14 w-14 rounded-2xl bg-[#1e1e1e] border border-[#2e2e2e] flex items-center justify-center text-slate-500">
           <Dices className="h-8 w-8 text-amber-400/50" />
         </div>
       </CardContent>
 
-      <CardFooter className="justify-end gap-2 border-t border-[#324157] bg-[#1d283a]/50 p-2.5">
+      <CardFooter className="justify-end gap-2 border-t border-[#2e2e2e] bg-[#1e1e1e]/50 p-2.5">
         <Button
           variant="ghost"
           size="icon"

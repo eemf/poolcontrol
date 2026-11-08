@@ -92,7 +92,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
       {/* 1. Tarjetas de métricas del flujo de gaveta */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Fondo Inicial */}
-        <Card className="bg-[#283244] border-[#324157] shadow-sm rounded-xl overflow-hidden">
+        <Card className="bg-[#252526] border-[#2e2e2e] shadow-sm rounded-xl overflow-hidden">
           <div className="p-3.5">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-medium text-muted-foreground">Fondo inicial</span>
@@ -108,7 +108,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
         </Card>
 
         {/* Ventas de Consumo */}
-        <Card className="bg-[#283244] border-[#324157] shadow-sm rounded-xl overflow-hidden">
+        <Card className="bg-[#252526] border-[#2e2e2e] shadow-sm rounded-xl overflow-hidden">
           <div className="p-3.5">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-medium text-muted-foreground">Ventas de productos</span>
@@ -124,7 +124,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
         </Card>
 
         {/* Alquileres de Mesas */}
-        <Card className="bg-[#283244] border-[#324157] shadow-sm rounded-xl overflow-hidden">
+        <Card className="bg-[#252526] border-[#2e2e2e] shadow-sm rounded-xl overflow-hidden">
           <div className="p-3.5">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-medium text-muted-foreground">Alquiler de mesas</span>
@@ -165,7 +165,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
             placeholder="Buscar por cliente, # comprobante o # venta..."
-            className="pl-10 pr-9 h-10 rounded-full bg-[#283244] border-[#324157] text-white placeholder:text-muted-foreground/70 focus-visible:ring-primary text-xs"
+            className="pl-10 pr-9 h-10 rounded-full bg-[#252526] border-[#2e2e2e] text-white placeholder:text-muted-foreground/70 focus-visible:ring-primary text-xs"
           />
           {filtroTexto && (
             <button
@@ -179,7 +179,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
 
         {/* Filtros de tipo y orden */}
         <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-between sm:justify-end">
-          <div className="flex items-center p-1 bg-[#283244] border border-[#324157] rounded-full text-xs">
+          <div className="flex items-center p-1 bg-[#252526] border border-[#2e2e2e] rounded-full text-xs">
             <button
               onClick={() => setTipoFiltro('todos')}
               className={cn(
@@ -213,7 +213,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
             variant="outline"
             size="sm"
             onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-            className="h-9 px-3 rounded-full text-xs bg-[#283244] border-[#324157] text-white hover:bg-[#324157] shrink-0 gap-1"
+            className="h-9 px-3 rounded-full text-xs bg-[#252526] border-[#2e2e2e] text-white hover:bg-[#2e2e2e] shrink-0 gap-1"
           >
             {sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-primary" /> : <ArrowDown className="h-3.5 w-3.5 text-primary" />}
             <span className="hidden sm:inline">{sortOrder === 'asc' ? 'Antiguos primero' : 'Recientes primero'}</span>
@@ -222,13 +222,13 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
       </div>
 
       {/* 3. Listado de movimientos de gaveta */}
-      <Card className="border border-[#324157] bg-[#17202e] shadow-sm rounded-xl overflow-hidden">
+      <Card className="border border-[#2e2e2e] bg-[#17202e] shadow-sm rounded-xl overflow-hidden">
         {/* Encabezado de la tabla */}
-        <div className="p-3 sm:p-4 border-b border-[#324157] bg-[#17202e] flex items-center justify-between text-xs text-muted-foreground">
+        <div className="p-3 sm:p-4 border-b border-[#2e2e2e] bg-[#17202e] flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <ReceiptText className="h-4 w-4 text-primary" />
             <span className="font-bold text-white">Registro cronológico de cobros</span>
-            <Badge className="bg-[#283244] text-white border-[#324157] font-mono text-[10px] rounded-full">
+            <Badge className="bg-[#252526] text-white border-[#2e2e2e] font-mono text-[10px] rounded-full">
               {flujoFiltrado.length} movimiento{flujoFiltrado.length !== 1 ? 's' : ''}
             </Badge>
           </div>
@@ -236,7 +236,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
         </div>
 
         <ScrollArea className="h-[440px]">
-          <div className="divide-y divide-[#324157]/60">
+          <div className="divide-y divide-[#2e2e2e]/60">
             {/* Fila de Apertura (si orden es ASC) */}
             {sortOrder === 'asc' && (
               <div className="p-3.5 sm:p-4 flex items-center justify-between bg-primary/10 transition-colors">
@@ -279,7 +279,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
                 return (
                   <div 
                     key={pago.idPago || idx} 
-                    className="p-3.5 sm:p-4 flex items-center justify-between hover:bg-[#283244]/50 transition-colors gap-3"
+                    className="p-3.5 sm:p-4 flex items-center justify-between hover:bg-[#252526]/50 transition-colors gap-3"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className={cn(

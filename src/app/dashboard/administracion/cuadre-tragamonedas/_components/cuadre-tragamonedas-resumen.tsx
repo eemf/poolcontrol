@@ -54,8 +54,8 @@ export function CuadreTragamonedasResumen({
   procesando
 }: CuadreTragamonedasResumenProps) {
   return (
-    <Card className="bg-[#283244] border-[#324157] text-white shadow-sm sticky top-20">
-      <CardHeader className="pb-3 border-b border-[#324157]">
+    <Card className="bg-[#252526] border-[#2e2e2e] text-white shadow-sm sticky top-20">
+      <CardHeader className="pb-3 border-b border-[#2e2e2e]">
         <CardTitle className="text-base font-bold text-white flex items-center gap-2">
           <Calculator className="h-5 w-5 text-sky-400" /> Resumen y Cierre
         </CardTitle>
@@ -67,7 +67,7 @@ export function CuadreTragamonedasResumen({
       <CardContent className="space-y-4 pt-4">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1" className="border-b-0">
-            <div className="p-4 rounded-xl bg-[#1d283a] border border-[#324157] text-center">
+            <div className="p-4 rounded-xl bg-[#1e1e1e] border border-[#2e2e2e] text-center">
               <p className="text-xs font-medium text-slate-400">
                 Ganancia Estimada ({porcentajeGanancia}%)
               </p>
@@ -79,7 +79,7 @@ export function CuadreTragamonedasResumen({
               </AccordionTrigger>
             </div>
             <AccordionContent className="text-xs text-slate-300 space-y-1.5 pt-3 px-1">
-              <div className="flex justify-between font-semibold border-b border-[#324157] pb-1.5">
+              <div className="flex justify-between font-semibold border-b border-[#2e2e2e] pb-1.5">
                 <span>Total Neto:</span> <span className="text-white">Q{resumen.totalNeto.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-slate-400">
@@ -88,7 +88,7 @@ export function CuadreTragamonedasResumen({
               <div className="flex justify-between text-slate-400">
                 <span>+ Total Extr. Neta:</span> <span>Q{resumen.totalExtraccionNeta.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between font-semibold border-t border-[#324157] pt-1.5 text-white">
+              <div className="flex justify-between font-semibold border-t border-[#2e2e2e] pt-1.5 text-white">
                 <span>= Total Extraído:</span> <span>Q{resumen.totalExtraido.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-rose-400">
@@ -105,7 +105,7 @@ export function CuadreTragamonedasResumen({
               value={existenciaSiguiente}
               onChange={(e) => setExistenciaSiguiente(e.target.value)}
               placeholder="0"
-              className="text-center bg-[#1d283a] border-[#324157] text-white rounded-full h-10"
+              className="text-center bg-[#1e1e1e] border-[#2e2e2e] text-white rounded-full h-10"
             />
           </div>
           <div className="space-y-1.5">
@@ -114,7 +114,7 @@ export function CuadreTragamonedasResumen({
               value={efectivoSiguientePeriodo}
               onChange={(e) => setEfectivoSiguientePeriodo(e.target.value)}
               placeholder="0.00"
-              className="text-center bg-[#1d283a] border-[#324157] text-white rounded-full h-10"
+              className="text-center bg-[#1e1e1e] border-[#2e2e2e] text-white rounded-full h-10"
             />
           </div>
         </div>
@@ -125,7 +125,7 @@ export function CuadreTragamonedasResumen({
             value={gananciaATrasladar}
             onChange={(e) => setGananciaATrasladar(e.target.value)}
             placeholder="0.00"
-            className="text-center bg-[#1d283a] border-[#324157] text-white rounded-full h-10"
+            className="text-center bg-[#1e1e1e] border-[#2e2e2e] text-white rounded-full h-10"
           />
         </div>
 
@@ -134,10 +134,10 @@ export function CuadreTragamonedasResumen({
             <Banknote className="h-4 w-4 text-emerald-400" /> Cuenta Destino para Traslado
           </Label>
           <Select value={cuentaDestinoId} onValueChange={setCuentaDestinoId}>
-            <SelectTrigger className="rounded-full bg-[#1d283a] border-[#324157] text-white h-10">
+            <SelectTrigger className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-white h-10">
               <SelectValue placeholder="Seleccione la cuenta..." />
             </SelectTrigger>
-            <SelectContent className="bg-[#1d283a] border-[#324157] text-white">
+            <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-white">
               {cuentas.map(c => (
                 <SelectItem key={c.id} value={c.id}>{c.nombre} (Q{c.saldo.toFixed(2)})</SelectItem>
               ))}
@@ -151,13 +151,13 @@ export function CuadreTragamonedasResumen({
             value={observaciones}
             onChange={e => setObservaciones(e.target.value)}
             placeholder="Ej: Cuadre semanal de máquinas..."
-            className="bg-[#1d283a] border-[#324157] text-white rounded-xl text-xs resize-none"
+            className="bg-[#1e1e1e] border-[#2e2e2e] text-white rounded-xl text-xs resize-none"
             rows={3}
           />
         </div>
       </CardContent>
 
-      <CardFooter className="pt-2 border-t border-[#324157]">
+      <CardFooter className="pt-2 border-t border-[#2e2e2e]">
         <Button
           className="w-full rounded-full bg-sky-600 hover:bg-sky-500 text-white font-bold h-10"
           onClick={onFinalizarClick}

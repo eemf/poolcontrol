@@ -78,7 +78,7 @@ export function AuditoriaDetalleDialog({
           {/* Cuadro de Información: Operador y Dispositivo */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {/* Operador Responsable */}
-            <div className="bg-[#1d283a] p-3 rounded-xl border border-app-border space-y-1">
+            <div className="bg-[#1e1e1e] p-3 rounded-xl border border-app-border space-y-1">
               <span className="text-[11px] font-semibold text-muted-foreground tracking-wide flex items-center gap-1">
                 <User className="h-3 w-3 text-sky-400" />
                 Operador Responsable
@@ -100,7 +100,7 @@ export function AuditoriaDetalleDialog({
             </div>
 
             {/* Dispositivo / Estación (PC, Tablet, Teléfono) */}
-            <div className="bg-[#1d283a] p-3 rounded-xl border border-app-border space-y-1">
+            <div className="bg-[#1e1e1e] p-3 rounded-xl border border-app-border space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold text-muted-foreground tracking-wide flex items-center gap-1">
                   <ModalDeviceIcon className={cn("h-3 w-3", modalDeviceMeta.color)} />
@@ -142,7 +142,7 @@ export function AuditoriaDetalleDialog({
 
           {/* Sección de Artículos y Cantidades Involucradas */}
           {(itemsAVisualizar.length > 0 || cargandoArticulos) && (
-            <div className="space-y-2 rounded-xl border border-app-border bg-[#1d283a] p-3 shadow-xs">
+            <div className="space-y-2 rounded-xl border border-app-border bg-[#1e1e1e] p-3 shadow-xs">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
                   <Package className="h-4 w-4 text-sky-400" />
@@ -230,7 +230,7 @@ export function AuditoriaDetalleDialog({
             <span className="text-xs font-semibold text-muted-foreground tracking-wide">
               Descripción
             </span>
-            <p className="text-xs text-slate-200 bg-[#1d283a] p-2.5 rounded-lg border border-app-border leading-relaxed">
+            <p className="text-xs text-slate-200 bg-[#1e1e1e] p-2.5 rounded-lg border border-app-border leading-relaxed">
               {registro.descripcion}
             </p>
           </div>
@@ -241,7 +241,7 @@ export function AuditoriaDetalleDialog({
               <span className="text-xs font-semibold text-muted-foreground tracking-wide">
                 Detalles Estructurados
               </span>
-              <ScrollArea className="max-h-48 rounded-lg border border-app-border bg-[#1d283a] p-3">
+              <ScrollArea className="max-h-48 rounded-lg border border-app-border bg-[#1e1e1e] p-3">
                 <div className="space-y-1.5">
                   {Object.entries(registro.detalles).map(([clave, valor]) => (
                     <div key={clave} className="flex flex-col text-xs pb-1 border-b border-app-border/40 last:border-b-0">

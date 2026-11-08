@@ -46,7 +46,7 @@ export function TransferDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#1d283a] border-[#324157] text-slate-100 rounded-xl sm:rounded-lg p-5 sm:p-6 font-body shadow-2xl">
+      <DialogContent className="sm:max-w-md bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-xl sm:rounded-lg p-5 sm:p-6 font-body shadow-2xl">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
@@ -87,7 +87,7 @@ export function TransferDialog({
             type="button"
             variant="secondary"
             onClick={() => onOpenChange(false)}
-            className="h-10 px-5 rounded-full font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+            className="h-10 px-5 rounded-full font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
           >
             Cancelar
           </Button>

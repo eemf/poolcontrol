@@ -53,7 +53,7 @@ export function CuadreMensualLista({
         </div>
       ) : (
         <div className="space-y-2.5">
-          <div className="flex items-center p-2.5 rounded-lg bg-[#283244] border border-app-border">
+          <div className="flex items-center p-2.5 rounded-lg bg-[#252526] border border-app-border">
             <Checkbox
               id="select-all-cuadres"
               checked={selectedCuadres.size === cuadresSemanales.length && cuadresSemanales.length > 0}
@@ -68,7 +68,7 @@ export function CuadreMensualLista({
             {cuadresSemanales.map((cuadre) => (
               <div
                 key={cuadre.id}
-                className="flex items-center p-3 rounded-xl bg-[#283244] border border-app-border hover:border-slate-500 transition-colors"
+                className="flex items-center p-3 rounded-xl bg-[#252526] border border-app-border hover:border-slate-500 transition-colors"
               >
                 <Checkbox
                   id={`cuadre-${cuadre.id}`}

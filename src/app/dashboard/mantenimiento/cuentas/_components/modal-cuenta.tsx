@@ -37,7 +37,7 @@ export function ModalCuenta({
 }: ModalCuentaProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-2xl bg-[#1d283a] border-[#324157] text-white">
+      <DialogContent className="sm:max-w-md rounded-2xl bg-[#1e1e1e] border-[#2e2e2e] text-white">
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-white">
@@ -58,7 +58,7 @@ export function ModalCuenta({
                 value={formState.nombre}
                 onChange={(e) => setFormState(p => ({ ...p, nombre: e.target.value }))}
                 required
-                className="rounded-full bg-[#283244] border-[#324157] text-white"
+                className="rounded-full bg-[#252526] border-[#2e2e2e] text-white"
                 placeholder="Ej: Caja Chica o Banco Industrial"
               />
             </div>
@@ -72,10 +72,10 @@ export function ModalCuenta({
                   value={formState.tipo}
                   onValueChange={(value: 'Efectivo' | 'Bancaria') => setFormState(p => ({ ...p, tipo: value }))}
                 >
-                  <SelectTrigger className="rounded-full bg-[#283244] border-[#324157] text-white">
+                  <SelectTrigger className="rounded-full bg-[#252526] border-[#2e2e2e] text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#283244] border-[#324157] text-white">
+                  <SelectContent className="bg-[#252526] border-[#2e2e2e] text-white">
                     <SelectItem value="Efectivo">Efectivo</SelectItem>
                     <SelectItem value="Bancaria">Bancaria</SelectItem>
                   </SelectContent>
@@ -91,16 +91,16 @@ export function ModalCuenta({
                   value={formState.saldo}
                   onChange={(e) => setFormState(p => ({ ...p, saldo: e.target.value === '' ? '' : Number(e.target.value) }))}
                   required
-                  className="rounded-full text-center font-bold text-base bg-[#283244] border-[#324157] text-white"
+                  className="rounded-full text-center font-bold text-base bg-[#252526] border-[#2e2e2e] text-white"
                   onFocus={(e) => e.target.select()}
                 />
               </div>
             </div>
           </div>
 
-          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2 border-t border-[#324157]">
+          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2 border-t border-[#2e2e2e]">
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="rounded-full w-full sm:w-auto border-[#324157] text-slate-300 hover:bg-[#283244]">
+              <Button type="button" variant="outline" className="rounded-full w-full sm:w-auto border-[#2e2e2e] text-slate-300 hover:bg-[#252526]">
                 Cancelar
               </Button>
             </DialogClose>

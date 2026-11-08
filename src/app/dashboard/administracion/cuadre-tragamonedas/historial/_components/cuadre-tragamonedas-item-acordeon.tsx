@@ -15,7 +15,7 @@ export function CuadreTragamonedasItemAcordeon({ cuadre }: CuadreTragamonedasIte
   return (
     <AccordionItem
       value={cuadre.id}
-      className="border border-[#324157] rounded-xl bg-[#283244] overflow-hidden mb-3 shadow-sm transition-all hover:border-slate-500"
+      className="border border-[#2e2e2e] rounded-xl bg-[#252526] overflow-hidden mb-3 shadow-sm transition-all hover:border-slate-500"
     >
       <AccordionTrigger className="p-4 hover:no-underline text-white">
         <div className="flex flex-1 items-center justify-between w-full pr-2">
@@ -49,22 +49,22 @@ export function CuadreTragamonedasItemAcordeon({ cuadre }: CuadreTragamonedasIte
       </AccordionTrigger>
 
       <AccordionContent className="p-4 pt-0">
-        <div className="border-t border-[#324157] pt-5 space-y-6">
+        <div className="border-t border-[#2e2e2e] pt-5 space-y-6">
           {/* Resumen de Bloques */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-[#1d283a] p-3 rounded-xl text-center border border-[#324157]">
+            <div className="bg-[#1e1e1e] p-3 rounded-xl text-center border border-[#2e2e2e]">
               <p className="text-xs font-medium text-slate-400 mb-0.5">Manual</p>
               <p className="text-base font-bold text-white">Q{(cuadre.resumen?.totalManual || 0).toFixed(2)}</p>
             </div>
-            <div className="bg-[#1d283a] p-3 rounded-xl text-center border border-[#324157]">
+            <div className="bg-[#1e1e1e] p-3 rounded-xl text-center border border-[#2e2e2e]">
               <p className="text-xs font-medium text-slate-400 mb-0.5">Base</p>
               <p className="text-base font-bold text-white">Q{(cuadre.resumen?.totalBase || 0).toFixed(2)}</p>
             </div>
-            <div className="bg-[#1d283a] p-3 rounded-xl text-center border border-[#324157]">
+            <div className="bg-[#1e1e1e] p-3 rounded-xl text-center border border-[#2e2e2e]">
               <p className="text-xs font-medium text-rose-400 mb-0.5">Deuda</p>
               <p className="text-base font-bold text-rose-400">Q{(cuadre.resumen?.totalDeuda || 0).toFixed(2)}</p>
             </div>
-            <div className="bg-[#1d283a] p-3 rounded-xl text-center border border-[#324157]">
+            <div className="bg-[#1e1e1e] p-3 rounded-xl text-center border border-[#2e2e2e]">
               <p className="text-xs font-medium text-emerald-400 mb-0.5">Extracción Neta</p>
               <p className="text-base font-bold text-emerald-400">Q{(cuadre.resumen?.totalExtraccionNeta || 0).toFixed(2)}</p>
             </div>
@@ -76,14 +76,14 @@ export function CuadreTragamonedasItemAcordeon({ cuadre }: CuadreTragamonedasIte
               <h4 className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
                 <Target className="h-4 w-4" /> Rendimiento por Máquina
               </h4>
-              <div className="border border-[#324157] rounded-xl overflow-hidden bg-[#1d283a]">
-                <div className="grid grid-cols-2 p-2.5 bg-[#283244] border-b border-[#324157] text-[11px] font-semibold text-slate-300">
+              <div className="border border-[#2e2e2e] rounded-xl overflow-hidden bg-[#1e1e1e]">
+                <div className="grid grid-cols-2 p-2.5 bg-[#252526] border-b border-[#2e2e2e] text-[11px] font-semibold text-slate-300">
                   <span>Máquina</span>
                   <span className="text-right">Extracciones</span>
                 </div>
-                <div className="divide-y divide-[#324157]">
+                <div className="divide-y divide-[#2e2e2e]">
                   {cuadre.maquinas?.map((m: any) => (
-                    <div key={m.id} className="p-2.5 flex justify-between items-center text-xs hover:bg-[#283244]/50 transition-colors">
+                    <div key={m.id} className="p-2.5 flex justify-between items-center text-xs hover:bg-[#252526]/50 transition-colors">
                       <span className="font-semibold text-white">{m.nombre}</span>
                       <div className="text-right">
                         <p className="text-emerald-400 font-bold">Q{m.extraccion.toFixed(2)}</p>
@@ -102,7 +102,7 @@ export function CuadreTragamonedasItemAcordeon({ cuadre }: CuadreTragamonedasIte
               <h4 className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
                 <Square className="h-4 w-4" /> Preparación Turno Siguiente
               </h4>
-              <Card className="p-4 border-[#324157] bg-[#1d283a] space-y-3">
+              <Card className="p-4 border-[#2e2e2e] bg-[#1e1e1e] space-y-3">
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400 font-medium">Existencia Monedas:</span>
                   <span className="font-bold text-white">Q{cuadre.existenciaSiguiente.toFixed(2)}</span>
@@ -111,7 +111,7 @@ export function CuadreTragamonedasItemAcordeon({ cuadre }: CuadreTragamonedasIte
                   <span className="text-slate-400 font-medium">Efectivo Acumulado:</span>
                   <span className="font-bold text-white">Q{cuadre.efectivoAcumuladoSiguiente.toFixed(2)}</span>
                 </div>
-                <Separator className="border-[#324157]" />
+                <Separator className="border-[#2e2e2e]" />
                 <div className="flex justify-between items-center pt-1">
                   <span className="text-xs font-semibold text-sky-400">Monto Trasladado:</span>
                   <span className="text-2xl font-black text-sky-400">Q{cuadre.gananciaATrasladar.toFixed(2)}</span>
@@ -121,7 +121,7 @@ export function CuadreTragamonedasItemAcordeon({ cuadre }: CuadreTragamonedasIte
               {cuadre.observaciones && (
                 <div className="mt-3">
                   <p className="text-xs font-medium text-slate-400 mb-1">Notas del Cierre:</p>
-                  <div className="bg-[#1d283a] p-3 rounded-xl border border-dashed border-[#324157] italic text-xs text-slate-300 leading-relaxed">
+                  <div className="bg-[#1e1e1e] p-3 rounded-xl border border-dashed border-[#2e2e2e] italic text-xs text-slate-300 leading-relaxed">
                     "{cuadre.observaciones}"
                   </div>
                 </div>

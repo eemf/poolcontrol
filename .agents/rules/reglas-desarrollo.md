@@ -18,16 +18,19 @@ Antes de escribir o editar cualquier archivo:
 
 ## 2. Reglas Maestras de Diseño Visual (UI/UX)
 
-### A. Paleta Oficial de Colores (Estricta)
-Queda prohibido introducir códigos de color oscuros arbitrarios (como `#182330`, `#202d3e`, `#2d3e55`). La paleta corporativa oficial es:
-* **Contenedor Principal / Listados:** `bg-[#1d283a]` (o clase `bg-app-panel`) con borde `border-[#324157]` (`border-app-border`).
-* **Tarjetas Secundarias / Acordeones / Inputs:** `bg-[#283244]` (o clase `bg-app-surface`) con borde `border-[#324157]`.
-* **Bloques Interiores (ej. Rutas Origen ➔ Destino):** `bg-[#1d283a]` con borde `border-[#324157]`.
+### A. Paleta Oficial de Colores (Estricta - Antigravity IDE Dark Theme)
+La paleta corporativa oficial del modo oscuro está sincronizada con el estándar del IDE Antigravity y sigue una jerarquía estricta de elevación en 4 capas para garantizar profundidad y contraste:
+* **Fondo Base de la Aplicación (Canvas / Body):** `#121212` (variable `--background: 0 0% 7%`).
+* **Contenedor Principal / Listados / Barra Lateral / Paneles:** `bg-[#1e1e1e]` (o clase `bg-app-panel`) con borde `border-[#2e2e2e]` (`border-app-border`).
+* **Tarjetas Secundarias / Acordeones / Inputs / Modales:** `bg-[#252526]` (o clase `bg-app-surface`) con borde `border-[#2e2e2e]`.
+* **Bloques Interiores Recesivos (ej. Rutas Origen ➔ Destino, Píldoras Inset):** `bg-[#141414]` con borde `border-[#2e2e2e]`.
+* **Hover de superficies táctiles:** `hover:bg-[#313131]` / `hover:bg-[#2e2e2e]`.
+* **Acentos de foco y acción:** Azul Antigravity (`#0078D4` / `text-sky-400` / `bg-sky-500`).
 
 ### B. Controles Redondeados en Píldora (`rounded-full`)
 * **Botones de acción:** Todo botón de acción táctil (Recibir, Cancelar, Ver Detalle, Nuevo, Filtros) debe ser `rounded-full`, con altura estándar `h-8` o `h-9` y padding ergonómico.
-* **Pestañas (Tabs):** Contenedor píldora `h-11 p-1 bg-[#283244] rounded-full border border-[#324157]`, con triggers `rounded-full` y estado activo en azul primario.
-* **Buscadores e Inputs:** Buscadores en barras de filtrado deben usar `rounded-full`, icono centrado `Search` y fondo `bg-[#283244]`.
+* **Pestañas (Tabs):** Contenedor píldora `h-11 p-1 bg-[#252526] rounded-full border border-[#2e2e2e]`, con triggers `rounded-full` y estado activo en azul primario.
+* **Buscadores e Inputs:** Buscadores en barras de filtrado deben usar `rounded-full`, icono centrado `Search` y fondo `bg-[#252526]`.
 
 ### C. Badges Numéricos (Forma y Contraste)
 * **Forma simétrica:** Siempre circulares para 1 dígito (`min-w-[20px] h-5 rounded-full inline-flex items-center justify-center text-[11px] font-black`).

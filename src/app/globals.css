@@ -42,25 +42,25 @@
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 217 33% 17%; /* Azul marino oscuro y elegante solicitado */
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 199 89% 48%;
+    --background: 0 0% 7%; /* #121212 (Antigravity IDE Deep Canvas / Base) */
+    --foreground: 0 0% 95%; /* #f3f4f6 (Antigravity Text) */
+    --card: 0 0% 11.8%; /* #1e1e1e (Antigravity IDE Panel / Main Container) */
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 14.5%; /* #252526 (Antigravity IDE Card / Surface Popover) */
+    --popover-foreground: 0 0% 98%;
+    --primary: 207 100% 42%; /* #0078D4 (Antigravity Accent Blue) */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 25%;
-    --secondary-foreground: 210 40% 90%;
-    --muted: 217 33% 22%; /* Tono ligeramente más claro solicitado */
-    --muted-foreground: 215 28% 65%;
-    --accent: 217 33% 22%;
-    --accent-foreground: 199 89% 48%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 27% 27%;
-    --input: 217 27% 27%;
-    --ring: 199 89% 48%;
+    --secondary: 0 0% 19%; /* #313131 */
+    --secondary-foreground: 0 0% 85%;
+    --muted: 0 0% 14.5%; /* #252526 */
+    --muted-foreground: 0 0% 63%; /* #9d9d9d */
+    --accent: 0 0% 19%; /* #313131 */
+    --accent-foreground: 207 100% 42%;
+    --destructive: 0 74% 42%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 18%; /* #2e2e2e (Antigravity Border) */
+    --input: 0 0% 18%; /* #2e2e2e */
+    --ring: 207 100% 42%;
   }
 }
 

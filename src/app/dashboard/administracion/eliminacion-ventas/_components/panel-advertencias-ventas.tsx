@@ -4,7 +4,7 @@ import { AlertTriangle, Info } from 'lucide-react'
 export function PanelAdvertenciasVentas() {
   return (
     <div className="space-y-4">
-      <Card className="bg-[#283244] border-amber-500/30 text-white shadow-none">
+      <Card className="bg-[#252526] border-amber-500/30 text-white shadow-none">
         <CardHeader className="pb-2">
           <CardTitle className="text-xs font-bold text-amber-400 flex items-center gap-2">
             <AlertTriangle className="h-4 w-4" /> Advertencia Crítica
@@ -17,7 +17,7 @@ export function PanelAdvertenciasVentas() {
         </CardContent>
       </Card>
 
-      <Card className="bg-[#283244] border-sky-500/30 text-white shadow-none">
+      <Card className="bg-[#252526] border-sky-500/30 text-white shadow-none">
         <CardHeader className="pb-2">
           <CardTitle className="text-xs font-bold text-sky-400 flex items-center gap-2">
             <Info className="h-4 w-4" /> Recomendación

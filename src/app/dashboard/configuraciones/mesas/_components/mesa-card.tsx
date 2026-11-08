@@ -29,7 +29,7 @@ export function MesaCard({ mesa, tarifas, onEdit, onDelete }: MesaCardProps) {
   }
 
   return (
-    <Card className="flex flex-col bg-[#283244] border-[#324157] text-white shadow-sm hover:border-slate-500 transition-colors">
+    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-white shadow-sm hover:border-slate-500 transition-colors">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -49,12 +49,12 @@ export function MesaCard({ mesa, tarifas, onEdit, onDelete }: MesaCardProps) {
 
       <CardContent className="flex-grow space-y-1.5">
         <p className="text-xs font-medium text-slate-400">Tarifa Asignada</p>
-        <p className="text-sm font-semibold text-white bg-[#1d283a] p-2 rounded-lg border border-[#324157]">
+        <p className="text-sm font-semibold text-white bg-[#1e1e1e] p-2 rounded-lg border border-[#2e2e2e]">
           {tarifa?.nombre || 'No asignada'}
         </p>
       </CardContent>
 
-      <CardFooter className="justify-end gap-2 border-t border-[#324157] bg-[#1d283a]/50 p-2.5">
+      <CardFooter className="justify-end gap-2 border-t border-[#2e2e2e] bg-[#1e1e1e]/50 p-2.5">
         <Button
           variant="ghost"
           size="icon"

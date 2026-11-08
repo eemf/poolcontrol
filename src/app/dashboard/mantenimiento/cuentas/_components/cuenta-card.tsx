@@ -14,8 +14,8 @@ export function CuentaCard({ cuenta, onEdit, onDelete }: CuentaCardProps) {
   const esEfectivo = cuenta.tipo === 'Efectivo'
 
   return (
-    <Card className="flex flex-col bg-[#283244] border-[#324157] text-white shadow-sm hover:border-slate-500 transition-colors">
-      <CardHeader className="pb-3 border-b border-[#324157]/60">
+    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-white shadow-sm hover:border-slate-500 transition-colors">
+      <CardHeader className="pb-3 border-b border-[#2e2e2e]/60">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
             <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${
@@ -29,7 +29,7 @@ export function CuentaCard({ cuenta, onEdit, onDelete }: CuentaCardProps) {
               <CardTitle className="text-base font-bold text-white">{cuenta.nombre}</CardTitle>
               <Badge
                 variant="secondary"
-                className="text-[10px] font-semibold mt-0.5 bg-[#1d283a] text-slate-300 border-[#324157]"
+                className="text-[10px] font-semibold mt-0.5 bg-[#1e1e1e] text-slate-300 border-[#2e2e2e]"
               >
                 {cuenta.tipo}
               </Badge>
@@ -45,7 +45,7 @@ export function CuentaCard({ cuenta, onEdit, onDelete }: CuentaCardProps) {
         </p>
       </CardContent>
 
-      <CardFooter className="justify-end gap-2 border-t border-[#324157] bg-[#1d283a]/50 p-2.5">
+      <CardFooter className="justify-end gap-2 border-t border-[#2e2e2e] bg-[#1e1e1e]/50 p-2.5">
         <Button
           variant="ghost"
           size="icon"

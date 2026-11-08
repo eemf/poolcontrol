@@ -55,7 +55,7 @@ export function CierreConteoCard({
 
       <div className="space-y-4">
         {/* Total Venta Monedas */}
-        <div className="p-4 bg-[#1d283a] rounded-xl text-center border border-amber-500/30">
+        <div className="p-4 bg-[#1e1e1e] rounded-xl text-center border border-amber-500/30">
           <div className="flex justify-center items-center gap-2">
             <Label className="text-xs font-semibold text-amber-400">Total Venta Monedas</Label>
             <Button
@@ -73,7 +73,7 @@ export function CierreConteoCard({
         
         {/* Total Pagado con Tarjeta */}
         {totalPagosTarjeta > 0 && (
-          <div className="p-4 bg-[#1d283a] rounded-xl text-center border border-sky-500/30">
+          <div className="p-4 bg-[#1e1e1e] rounded-xl text-center border border-sky-500/30">
             <div className="flex justify-center items-center gap-2">
               <Label className="text-xs font-semibold text-sky-400">Total Pagado con Tarjeta</Label>
               <Button
@@ -96,7 +96,7 @@ export function CierreConteoCard({
         )}
 
         {/* Total Efectivo Esperado */}
-        <div className="p-4 bg-[#1d283a] rounded-xl text-center border-2 border-dashed border-sky-500/40 space-y-3">
+        <div className="p-4 bg-[#1e1e1e] rounded-xl text-center border-2 border-dashed border-sky-500/40 space-y-3">
           <div>
             <div className="flex justify-center items-center gap-2">
               <Label className="text-xs font-semibold text-slate-200">Total Efectivo Esperado</Label>
@@ -128,7 +128,7 @@ export function CierreConteoCard({
             placeholder="0" 
             value={efectivoFinalContado} 
             onChange={e => setEfectivoFinalContado(Number(e.target.value))} 
-            className="h-11 text-lg text-center font-bold font-mono bg-[#1d283a] border-app-border rounded-full" 
+            className="h-11 text-lg text-center font-bold font-mono bg-[#1e1e1e] border-app-border rounded-full" 
           />
         </div>
 

@@ -157,7 +157,7 @@ export function IncomeSummary({
 
             {resumen.length === 0 ? (
               <div className="text-center text-slate-400 py-10 flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#283244] border border-[#324157] flex items-center justify-center text-slate-500">
+                <div className="w-12 h-12 rounded-full bg-[#252526] border border-[#2e2e2e] flex items-center justify-center text-slate-500">
                   <History className="h-5 w-5" />
                 </div>
                 <p className="text-xs">Sin cobros registrados en este turno.</p>
@@ -178,11 +178,11 @@ export function IncomeSummary({
                       </div>
                       <Progress
                         value={totalGeneral > 0 ? (total / totalGeneral) * 100 : 0}
-                        className="h-1.5 bg-[#1d283a]"
+                        className="h-1.5 bg-[#1e1e1e]"
                       />
                     </div>
 
-                    <div className="divide-y divide-[#324157] pt-0.5">
+                    <div className="divide-y divide-[#2e2e2e] pt-0.5">
                       {sesiones.map((sesion) => (
                         <div
                           key={sesion.id}

@@ -238,7 +238,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
 
       {cuentasFiltradas.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-center text-slate-400 gap-2">
-          <div className="w-12 h-12 rounded-full bg-[#283244] border border-[#324157] flex items-center justify-center text-slate-500">
+          <div className="w-12 h-12 rounded-full bg-[#252526] border border-[#2e2e2e] flex items-center justify-center text-slate-500">
             {state.vistaCuentas === 'pendientes' ? (
               <FileClock className="h-5 w-5" />
             ) : (
@@ -286,7 +286,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                   'border rounded-xl transition-all overflow-hidden',
                   state.idVentaActiva === venta.id
                     ? 'border-sky-500 bg-sky-500/10'
-                    : 'bg-[#283244] border-[#324157]'
+                    : 'bg-[#252526] border-[#2e2e2e]'
                 )}
               >
                 <AccordionTrigger
@@ -322,7 +322,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                             </span>
                           </div>
                           <div className="flex justify-end py-0.5">
-                            <Separator className="w-16 bg-[#324157]" />
+                            <Separator className="w-16 bg-[#2e2e2e]" />
                           </div>
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1.5">
@@ -356,7 +356,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-3.5 pb-3.5 pt-0">
-                  <div className="border-t border-[#324157] pt-3 space-y-3">
+                  <div className="border-t border-[#2e2e2e] pt-3 space-y-3">
                     <div className="flex items-center justify-center gap-1.5 flex-nowrap w-full">
                       {permiteConsumoInterno && (
                         <Button
@@ -423,7 +423,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                       </Button>
                     </div>
 
-                    <ul className="divide-y divide-[#324157]">
+                    <ul className="divide-y divide-[#2e2e2e]">
                       {venta.detalles.map((detalle) => (
                         <li
                           key={detalle.idDetalle}

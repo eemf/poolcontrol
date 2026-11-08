@@ -51,7 +51,7 @@ export function AuditoriaFiltros({
         {/* Selector de Período de Caja */}
         <div>
           <Select value={periodoSeleccionado} onValueChange={setPeriodoSeleccionado}>
-            <SelectTrigger className="h-9 text-sm font-medium rounded-full bg-[#1d283a] border-app-border">
+            <SelectTrigger className="h-9 text-sm font-medium rounded-full bg-[#1e1e1e] border-app-border">
               <div className="flex items-center gap-2 truncate">
                 <History className="h-3.5 w-3.5 text-sky-400 shrink-0" />
                 <SelectValue placeholder="Seleccionar período" />
@@ -93,14 +93,14 @@ export function AuditoriaFiltros({
             placeholder="Buscar por usuario, equipo, tablet, PC..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="pl-9 pr-4 h-9 text-sm rounded-full bg-[#1d283a] border-app-border"
+            className="pl-9 pr-4 h-9 text-sm rounded-full bg-[#1e1e1e] border-app-border"
           />
         </div>
 
         {/* Selector de Usuario */}
         <div>
           <Select value={usuarioSeleccionado} onValueChange={setUsuarioSeleccionado}>
-            <SelectTrigger className="h-9 text-sm rounded-full bg-[#1d283a] border-app-border">
+            <SelectTrigger className="h-9 text-sm rounded-full bg-[#1e1e1e] border-app-border">
               <div className="flex items-center gap-2 truncate">
                 <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                 <SelectValue placeholder="Todos los usuarios" />
@@ -120,7 +120,7 @@ export function AuditoriaFiltros({
         {/* Selector de Categoría */}
         <div>
           <Select value={categoriaSeleccionada} onValueChange={setCategoriaSeleccionada}>
-            <SelectTrigger className="h-9 text-sm rounded-full bg-[#1d283a] border-app-border">
+            <SelectTrigger className="h-9 text-sm rounded-full bg-[#1e1e1e] border-app-border">
               <div className="flex items-center gap-2 truncate">
                 <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                 <SelectValue placeholder="Todas las categorías" />
@@ -145,7 +145,7 @@ export function AuditoriaFiltros({
           variant={categoriaSeleccionada === 'TODAS' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setCategoriaSeleccionada('TODAS')}
-          className={`h-7 px-3 text-xs font-normal rounded-full ${categoriaSeleccionada === 'TODAS' ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-[#1d283a]'}`}
+          className={`h-7 px-3 text-xs font-normal rounded-full ${categoriaSeleccionada === 'TODAS' ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-[#1e1e1e]'}`}
         >
           Todas ({totalEventosRaw})
         </Button>
@@ -160,7 +160,7 @@ export function AuditoriaFiltros({
               size="sm"
               onClick={() => setCategoriaSeleccionada(catKey)}
               className={`h-7 px-3 text-xs font-normal gap-1.5 rounded-full ${
-                esActivo ? 'bg-sky-600 text-white font-medium' : 'text-slate-300 hover:bg-[#1d283a]'
+                esActivo ? 'bg-sky-600 text-white font-medium' : 'text-slate-300 hover:bg-[#1e1e1e]'
               }`}
             >
               <Icon className={`h-3.5 w-3.5 ${esActivo ? 'text-white' : config.color}`} />

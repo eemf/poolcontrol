@@ -58,7 +58,7 @@ export default function PaginaMesas() {
             <Button
               variant="secondary"
               asChild
-              className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#1d283a] text-slate-200 border border-[#324157]"
+              className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]"
             >
               <Link href="/dashboard/ventas">
                 <ShoppingCart className="mr-1.5 h-3.5 w-3.5 text-sky-400" />
@@ -68,7 +68,7 @@ export default function PaginaMesas() {
             <Button
               variant="secondary"
               asChild
-              className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#1d283a] text-slate-200 border border-[#324157]"
+              className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]"
             >
               <Link href="/dashboard/gestion-tragamonedas">
                 <Dices className="mr-1.5 h-3.5 w-3.5 text-amber-400" />

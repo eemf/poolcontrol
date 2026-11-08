@@ -57,7 +57,7 @@ export function AuditoriaEquipoDialog({
 
         <div className="space-y-4 py-2">
           {/* Hardware detectado */}
-          <div className="bg-[#1d283a] p-3 rounded-xl border border-app-border space-y-1 text-xs">
+          <div className="bg-[#1e1e1e] p-3 rounded-xl border border-app-border space-y-1 text-xs">
             <span className="font-semibold text-slate-200 flex items-center gap-1.5">
               <CurrentDeviceIcon className={`h-4 w-4 ${metaDispositivo.color}`} />
               Hardware detectado en este dispositivo:
@@ -87,7 +87,7 @@ export function AuditoriaEquipoDialog({
               placeholder="Ej. Tablet Mesas 1, Caja Mostrador, Celular Admin..."
               value={inputNombreEquipo}
               onChange={(e) => setInputNombreEquipo(e.target.value)}
-              className="text-sm h-9 bg-[#1d283a] border-app-border rounded-full px-4"
+              className="text-sm h-9 bg-[#1e1e1e] border-app-border rounded-full px-4"
             />
           </div>
 

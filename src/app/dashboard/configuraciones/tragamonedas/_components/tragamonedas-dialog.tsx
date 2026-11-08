@@ -32,7 +32,7 @@ export function TragamonedasDialog({
 }: TragamonedasDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-2xl bg-[#1d283a] border-[#324157] text-white">
+      <DialogContent className="sm:max-w-md rounded-2xl bg-[#1e1e1e] border-[#2e2e2e] text-white">
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-white">
@@ -53,7 +53,7 @@ export function TragamonedasDialog({
                 value={formState.nombre}
                 onChange={(e) => onFormChange('nombre', e.target.value)}
                 required
-                className="rounded-full bg-[#283244] border-[#324157] text-white"
+                className="rounded-full bg-[#252526] border-[#2e2e2e] text-white"
                 placeholder="Ej: Máquina 01"
               />
             </div>
@@ -65,7 +65,7 @@ export function TragamonedasDialog({
                   id="modelo"
                   value={formState.modelo}
                   onChange={(e) => onFormChange('modelo', e.target.value)}
-                  className="rounded-full bg-[#283244] border-[#324157] text-white"
+                  className="rounded-full bg-[#252526] border-[#2e2e2e] text-white"
                   placeholder="Ej: Cherry Master"
                 />
               </div>
@@ -76,10 +76,10 @@ export function TragamonedasDialog({
                   value={formState.estado}
                   onValueChange={(v: EstadoTragamonedas) => onFormChange('estado', v)}
                 >
-                  <SelectTrigger className="rounded-full bg-[#283244] border-[#324157] text-white">
+                  <SelectTrigger className="rounded-full bg-[#252526] border-[#2e2e2e] text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#283244] border-[#324157] text-white">
+                  <SelectContent className="bg-[#252526] border-[#2e2e2e] text-white">
                     <SelectItem value="activo">Activo</SelectItem>
                     <SelectItem value="mantenimiento">Mantenimiento</SelectItem>
                     <SelectItem value="inactivo">Inactivo</SelectItem>
@@ -89,9 +89,9 @@ export function TragamonedasDialog({
             </div>
           </div>
 
-          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2 border-t border-[#324157]">
+          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2 border-t border-[#2e2e2e]">
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="rounded-full w-full sm:w-auto border-[#324157] text-slate-300 hover:bg-[#283244]">
+              <Button type="button" variant="outline" className="rounded-full w-full sm:w-auto border-[#2e2e2e] text-slate-300 hover:bg-[#252526]">
                 Cancelar
               </Button>
             </DialogClose>

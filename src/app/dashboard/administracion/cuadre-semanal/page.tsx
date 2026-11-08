@@ -85,7 +85,7 @@ export default function CuadreSemanalPage() {
       <EncabezadoSemanal hayDatosPendientes={hayDatosPendientes} />
 
       {!hayDatosPendientes ? (
-        <SurfaceCard variant="panel" className="p-12 text-center border-dashed border-[#324157] space-y-4">
+        <SurfaceCard variant="panel" className="p-12 text-center border-dashed border-[#2e2e2e] space-y-4">
           <CalendarDays className="h-12 w-12 mx-auto text-primary/40" />
           <div className="space-y-1">
             <p className="font-semibold text-lg text-white">No hay registros pendientes de procesar</p>
@@ -94,7 +94,7 @@ export default function CuadreSemanalPage() {
           <Link href="/dashboard/administracion/cuadre-semanal/historial" className="inline-block pt-1">
             <Button
               variant="outline"
-              className="rounded-full px-6 font-semibold text-xs h-9 gap-2 border-[#324157] bg-[#283244] text-slate-200 hover:text-white"
+              className="rounded-full px-6 font-semibold text-xs h-9 gap-2 border-[#2e2e2e] bg-[#252526] text-slate-200 hover:text-white"
             >
               <History className="h-3.5 w-3.5 text-primary" />
               Ver Historial de Cuadres Semanales
@@ -174,7 +174,7 @@ export default function CuadreSemanalPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="rounded-full h-9 px-6 font-semibold text-xs border-[#324157] bg-[#283244] text-slate-300 hover:text-white">
+            <AlertDialogCancel className="rounded-full h-9 px-6 font-semibold text-xs border-[#2e2e2e] bg-[#252526] text-slate-300 hover:text-white">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction

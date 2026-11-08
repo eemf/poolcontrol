@@ -32,7 +32,7 @@ export default function HistorialCuadresTragamonedasPage() {
 
   if (error) {
     return (
-      <div className="text-center text-rose-400 p-6 bg-[#1d283a] rounded-xl border border-rose-500/30">
+      <div className="text-center text-rose-400 p-6 bg-[#1e1e1e] rounded-xl border border-rose-500/30">
         <p className="font-bold">Error al cargar el historial:</p>
         <p className="text-xs mt-1">{error.message}</p>
       </div>
@@ -46,7 +46,7 @@ export default function HistorialCuadresTragamonedasPage() {
         description="Registro y auditoría de cierres operativos de máquinas tragamonedas."
         icon={History}
         action={
-          <Button variant="outline" asChild className="rounded-full h-9 px-5 border-[#324157] text-white hover:bg-[#283244] w-full sm:w-auto">
+          <Button variant="outline" asChild className="rounded-full h-9 px-5 border-[#2e2e2e] text-white hover:bg-[#252526] w-full sm:w-auto">
             <Link href="/dashboard/administracion/cuadre-tragamonedas">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver
@@ -57,18 +57,18 @@ export default function HistorialCuadresTragamonedasPage() {
 
       <SurfaceCard variant="panel" className="space-y-4">
         {/* Barra de Filtros */}
-        <div className="flex flex-col md:flex-row gap-3 justify-between items-center pb-3 border-b border-[#324157]">
+        <div className="flex flex-col md:flex-row gap-3 justify-between items-center pb-3 border-b border-[#2e2e2e]">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Buscar por ID..."
-              className="pl-10 rounded-full h-10 border-[#324157] bg-[#283244] text-white placeholder:text-slate-400 focus-visible:ring-sky-500"
+              className="pl-10 rounded-full h-10 border-[#2e2e2e] bg-[#252526] text-white placeholder:text-slate-400 focus-visible:ring-sky-500"
               value={filtro}
               onChange={(e) => setFiltro(e.target.value)}
             />
           </div>
 
-          <div className="flex items-center justify-center gap-3 px-4 h-10 border border-[#324157] rounded-full bg-[#283244] shrink-0 w-full sm:w-auto">
+          <div className="flex items-center justify-center gap-3 px-4 h-10 border border-[#2e2e2e] rounded-full bg-[#252526] shrink-0 w-full sm:w-auto">
             <span className={cn("text-xs font-semibold transition-colors", !mostrarTodos ? "text-sky-400" : "text-slate-400")}>
               Pendientes
             </span>
@@ -89,7 +89,7 @@ export default function HistorialCuadresTragamonedasPage() {
             <Loader2 className="h-10 w-10 animate-spin text-sky-400" />
           </div>
         ) : cuadresPaginados.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border-2 border-dashed border-[#324157] rounded-xl bg-[#283244]/40">
+          <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40">
             <FileText className="h-12 w-12 mb-3 text-slate-500" />
             <p className="font-semibold text-base text-white">
               {filtro ? "No se encontraron registros" : (mostrarTodos ? "No hay cuadres registrados" : "No hay cuadres pendientes")}
@@ -105,17 +105,17 @@ export default function HistorialCuadresTragamonedasPage() {
 
         {/* Paginación */}
         {totalPages > 1 && (
-          <div className="flex flex-col items-center gap-3 border-t border-[#324157] pt-4 sm:flex-row sm:justify-between">
+          <div className="flex flex-col items-center gap-3 border-t border-[#2e2e2e] pt-4 sm:flex-row sm:justify-between">
             <div className="flex items-center space-x-2">
               <p className="text-xs font-medium text-slate-400">Filas por página</p>
               <Select
                 value={`${itemsPerPage}`}
                 onValueChange={(value) => setItemsPerPage(Number(value))}
               >
-                <SelectTrigger className="h-8 w-[70px] rounded-full text-xs bg-[#283244] border-[#324157] text-white">
+                <SelectTrigger className="h-8 w-[70px] rounded-full text-xs bg-[#252526] border-[#2e2e2e] text-white">
                   <SelectValue placeholder={itemsPerPage} />
                 </SelectTrigger>
-                <SelectContent className="bg-[#283244] border-[#324157] text-white">
+                <SelectContent className="bg-[#252526] border-[#2e2e2e] text-white">
                   {[10, 20, 50, 100].map((pageSize) => (
                     <SelectItem key={pageSize} value={`${pageSize}`}>
                       {pageSize}
@@ -131,7 +131,7 @@ export default function HistorialCuadresTragamonedasPage() {
                 size="sm"
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
-                className="h-8 px-3 rounded-full border-[#324157] text-slate-300 hover:bg-[#283244]"
+                className="h-8 px-3 rounded-full border-[#2e2e2e] text-slate-300 hover:bg-[#252526]"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <span className="hidden sm:inline text-xs ml-1 font-semibold">Anterior</span>
@@ -144,7 +144,7 @@ export default function HistorialCuadresTragamonedasPage() {
                 size="sm"
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
-                className="h-8 px-3 rounded-full border-[#324157] text-slate-300 hover:bg-[#283244]"
+                className="h-8 px-3 rounded-full border-[#2e2e2e] text-slate-300 hover:bg-[#252526]"
               >
                 <span className="hidden sm:inline text-xs mr-1 font-semibold">Siguiente</span>
                 <ChevronRight className="h-4 w-4" />

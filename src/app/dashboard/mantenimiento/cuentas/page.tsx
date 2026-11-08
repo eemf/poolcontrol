@@ -49,12 +49,12 @@ export default function CuentasPage() {
       />
 
       {/* Barra de Filtro y Búsqueda */}
-      <div className="bg-[#1d283a] p-3.5 rounded-2xl border border-[#324157] shadow-sm">
+      <div className="bg-[#1e1e1e] p-3.5 rounded-2xl border border-[#2e2e2e] shadow-sm">
         <div className="relative max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
             placeholder="Buscar por nombre o tipo..."
-            className="pl-10 rounded-full h-9 bg-[#283244] border-[#324157] text-white placeholder:text-slate-400 text-xs focus:ring-1 focus:ring-sky-500"
+            className="pl-10 rounded-full h-9 bg-[#252526] border-[#2e2e2e] text-white placeholder:text-slate-400 text-xs focus:ring-1 focus:ring-sky-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -63,12 +63,12 @@ export default function CuentasPage() {
 
       {/* Grid de Cuentas */}
       {isLoading || isLoadingSucursal ? (
-        <div className="flex flex-col items-center justify-center h-52 bg-[#1d283a] rounded-2xl border border-[#324157]">
+        <div className="flex flex-col items-center justify-center h-52 bg-[#1e1e1e] rounded-2xl border border-[#2e2e2e]">
           <Loader2 className="h-8 w-8 animate-spin text-sky-400 mb-2" />
           <span className="text-xs text-slate-400">Cargando cuentas...</span>
         </div>
       ) : filteredCuentas.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center p-12 bg-[#1d283a] border border-dashed border-[#324157] rounded-2xl">
+        <div className="flex flex-col items-center justify-center text-center p-12 bg-[#1e1e1e] border border-dashed border-[#2e2e2e] rounded-2xl">
           <BookUser className="h-12 w-12 text-slate-500 mb-3 opacity-60" />
           <h3 className="font-semibold text-slate-200 text-sm">
             {searchTerm ? 'No se encontraron resultados' : 'No hay cuentas registradas'}

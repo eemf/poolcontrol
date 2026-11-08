@@ -12,9 +12,63 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
+    build: 10,
+    fecha: "2026-11-08",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b10",
+    descripcion: "Jerarquía de elevación en 4 capas para separación nítida de contenedores principales.",
+    cambios: [
+      "Diferenciación de Contenedores Principales: Configurado el fondo base de la aplicación (Canvas/Body) en `#121212` (`--background: 0 0% 7%`) y los paneles principales (`SurfaceCard variant=\"panel\"` y `bg-app-panel`) en `#1e1e1e` con bordes `#2e2e2e`, eliminando el problema de fusión visual entre el fondo y los contenedores.",
+      "Profundidad y contraste multicapa: Capa 0 Canvas (`#121212`), Capa 1 Paneles (`#1e1e1e`), Capa 2 Tarjetas/Surfaces (`#252526`), Capa 3 Insets/Subcards (`#141414`), garantizando que cada contenedor principal (ej. Punto de Venta y Cuentas abiertas) destaque como un bloque claramente delimitado.",
+      "Actualización de tokens y reglas: Sincronización en `globals.css`, `tailwind.config.ts`, `surface-card.tsx`, `AGENTS.md` y `.ai-rules.md`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 9,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b9",
+    descripcion: "Migración integral a la paleta oficial oscura del IDE Antigravity.",
+    cambios: [
+      "Paleta oficial Antigravity IDE Dark Modern: Reemplazo global de la gama azulada (#1d283a, #283244, #324157) por la paleta neutra y profesional del IDE Antigravity: paneles `#1e1e1e`, superficies/tarjetas `#252526`, bordes `#2e2e2e`, inputs `#252526`/`#313131` y acentos azul `#0078D4`.",
+      "Configuración en `tailwind.config.ts` y `globals.css`: Actualizadas las variables semánticas de Tailwind y del modo oscuro (`.dark`) con los valores exactos del tema oscuro de Antigravity IDE.",
+      "Actualización de reglas maestras en `AGENTS.md` y `.ai-rules.md`: Establecida la paleta de Antigravity IDE como la norma oficial corporativa para futuros desarrollos."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 8,
+    fecha: "2026-11-06",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b8",
+    descripcion: "Estructura simétrica de 2 columnas en cabecera de tarjeta de historial de ventas.",
+    cambios: [
+      "Rediseño en 2 columnas en `HistorialVentaItem` (`src/app/dashboard/historial-ventas/_components/historial-venta-item.tsx`): Columna 1 (Izquierda: Cliente + Venta en fila 1, Turno en fila 2, Fecha y hora en fila 3); Columna 2 (Derecha: Total en fila 1, Pendiente en fila 2, Badge de Estado en fila 3).",
+      "Alineación simétrica y legible: Distribución exacta solicitada que previene recortes de texto y otorga balance visual perfecto en móvil y escritorio."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 7,
+    fecha: "2026-11-06",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b7",
+    descripcion: "Reorganización de cabecera de venta en 3 filas para nombres de clientes y textos sin recortes.",
+    cambios: [
+      "Cabecera en 3 filas en `HistorialVentaItem` (`src/app/dashboard/historial-ventas/_components/historial-venta-item.tsx`): Fila 1 dedicada para nombre del cliente completo y monto total; Fila 2 para badges de turno/cortesía y estado de pago/abono; Fila 3 para folio y fecha/hora completa sin truncamiento.",
+      "Garantía de nombre de cliente en `useHistorialVentas` (`src/app/dashboard/historial-ventas/_hooks/use-historial-ventas.ts`): Fallback seguro de lectura hacia `vOriginal.clienteNombre` y valor predeterminado 'Consumidor Final', evitando que el campo quede en blanco."
+    ]
+  },
+  {
+    version: "2.0.0",
     build: 6,
     fecha: "2026-11-06",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b6",
     descripcion: "Centrado y auto-scroll inteligente para teclados virtuales en dispositivos móviles.",
@@ -325,7 +379,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b378",
     descripcion: "Estandarización de tooltips flotantes en píldora para las descripciones de botones en Punto de Venta.",
     cambios: [
-      "Diseño corporativo de `TooltipContent` (`src/components/ui/tooltip.tsx`): Formato píldora (`rounded-full`), fondo `#1d283a`, borde `#324157` y renderizado en portal para evitar recortes.",
+      "Diseño corporativo de `TooltipContent` (`src/components/ui/tooltip.tsx`): Formato píldora (`rounded-full`), fondo `#1e1e1e`, borde `#2e2e2e` y renderizado en portal para evitar recortes.",
       "Reemplazo de atributos `title` nativos por `<Tooltip>` en `POSAccounts` (`src/app/dashboard/ventas/_components/pos-accounts.tsx`) y `PillTabs` (`src/components/comunes/pill-tabs.tsx`)."
     ]
   },
@@ -350,7 +404,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b376",
     descripcion: "Visualización permanente del input de búsqueda a la izquierda junto a las pestañas en la misma píldora en `<PillTabs>`.",
     cambios: [
-      "Input de búsqueda visible por defecto en `PillTabs` (`src/components/comunes/pill-tabs.tsx`): El campo de búsqueda se muestra permanentemente a la izquierda y las pestañas a la derecha dentro de la misma píldora (`rounded-full bg-[#283244] border-[#324157]`)."
+      "Input de búsqueda visible por defecto en `PillTabs` (`src/components/comunes/pill-tabs.tsx`): El campo de búsqueda se muestra permanentemente a la izquierda y las pestañas a la derecha dentro de la misma píldora (`rounded-full bg-[#252526] border-[#2e2e2e]`)."
     ]
   },
   {
@@ -413,10 +467,10 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b371",
     descripcion: "Auditoría y estandarización integral de la página de Punto de Venta (`/dashboard/ventas`) con los controles y paleta oficiales.",
     cambios: [
-      "Cabecera POS (`pos-header.tsx`): Botones de navegación rápida (`Sala de Juegos`, `Tragamonedas`, `Historial`) con diseño píldora oficial (`rounded-full bg-[#283244] border-[#324157]`), iconos semánticos coloreados y centrado en vista móvil.",
-      "Formulario y Carrito POS (`pos-form.tsx`, `pos-cart.tsx`): Eliminación de contenedores secundarios redundantes en la sección de carga de productos, adopción de `<SurfaceCard>` con paleta `#1d283a` / `#283244`, controles base por defecto, lista de carrito con scroll acotado (`max-h-[380px]`) y botón circular de eliminación.",
-      "Cuentas Activas (`pos-accounts.tsx`): Reemplazo del selector improvisado dentro del buscador por `<PillTabs>` oficial (`Pendientes` y `Crédito` con `<CountBadge>`), buscador píldora independiente, eliminación de fondos oscuros arbitrarios (`#17202e`) y tarjetas de acordeón en `#283244` con botones `rounded-full`.",
-      "Modales de POS (`pos-dialogs.tsx`): Rediseño completo de 'Cobro de Cuenta', 'Consumo Interno' y confirmaciones con el formato de `BillingDialog` (`#1d283a`, `Total a Liquidar` directo sobre el lienzo, sub-modales internos para Confirmar Pago con Tarjeta y Registrar Abono evitando conflictos de doble modal Radix)."
+      "Cabecera POS (`pos-header.tsx`): Botones de navegación rápida (`Sala de Juegos`, `Tragamonedas`, `Historial`) con diseño píldora oficial (`rounded-full bg-[#252526] border-[#2e2e2e]`), iconos semánticos coloreados y centrado en vista móvil.",
+      "Formulario y Carrito POS (`pos-form.tsx`, `pos-cart.tsx`): Eliminación de contenedores secundarios redundantes en la sección de carga de productos, adopción de `<SurfaceCard>` con paleta `#1e1e1e` / `#252526`, controles base por defecto, lista de carrito con scroll acotado (`max-h-[380px]`) y botón circular de eliminación.",
+      "Cuentas Activas (`pos-accounts.tsx`): Reemplazo del selector improvisado dentro del buscador por `<PillTabs>` oficial (`Pendientes` y `Crédito` con `<CountBadge>`), buscador píldora independiente, eliminación de fondos oscuros arbitrarios (`#17202e`) y tarjetas de acordeón en `#252526` con botones `rounded-full`.",
+      "Modales de POS (`pos-dialogs.tsx`): Rediseño completo de 'Cobro de Cuenta', 'Consumo Interno' y confirmaciones con el formato de `BillingDialog` (`#1e1e1e`, `Total a Liquidar` directo sobre el lienzo, sub-modales internos para Confirmar Pago con Tarjeta y Registrar Abono evitando conflictos de doble modal Radix)."
     ]
   },
   {
@@ -479,7 +533,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Reemplazo de `AlertDialog` de Radix por un overlay flotante aislado (`data-global-alert`, `z-[100]`) en `src/app/dashboard/layout.tsx` con reconocimiento optimista inmediato, evitando cierres accidentales de modales activos (`BillingDialog`, `ConsumptionDialog`) y bloqueos de `pointer-events` en `body`.",
       "Protección en `DialogContent` (`src/components/ui/dialog.tsx`) para ignorar eventos de clic/foco externos provenientes de alertas globales.",
-      "Estandarización visual del modal '¡Tiempo Culminado!' con paleta oficial (`#1d283a`, borde `#324157`), icono circular translúcido ámbar y botón en píldora."
+      "Estandarización visual del modal '¡Tiempo Culminado!' con paleta oficial (`#1e1e1e`, borde `#2e2e2e`), icono circular translúcido ámbar y botón en píldora."
     ]
   },
   {
@@ -506,8 +560,8 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b364",
     descripcion: "Unificación de sub-contenedores financieros y de consumos en la tarjeta de estación (`TableCard`).",
     cambios: [
-      "Rediseño del bloque financiero en `TableCard`: Se reemplazaron los 3 sub-contenedores separados (Total a Pagar, Alquiler, Consumo) y la línea divisoria flotante por un único bloque unificado (`#283244`) con divisiones limpias.",
-      "Integración del acordeón 'Ver Consumos' dentro del mismo bloque unificado con separadores `divide-y divide-[#324157]`, eliminando contenedores secundarios adicionales al desplegar."
+      "Rediseño del bloque financiero en `TableCard`: Se reemplazaron los 3 sub-contenedores separados (Total a Pagar, Alquiler, Consumo) y la línea divisoria flotante por un único bloque unificado (`#252526`) con divisiones limpias.",
+      "Integración del acordeón 'Ver Consumos' dentro del mismo bloque unificado con separadores `divide-y divide-[#2e2e2e]`, eliminando contenedores secundarios adicionales al desplegar."
     ]
   },
   {
@@ -519,8 +573,8 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b363",
     descripcion: "Simplificación de contenedores anidados en el resumen de Ingresos de Sala de Juegos.",
     cambios: [
-      "Eliminación del contenedor secundario en 'Total Consolidado' dentro de `IncomeSummary`, ubicándolo directamente sobre el lienzo del panel principal (`#1d283a`).",
-      "Eliminación del sub-contenedor anidado (`subcard`) y subtítulo redundante dentro de cada tarjeta de mesa, integrando las sesiones directamente con separadores `divide-y divide-[#324157]`."
+      "Eliminación del contenedor secundario en 'Total Consolidado' dentro de `IncomeSummary`, ubicándolo directamente sobre el lienzo del panel principal (`#1e1e1e`).",
+      "Eliminación del sub-contenedor anidado (`subcard`) y subtítulo redundante dentro de cada tarjeta de mesa, integrando las sesiones directamente con separadores `divide-y divide-[#2e2e2e]`."
     ]
   },
   {
@@ -595,7 +649,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b357",
     descripcion: "Estandarización global de controles base (Select, Input, DropdownMenu y AutocompleteInput) con hover y paleta oficial integrada.",
     cambios: [
-      "Estilos oficiales integrados en `Select` (`src/components/ui/select.tsx`): `SelectTrigger`, `SelectContent` y `SelectItem` incluyen de fábrica la paleta `#283244`/`#1d283a`, bordes `#324157` y estados `hover:bg-sky-500/20 data-[highlighted]:bg-sky-500/20` sin requerir clases manuales en cada página.",
+      "Estilos oficiales integrados en `Select` (`src/components/ui/select.tsx`): `SelectTrigger`, `SelectContent` y `SelectItem` incluyen de fábrica la paleta `#252526`/`#1e1e1e`, bordes `#2e2e2e` y estados `hover:bg-sky-500/20 data-[highlighted]:bg-sky-500/20` sin requerir clases manuales en cada página.",
       "Estandarización global de `Input`, `DropdownMenu` y `AutocompleteInput`: Integración directa del diseño corporativo y resaltado al pasar el cursor (`onMouseEnter` + `hover:bg-sky-500/20`)."
     ]
   },
@@ -647,7 +701,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b353",
     descripcion: "Ajuste de bordes, dimensiones compactas y desglose informativo en los modales de confirmación de eliminación de consumo.",
     cambios: [
-      "Borde y radio oficial (`rounded-xl sm:rounded-lg border-[#324157]`): Homologación del radio de esquina con `DialogContent` en los modales de confirmación de eliminación.",
+      "Borde y radio oficial (`rounded-xl sm:rounded-lg border-[#2e2e2e]`): Homologación del radio de esquina con `DialogContent` en los modales de confirmación de eliminación.",
       "Diseño compacto e informativo (`max-w-sm p-5`): Muestra estación, nombre del producto, cantidad × precio unitario, hora de registro, monto total y unidades exactas a reintegrar al stock."
     ]
   },
@@ -687,7 +741,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b350",
     descripcion: "Homologación visual del carrito en el modal Añadir Consumo con el carrito de Ventas POS.",
     cambios: [
-      "Diseño de filas idéntico a POSCart: En `ConsumptionDialog`, los ítems del carrito muestran icono de estado (`BadgeHelp` en rojo o `ReceiptText` en índigo para manuales), nombre en `text-sm font-semibold`, sublínea con `{cantidad} × Q{precio}` y hora exacta (`Clock` + `hh:mm:ss a`), monto en blanco, botón de eliminar (`Trash2`) y divisores horizontales (`divide-y divide-[#324157]`), ordenando los productos recién agregados al inicio."
+      "Diseño de filas idéntico a POSCart: En `ConsumptionDialog`, los ítems del carrito muestran icono de estado (`BadgeHelp` en rojo o `ReceiptText` en índigo para manuales), nombre en `text-sm font-semibold`, sublínea con `{cantidad} × Q{precio}` y hora exacta (`Clock` + `hh:mm:ss a`), monto en blanco, botón de eliminar (`Trash2`) y divisores horizontales (`divide-y divide-[#2e2e2e]`), ordenando los productos recién agregados al inicio."
     ]
   },
   {
@@ -773,7 +827,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b343",
     descripcion: "Homologación de color de fondo entre tarjetas de estaciones y panel de ingresos, y remoción de línea divisoria en ingresos.",
     cambios: [
-      "Unificación cromática de contenedores principales: `TableCard` adopta `SurfaceCard variant=\"panel\"` (`#1d283a`) igualando el tono del contenedor de `IncomeSummary`, con bloques internos en `#283244`.",
+      "Unificación cromática de contenedores principales: `TableCard` adopta `SurfaceCard variant=\"panel\"` (`#1e1e1e`) igualando el tono del contenedor de `IncomeSummary`, con bloques internos en `#252526`.",
       "Limpieza visual en Ingresos: Se eliminó el borde divisor inferior (`border-b`) del encabezado en `IncomeSummary`."
     ]
   },
@@ -810,7 +864,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b340",
     descripcion: "Estandarización visual integral y corrección de props en Control de Estaciones (/dashboard/mesas).",
     cambios: [
-      "Adopción estricta del Design System en Sala de Juegos: Uso de `<SurfaceCard>`, `<PillTabs>`, `<CountBadge>` y paleta oficial (#1d283a, #283244, #324157) en TableCard, IncomeSummary y todos los modales operativos.",
+      "Adopción estricta del Design System en Sala de Juegos: Uso de `<SurfaceCard>`, `<PillTabs>`, `<CountBadge>` y paleta oficial (#1e1e1e, #252526, #2e2e2e) en TableCard, IncomeSummary y todos los modales operativos.",
       "Controles redondeados en píldora y tipografía limpia: Estandarización de inputs, selects y botones a `rounded-full` (h-9/h-10) y eliminación total de clases `uppercase` en etiquetas, insignias y divisores.",
       "Corrección de sincronización de props en MesasDialogs: Alineación de propiedades en `BillingDialog` y `ConsumptionDialog` e inclusión del interruptor visible para Consumo Manual (F6) en escritorio y móvil."
     ]
@@ -824,7 +878,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b339",
     descripcion: "Integración de Paleta de Colores oficial: Modo Oscuro (Antigravity IDE) y Modo Claro corporativo en la vitrina de controles estándar.",
     cambios: [
-      "Paleta cromática inspirada en Antigravity IDE: Lienzo base ultra oscuro descansado (`#12151b`), paneles estructurados (`#1d283a`), superficies elevadas (`#283244`), bordes de alta definición de 1px (`#324157`), azul primario de acción (`#0284c7`), y acentos de sintaxis semántica (esmeralda, ámbar, rosa, violeta).",
+      "Paleta cromática inspirada en Antigravity IDE: Lienzo base ultra oscuro descansado (`#12151b`), paneles estructurados (`#1e1e1e`), superficies elevadas (`#252526`), bordes de alta definición de 1px (`#2e2e2e`), azul primario de acción (`#0284c7`), y acentos de sintaxis semántica (esmeralda, ámbar, rosa, violeta).",
       "Paleta equivalente en Modo Claro: Lienzo ultra limpio (`#f8fafc`), paneles blancos (`#ffffff`), superficies suaves (`#f1f5f9`) y bordes nítidos (`#cbd5e1`).",
       "Herramientas de inspección: Muestra de fichas cromáticas con copiado directo al portapapeles con un clic, tabla comparativa lado a lado y simulador de controles en tiempo real con selector de tema."
     ]
@@ -941,7 +995,7 @@ export const releaseHistory: ReleaseItem[] = [
       "Optimización final de Sala de Juegos (Mesas): Encapsulamiento de modales en `MesasDialogs` recibiendo el estado estructurado de `useMesas`, reduciendo `mesas/page.tsx` de 285 a 95 líneas limpias y legibles.",
       "Modularización de Cuentas Financieras: Creación de `useMantenimientoCuentas.ts`, `CuentaCard.tsx`, `ModalCuenta.tsx` y `DialogoEliminarCuenta.tsx`, reduciendo `mantenimiento/cuentas/page.tsx` de 253 a 115 líneas.",
       "Auditoría integral de arquitectura: Verificación completa de todas las páginas de producción del Dashboard, garantizando que el 100% de las rutas operativas se ubiquen cómodamente por debajo del límite de 250 líneas.",
-      "Cumplimiento estricto del Design System: Adopción del encabezado `<PageHeader>`, botones píldora `rounded-full`, paleta corporativa (#1d283a, #283244, #324157) y cero textos en mayúsculas sostenidas."
+      "Cumplimiento estricto del Design System: Adopción del encabezado `<PageHeader>`, botones píldora `rounded-full`, paleta corporativa (#1e1e1e, #252526, #2e2e2e) y cero textos en mayúsculas sostenidas."
     ]
   },
   {
@@ -954,7 +1008,7 @@ export const releaseHistory: ReleaseItem[] = [
     descripcion: "Modularización y optimización arquitectónica de Mantenimiento de Cuentas Financieras con adopción estricta del Design System oficial.",
     cambios: [
       "Modularización de Cuentas Financieras: Creación de `useMantenimientoCuentas.ts`, `CuentaCard.tsx`, `ModalCuenta.tsx` y `DialogoEliminarCuenta.tsx`, reduciendo `mantenimiento/cuentas/page.tsx` de 253 a 115 líneas limpias.",
-      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, buscador ergonómico con `rounded-full` en `#283244`, eliminación total de textos en mayúsculas sostenidas (`uppercase`), y aplicación de la paleta corporativa oficial (#1d283a, #283244, #324157).",
+      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, buscador ergonómico con `rounded-full` en `#252526`, eliminación total de textos en mayúsculas sostenidas (`uppercase`), y aplicación de la paleta corporativa oficial (#1e1e1e, #252526, #2e2e2e).",
       "Experiencia móvil y adaptativa: Reemplazo de tablas rígidas por tarjetas responsivas e independientes con microinteracciones y controles píldora."
     ]
   },
@@ -970,7 +1024,7 @@ export const releaseHistory: ReleaseItem[] = [
       "Modularización de Historial de Cuadre de Tragamonedas: Creación de `useHistorialCuadreTragamonedas.ts` y `CuadreTragamonedasItemAcordeon.tsx`, reduciendo `cuadre-tragamonedas/historial/page.tsx` de 316 a 135 líneas.",
       "Modularización de Historial de Cuadre Mensual: Creación de `useHistorialCuadreMensual.ts`, `DetalleCuadresSemanales.tsx` y `CuadreMensualItemAcordeon.tsx`, reduciendo `cuadre-mensual/historial/page.tsx` de 312 a 125 líneas.",
       "Modularización de Gestión de Usuarios: Extracción de `useUsuariosSucursal.ts` con aislamiento de creación secundaria en Firebase Auth y actualización de `EncabezadoUsuarios.tsx` con `PageHeader`, reduciendo `configuraciones/usuarios/page.tsx` de 304 a 75 líneas.",
-      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full`, eliminación de mayúsculas sostenidas y aplicación de la paleta corporativa oficial (#1d283a, #283244, #324157)."
+      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full`, eliminación de mayúsculas sostenidas y aplicación de la paleta corporativa oficial (#1e1e1e, #252526, #2e2e2e)."
     ]
   },
   {
@@ -985,7 +1039,7 @@ export const releaseHistory: ReleaseItem[] = [
       "Modularización de Configuración de Tragamonedas: Creación de `useConfigTragamonedas.ts`, `TragamonedasCard.tsx`, `TragamonedasDialog.tsx` y `EliminarMaquinaDialog.tsx`, reduciendo `configuraciones/tragamonedas/page.tsx` de 329 a 105 líneas.",
       "Modularización de Cuadre de Tragamonedas: Extracción de `useCuadreTragamonedasCierre.ts`, `MaquinaCuadreCard.tsx`, `CuadreTragamonedasResumen.tsx` y `CuadreConfirmacionDialog.tsx`, reduciendo `administracion/cuadre-tragamonedas/page.tsx` de 286 a 95 líneas.",
       "Modularización de Historial de Cierres de Caja: Creación de `useHistorialCierreCaja.ts` y `CierreCajaItemAcordeon.tsx`, reduciendo `cierre-caja/historial/page.tsx` de 305 a 135 líneas.",
-      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full`, eliminación de mayúsculas sostenidas y aplicación de la paleta corporativa oficial (#1d283a, #283244, #324157)."
+      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full`, eliminación de mayúsculas sostenidas y aplicación de la paleta corporativa oficial (#1e1e1e, #252526, #2e2e2e)."
     ]
   },
   {
@@ -1000,7 +1054,7 @@ export const releaseHistory: ReleaseItem[] = [
       "Modularización de Configuración de Estaciones: Extracción de `useConfigMesas.ts`, `TarifaCard.tsx`, `MesaCard.tsx`, `TarifaDialog.tsx`, `MesaDialog.tsx` y `EliminarDialogs.tsx`, reduciendo `configuraciones/mesas/page.tsx` de 570 a 160 líneas.",
       "Optimización de Tarifas de Estaciones: Desacoplamiento de `configuraciones/mesas/tarifas/page.tsx` reutilizando subcomponentes estandarizados, reduciendo de 386 a 85 líneas limpias.",
       "Modularización de Historial de Cuadre Semanal: Creación de `useHistorialCuadreSemanal.ts`, `CuadreItemAcordeon.tsx` y `DetalleRegistrosProcesados.tsx`, reduciendo `cuadre-semanal/historial/page.tsx` de 361 a 140 líneas.",
-      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, pestañas `<PillTabs>`, contenedores `<SurfaceCard>`, botones `rounded-full` y paleta corporativa oficial (#1d283a, #283244, #324157)."
+      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, pestañas `<PillTabs>`, contenedores `<SurfaceCard>`, botones `rounded-full` y paleta corporativa oficial (#1e1e1e, #252526, #2e2e2e)."
     ]
   },
   {
@@ -1014,7 +1068,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Modularización de Sala de Juegos: Extracción del subcomponente `MesasDialogs.tsx` (modales de cobro, consumo, traslados, ajustes y alertas), reduciendo `mesas/page.tsx` a 240 líneas.",
       "Modularización de Cierre de Caja: Extracción de `CierreConteoCard.tsx` y `CierreLiquidacionCard.tsx`, reduciendo `cierre-caja/page.tsx` a 190 líneas.",
-      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full` y paleta corporativa oficial (#1d283a, #283244, #324157)."
+      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full` y paleta corporativa oficial (#1e1e1e, #252526, #2e2e2e)."
     ]
   },
   {
@@ -1027,7 +1081,7 @@ export const releaseHistory: ReleaseItem[] = [
     descripcion: "Modularización y optimización arquitectónica de Inventario de Productos: reducción de 357 a 195 líneas mediante InventarioFiltros, InventarioRevisionFooter e InventarioPaginacion.",
     cambios: [
       "Modularización de Inventario de Productos: Desacoplamiento de la vista principal en subcomponentes modulares especializados (`InventarioFiltros.tsx`, `InventarioRevisionFooter.tsx` e `InventarioPaginacion.tsx`).",
-      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full` y paleta corporativa oficial (#1d283a, #283244, #324157).",
+      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full` y paleta corporativa oficial (#1e1e1e, #252526, #2e2e2e).",
       "Reducción de código: La página pasa de 357 a 195 líneas limpias y coordinadas."
     ]
   },
@@ -1042,7 +1096,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Modularización de Cuadre Mensual: Creación de `useCuadreMensual.ts` aislando consultas de cortes semanales pendientes, selección múltiple y liquidación contable de balances.",
       "Subcomponentes modulares: Extracción de `CuadreMensualLista.tsx` (listado con selección de cortes) y `CuadreMensualResumen.tsx` (cálculos, transferencias entre cuentas y notas).",
-      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full` y paleta corporativa oficial (#1d283a, #283244, #324157).",
+      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full` y paleta corporativa oficial (#1e1e1e, #252526, #2e2e2e).",
       "Reducción de código: La página pasa de 319 a 98 líneas limpias y coordinadas."
     ]
   },
@@ -1057,7 +1111,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Modularización del Tablero Principal: Creación de `useDashboard.ts` aislando consultas y cálculos de métricas de ocupación, stock, ventas acumuladas y series temporales de gráficos.",
       "Subcomponentes desacoplados: Creación de `DashboardKPIs.tsx` (ocupación de mesas y consolas, ventas del turno y alertas de stock), `DashboardTopStations.tsx` (estaciones líderes) y `DashboardCharts.tsx` (gráficos de rendimiento semanal, por estación, monedas y mensual).",
-      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, eliminación total de mayúsculas sostenidas en badges y métricas, y aplicación de la paleta oficial (#1d283a, #283244, #324157).",
+      "Cumplimiento del Design System: Adopción del encabezado oficial `<PageHeader>`, eliminación total de mayúsculas sostenidas en badges y métricas, y aplicación de la paleta oficial (#1e1e1e, #252526, #2e2e2e).",
       "Reducción de código: La página pasa de 682 a 78 líneas limpias y coordinadas."
     ]
   },
@@ -1072,7 +1126,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Modularización del Punto de Venta (POS): Creación de `useVentas.ts` aislando sincronización de catálogo, carrito, control transaccional de stock temporal, guardado y pagos unificados, reduciendo `ventas/page.tsx` de 627 a 48 líneas.",
       "Modularización de Historial de Ventas: Creación de `useHistorialVentas.ts` (agrupación multi-abono, paginación y anulaciones) y subcomponente `HistorialVentaItem.tsx`, reduciendo `historial-ventas/page.tsx` de 612 a 195 líneas.",
-      "Design System oficial aplicado: Integración de `<PageHeader>`, accesos rápidos `rounded-full` a Sala de Juegos, Tragamonedas y POS, eliminación de mayúsculas sostenidas en badges y uso de paleta corporativa (#1d283a, #283244, #324157)."
+      "Design System oficial aplicado: Integración de `<PageHeader>`, accesos rápidos `rounded-full` a Sala de Juegos, Tragamonedas y POS, eliminación de mayúsculas sostenidas en badges y uso de paleta corporativa (#1e1e1e, #252526, #2e2e2e)."
     ]
   },
   {
@@ -1086,7 +1140,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Desacoplamiento integral de Tragamonedas: Creación de `useGestionTragamonedas.ts` aislando consultas Firestore de máquinas, estados de modales de anulación y limpieza de pointer events.",
       "Subcomponentes especializados: Extracción de `PremioForm.tsx` (registro total o parcial de premios), `MaquinaCard.tsx` (tarjeta de métricas con modales de base y extracción) e `HistorialModal.tsx`.",
-      "Cumplimiento estricto del Design System: Adopción de `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full`, paleta corporativa oficial (#1d283a, #283244, #324157) y tipografía sin mayúsculas sostenidas.",
+      "Cumplimiento estricto del Design System: Adopción de `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full`, paleta corporativa oficial (#1e1e1e, #252526, #2e2e2e) y tipografía sin mayúsculas sostenidas.",
       "Reducción de código: La página principal pasa de 721 a 180 líneas limpias y de fácil mantenimiento."
     ]
   },
@@ -1116,7 +1170,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Módulo Cierre de Caja desacoplado: Creación de `useCierreCaja.ts` aislando consultas de generales, cuentas, ventas pendientes y mesas activas, validaciones atómicas de cuadre y apertura de turnos.",
       "Subcomponentes modulares de Historial: Extracción de `HistorialPagosEfectivo`, `HistorialPagosTarjeta` e `HistorialMonedas` a subcomponentes independientes.",
-      "Cumplimiento estricto del Design System: Adopción de `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full`, paleta oficial (#1d283a, #283244, #324157) y eliminación de textos en mayúsculas forzadas.",
+      "Cumplimiento estricto del Design System: Adopción de `<PageHeader>`, contenedores `<SurfaceCard>`, botones `rounded-full`, paleta oficial (#1e1e1e, #252526, #2e2e2e) y eliminación de textos en mayúsculas forzadas.",
       "Reducción de código: La página principal pasa de 802 a 260 líneas limpias y de fácil mantenimiento."
     ]
   },
@@ -1131,7 +1185,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Desacoplamiento integral de Control de Pagos: Creación de `useControlPagos.ts` (360 líneas) aislando consultas Firestore, agrupación inteligente de pagos multi-venta, filtrado multidimensional, métricas financieras y exportación CSV.",
       "Subcomponentes modulares en Control de Pagos: Separación en `ControlPagosMetricas`, `ControlPagosFiltros`, `ControlPagosCard` y `ControlPagosTicketDialog`.",
-      "Design System oficial aplicado: Integración de `<PageHeader>`, contenedores `<SurfaceCard>`, botones de acción `rounded-full`, paleta oficial (#1d283a, #283244, #324157) y eliminación de tablas desbordables.",
+      "Design System oficial aplicado: Integración de `<PageHeader>`, contenedores `<SurfaceCard>`, botones de acción `rounded-full`, paleta oficial (#1e1e1e, #252526, #2e2e2e) y eliminación de tablas desbordables.",
       "Reducción de código: La página principal pasa de 1,276 a 190 líneas limpias y de alto rendimiento."
     ]
   },
@@ -1146,7 +1200,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Desacoplamiento masivo de Auditoría: Creación de `useAuditoria.ts` (450 líneas) y `auditoria-helpers.ts` aislando consultas, resolución de usuarios, recuperación de artículos e identificación de dispositivos.",
       "Subcomponentes modulares en Auditoría: Separación en `AuditoriaFeedItem`, `AuditoriaDetalleDialog`, `AuditoriaEquipoDialog` y `AuditoriaFiltros`.",
-      "Design System oficial aplicado: Contenedores `<SurfaceCard>`, encabezado `<PageHeader>`, controles píldora `rounded-full` y paleta corporativa #1d283a, #283244 y #324157.",
+      "Design System oficial aplicado: Contenedores `<SurfaceCard>`, encabezado `<PageHeader>`, controles píldora `rounded-full` y paleta corporativa #1e1e1e, #252526 y #2e2e2e.",
       "Reducción de código: La página principal pasa de 1,527 a 170 líneas limpias y de fácil mantenimiento."
     ]
   },
@@ -1161,7 +1215,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Cuadre Semanal modularizado: Creación de `useCuadreSemanal.ts` (255 líneas de lógica aislada), reduciendo `cuadre-semanal/page.tsx` de 357 a 130 líneas limpias y actualización de `encabezado-semanal.tsx` con `<PageHeader>`.",
       "Monitoreo Integral desacoplado: Extracción de más de 500 líneas de cálculos y filtros a `useMonitoreoIntegral.ts`, reduciendo `monitoreo-integral/page.tsx` de 706 a 180 líneas.",
-      "Estandarización visual: Integración de `<PageHeader>`, `<PillTabs>` (Flujo de Gaveta, Flujo de Monedas, Kardex de Inventario, Balance General) y `<SurfaceCard>` respetando la paleta oficial #1d283a, #283244 y #324157."
+      "Estandarización visual: Integración de `<PageHeader>`, `<PillTabs>` (Flujo de Gaveta, Flujo de Monedas, Kardex de Inventario, Balance General) y `<SurfaceCard>` respetando la paleta oficial #1e1e1e, #252526 y #2e2e2e."
     ]
   },
   {
@@ -1176,7 +1230,7 @@ export const releaseHistory: ReleaseItem[] = [
       "Módulo Compras modularizado: Creación de `useCompras.ts` (180 líneas de lógica aislada), reduciendo `compras/page.tsx` de 349 a 75 líneas limpias.",
       "Estandarización de Compras: Adopción de `<PageHeader>` oficial, pestañas `<PillTabs>` (Pendientes/Todas) con contadores numéricos y `<SurfaceCard>`.",
       "Módulo Inventario modularizado: Creación de `useInventario.ts`, subcomponentes `InventarioItemCard` e `InventarioRevisionItem`, reduciendo `inventario/page.tsx` de 472 a 220 líneas.",
-      "Paleta oficial aplicada: Sustitución de fondos y bordes arbitrarios por `#1d283a`, `#283244` y `#324157` junto a botones píldora redondeados."
+      "Paleta oficial aplicada: Sustitución de fondos y bordes arbitrarios por `#1e1e1e`, `#252526` y `#2e2e2e` junto a botones píldora redondeados."
     ]
   },
   {
@@ -1205,7 +1259,7 @@ export const releaseHistory: ReleaseItem[] = [
     cambios: [
       "Reglas Maestras de Desarrollo: Creación de `.agents/rules/reglas-desarrollo.md`, `AGENTS.md` y sincronización de `.ai-rules.md` con checklist obligatorio antes de modificar código.",
       "Componentes Comunes Reutilizables: Creación de `<PageHeader>`, `<PillTabs>`, `<CountBadge>` y `<SurfaceCard>` en `@/components/comunes` para evitar controles duplicados.",
-      "Tokens de Color en Tailwind: Adición de `app.panel` (#1d283a), `app.surface` (#283244) y `app.border` (#324157) en `tailwind.config.ts`.",
+      "Tokens de Color en Tailwind: Adición de `app.panel` (#1e1e1e), `app.surface` (#252526) y `app.border` (#2e2e2e) en `tailwind.config.ts`.",
       "Estandarización de Traslados: Refactorización de la página de traslados usando `PageHeader` y `PillTabs`, garantizando coherencia visual y reducción de código."
     ]
   },
@@ -1230,12 +1284,12 @@ export const releaseHistory: ReleaseItem[] = [
     estado: "publicada_anterior",
     tipo: "Parche",
     tagGit: "v1.0.0-b311",
-    descripcion: "Rediseño integral de Traslados: tarjetas responsivas, paleta oficial (#1d283a, #283244, #324157), pestañas estándar y botones píldora.",
+    descripcion: "Rediseño integral de Traslados: tarjetas responsivas, paleta oficial (#1e1e1e, #252526, #2e2e2e), pestañas estándar y botones píldora.",
     cambios: [
       "Simplificación del encabezado: Título directo 'Traslados' sin descripción adicional.",
       "Eliminación de tarjetas de métricas: Maximización del área de trabajo eliminando contadores redundantes.",
-      "Pestañas estándar tipo píldora (rounded-full): Nombres simplificados a 'Pendientes', 'Enviados' e 'Historial' con badges de conteo integrados y barra #283244.",
-      "Paleta oficial de contenedores: Contenedor principal en #1d283a, bordes en #324157, buscador y tarjetas en #283244.",
+      "Pestañas estándar tipo píldora (rounded-full): Nombres simplificados a 'Pendientes', 'Enviados' e 'Historial' con badges de conteo integrados y barra #252526.",
+      "Paleta oficial de contenedores: Contenedor principal en #1e1e1e, bordes en #2e2e2e, buscador y tarjetas en #252526.",
       "Formato de tarjetas responsivas: Reemplazo de tablas rígidas por tarjetas móviles y adaptables que eliminan el desbordamiento horizontal.",
       "Botones píldora redondeados (rounded-full): Estandarización visual de los botones Recibir, Cancelar y Ver Detalle."
     ]
@@ -1760,7 +1814,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b276",
     descripcion: "Paleta visual unificada del POS aplicada a historiales de cuadre semanal y mensual.",
     cambios: [
-      "Aplicación de colores del POS de venta (#1d283a en contenedor principal, #283244 en acordeones y tarjetas, #324157 en líneas y bordes).",
+      "Aplicación de colores del POS de venta (#1e1e1e en contenedor principal, #252526 en acordeones y tarjetas, #2e2e2e en líneas y bordes).",
       "Actualización de filtros de búsqueda, tarjetas de métricas internas y detalles de registros al tema oscuro del POS.",
       "Eliminación de estilos en mayúsculas forzadas (uppercase) preservando la tipografía natural del sistema."
     ]
@@ -1992,7 +2046,7 @@ export const releaseHistory: ReleaseItem[] = [
     tagGit: "v1.0.0-b260",
     descripcion: "Ajuste de diseño y vista móvil en Cuadre Semanal.",
     cambios: [
-      "Paleta unificada (#1d283a contenedor, #283244 tarjetas y #324157 bordes) en Cuadre Semanal",
+      "Paleta unificada (#1e1e1e contenedor, #252526 tarjetas y #2e2e2e bordes) en Cuadre Semanal",
       "Reducción de títulos y eliminación de descripciones en contenedores para vista móvil",
       "Corrección de desbordamiento horizontal en compras pendientes y tarjetas de ingresos",
       "Formateo de fechas compacto y diseño responsivo para montos, badges y acordeones"
@@ -2024,7 +2078,7 @@ export const releaseHistory: ReleaseItem[] = [
       "Sección 'Acerca del Sistema e Historial de Versiones' en Configuraciones",
       "Optimización de espacios, radios de borde y estilo limpio en modal de compras",
       "Historial de compras filtrado estrictamente por proveedor seleccionado",
-      "Paleta de colores para listado de compras (#1d283a, acordeones #283244 y bordes #324157)",
+      "Paleta de colores para listado de compras (#1e1e1e, acordeones #252526 y bordes #2e2e2e)",
       "Regla de interfaz: prohíbe textos exclusivamente en mayúsculas sostenidas",
       "Ocultamiento de flechas/spinners de incremento en inputs numéricos de compras",
       "Barra de desplazamiento personalizada ultra fina y alineación en sidebar"
@@ -2061,9 +2115,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "2.0.0",
-  build: 6,
-  date: "2026-11-06",
-  publicadaActual: releaseHistory[0], // Build 6 (v2.0.0)
-  publicadaAnterior: releaseHistory[1], // Build 5 (v2.0.0)
+  build: 10,
+  date: "2026-11-08",
+  publicadaActual: releaseHistory[0], // Build 10 (v2.0.0)
+  publicadaAnterior: releaseHistory[1], // Build 9 (v2.0.0)
   historial: releaseHistory
 };

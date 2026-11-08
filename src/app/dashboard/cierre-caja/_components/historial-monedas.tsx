@@ -126,7 +126,7 @@ export function HistorialMonedas({
             Balance neto del período: <span className="font-bold text-amber-400 font-mono">Q{balanceTotal.toFixed(2)}</span>
           </p>
         </div>
-        <Button variant="ghost" size="icon" onClick={onCerrar} className="rounded-full h-8 w-8 hover:bg-[#1d283a]">
+        <Button variant="ghost" size="icon" onClick={onCerrar} className="rounded-full h-8 w-8 hover:bg-[#1e1e1e]">
           <X className="h-4 w-4 text-muted-foreground" />
         </Button>
       </div>
@@ -148,8 +148,8 @@ export function HistorialMonedas({
               if (item.tipo === 'venta_moneda') {
                 const pago = item.data as Pago;
                 return (
-                  <AccordionItem value={item.id} key={item.id} className="border border-app-border rounded-xl bg-[#1d283a] overflow-hidden">
-                    <AccordionTrigger className="p-3.5 hover:no-underline text-sm hover:bg-[#283244]/50">
+                  <AccordionItem value={item.id} key={item.id} className="border border-app-border rounded-xl bg-[#1e1e1e] overflow-hidden">
+                    <AccordionTrigger className="p-3.5 hover:no-underline text-sm hover:bg-[#252526]/50">
                       <div className="grid grid-cols-[1fr,auto] sm:grid-cols-[auto,1fr,auto] gap-x-3 items-center w-full text-left">
                         <div className={`hidden sm:block p-2 rounded-full row-span-2 ${pago.metodoPago === 'Efectivo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-sky-500/10 text-sky-400'}`}>
                           {pago.metodoPago === 'Efectivo' ? <Coins className="h-4 w-4" /> : <CreditCard className="h-4 w-4" />}
@@ -178,7 +178,7 @@ export function HistorialMonedas({
               } else if (item.tipo === 'pago_premio') {
                 const premio = item.data as HistorialTragamonedas;
                 return (
-                  <div key={item.id} className="border border-app-border rounded-xl overflow-hidden p-3.5 bg-[#1d283a]">
+                  <div key={item.id} className="border border-app-border rounded-xl overflow-hidden p-3.5 bg-[#1e1e1e]">
                     <div className="grid grid-cols-[1fr,auto] sm:grid-cols-[auto,1fr,auto] gap-x-3 items-center w-full text-left">
                       <div className="hidden sm:block bg-rose-500/10 text-rose-400 p-2 rounded-full row-span-2">
                         <Trophy className="h-4 w-4" />

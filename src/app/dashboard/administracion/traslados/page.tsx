@@ -90,7 +90,7 @@ export default function PaginaTraslados() {
 
       {/* Contenedor Principal de Listado */}
       <SurfaceCard variant="panel">
-        <div className="p-3 sm:p-4 border-b border-[#324157] bg-[#1d283a]">
+        <div className="p-3 sm:p-4 border-b border-[#2e2e2e] bg-[#1e1e1e]">
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             {/* Pestañas en píldora estándar */}
             <div className="w-full md:w-auto">
@@ -129,13 +129,13 @@ export default function PaginaTraslados() {
                 placeholder="Buscar por #, sucursal, producto..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
-                className="pl-9 bg-[#283244] border-[#324157] text-white placeholder:text-slate-400 text-xs h-10 rounded-full focus-visible:ring-1 focus-visible:ring-primary"
+                className="pl-9 bg-[#252526] border-[#2e2e2e] text-white placeholder:text-slate-400 text-xs h-10 rounded-full focus-visible:ring-1 focus-visible:ring-primary"
               />
             </div>
           </div>
         </div>
 
-        <div className="p-3 sm:p-4 bg-[#1d283a]">
+        <div className="p-3 sm:p-4 bg-[#1e1e1e]">
           {listaFiltrada.length === 0 ? (
             <div className="text-center py-12 px-4 text-slate-400 text-xs">
               <Truck className="h-8 w-8 mx-auto text-slate-500 opacity-40 mb-2" />

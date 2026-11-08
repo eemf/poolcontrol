@@ -76,7 +76,7 @@ export default function PaginaAuditoria() {
                 setInputNombreEquipo(nombreEquipoLocal);
                 setDialogoEquipoAbierto(true);
               }}
-              className="h-8 gap-1.5 text-xs bg-app-surface hover:bg-[#324157] border-app-border rounded-full"
+              className="h-8 gap-1.5 text-xs bg-app-surface hover:bg-[#2e2e2e] border-app-border rounded-full"
               title="Haz clic para personalizar el nombre de este equipo o ver sus datos"
             >
               <CurrentDeviceIcon className={`h-3.5 w-3.5 ${metaDispositivoLocal.color} shrink-0`} />
@@ -95,7 +95,7 @@ export default function PaginaAuditoria() {
               variant="outline"
               size="sm"
               onClick={() => setLimiteConsulta((prev) => (prev === 150 ? 300 : 150))}
-              className="text-xs gap-1.5 rounded-full border-app-border bg-app-surface hover:bg-[#324157]"
+              className="text-xs gap-1.5 rounded-full border-app-border bg-app-surface hover:bg-[#2e2e2e]"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               {limiteConsulta === 150 ? 'Cargar 300' : 'Ver 150'}

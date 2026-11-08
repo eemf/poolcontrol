@@ -75,17 +75,17 @@ export default function PaginaMonitoreoIntegral() {
           <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
             <div className="w-full sm:w-64">
               <Select value={periodoId} onValueChange={setPeriodoId}>
-                <SelectTrigger className="rounded-full h-9 border-[#324157] bg-[#283244] text-white text-xs font-semibold focus:ring-primary shadow-sm">
+                <SelectTrigger className="rounded-full h-9 border-[#2e2e2e] bg-[#252526] text-white text-xs font-semibold focus:ring-primary shadow-sm">
                   <Clock className="h-3.5 w-3.5 text-primary mr-1.5 shrink-0" />
                   <SelectValue placeholder="Seleccionar turno..." />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1d283a] border-[#324157] text-white max-h-[320px]">
+                <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-white max-h-[320px]">
                   <SelectItem value="actual" className="font-bold text-primary text-xs">
                     Turno actual (abierto)
                   </SelectItem>
                   {cierres && cierres.length > 0 && (
                     <>
-                      <Separator className="my-1.5 bg-[#324157]" />
+                      <Separator className="my-1.5 bg-[#2e2e2e]" />
                       <p className="px-2 py-1 text-[10px] font-medium text-slate-400">Turnos anteriores</p>
                       {cierres.map((c) => (
                         <SelectItem key={c.id} value={c.id} className="text-xs">
@@ -102,7 +102,7 @@ export default function PaginaMonitoreoIntegral() {
               variant="outline"
               size="sm"
               onClick={exportarReporteCSV}
-              className="rounded-full h-9 px-3.5 text-xs font-semibold border-[#324157] bg-[#283244] text-slate-200 hover:text-white shrink-0 w-full sm:w-auto"
+              className="rounded-full h-9 px-3.5 text-xs font-semibold border-[#2e2e2e] bg-[#252526] text-slate-200 hover:text-white shrink-0 w-full sm:w-auto"
             >
               <Download className="h-3.5 w-3.5 mr-1.5 text-primary" />
               <span>Exportar CSV</span>
@@ -169,7 +169,7 @@ export default function PaginaMonitoreoIntegral() {
 
       {/* 3. Contenedor Unificado con Pestañas Estándar */}
       <SurfaceCard variant="panel">
-        <div className="p-2 sm:p-3 border-b border-[#324157] bg-[#1d283a]">
+        <div className="p-2 sm:p-3 border-b border-[#2e2e2e] bg-[#1e1e1e]">
           <PillTabs
             value={tabActiva}
             onValueChange={setTabActiva}
@@ -182,7 +182,7 @@ export default function PaginaMonitoreoIntegral() {
           />
         </div>
 
-        <div className="p-3 sm:p-5 bg-[#1d283a]">
+        <div className="p-3 sm:p-5 bg-[#1e1e1e]">
           {tabActiva === 'gaveta' && (
             <FlujoGaveta
               resumen={resumenGaveta}

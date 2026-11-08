@@ -22,8 +22,8 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
 
   return (
     <Card
-      className="shadow-sm overflow-hidden font-body !bg-[#1d283a] border !border-[#324157]"
-      style={{ backgroundColor: '#1d283a', borderColor: '#324157' }}
+      className="shadow-sm overflow-hidden font-body !bg-[#1e1e1e] border !border-[#2e2e2e]"
+      style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
         <div className="flex items-center justify-between">
@@ -38,7 +38,7 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
       </CardHeader>
       <CardContent className="p-4 pt-1">
         <div className="space-y-3">
-          <div className="flex items-center p-2 border-b !border-[#324157]">
+          <div className="flex items-center p-2 border-b !border-[#2e2e2e]">
             <Checkbox
               id="select-all-traslados"
               checked={selected.size === items.length && items.length > 0}
@@ -60,8 +60,8 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                 <AccordionItem
                   value={traslado.id}
                   key={traslado.id}
-                  style={{ backgroundColor: '#283244', borderColor: '#324157' }}
-                  className="border-b-0 rounded-xl border !border-[#324157] !bg-[#283244] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
+                  style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
+                  className="border-b-0 rounded-xl border !border-[#2e2e2e] !bg-[#252526] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
                 >
                   {/* Checkbox anclado a la cabecera del acordeón */}
                   <div className="absolute left-3 top-6 -translate-y-1/2 z-20 flex items-center justify-center">
@@ -121,7 +121,7 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                   </AccordionTrigger>
 
                   <AccordionContent className="px-3 pb-3">
-                    <div className="space-y-2 border-t !border-[#324157] pt-2.5 mt-1 text-xs">
+                    <div className="space-y-2 border-t !border-[#2e2e2e] pt-2.5 mt-1 text-xs">
                       <div className="flex items-center justify-between text-slate-300 px-1 text-[11px]">
                         <span className="font-semibold text-slate-400">Detalle de mercancía despachada:</span>
                         {traslado.idCompraGeneradaDestino && (
@@ -135,7 +135,7 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                         {traslado.items?.map((item, idx) => (
                           <div
                             key={idx}
-                            className="flex justify-between items-center text-[11px] bg-[#1d283a]/70 p-2.5 rounded-lg border !border-[#324157]"
+                            className="flex justify-between items-center text-[11px] bg-[#1e1e1e]/70 p-2.5 rounded-lg border !border-[#2e2e2e]"
                           >
                             <div className="flex flex-col min-w-0 flex-1 mr-2">
                               <span className="font-bold text-foreground/90 truncate">{item.nombreProducto}</span>
@@ -151,7 +151,7 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                       </div>
 
                       {traslado.observacionesEnvio && (
-                        <div className="p-2 rounded-lg bg-[#1d283a]/50 border !border-[#324157] text-[10px] text-slate-300">
+                        <div className="p-2 rounded-lg bg-[#1e1e1e]/50 border !border-[#2e2e2e] text-[10px] text-slate-300">
                           <strong className="text-slate-400">Nota de envío:</strong> {traslado.observacionesEnvio}
                         </div>
                       )}

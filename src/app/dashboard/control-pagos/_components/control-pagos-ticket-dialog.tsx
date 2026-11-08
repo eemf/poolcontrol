@@ -46,7 +46,7 @@ export function ControlPagosTicketDialog({
 
         <div className="space-y-4 my-2 text-xs">
           {/* Encabezado del Ticket */}
-          <div className="bg-[#1d283a] p-4 rounded-xl border border-app-border text-center space-y-1">
+          <div className="bg-[#1e1e1e] p-4 rounded-xl border border-app-border text-center space-y-1">
             <h3 className="font-bold text-sm text-slate-100">
               {sucursalNombre || 'Pool Control'}
             </h3>
@@ -59,7 +59,7 @@ export function ControlPagosTicketDialog({
           </div>
 
           {/* Datos de la Operación */}
-          <div className="space-y-1.5 bg-[#1d283a] p-3 rounded-xl border border-app-border">
+          <div className="space-y-1.5 bg-[#1e1e1e] p-3 rounded-xl border border-app-border">
             <div className="flex justify-between py-1 border-b border-app-border/40">
               <span className="text-muted-foreground font-medium">Cliente:</span>
               <span className="font-bold text-slate-100">{pago.clienteNombre}</span>
@@ -87,7 +87,7 @@ export function ControlPagosTicketDialog({
             </p>
             <div className="max-h-[180px] overflow-y-auto space-y-2 pr-1">
               {pago.ventas.map((v) => (
-                <div key={v.idVenta} className="p-2.5 rounded-xl bg-[#1d283a] border border-app-border space-y-1.5">
+                <div key={v.idVenta} className="p-2.5 rounded-xl bg-[#1e1e1e] border border-app-border space-y-1.5">
                   <div className="flex justify-between items-center text-xs font-bold text-slate-100 pb-1 border-b border-app-border/60">
                     <span className="text-sky-400 font-mono">Venta #{v.idVenta}</span>
                     <span className="text-emerald-400 font-mono">Q{v.montoPagadoVenta.toFixed(2)}</span>
@@ -119,7 +119,7 @@ export function ControlPagosTicketDialog({
             variant="outline"
             size="sm"
             onClick={onClose}
-            className="rounded-full bg-[#1d283a] border-app-border text-slate-200 hover:bg-app-surface"
+            className="rounded-full bg-[#1e1e1e] border-app-border text-slate-200 hover:bg-app-surface"
           >
             Cerrar
           </Button>

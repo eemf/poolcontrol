@@ -30,7 +30,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
   return (
     <AccordionItem
       value={cierre.id}
-      className="border border-[#324157] rounded-xl bg-[#283244] overflow-hidden mb-3 shadow-sm transition-all hover:border-slate-500"
+      className="border border-[#2e2e2e] rounded-xl bg-[#252526] overflow-hidden mb-3 shadow-sm transition-all hover:border-slate-500"
     >
       <AccordionTrigger className="p-4 hover:no-underline text-white">
         <div className="flex justify-between items-center w-full pr-2">
@@ -64,10 +64,10 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
       </AccordionTrigger>
 
       <AccordionContent className="p-4 pt-0">
-        <div className="space-y-5 pt-3 border-t border-[#324157]">
+        <div className="space-y-5 pt-3 border-t border-[#2e2e2e]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-xs">
             {/* Columna 1: Ingresos del Período */}
-            <div className="space-y-2 p-3 bg-[#1d283a] rounded-xl border border-[#324157]">
+            <div className="space-y-2 p-3 bg-[#1e1e1e] rounded-xl border border-[#2e2e2e]">
               <h4 className="font-bold text-xs text-sky-400 mb-2">Ingresos del Período</h4>
               <div className="space-y-1.5 text-slate-300">
                 <div className="flex justify-between items-center">
@@ -83,7 +83,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
                   <span className="font-semibold text-white">Q{cierre.totalVentaConsumo.toFixed(2)}</span>
                 </div>
               </div>
-              <Separator className="my-2 border-[#324157]" />
+              <Separator className="my-2 border-[#2e2e2e]" />
               <div className="flex justify-between items-center font-bold text-sky-400">
                 <span>Efectivo Esperado:</span>
                 <span>Q{cierre.efectivoEsperado.toFixed(2)}</span>
@@ -91,7 +91,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
             </div>
 
             {/* Columna 2: Totales y Conteo */}
-            <div className="space-y-2 p-3 bg-[#1d283a] rounded-xl border border-[#324157]">
+            <div className="space-y-2 p-3 bg-[#1e1e1e] rounded-xl border border-[#2e2e2e]">
               <h4 className="font-bold text-xs text-sky-400 mb-2">Totales y Conteo</h4>
               <div className="space-y-1.5 text-slate-300">
                 <div className="flex justify-between items-center">
@@ -107,7 +107,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
                   <span className="font-semibold text-white">Q{cierre.totalVentaMonedas.toFixed(2)}</span>
                 </div>
               </div>
-              <Separator className="my-2 border-[#324157]" />
+              <Separator className="my-2 border-[#2e2e2e]" />
               <div className="space-y-1">
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">Diferencia:</span>
@@ -125,7 +125,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             {/* Resumen de Monedas */}
-            <div className="space-y-2 p-3 bg-[#1d283a] rounded-xl border border-[#324157] text-xs">
+            <div className="space-y-2 p-3 bg-[#1e1e1e] rounded-xl border border-[#2e2e2e] text-xs">
               <h4 className="font-bold text-xs text-sky-400 mb-2">Resumen de Monedas</h4>
               <div className="space-y-1.5 text-slate-300">
                 <div className="flex justify-between items-center">
@@ -144,15 +144,15 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
             </div>
 
             {/* Estado del Cierre */}
-            <div className="space-y-2 p-3 bg-[#1d283a] rounded-xl border border-[#324157] text-xs">
+            <div className="space-y-2 p-3 bg-[#1e1e1e] rounded-xl border border-[#2e2e2e] text-xs">
               <h4 className="font-bold text-xs text-slate-400 mb-2">Estado del Cierre</h4>
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between p-2 bg-[#283244] rounded-lg border border-[#324157]">
+                <div className="flex items-center justify-between p-2 bg-[#252526] rounded-lg border border-[#2e2e2e]">
                   <span className="font-medium text-slate-300">Liquidación Efectivo</span>
                   {getStatusBadge(cierre.estadoEfectivo)}
                 </div>
                 {cierre.pagosTarjeta > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-[#283244] rounded-lg border border-[#324157]">
+                  <div className="flex items-center justify-between p-2 bg-[#252526] rounded-lg border border-[#2e2e2e]">
                     <span className="font-medium text-slate-300">Pagos con Tarjeta</span>
                     {getStatusBadge(cierre.estadoTarjeta)}
                   </div>
@@ -162,7 +162,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
           </div>
 
           {cierre.observaciones && (
-            <div className="p-3 bg-[#1d283a] rounded-xl border border-dashed border-[#324157] text-xs">
+            <div className="p-3 bg-[#1e1e1e] rounded-xl border border-dashed border-[#2e2e2e] text-xs">
               <h4 className="font-bold text-slate-400 mb-1">Observaciones del Cajero</h4>
               <p className="italic text-slate-300 leading-relaxed">"{cierre.observaciones}"</p>
             </div>

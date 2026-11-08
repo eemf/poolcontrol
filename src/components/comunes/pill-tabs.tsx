@@ -32,7 +32,7 @@ interface PillTabsProps {
 
 /**
  * Pestañas en píldora estándar para Pool Control.
- * - Barra contenedora redondeada (`rounded-full`) con fondo #283244 y borde #324157.
+ * - Barra contenedora redondeada (`rounded-full`) con fondo #252526 y borde #2e2e2e.
  * - Triggers en píldora completa (`rounded-full`), estado activo en azul primario.
  * - Soporte integrado para buscador a la izquierda y pestañas con badges a la derecha en la misma píldora.
  */
@@ -77,7 +77,7 @@ export function PillTabs({
       <div className={`w-full ${className}`}>
         <Tabs value={value} onValueChange={onValueChange} className="w-full">
           <TabsList
-            className={`grid ${colsClass} w-full h-11 p-1 bg-[#283244] rounded-full border border-[#324157] gap-1 ${listClassName}`}
+            className={`grid ${colsClass} w-full h-11 p-1 bg-[#252526] rounded-full border border-[#2e2e2e] gap-1 ${listClassName}`}
           >
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -110,7 +110,7 @@ export function PillTabs({
     <div className={cn('w-full', className)}>
       <div
         className={cn(
-          'w-full h-11 p-1 bg-[#283244] rounded-full border border-[#324157] focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500 flex items-center gap-1.5 transition-all',
+          'w-full h-11 p-1 bg-[#252526] rounded-full border border-[#2e2e2e] focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500 flex items-center gap-1.5 transition-all',
           listClassName
         )}
       >

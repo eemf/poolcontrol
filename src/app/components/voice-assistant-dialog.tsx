@@ -134,9 +134,9 @@ export default function VoiceAssistantDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md w-[92vw] max-w-sm bg-[#1d283a] border-[#324157] text-slate-100 p-0 overflow-hidden shadow-2xl rounded-2xl mx-auto">
+      <DialogContent className="sm:max-w-md w-[92vw] max-w-sm bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 p-0 overflow-hidden shadow-2xl rounded-2xl mx-auto">
         {/* Cabecera Minimalista Adaptada a Móvil */}
-        <div className="px-4 py-3 border-b border-[#324157] flex items-center justify-between bg-[#17202e] pr-12">
+        <div className="px-4 py-3 border-b border-[#2e2e2e] flex items-center justify-between bg-[#17202e] pr-12">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-sm shrink-0">
               <Sparkles className="w-4 h-4" />
@@ -280,7 +280,7 @@ export default function VoiceAssistantDialog({
 
           {/* Visualización de Transcripción */}
           {(transcript || interimTranscript) && (
-            <div className="w-full bg-[#283244] border border-[#324157] rounded-lg p-2.5 text-xs">
+            <div className="w-full bg-[#252526] border border-[#2e2e2e] rounded-lg p-2.5 text-xs">
               <span className="text-slate-400 text-[10px] block mb-0.5 font-medium">
                 Texto reconocido:
               </span>
@@ -398,11 +398,11 @@ export default function VoiceAssistantDialog({
           )}
 
           {/* Guía de Comandos Sugeridos por Módulo (Colapsable, Oculto por defecto) */}
-          <div className="w-full pt-1 border-t border-[#324157]/50">
+          <div className="w-full pt-1 border-t border-[#2e2e2e]/50">
             <button
               type="button"
               onClick={() => setMostrarComandos(!mostrarComandos)}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[#243044]/60 hover:bg-[#28364c] text-slate-300 hover:text-white transition-all text-xs font-medium cursor-pointer border border-[#324157]/40"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[#243044]/60 hover:bg-[#28364c] text-slate-300 hover:text-white transition-all text-xs font-medium cursor-pointer border border-[#2e2e2e]/40"
             >
               <div className="flex items-center gap-2">
                 <HelpCircle className="w-3.5 h-3.5 text-blue-400" />
@@ -434,7 +434,7 @@ export default function VoiceAssistantDialog({
                           'flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer',
                           isActive
                             ? 'bg-blue-600 text-white shadow-sm shadow-blue-900/30'
-                            : 'bg-[#283244] text-slate-400 hover:text-slate-200 hover:bg-[#324157]'
+                            : 'bg-[#252526] text-slate-400 hover:text-slate-200 hover:bg-[#2e2e2e]'
                         )}
                       >
                         <Icon className="w-3 h-3" />
@@ -452,7 +452,7 @@ export default function VoiceAssistantDialog({
                       type="button"
                       onClick={() => handleExampleClick(ejemplo)}
                       disabled={isProcessing}
-                      className="text-[11px] bg-[#283244] hover:bg-[#324157] text-slate-300 border border-[#324157] rounded-md px-2.5 py-1 text-left transition-colors cursor-pointer active:scale-95"
+                      className="text-[11px] bg-[#252526] hover:bg-[#2e2e2e] text-slate-300 border border-[#2e2e2e] rounded-md px-2.5 py-1 text-left transition-colors cursor-pointer active:scale-95"
                     >
                       "{ejemplo}"
                     </button>

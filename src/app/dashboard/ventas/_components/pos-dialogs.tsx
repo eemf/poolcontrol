@@ -151,7 +151,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
               return;
             }
           }}
-          className="p-5 sm:p-6 sm:max-w-lg rounded-xl sm:rounded-lg overflow-hidden font-body bg-[#1d283a] border-[#324157] text-slate-100 shadow-2xl flex flex-col max-h-[90vh] gap-4"
+          className="p-5 sm:p-6 sm:max-w-lg rounded-xl sm:rounded-lg overflow-hidden font-body bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 shadow-2xl flex flex-col max-h-[90vh] gap-4"
         >
           <DialogHeader className="shrink-0">
             <div className="flex items-center justify-between gap-3 pr-6">
@@ -209,7 +209,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
               )}
             </div>
 
-            <div className="max-h-[220px] overflow-y-auto custom-scrollbar divide-y divide-[#324157] pr-1">
+            <div className="max-h-[220px] overflow-y-auto custom-scrollbar divide-y divide-[#2e2e2e] pr-1">
               {itemsPendientes.map((detalle) => {
                 const isSelected = state.itemsSeleccionadosParaPagar.has(detalle.idDetalle);
                 return (
@@ -217,7 +217,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                     key={detalle.idDetalle}
                     className={cn(
                       'flex justify-between items-center py-2.5 px-2 transition-colors',
-                      !esVentaCredito && 'cursor-pointer hover:bg-[#1d283a]/60 rounded-lg',
+                      !esVentaCredito && 'cursor-pointer hover:bg-[#1e1e1e]/60 rounded-lg',
                       esVentaCredito && 'opacity-90'
                     )}
                     onClick={
@@ -264,7 +264,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                   'flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer mt-1',
                   state.incluirCreditoEnPago
                     ? 'bg-amber-500/15 border-amber-500/40'
-                    : 'bg-[#1d283a] border-[#324157] hover:border-slate-500'
+                    : 'bg-[#1e1e1e] border-[#2e2e2e] hover:border-slate-500'
                 )}
               >
                 <div className="flex items-center gap-2.5">
@@ -317,7 +317,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
               <Button
                 type="button"
                 variant="secondary"
-                className="rounded-full h-10 font-semibold text-xs bg-[#283244] hover:bg-[#324157] text-slate-100 border border-[#324157]"
+                className="rounded-full h-10 font-semibold text-xs bg-[#252526] hover:bg-[#2e2e2e] text-slate-100 border border-[#2e2e2e]"
                 disabled={state.montoAPagarDialogo <= 0 || state.procesandoGuardado}
                 onClick={() => actions.setVistaDialogo('confirmarTarjeta')}
               >
@@ -351,7 +351,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
               }}
             >
               <div
-                className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+                className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center gap-2.5">
@@ -368,7 +368,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                   </div>
                 </div>
 
-                <div className="rounded-lg bg-[#283244] border border-[#324157] p-3 space-y-2">
+                <div className="rounded-lg bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-medium text-slate-300">
                       Monto a cobrar con tarjeta
@@ -377,7 +377,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                       Q{state.montoAPagarDialogo.toFixed(2)}
                     </span>
                   </div>
-                  <div className="pt-2 border-t border-[#324157] text-[11px] text-slate-400 leading-snug">
+                  <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-400 leading-snug">
                     El cobro se registrará como pago con tarjeta y no sumará al efectivo en caja.
                   </div>
                 </div>
@@ -388,7 +388,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                     variant="secondary"
                     disabled={state.procesandoGuardado}
                     onClick={() => actions.setVistaDialogo('pago')}
-                    className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                    className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                   >
                     Cancelar
                   </Button>
@@ -431,7 +431,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                 }}
               >
                 <div
-                  className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+                  className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center gap-2.5">
@@ -449,10 +449,10 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                   </div>
 
                   {/* Tarjeta Unificada de Desglose de Saldos */}
-                  <div className="rounded-xl bg-[#283244] border border-[#324157] overflow-hidden">
+                  <div className="rounded-xl bg-[#252526] border border-[#2e2e2e] overflow-hidden">
                     {saldoCredito > 0 && !esVentaCredito ? (
                       <>
-                        <div className="grid grid-cols-2 divide-x divide-[#324157]">
+                        <div className="grid grid-cols-2 divide-x divide-[#2e2e2e]">
                           <div className="p-2.5 text-center space-y-0.5">
                             <div className="flex items-center justify-center gap-1 text-[11px] font-medium text-slate-400">
                               <FileClock className="h-3 w-3 text-sky-400 shrink-0" />
@@ -472,7 +472,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                             </p>
                           </div>
                         </div>
-                        <div className="px-3.5 py-2 border-t border-[#324157] bg-[#1d283a]/40 flex items-center justify-between">
+                        <div className="px-3.5 py-2 border-t border-[#2e2e2e] bg-[#1e1e1e]/40 flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <Sigma className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                             <span className="text-xs font-bold text-slate-200">Deuda Total</span>
@@ -501,7 +501,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                     )}
 
                     {abonoIngresado > 0 && (
-                      <div className="px-3.5 py-1.5 border-t border-[#324157] bg-emerald-500/10 flex items-center justify-between text-xs animate-in fade-in duration-150">
+                      <div className="px-3.5 py-1.5 border-t border-[#2e2e2e] bg-emerald-500/10 flex items-center justify-between text-xs animate-in fade-in duration-150">
                         <span className="font-medium text-emerald-300">Restante tras abono</span>
                         <span className="font-bold text-emerald-400 tabular-nums">
                           Q{saldoRestante.toFixed(2)}
@@ -546,7 +546,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                       variant="secondary"
                       disabled={state.procesandoGuardado}
                       onClick={() => actions.setDialogoAbonoAbierto(false)}
-                      className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                      className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                     >
                       Cancelar
                     </Button>
@@ -577,7 +577,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           {/* Capa de Bloqueo y Animación de Carga al Procesar Pago */}
           {state.procesandoGuardado && (
             <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/75 backdrop-blur-[2px] rounded-xl sm:rounded-lg animate-in fade-in duration-150">
-              <div className="p-5 rounded-2xl bg-[#1d283a] border border-[#324157] shadow-2xl flex flex-col items-center gap-3 text-center animate-in zoom-in-95 duration-150">
+              <div className="p-5 rounded-2xl bg-[#1e1e1e] border border-[#2e2e2e] shadow-2xl flex flex-col items-center gap-3 text-center animate-in zoom-in-95 duration-150">
                 <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
@@ -600,7 +600,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
         open={state.dialogoConsumoInternoAbierto}
         onOpenChange={actions.setDialogoConsumoInternoAbierto}
       >
-        <DialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border-[#324157] text-slate-100 p-5 shadow-2xl gap-4">
+        <DialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 p-5 shadow-2xl gap-4">
           <DialogHeader>
             <div className="flex items-center gap-3 pr-6">
               <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
@@ -618,7 +618,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           </DialogHeader>
 
           <div className="space-y-3.5">
-            <div className="flex items-center justify-between gap-2 p-3 bg-[#283244] border border-[#324157] rounded-lg">
+            <div className="flex items-center justify-between gap-2 p-3 bg-[#252526] border border-[#2e2e2e] rounded-lg">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-100 truncate">
                   {state.ventaParaConsumo?.nombreCliente}
@@ -660,7 +660,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             <Button
               type="button"
               variant="secondary"
-              className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+              className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
               onClick={() => actions.setDialogoConsumoInternoAbierto(false)}
             >
               Cancelar
@@ -685,7 +685,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           actions.setAlertaCancelarVentaAbierta(abierta);
         }}
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
           <AlertDialogHeader>
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
@@ -705,7 +705,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
             <AlertDialogCancel
               onClick={actions.manejarPermanecerEnVenta}
-              className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200"
+              className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200"
             >
               Permanecer
             </AlertDialogCancel>
@@ -724,7 +724,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
         open={state.alertaEliminarAbierta}
         onOpenChange={state.procesandoGuardado ? undefined : actions.setAlertaEliminarAbierta}
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
           <AlertDialogHeader>
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0 mt-0.5">
@@ -745,7 +745,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
-            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200">
+            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
@@ -764,7 +764,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
         open={state.alertaCreditoMonedasAbierta}
         onOpenChange={actions.setAlertaCreditoMonedasAbierta}
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-2xl font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-4 sm:p-5 gap-3 shadow-2xl">
+        <AlertDialogContent className="sm:max-w-sm rounded-2xl font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-4 sm:p-5 gap-3 shadow-2xl">
           <AlertDialogHeader className="space-y-2.5">
             <div className="flex items-center gap-2.5">
               <div className="relative flex items-center justify-center shrink-0">
@@ -787,7 +787,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             <AlertDialogDescription asChild>
               <div className="space-y-2.5 text-left">
                 {/* Resumen Compacto en 1 sola fila */}
-                <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#283244] border border-[#324157]">
+                <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#252526] border border-[#2e2e2e]">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <User className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                     <span className="text-xs font-bold text-slate-100 truncate">
@@ -810,7 +810,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
-            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200">
+            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
@@ -831,7 +831,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
         open={state.alertaClienteConCreditoAbierta}
         onOpenChange={actions.setAlertaClienteConCreditoAbierta}
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
           <AlertDialogHeader>
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
@@ -849,7 +849,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
-            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200">
+            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200">
               Revisar Deuda
             </AlertDialogCancel>
             <AlertDialogAction
@@ -869,7 +869,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           state.procesandoEliminarItem ? undefined : actions.setAlertaEliminarItemAbierta
         }
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1d283a] border border-[#324157] text-slate-100 p-5 gap-3.5 shadow-2xl">
+        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
           <AlertDialogHeader>
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
@@ -886,7 +886,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             </div>
           </AlertDialogHeader>
 
-          <div className="rounded-lg bg-[#283244] border border-[#324157] p-3 space-y-2">
+          <div className="rounded-lg bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-100 truncate">
@@ -907,7 +907,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             </div>
 
             {state.itemParaEliminar?.item.idDetalle !== 0 && (
-              <div className="pt-2 border-t border-[#324157] text-[11px] text-slate-300 leading-snug">
+              <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
                 {state.itemParaEliminar?.item.idProducto === 'item-manual' ||
                 state.itemParaEliminar?.item.idProducto?.startsWith('mesa-') ||
                 state.itemParaEliminar?.item.idProducto?.startsWith('division-mesa-')
@@ -920,7 +920,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-0.5 sm:space-x-0">
             <AlertDialogCancel
               disabled={state.procesandoEliminarItem}
-              className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] border-[#324157] text-slate-200"
+              className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200"
             >
               Cancelar
             </AlertDialogCancel>

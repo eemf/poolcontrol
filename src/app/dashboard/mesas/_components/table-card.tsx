@@ -90,7 +90,7 @@ export function TableCard({
       'border-rose-500/80': isOcupada && mesa.modoJuego === 'libre',
       'border-amber-500/80': isOcupada && mesa.modoJuego === 'definido' && !showTimeUpWarning,
       'border-yellow-400 animate-pulse ring-2 ring-yellow-400': isOcupada && showTimeUpWarning,
-      'border-[#324157]': !isOcupada,
+      'border-[#2e2e2e]': !isOcupada,
     }
   );
 
@@ -154,19 +154,19 @@ export function TableCard({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full bg-[#283244] hover:bg-[#324157] text-slate-300 border border-[#324157]"
+              className="h-8 w-8 rounded-full bg-[#252526] hover:bg-[#2e2e2e] text-slate-300 border border-[#2e2e2e]"
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
           <PopoverContent
             align="end"
-            className="w-52 p-1.5 bg-[#1d283a] border-[#324157] text-slate-100 rounded-2xl shadow-2xl"
+            className="w-52 p-1.5 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-2xl shadow-2xl"
           >
             <div className="flex flex-col gap-1 font-body">
               <Button
                 variant="ghost"
-                className="w-full justify-start h-9 rounded-full text-xs font-semibold text-slate-200 hover:bg-[#283244] hover:text-white"
+                className="w-full justify-start h-9 rounded-full text-xs font-semibold text-slate-200 hover:bg-[#252526] hover:text-white"
                 onClick={() => {
                   setMenuOpen(false);
                   onConsumo(mesa);
@@ -177,7 +177,7 @@ export function TableCard({
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start h-9 rounded-full text-xs font-semibold text-slate-200 hover:bg-[#283244] hover:text-white"
+                className="w-full justify-start h-9 rounded-full text-xs font-semibold text-slate-200 hover:bg-[#252526] hover:text-white"
                 onClick={() => {
                   setMenuOpen(false);
                   onTraslado(mesa);
@@ -189,7 +189,7 @@ export function TableCard({
               {mesa.modoJuego === 'definido' && (
                 <Button
                   variant="ghost"
-                  className="w-full justify-start h-9 rounded-full text-xs font-semibold text-slate-200 hover:bg-[#283244] hover:text-white"
+                  className="w-full justify-start h-9 rounded-full text-xs font-semibold text-slate-200 hover:bg-[#252526] hover:text-white"
                   onClick={() => {
                     setMenuOpen(false);
                     onAjusteTiempo(mesa);
@@ -279,7 +279,7 @@ export function TableCard({
                 </div>
               )}
 
-              {/* Bloque Interior Unificado (#283244 con borde #324157) */}
+              {/* Bloque Interior Unificado (#252526 con borde #2e2e2e) */}
               <SurfaceCard variant="surface" className="mt-3 p-3 space-y-2.5 text-center">
                 <div>
                   <p className="text-xs font-medium text-slate-400">Total a Pagar</p>
@@ -288,7 +288,7 @@ export function TableCard({
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 divide-x divide-[#324157] pt-2.5 border-t border-[#324157]">
+                <div className="grid grid-cols-2 divide-x divide-[#2e2e2e] pt-2.5 border-t border-[#2e2e2e]">
                   <div className="px-2">
                     <p className="text-[11px] font-medium text-slate-400">Alquiler</p>
                     <p className="text-sm font-bold text-slate-100 tabular-nums">
@@ -304,14 +304,14 @@ export function TableCard({
                 </div>
 
                 {cantidadConsumos > 0 && (
-                  <Accordion type="single" collapsible className="w-full pt-2 border-t border-[#324157]">
+                  <Accordion type="single" collapsible className="w-full pt-2 border-t border-[#2e2e2e]">
                     <AccordionItem value="consumos" className="border-none">
                       <AccordionTrigger className="text-xs font-semibold text-slate-300 hover:text-white hover:no-underline py-1 px-2 rounded-full justify-center gap-2 transition-colors">
                         <span>Ver Consumos</span>
                         <CountBadge count={cantidadConsumos} variant="amber" />
                       </AccordionTrigger>
                       <AccordionContent className="pt-2 pb-0">
-                        <div className="max-h-32 overflow-y-auto custom-scrollbar divide-y divide-[#324157] text-xs text-left pr-1">
+                        <div className="max-h-32 overflow-y-auto custom-scrollbar divide-y divide-[#2e2e2e] text-xs text-left pr-1">
                           {mesa.consumos?.map((item: any, index: number) => (
                             <div
                               key={item.id || index}

@@ -81,7 +81,7 @@ export function ControlPagosFiltros({
             placeholder="Buscar por cliente, # comprobante, # venta, producto o cajero..."
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
-            className="pl-9 pr-28 h-10 text-sm bg-[#1d283a] border-app-border rounded-full"
+            className="pl-9 pr-28 h-10 text-sm bg-[#1e1e1e] border-app-border rounded-full"
           />
           <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
             <Button
@@ -91,7 +91,7 @@ export function ControlPagosFiltros({
               className={`h-7 px-2.5 text-xs rounded-full gap-1.5 ${
                 mostrarFiltros 
                   ? "bg-sky-600 text-white hover:bg-sky-700" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-[#283244]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-[#252526]"
               }`}
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -106,7 +106,7 @@ export function ControlPagosFiltros({
         </div>
 
         <div className="flex items-center justify-between sm:justify-end gap-2 text-xs text-muted-foreground">
-          <Badge variant="outline" className="px-3 py-1.5 text-xs text-slate-300 bg-[#1d283a] border-app-border rounded-full font-medium">
+          <Badge variant="outline" className="px-3 py-1.5 text-xs text-slate-300 bg-[#1e1e1e] border-app-border rounded-full font-medium">
             {totalPagosFiltrados} {totalPagosFiltrados === 1 ? 'resultado' : 'resultados'}
           </Badge>
 
@@ -133,7 +133,7 @@ export function ControlPagosFiltros({
               <Calendar className="h-3 w-3 text-sky-400" /> Período
             </label>
             <Select value={periodoFiltro} onValueChange={(v) => setPeriodoFiltro(v as PeriodoTipo)}>
-              <SelectTrigger className="h-8 text-xs bg-[#1d283a] border-app-border rounded-full">
+              <SelectTrigger className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full">
                 <SelectValue placeholder="Período" />
               </SelectTrigger>
               <SelectContent className="bg-app-surface border-app-border text-foreground">
@@ -169,7 +169,7 @@ export function ControlPagosFiltros({
                   type="date"
                   value={fechaInicioPers}
                   onChange={(e) => setFechaInicioPers(e.target.value)}
-                  className="h-8 text-xs bg-[#1d283a] border-app-border rounded-full"
+                  className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full"
                 />
               </div>
               <div className="space-y-1">
@@ -178,7 +178,7 @@ export function ControlPagosFiltros({
                   type="date"
                   value={fechaFinPers}
                   onChange={(e) => setFechaFinPers(e.target.value)}
-                  className="h-8 text-xs bg-[#1d283a] border-app-border rounded-full"
+                  className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full"
                 />
               </div>
             </div>
@@ -190,7 +190,7 @@ export function ControlPagosFiltros({
               <CreditCard className="h-3 w-3 text-sky-400" /> Método de Pago
             </label>
             <Select value={metodoFiltro} onValueChange={setMetodoFiltro}>
-              <SelectTrigger className="h-8 text-xs bg-[#1d283a] border-app-border rounded-full">
+              <SelectTrigger className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full">
                 <SelectValue placeholder="Método" />
               </SelectTrigger>
               <SelectContent className="bg-app-surface border-app-border text-foreground">
@@ -208,7 +208,7 @@ export function ControlPagosFiltros({
               <User className="h-3 w-3 text-sky-400" /> Operador / Cajero
             </label>
             <Select value={operadorFiltro} onValueChange={setOperadorFiltro}>
-              <SelectTrigger className="h-8 text-xs bg-[#1d283a] border-app-border rounded-full">
+              <SelectTrigger className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full">
                 <SelectValue placeholder="Operador" />
               </SelectTrigger>
               <SelectContent className="bg-app-surface border-app-border text-foreground">
@@ -228,7 +228,7 @@ export function ControlPagosFiltros({
               <Split className="h-3 w-3 text-sky-400" /> Tipo de Cobro
             </label>
             <Select value={tipoCoberturaFiltro} onValueChange={setTipoCoberturaFiltro}>
-              <SelectTrigger className="h-8 text-xs bg-[#1d283a] border-app-border rounded-full">
+              <SelectTrigger className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full">
                 <SelectValue placeholder="Cobertura" />
               </SelectTrigger>
               <SelectContent className="bg-app-surface border-app-border text-foreground">

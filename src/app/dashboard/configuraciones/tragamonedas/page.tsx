@@ -33,7 +33,7 @@ export default function PaginaConfiguracionTragamonedas() {
 
   if (error) {
     return (
-      <div className="text-center text-rose-400 p-6 bg-[#1d283a] rounded-xl border border-rose-500/30">
+      <div className="text-center text-rose-400 p-6 bg-[#1e1e1e] rounded-xl border border-rose-500/30">
         <p>No tienes los permisos necesarios para realizar estas operaciones.</p>
       </div>
     )
@@ -63,7 +63,7 @@ export default function PaginaConfiguracionTragamonedas() {
         </div>
       ) : (
         <SurfaceCard variant="panel" className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#324157]">
+          <div className="flex items-center justify-between pb-2 border-b border-[#2e2e2e]">
             <div>
               <h2 className="text-base font-bold text-white">Inventario de Máquinas</h2>
               <p className="text-xs text-slate-400">Total de máquinas registradas en la sucursal actual.</p>
@@ -71,7 +71,7 @@ export default function PaginaConfiguracionTragamonedas() {
           </div>
 
           {maquinasConDocId.length === 0 ? (
-            <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border-2 border-dashed border-[#324157] rounded-xl bg-[#283244]/40">
+            <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40">
               <Dices className="h-12 w-12 mb-3 text-slate-500" />
               <p className="font-semibold text-base text-white">No hay máquinas registradas</p>
               <Button

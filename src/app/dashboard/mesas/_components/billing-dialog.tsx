@@ -171,7 +171,7 @@ export function BillingDialog({
             return;
           }
         }}
-        className="p-5 sm:p-6 sm:max-w-lg flex flex-col font-body rounded-xl sm:rounded-lg overflow-visible bg-[#1d283a] border-[#324157] text-slate-100 gap-5 shadow-2xl"
+        className="p-5 sm:p-6 sm:max-w-lg flex flex-col font-body rounded-xl sm:rounded-lg overflow-visible bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 gap-5 shadow-2xl"
       >
         <DialogHeader className="shrink-0">
           <div className="flex items-center gap-3">
@@ -202,7 +202,7 @@ export function BillingDialog({
 
             <SurfaceCard
               variant="surface"
-              className="grid grid-cols-2 divide-x divide-[#324157] p-3.5"
+              className="grid grid-cols-2 divide-x divide-[#2e2e2e] p-3.5"
             >
               {/* Columna Alquiler */}
               <div className="pr-4 flex flex-col justify-center">
@@ -212,7 +212,7 @@ export function BillingDialog({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6 rounded-full bg-[#1d283a] hover:bg-sky-500/20 hover:text-sky-300 text-slate-300 border border-[#324157]"
+                    className="h-6 w-6 rounded-full bg-[#1e1e1e] hover:bg-sky-500/20 hover:text-sky-300 text-slate-300 border border-[#2e2e2e]"
                     onMouseDown={(e) => {
                       // Evitar que el blur del input cierre y reabra al mismo tiempo al hacer clic en el lápiz
                       e.preventDefault();
@@ -232,7 +232,7 @@ export function BillingDialog({
                       onChange={(e) =>
                         setEditableCost(e.target.value === '' ? '' : Number(e.target.value))
                       }
-                      className="h-8 pl-7 pr-3 text-sm font-bold rounded-full bg-[#1d283a] border-[#324157] text-slate-100"
+                      className="h-8 pl-7 pr-3 text-sm font-bold rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
                       autoFocus
                       onFocus={(e) => e.target.select()}
                       onBlur={() => setIsEditingCost(false)}
@@ -279,7 +279,7 @@ export function BillingDialog({
                 <Button
                   type="button"
                   variant="secondary"
-                  className="rounded-full px-5 font-medium h-10 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                  className="rounded-full px-5 font-medium h-10 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                   onClick={() => onOpenChange(false)}
                 >
                   Cancelar
@@ -319,7 +319,7 @@ export function BillingDialog({
                   <Button
                     type="button"
                     variant="secondary"
-                    className="w-full sm:w-auto rounded-full px-5 font-medium h-10 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                    className="w-full sm:w-auto rounded-full px-5 font-medium h-10 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                     onClick={() => onOpenChange(false)}
                   >
                     Cancelar
@@ -330,7 +330,7 @@ export function BillingDialog({
                       onClick={() => setConfirmarTarjetaModo('rapido')}
                       disabled={processingCharge}
                       variant="secondary"
-                      className="flex-1 rounded-full h-10 font-semibold bg-[#283244] hover:bg-[#324157] text-slate-100 border border-[#324157]"
+                      className="flex-1 rounded-full h-10 font-semibold bg-[#252526] hover:bg-[#2e2e2e] text-slate-100 border border-[#2e2e2e]"
                     >
                       <CreditCard className="mr-1.5 h-4 w-4 text-sky-400" /> Tarjeta
                     </Button>
@@ -374,7 +374,7 @@ export function BillingDialog({
                       type="button"
                       variant="secondary"
                       disabled={processingCharge || submittingCuenta}
-                      className="rounded-full px-5 font-medium h-10 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                      className="rounded-full px-5 font-medium h-10 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                       onClick={() => onOpenChange(false)}
                     >
                       Cancelar
@@ -414,7 +414,7 @@ export function BillingDialog({
                             key={parts}
                             type="button"
                             variant="secondary"
-                            className="rounded-full font-semibold h-10 bg-[#283244] hover:bg-sky-600 hover:text-white hover:border-sky-500 text-slate-200 border border-[#324157]"
+                            className="rounded-full font-semibold h-10 bg-[#252526] hover:bg-sky-600 hover:text-white hover:border-sky-500 text-slate-200 border border-[#2e2e2e]"
                             onClick={() => {
                               setNumeroDePartes(parts);
                               setCurrentDivisionStep(0);
@@ -427,7 +427,7 @@ export function BillingDialog({
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between px-4 py-2.5 rounded-full bg-[#283244] border border-[#324157]">
+                      <div className="flex items-center justify-between px-4 py-2.5 rounded-full bg-[#252526] border border-[#2e2e2e]">
                         <span className="text-xs font-semibold text-slate-300">
                           Pago {currentDivisionStep + 1} de {numeroDePartes}
                         </span>
@@ -442,7 +442,7 @@ export function BillingDialog({
                           onClick={() => setConfirmarTarjetaModo('dividir')}
                           disabled={procesandoDivision}
                           variant="secondary"
-                          className="flex-1 rounded-full h-10 font-semibold bg-[#283244] hover:bg-[#324157] text-slate-100 border border-[#324157]"
+                          className="flex-1 rounded-full h-10 font-semibold bg-[#252526] hover:bg-[#2e2e2e] text-slate-100 border border-[#2e2e2e]"
                         >
                           <CreditCard className="mr-1.5 h-4 w-4 text-sky-400" /> Tarjeta
                         </Button>
@@ -460,11 +460,11 @@ export function BillingDialog({
                       </div>
 
                       <div className="relative my-2 flex items-center justify-center">
-                        <div className="w-full border-t border-[#324157]" />
-                        <span className="bg-[#1d283a] px-3 text-[11px] font-medium text-slate-400 shrink-0">
+                        <div className="w-full border-t border-[#2e2e2e]" />
+                        <span className="bg-[#1e1e1e] px-3 text-[11px] font-medium text-slate-400 shrink-0">
                           O enviar a cuenta
                         </span>
-                        <div className="w-full border-t border-[#324157]" />
+                        <div className="w-full border-t border-[#2e2e2e]" />
                       </div>
 
                       <div className="space-y-3">
@@ -481,7 +481,7 @@ export function BillingDialog({
                             type="button"
                             variant="secondary"
                             disabled={procesandoDivision || submittingCuenta}
-                            className="rounded-full px-5 font-medium h-10 bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                            className="rounded-full px-5 font-medium h-10 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                             onClick={() => setCurrentDivisionStep(null)}
                           >
                             Cancelar
@@ -522,7 +522,7 @@ export function BillingDialog({
             }}
           >
             <div
-              className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+              className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2.5">
@@ -539,7 +539,7 @@ export function BillingDialog({
                 </div>
               </div>
 
-              <div className="rounded-lg bg-[#283244] border border-[#324157] p-3 space-y-2">
+              <div className="rounded-lg bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-medium text-slate-300">
                     {confirmarTarjetaModo === 'dividir'
@@ -554,7 +554,7 @@ export function BillingDialog({
                     ).toFixed(2)}
                   </span>
                 </div>
-                <div className="pt-2 border-t border-[#324157] text-[11px] text-slate-400 leading-snug">
+                <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-400 leading-snug">
                   El cobro se registrará como pago con tarjeta y no sumará al efectivo en caja.
                 </div>
               </div>
@@ -565,7 +565,7 @@ export function BillingDialog({
                   variant="secondary"
                   disabled={processingCharge || procesandoDivision}
                   onClick={() => setConfirmarTarjetaModo(null)}
-                  className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                  className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                 >
                   Cancelar
                 </Button>
@@ -599,7 +599,7 @@ export function BillingDialog({
             onClick={() => setConfirmarCancelarDivision(false)}
           >
             <div
-              className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1d283a] border border-[#324157] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+              className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2.5">
@@ -621,7 +621,7 @@ export function BillingDialog({
                   type="button"
                   variant="secondary"
                   onClick={() => setConfirmarCancelarDivision(false)}
-                  className="rounded-full h-9 px-4 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                  className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                 >
                   No, Continuar
                 </Button>

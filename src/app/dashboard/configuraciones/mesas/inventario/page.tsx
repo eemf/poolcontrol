@@ -55,7 +55,7 @@ export default function PaginaInventarioMesas() {
         </div>
       ) : (
         <SurfaceCard variant="panel" className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#324157]">
+          <div className="flex items-center justify-between pb-2 border-b border-[#2e2e2e]">
             <div>
               <h2 className="text-base font-bold text-white">Estaciones Registradas</h2>
               <p className="text-xs text-slate-400">Catálogo de mesas activas con su tarifa vinculada.</p>
@@ -63,7 +63,7 @@ export default function PaginaInventarioMesas() {
           </div>
 
           {mesasConDocId.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-[#324157] rounded-xl bg-[#283244]/40">
+            <div className="text-center py-12 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40">
               <p className="text-slate-400 text-sm">No hay estaciones registradas aún.</p>
               <Button
                 onClick={abrirNuevaMesa}

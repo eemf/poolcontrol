@@ -102,7 +102,7 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
       </div>
 
       {state.clienteSeleccionadoId && (
-        <div className="pt-3 border-t border-[#324157] space-y-2">
+        <div className="pt-3 border-t border-[#2e2e2e] space-y-2">
           {state.mostrarItemManual ? (
             <div className="space-y-2 animate-in fade-in slide-in-from-top-1">
               <div className="grid grid-cols-12 gap-2.5 items-end">
@@ -128,7 +128,7 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
                   </div>
                   <div className="sm:hidden flex flex-col items-center gap-1 shrink-0">
                     <Label className="text-xs font-medium text-slate-200">Manual</Label>
-                    <div className="flex items-center justify-center px-3 h-10 border border-[#324157] rounded-full bg-[#283244]">
+                    <div className="flex items-center justify-center px-3 h-10 border border-[#2e2e2e] rounded-full bg-[#252526]">
                       <Switch checked={state.mostrarItemManual} onCheckedChange={actions.setMostrarItemManual} />
                     </div>
                   </div>
@@ -245,7 +245,7 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
                   </div>
                   <div className="sm:hidden flex flex-col items-center gap-1 shrink-0">
                     <Label className="text-xs font-medium text-slate-200">Manual</Label>
-                    <div className="flex items-center justify-center px-3 h-10 border border-[#324157] rounded-full bg-[#283244]">
+                    <div className="flex items-center justify-center px-3 h-10 border border-[#2e2e2e] rounded-full bg-[#252526]">
                       <Switch
                         id="item-manual-switch-on"
                         checked={state.mostrarItemManual}
@@ -301,7 +301,7 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
               <div
                 ref={refs.preparacionesContainerRef}
                 tabIndex={0}
-                className="mt-1 focus:outline-none focus:ring-1 focus:ring-sky-500 rounded-md p-2 bg-muted/5 border border-dashed border-[#324157]"
+                className="mt-1 focus:outline-none focus:ring-1 focus:ring-sky-500 rounded-md p-2 bg-muted/5 border border-dashed border-[#2e2e2e]"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();

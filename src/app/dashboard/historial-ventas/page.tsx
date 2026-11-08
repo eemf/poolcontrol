@@ -115,7 +115,7 @@ export default function HistorialVentasPage() {
             <Loader2 className="h-8 w-8 animate-spin text-sky-400" />
           </div>
         ) : ventasPaginadas.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border-2 border-dashed rounded-xl border-[#324157] bg-[#283244]/30 p-4">
+          <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border-2 border-dashed rounded-xl border-[#2e2e2e] bg-[#252526]/30 p-4">
             <div className="w-12 h-12 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 mb-3">
               <History className="h-6 w-6" />
             </div>
@@ -147,7 +147,7 @@ export default function HistorialVentasPage() {
 
         {/* Pie de Paginación y Selector de Filas */}
         {ventasAgrupadas.length > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-[#324157] text-xs text-slate-400">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-[#2e2e2e] text-xs text-slate-400">
             <div className="flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto text-center">
               <span className="inline-flex items-center leading-none text-slate-300">
                 Página <strong className="text-white mx-1">{currentPage}</strong> de{' '}
@@ -155,16 +155,16 @@ export default function HistorialVentasPage() {
                 {ventasAgrupadas.length === 1 ? 'venta' : 'ventas'})
               </span>
 
-              <div className="flex items-center gap-1.5 pl-3 border-l border-[#324157]">
+              <div className="flex items-center gap-1.5 pl-3 border-l border-[#2e2e2e]">
                 <span className="hidden sm:inline text-slate-400 text-xs">Mostrar:</span>
                 <Select
                   value={String(itemsPerPage)}
                   onValueChange={(val) => setItemsPerPage(Number(val))}
                 >
-                  <SelectTrigger className="h-7 w-[88px] rounded-full border-[#324157] bg-[#283244] text-slate-200 text-xs font-semibold focus:ring-1 focus:ring-sky-500 px-2.5">
+                  <SelectTrigger className="h-7 w-[88px] rounded-full border-[#2e2e2e] bg-[#252526] text-slate-200 text-xs font-semibold focus:ring-1 focus:ring-sky-500 px-2.5">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1d283a] border-[#324157] text-slate-200 rounded-xl shadow-xl">
+                  <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-slate-200 rounded-xl shadow-xl">
                     <SelectItem value="10" className="text-xs rounded-lg cursor-pointer">
                       10 filas
                     </SelectItem>
@@ -187,7 +187,7 @@ export default function HistorialVentasPage() {
                   size="sm"
                   onClick={handlePreviousPage}
                   disabled={currentPage === 1}
-                  className="h-8 rounded-full px-3.5 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                  className="h-8 rounded-full px-3.5 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                 >
                   <ChevronLeft className="h-3.5 w-3.5 mr-1" />
                   Anterior
@@ -198,7 +198,7 @@ export default function HistorialVentasPage() {
                   size="sm"
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
-                  className="h-8 rounded-full px-3.5 text-xs font-medium bg-[#283244] hover:bg-[#324157] text-slate-200 border border-[#324157]"
+                  className="h-8 rounded-full px-3.5 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
                 >
                   Siguiente
                   <ChevronRight className="h-3.5 w-3.5 ml-1" />

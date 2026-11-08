@@ -22,15 +22,15 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
 
   return (
     <Card 
-      className="shadow-sm overflow-hidden font-body !bg-[#1d283a] border !border-[#324157]"
-      style={{ backgroundColor: '#1d283a', borderColor: '#324157' }}
+      className="shadow-sm overflow-hidden font-body !bg-[#1e1e1e] border !border-[#2e2e2e]"
+      style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
         <CardTitle className="font-bold text-base sm:text-lg text-foreground">Compras Pendientes</CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-1">
         <div className="space-y-3">
-          <div className="flex items-center p-2 border-b !border-[#324157]">
+          <div className="flex items-center p-2 border-b !border-[#2e2e2e]">
             <Checkbox 
               id="select-all-compras" 
               checked={selected.size === items.length && items.length > 0} 
@@ -46,8 +46,8 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
               <AccordionItem 
                 value={compra.docId} 
                 key={compra.docId} 
-                style={{ backgroundColor: '#283244', borderColor: '#324157' }}
-                className="border-b-0 rounded-xl border !border-[#324157] !bg-[#283244] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
+                style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
+                className="border-b-0 rounded-xl border !border-[#2e2e2e] !bg-[#252526] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
               >
                 {/* Checkbox anclado a la cabecera del acordeón */}
                 <div className="absolute left-3 top-6 -translate-y-1/2 z-20 flex items-center justify-center">
@@ -89,10 +89,10 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
                 </AccordionTrigger>
 
                 <AccordionContent className="px-3 pb-3">
-                  <div className="space-y-1.5 border-t !border-[#324157] pt-2.5 mt-1">
+                  <div className="space-y-1.5 border-t !border-[#2e2e2e] pt-2.5 mt-1">
                     <p className="text-[9px] font-bold text-muted-foreground tracking-wider mb-1 px-1">Detalle de Artículos</p>
                     {compra.items?.map((subItem: any, idx: number) => (
-                      <div key={idx} className="flex justify-between items-center text-[11px] bg-[#1d283a]/70 p-2.5 rounded-lg border !border-[#324157]">
+                      <div key={idx} className="flex justify-between items-center text-[11px] bg-[#1e1e1e]/70 p-2.5 rounded-lg border !border-[#2e2e2e]">
                         <div className="flex flex-col min-w-0 flex-1 mr-2">
                           <span className="font-bold text-foreground/90 truncate">{subItem.nombreProducto}</span>
                           <span className="text-[10px] text-muted-foreground">

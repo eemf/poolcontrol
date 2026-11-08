@@ -25,8 +25,8 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
 
   return (
     <Card 
-      className="shadow-sm overflow-hidden font-body !bg-[#1d283a] border !border-[#324157]"
-      style={{ backgroundColor: '#1d283a', borderColor: '#324157' }}
+      className="shadow-sm overflow-hidden font-body !bg-[#1e1e1e] border !border-[#2e2e2e]"
+      style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
         <CardTitle className="font-bold text-base sm:text-lg text-foreground">
@@ -34,7 +34,7 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-1 space-y-3">
-        <div className="flex items-center p-2 border-b !border-[#324157]">
+        <div className="flex items-center p-2 border-b !border-[#2e2e2e]">
           <Checkbox 
             id="select-all-fisico" 
             checked={selectedEfectivo.size === totalEfectivoCount && selectedTragamonedas.size === totalTragamonedasCount} 
@@ -56,8 +56,8 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
           return (
             <div 
               key={`${item.tipoItem}-${item.id}`} 
-              style={{ backgroundColor: '#283244', borderColor: '#324157' }}
-              className="flex items-center p-3 border !border-[#324157] rounded-xl !bg-[#283244] hover:brightness-105 transition-all shadow-sm"
+              style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
+              className="flex items-center p-3 border !border-[#2e2e2e] rounded-xl !bg-[#252526] hover:brightness-105 transition-all shadow-sm"
             >
               <Checkbox 
                 id={`fisico-${item.tipoItem}-${item.id}`} 

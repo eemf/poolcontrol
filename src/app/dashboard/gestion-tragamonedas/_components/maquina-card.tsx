@@ -134,7 +134,7 @@ export function MaquinaCard({ maquina, sucursalId, usuarioId, onVerHistorial }: 
                 <Loader2 className="h-6 w-6 animate-spin text-sky-400" />
               </div>
             ) : (
-              <div className="space-y-1.5 bg-[#283244] p-3 rounded-xl border border-app-border">
+              <div className="space-y-1.5 bg-[#252526] p-3 rounded-xl border border-app-border">
                 <div className="flex justify-between items-center text-xs">
                   <span className="flex items-center gap-1.5 text-muted-foreground">
                     <Wallet className="h-3.5 w-3.5 text-rose-400" /> Deuda
@@ -186,7 +186,7 @@ export function MaquinaCard({ maquina, sucursalId, usuarioId, onVerHistorial }: 
 
           <PermissionGuard permission="tragamonedas.historial">
             <Button
-              className="w-full rounded-full h-8 text-xs bg-[#1d283a] hover:bg-slate-700/50 border border-app-border text-slate-300"
+              className="w-full rounded-full h-8 text-xs bg-[#1e1e1e] hover:bg-slate-700/50 border border-app-border text-slate-300"
               variant="outline"
               onClick={() => onVerHistorial(maquina)}
             >
@@ -218,7 +218,7 @@ export function MaquinaCard({ maquina, sucursalId, usuarioId, onVerHistorial }: 
               onChange={(e) => setMontoBase(e.target.value === '' ? '' : Number(e.target.value))}
               autoFocus
               onFocus={(e) => e.target.select()}
-              className="text-center rounded-full text-base h-10 bg-[#1d283a] border-app-border font-bold"
+              className="text-center rounded-full text-base h-10 bg-[#1e1e1e] border-app-border font-bold"
               onKeyDown={(e) => { if (e.key === 'Enter') handleRegistrarBase(); }}
             />
           </div>
@@ -264,7 +264,7 @@ export function MaquinaCard({ maquina, sucursalId, usuarioId, onVerHistorial }: 
               onChange={(e) => setMontoExtraccion(e.target.value === '' ? '' : Number(e.target.value))}
               autoFocus
               onFocus={(e) => e.target.select()}
-              className="text-center rounded-full text-base h-10 bg-[#1d283a] border-app-border font-bold"
+              className="text-center rounded-full text-base h-10 bg-[#1e1e1e] border-app-border font-bold"
               onKeyDown={(e) => { if (e.key === 'Enter') handleRegistrarExtraccion(); }}
             />
           </div>

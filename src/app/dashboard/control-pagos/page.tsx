@@ -68,7 +68,7 @@ export default function PaginaControlPagos() {
             size="sm"
             onClick={exportarCSV}
             disabled={pagosFiltrados.length === 0}
-            className="h-9 px-4 text-xs font-semibold rounded-full bg-app-surface border-app-border text-slate-100 hover:bg-[#324157] gap-2 shadow-xs"
+            className="h-9 px-4 text-xs font-semibold rounded-full bg-app-surface border-app-border text-slate-100 hover:bg-[#2e2e2e] gap-2 shadow-xs"
           >
             <Download className="h-4 w-4 text-sky-400" />
             <span>Exportar CSV</span>
@@ -159,7 +159,7 @@ export default function PaginaControlPagos() {
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 rounded-full h-8 bg-app-surface border-app-border text-slate-200 hover:bg-[#324157]"
+                className="px-3 rounded-full h-8 bg-app-surface border-app-border text-slate-200 hover:bg-[#2e2e2e]"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 <span className="text-xs">Anterior</span>
@@ -174,7 +174,7 @@ export default function PaginaControlPagos() {
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 rounded-full h-8 bg-app-surface border-app-border text-slate-200 hover:bg-[#324157]"
+                className="px-3 rounded-full h-8 bg-app-surface border-app-border text-slate-200 hover:bg-[#2e2e2e]"
               >
                 <span className="text-xs">Siguiente</span>
                 <ChevronRight className="h-4 w-4 ml-1" />

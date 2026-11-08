@@ -97,7 +97,7 @@ export function PurchaseList({
 
   return (
     <SurfaceCard variant="panel" className="font-body">
-      <div className="p-3 sm:p-4 border-b border-[#324157] bg-[#1d283a]">
+      <div className="p-3 sm:p-4 border-b border-[#2e2e2e] bg-[#1e1e1e]">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Pestañas de filtrado con PillTabs estándar */}
           <div className="w-full md:w-auto">
@@ -129,7 +129,7 @@ export function PurchaseList({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <Input
               placeholder="Buscar por ID o proveedor..."
-              className="pl-9 bg-[#283244] border-[#324157] text-white placeholder:text-slate-400 text-xs h-10 rounded-full focus-visible:ring-1 focus-visible:ring-primary"
+              className="pl-9 bg-[#252526] border-[#2e2e2e] text-white placeholder:text-slate-400 text-xs h-10 rounded-full focus-visible:ring-1 focus-visible:ring-primary"
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
             />
@@ -137,7 +137,7 @@ export function PurchaseList({
         </div>
       </div>
 
-      <CardContent className="p-3 sm:p-4 bg-[#1d283a]">
+      <CardContent className="p-3 sm:p-4 bg-[#1e1e1e]">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-64 space-y-3">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -149,7 +149,7 @@ export function PurchaseList({
               <AccordionItem
                 value={compra.docId}
                 key={compra.docId}
-                className="border-b-0 rounded-xl border border-[#324157] bg-[#283244] hover:border-slate-500/60 transition-all overflow-hidden shadow-sm"
+                className="border-b-0 rounded-xl border border-[#2e2e2e] bg-[#252526] hover:border-slate-500/60 transition-all overflow-hidden shadow-sm"
               >
                 <AccordionTrigger className="px-4 py-3.5 hover:no-underline">
                   <div className="flex-1 grid grid-cols-[1fr_auto] sm:grid-cols-3 gap-4 items-center text-sm text-left">
@@ -180,7 +180,7 @@ export function PurchaseList({
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
-                  <div className="border-t border-[#324157] pt-3.5 mt-1 space-y-4">
+                  <div className="border-t border-[#2e2e2e] pt-3.5 mt-1 space-y-4">
                     <div className="space-y-2.5">
                       <h4 className="font-semibold text-xs text-slate-300 flex items-center gap-1.5">
                         <ShoppingCart className="h-3.5 w-3.5 text-primary" />
@@ -190,7 +190,7 @@ export function PurchaseList({
                         {compra.items.map((item, index) => (
                           <div
                             key={index}
-                            className="flex justify-between items-center bg-[#1d283a] border border-[#324157] p-2.5 rounded-xl text-xs"
+                            className="flex justify-between items-center bg-[#1e1e1e] border border-[#2e2e2e] p-2.5 rounded-xl text-xs"
                           >
                             <div>
                               <p className="font-semibold text-white">{item.nombreProducto}</p>
@@ -210,7 +210,7 @@ export function PurchaseList({
                       </div>
                     </div>
 
-                    <div className="flex justify-end gap-2 pt-2 border-t border-[#324157]">
+                    <div className="flex justify-end gap-2 pt-2 border-t border-[#2e2e2e]">
                       <Button
                         size="sm"
                         className="rounded-full h-8 px-4 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-sm flex items-center gap-1.5 transition-all"
@@ -235,7 +235,7 @@ export function PurchaseList({
             ))}
           </Accordion>
         ) : (
-          <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border border-dashed border-[#324157] rounded-xl bg-[#283244]/40 p-4">
+          <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40 p-4">
             <Truck className="h-10 w-10 mb-3 text-slate-500 opacity-40" />
             <p className="font-bold text-sm text-white">
               {searchTerm ? "Sin resultados" : (mostrarTodas ? "No hay compras registradas" : "Sin compras pendientes")}
@@ -248,17 +248,17 @@ export function PurchaseList({
       </CardContent>
 
       {pagination.totalPages > 1 && (
-        <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#324157] p-3 sm:p-4 bg-[#1d283a]">
+        <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#2e2e2e] p-3 sm:p-4 bg-[#1e1e1e]">
           <div className="flex items-center space-x-2">
             <p className="text-xs font-medium text-slate-400">Filas por página</p>
             <Select
               value={`${pagination.itemsPerPage}`}
               onValueChange={(value) => pagination.onItemsPerPageChange(Number(value))}
             >
-              <SelectTrigger className="h-8 w-[70px] rounded-full text-xs bg-[#283244] border-[#324157] text-white">
+              <SelectTrigger className="h-8 w-[70px] rounded-full text-xs bg-[#252526] border-[#2e2e2e] text-white">
                 <SelectValue placeholder={pagination.itemsPerPage} />
               </SelectTrigger>
-              <SelectContent side="top" className="bg-[#1d283a] border-[#324157] text-white">
+              <SelectContent side="top" className="bg-[#1e1e1e] border-[#2e2e2e] text-white">
                 {[10, 20, 50, 100].map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
                     {pageSize}
@@ -274,7 +274,7 @@ export function PurchaseList({
               size="sm"
               onClick={() => pagination.onPageChange(Math.max(1, pagination.currentPage - 1))}
               disabled={pagination.currentPage === 1}
-              className="h-8 px-3 rounded-full text-xs border-[#324157] bg-[#283244] text-slate-300 hover:text-white"
+              className="h-8 px-3 rounded-full text-xs border-[#2e2e2e] bg-[#252526] text-slate-300 hover:text-white"
             >
               <ChevronLeft className="h-3.5 w-3.5 mr-1" />
               <span>Anterior</span>
@@ -287,7 +287,7 @@ export function PurchaseList({
               size="sm"
               onClick={() => pagination.onPageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
               disabled={pagination.currentPage === pagination.totalPages}
-              className="h-8 px-3 rounded-full text-xs border-[#324157] bg-[#283244] text-slate-300 hover:text-white"
+              className="h-8 px-3 rounded-full text-xs border-[#2e2e2e] bg-[#252526] text-slate-300 hover:text-white"
             >
               <span>Siguiente</span>
               <ChevronRight className="h-3.5 w-3.5 ml-1" />

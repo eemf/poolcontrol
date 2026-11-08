@@ -138,7 +138,7 @@ export default function PaginaInventario() {
           ubicacionesDisponibles={ubicacionesDisponibles}
         />
 
-        <CardContent className="p-3 sm:p-4 bg-[#1d283a]">
+        <CardContent className="p-3 sm:p-4 bg-[#1e1e1e]">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-64 space-y-3">
               <Loader2 className="h-8 w-8 animate-spin text-sky-400" />
@@ -147,7 +147,7 @@ export default function PaginaInventario() {
           ) : !isRevisionMode ? (
             <div className="space-y-2.5">
               {paginatedProductos.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border border-dashed border-app-border rounded-xl bg-[#283244]/40 p-4">
+                <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border border-dashed border-app-border rounded-xl bg-[#252526]/40 p-4">
                   <Search className="h-10 w-10 mb-3 opacity-30 text-slate-500" />
                   <p className="font-bold text-sm text-white">No se encontraron productos</p>
                   <p className="text-xs mt-1">Intenta con otro término o filtro de ubicación.</p>

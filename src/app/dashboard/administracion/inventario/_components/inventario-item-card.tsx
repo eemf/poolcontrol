@@ -34,7 +34,7 @@ export function InventarioItemCard({ producto }: InventarioItemCardProps) {
             {esStockBajo ? 'Bajo' : 'En stock'}
           </Badge>
           {producto.ubicacion && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#1d283a] border border-[#324157] text-[10px] font-semibold text-slate-300 rounded-full">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#1e1e1e] border border-[#2e2e2e] text-[10px] font-semibold text-slate-300 rounded-full">
               <MapPin className="h-2.5 w-2.5 text-primary" />
               {producto.ubicacion}
             </span>

@@ -46,7 +46,7 @@ export function InventarioRevisionItem({
           value={producto.existenciaFisica}
           onChange={(e) => onChange(producto.id, e.target.value)}
           onKeyDown={(e) => onKeyDown(e, index)}
-          className="h-9 w-20 sm:w-24 text-center font-bold text-sm rounded-full bg-[#1d283a] border-[#324157] text-white focus-visible:ring-1 focus-visible:ring-primary"
+          className="h-9 w-20 sm:w-24 text-center font-bold text-sm rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-white focus-visible:ring-1 focus-visible:ring-primary"
           placeholder="0"
           onFocus={(e) => e.target.select()}
         />
