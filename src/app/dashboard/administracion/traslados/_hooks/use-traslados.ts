@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   collection,
   query,
@@ -26,9 +26,15 @@ export function useTraslados() {
   const [trasladoParaCancelar, setTrasladoParaCancelar] = useState<TrasladoInterSucursal | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
 
-  // Filtros
+  // Filtros y paginación
   const [busqueda, setBusqueda] = useState('');
   const [activeTab, setActiveTab] = useState<TabTraslado>('pendientes');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, busqueda, itemsPerPage]);
 
   // 1. Consultar todos los traslados donde participa esta sucursal (origen o destino)
   const trasladosQuery = useMemoFirebase(() => {
@@ -114,6 +120,12 @@ export function useTraslados() {
     });
   }, [todosTraslados, activeTab, pendientesRecibir, enviadosEnTransito, busqueda]);
 
+  const totalPages = Math.max(1, Math.ceil(listaFiltrada.length / itemsPerPage));
+  const paginatedTraslados = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return listaFiltrada.slice(start, start + itemsPerPage);
+  }, [listaFiltrada, currentPage, itemsPerPage]);
+
   // Acción cancelar traslado
   const handleConfirmarCancelacion = async () => {
     if (!firestore || !user || !trasladoParaCancelar) return;
@@ -156,6 +168,14 @@ export function useTraslados() {
     pendientesRecibir,
     enviadosEnTransito,
     listaFiltrada,
+    paginatedTraslados,
+    pagination: {
+      currentPage,
+      itemsPerPage,
+      totalPages,
+      onPageChange: setCurrentPage,
+      onItemsPerPageChange: setItemsPerPage,
+    },
     activeTab,
     setActiveTab,
     busqueda,

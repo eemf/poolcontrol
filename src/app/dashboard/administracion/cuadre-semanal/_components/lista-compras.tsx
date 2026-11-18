@@ -26,7 +26,10 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
       style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
-        <CardTitle className="font-bold text-base sm:text-lg text-foreground">Compras Pendientes</CardTitle>
+        <CardTitle className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
+          <Truck className="h-5 w-5 text-rose-400 shrink-0" />
+          Compras Pendientes
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-1">
         <div className="space-y-3">
@@ -49,16 +52,17 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
                 style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
                 className="border-b-0 rounded-xl border !border-[#2e2e2e] !bg-[#252526] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
               >
-                {/* Checkbox anclado a la cabecera del acordeón */}
-                <div className="absolute left-3 top-6 -translate-y-1/2 z-20 flex items-center justify-center">
-                  <Checkbox 
-                    id={`compra-${compra.docId}`} 
-                    checked={selected.has(compra.docId)} 
-                    onCheckedChange={(checked) => onSelect(compra.docId, !!checked)} 
-                  />
-                </div>
+                {/* Checkbox centrado verticalmente en la cabecera del acordeón */}
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center">
+                    <Checkbox 
+                      id={`compra-${compra.docId}`} 
+                      checked={selected.has(compra.docId)} 
+                      onCheckedChange={(checked) => onSelect(compra.docId, !!checked)} 
+                    />
+                  </div>
 
-                <AccordionTrigger className="pl-10 pr-3 hover:no-underline py-3 w-full">
+                  <AccordionTrigger className="pl-10 pr-3 hover:no-underline py-3 w-full data-[state=open]:border-b data-[state=open]:border-[#2e2e2e]">
                   <div className="flex-1 min-w-0 flex items-center justify-between gap-2 mr-2 text-left">
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       <div className="hidden sm:flex h-8 w-8 rounded-full bg-primary/10 items-center justify-center shrink-0">
@@ -81,29 +85,39 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
                       <p className="font-bold text-xs sm:text-sm text-rose-400 whitespace-nowrap tabular-nums leading-tight">
                         - Q{compra.montoTotal.toFixed(2)}
                       </p>
-                      <Badge className="h-4 text-[9px] font-semibold border-none bg-rose-500/20 text-rose-300 px-1.5 py-0">
+                      <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                         Pendiente
                       </Badge>
                     </div>
                   </div>
-                </AccordionTrigger>
+                  </AccordionTrigger>
+                </div>
 
-                <AccordionContent className="px-3 pb-3">
-                  <div className="space-y-1.5 border-t !border-[#2e2e2e] pt-2.5 mt-1">
-                    <p className="text-[9px] font-bold text-muted-foreground tracking-wider mb-1 px-1">Detalle de Artículos</p>
-                    {compra.items?.map((subItem: any, idx: number) => (
-                      <div key={idx} className="flex justify-between items-center text-[11px] bg-[#1e1e1e]/70 p-2.5 rounded-lg border !border-[#2e2e2e]">
-                        <div className="flex flex-col min-w-0 flex-1 mr-2">
-                          <span className="font-bold text-foreground/90 truncate">{subItem.nombreProducto}</span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {subItem.tipo === 'producto' ? `${subItem.cantidad} unidades × Q${subItem.costoUnitario.toFixed(2)}` : 'Gasto directo'}
-                          </span>
+                <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e]">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="font-semibold text-xs text-slate-300 flex items-center gap-1.5">
+                        <ShoppingCart className="h-3.5 w-3.5 text-sky-400" />
+                        <span>Detalle de la compra #{compra.idCompra}</span>
+                      </h4>
+                      <span className="text-[11px] font-medium text-slate-400 tabular-nums">
+                        {compra.items?.length || 0} {(compra.items?.length || 0) === 1 ? 'artículo' : 'artículos'}
+                      </span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {compra.items?.map((subItem: any, idx: number) => (
+                        <div key={idx} className="flex justify-between items-center bg-[#252526] border border-[#2e2e2e] p-2.5 rounded-xl text-xs">
+                          <div className="min-w-0 pr-2">
+                            <p className="font-semibold text-slate-100 truncate">{subItem.nombreProducto}</p>
+                            <p className="text-[10px] text-slate-400 tabular-nums">
+                              {subItem.tipo === 'producto' ? `${subItem.cantidad} unidades × Q${subItem.costoUnitario.toFixed(2)}` : 'Gasto directo'}
+                            </p>
+                          </div>
+                          <p className="font-bold text-sky-400 tabular-nums shrink-0">
+                            Q{(subItem.cantidad * subItem.costoUnitario).toFixed(2)}
+                          </p>
                         </div>
-                        <span className="font-bold text-foreground/80 shrink-0">Q{(subItem.cantidad * subItem.costoUnitario).toFixed(2)}</span>
-                      </div>
-                    ))}
-                    <div className="flex justify-end pt-1">
-                       <span className="text-[9px] font-bold text-muted-foreground">ID Registro: #{compra.idCompra}</span>
+                      ))}
                     </div>
                   </div>
                 </AccordionContent>

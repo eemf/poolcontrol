@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { collection, query, orderBy, Timestamp } from 'firebase/firestore'
+import { collection, query, orderBy, limit, Timestamp } from 'firebase/firestore'
 import { useFirebase, useCollection, useMemoFirebase } from '@/firebase'
 import { useSucursal } from '@/hooks/use-sucursal'
 import type { CierreCaja } from '@/lib/tipos'
@@ -25,45 +25,48 @@ export function useHistorialCierreCaja() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [mostrarTodos, setMostrarTodos] = useState(false)
 
+  // Por defecto carga únicamente los cierres recientes para mostrar los pendientes rápido;
+  // al seleccionar "Todos los Registros", realiza la consulta completa.
   const cierresQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null
-    return query(collection(firestore, `sucursales/${sucursalId}/cierre_caja`), orderBy('fecha', 'desc'))
-  }, [firestore, sucursalId])
+    const baseRef = collection(firestore, `sucursales/${sucursalId}/cierre_caja`)
+    if (!mostrarTodos) {
+      return query(baseRef, orderBy('fecha', 'desc'), limit(30))
+    }
+    return query(baseRef, orderBy('fecha', 'desc'))
+  }, [firestore, sucursalId, mostrarTodos])
 
   const { data: todosLosCierres, isLoading: isLoadingCierres, error } = useCollection<CierreCaja>(cierresQuery)
+
+  const cierresPendientes = useMemo(() => {
+    if (!todosLosCierres) return []
+    return todosLosCierres.filter(
+      c => c.estadoEfectivo === 'pendiente' || (c.pagosTarjeta > 0 && c.estadoTarjeta === 'pendiente')
+    )
+  }, [todosLosCierres])
 
   const cierresFiltradosYMostrados = useMemo(() => {
     if (!todosLosCierres) return []
 
-    let listaBase = todosLosCierres
+    const listaBase = mostrarTodos ? todosLosCierres : cierresPendientes
+    const q = filtro.trim().toLowerCase()
+    if (!q) return listaBase
 
-    if (!mostrarTodos) {
-      listaBase = todosLosCierres.filter(c => c.estadoEfectivo === 'pendiente' || (c.pagosTarjeta > 0 && c.estadoTarjeta === 'pendiente'))
-    }
-
-    if (!filtro) return listaBase
-
-    const filtroLower = filtro.toLowerCase()
-    return listaBase.filter(c =>
-      String(c.idCuadre).includes(filtroLower) ||
-      (c.observaciones && c.observaciones.toLowerCase().includes(filtroLower))
+    return listaBase.filter(
+      c =>
+        String(c.idCuadre).includes(q) ||
+        (c.observaciones && c.observaciones.toLowerCase().includes(q)) ||
+        (c.usuarioNombre && c.usuarioNombre.toLowerCase().includes(q))
     )
-  }, [todosLosCierres, mostrarTodos, filtro])
+  }, [todosLosCierres, cierresPendientes, mostrarTodos, filtro])
 
-  const totalPages = Math.ceil(cierresFiltradosYMostrados.length / itemsPerPage) || 1
+  const totalItems = cierresFiltradosYMostrados.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1
 
   const cierresPaginados = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage
     return cierresFiltradosYMostrados.slice(startIndex, startIndex + itemsPerPage)
   }, [cierresFiltradosYMostrados, currentPage, itemsPerPage])
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
-  }
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
-  }
 
   useEffect(() => {
     setCurrentPage(1)
@@ -79,11 +82,13 @@ export function useHistorialCierreCaja() {
     mostrarTodos,
     setMostrarTodos,
     currentPage,
+    setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
+    totalItems,
     totalPages,
+    totalPendientes: cierresPendientes.length,
+    totalCargados: todosLosCierres?.length || 0,
     cierresPaginados,
-    handleNextPage,
-    handlePreviousPage,
   }
 }

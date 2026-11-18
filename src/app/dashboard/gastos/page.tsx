@@ -8,6 +8,7 @@ import { useSucursal } from "@/hooks/use-sucursal"
 import type { Gasto as GastoType } from '@/lib/tipos'
 
 // Componentes Refactorizados
+import { BotonVolverArriba } from "@/components/comunes"
 import { EncabezadoGastos } from "./_components/encabezado-gastos"
 import { ListaGastos } from "./_components/lista-gastos"
 import { ModalGasto } from "./_components/modal-gasto"
@@ -68,8 +69,14 @@ export default function PaginaGastos() {
     return result;
   }, [todosLosGastos, mostrarTodos, searchTerm]);
 
+  const totalPendientes = useMemo(() => {
+    return (todosLosGastos || []).filter(g => g.estado === 'pendiente').length;
+  }, [todosLosGastos]);
+
+  const totalTodos = todosLosGastos?.length ?? 0;
+
   // --- Paginación ---
-  const totalPages = Math.ceil(gastosConDocId.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(gastosConDocId.length / itemsPerPage));
   const paginatedGastos = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return gastosConDocId.slice(startIndex, startIndex + itemsPerPage);
@@ -157,11 +164,14 @@ export default function PaginaGastos() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 font-body pb-10">
       <EncabezadoGastos onNuevoGasto={handleNuevoGasto} />
       
       <ListaGastos 
         gastos={paginatedGastos}
+        totalItems={gastosConDocId.length}
+        totalPendientes={totalPendientes}
+        totalTodos={totalTodos}
         cargando={isLoadingGastos || isLoadingSucursal}
         terminoBusqueda={searchTerm}
         onTerminoBusquedaChange={setSearchTerm}
@@ -197,6 +207,8 @@ export default function PaginaGastos() {
         onConfirmar={handleDelete}
         procesando={loading}
       />
+
+      <BotonVolverArriba />
     </div>
   )
 }

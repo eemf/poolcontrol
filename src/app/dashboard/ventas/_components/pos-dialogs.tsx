@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { SurfaceCard } from '@/components/comunes';
+import { SurfaceCard, ModalConfirmacion } from '@/components/comunes';
 import {
   CreditCard,
   Coins,
@@ -264,7 +264,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                   'flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer mt-1',
                   state.incluirCreditoEnPago
                     ? 'bg-amber-500/15 border-amber-500/40'
-                    : 'bg-[#1e1e1e] border-[#2e2e2e] hover:border-slate-500'
+                    : 'bg-[#2e2e2e]/60 border-[#3a3a3a] hover:bg-[#313131] hover:border-slate-500'
                 )}
               >
                 <div className="flex items-center gap-2.5">
@@ -345,13 +345,13 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           {/* Sub-modal interno: Confirmar Pago con Tarjeta */}
           {state.vistaDialogo === 'confirmarTarjeta' && (
             <div
-              className="absolute inset-0 z-50 flex items-center justify-center rounded-xl sm:rounded-lg bg-black/75 backdrop-blur-[2px] p-4 animate-in fade-in duration-150"
+              className="absolute inset-0 z-50 flex items-center justify-center rounded-2xl bg-black/75 backdrop-blur-[2px] p-4 animate-in fade-in duration-150"
               onClick={() => {
                 if (!state.procesandoGuardado) actions.setVistaDialogo('pago');
               }}
             >
               <div
-                className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+                className="w-full max-w-sm rounded-2xl bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center gap-2.5">
@@ -368,7 +368,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                   </div>
                 </div>
 
-                <div className="rounded-lg bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
+                <div className="rounded-xl bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-medium text-slate-300">
                       Monto a cobrar con tarjeta
@@ -425,13 +425,13 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
 
             return (
               <div
-                className="absolute inset-0 z-50 flex items-center justify-center rounded-xl sm:rounded-lg bg-black/75 backdrop-blur-[2px] p-4 animate-in fade-in duration-150"
+                className="absolute inset-0 z-50 flex items-center justify-center rounded-2xl bg-black/75 backdrop-blur-[2px] p-4 animate-in fade-in duration-150"
                 onClick={() => {
                   if (!state.procesandoGuardado) actions.setDialogoAbonoAbierto(false);
                 }}
               >
                 <div
-                  className="w-full max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
+                  className="w-full max-w-sm rounded-2xl bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center gap-2.5">
@@ -472,7 +472,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                             </p>
                           </div>
                         </div>
-                        <div className="px-3.5 py-2 border-t border-[#2e2e2e] bg-[#1e1e1e]/40 flex items-center justify-between">
+                        <div className="px-3.5 py-2 border-t border-[#2e2e2e] bg-[#2e2e2e]/40 flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <Sigma className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                             <span className="text-xs font-bold text-slate-200">Deuda Total</span>
@@ -533,7 +533,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                           }
                         }}
                         placeholder="0.00"
-                        className="h-10 pl-8 pr-4 text-sm font-semibold text-center tabular-nums"
+                        className="h-9 pl-8 pr-4 text-xs font-semibold text-center tabular-nums"
                         autoFocus
                         onFocus={(e) => e.target.select()}
                       />
@@ -576,7 +576,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
 
           {/* Capa de Bloqueo y Animación de Carga al Procesar Pago */}
           {state.procesandoGuardado && (
-            <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/75 backdrop-blur-[2px] rounded-xl sm:rounded-lg animate-in fade-in duration-150">
+            <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/75 backdrop-blur-[2px] rounded-2xl animate-in fade-in duration-150">
               <div className="p-5 rounded-2xl bg-[#1e1e1e] border border-[#2e2e2e] shadow-2xl flex flex-col items-center gap-3 text-center animate-in zoom-in-95 duration-150">
                 <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <Loader2 className="h-6 w-6 animate-spin" />
@@ -595,355 +595,187 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Diálogo de Consumo Interno */}
-      <Dialog
+      {/* Diálogo de Consumo Interno (Línea 1 Antigravity + SweetAlert2) */}
+      <ModalConfirmacion
         open={state.dialogoConsumoInternoAbierto}
         onOpenChange={actions.setDialogoConsumoInternoAbierto}
+        tipo="normal"
+        swalTipo="info"
+        titulo="Consumo Interno"
+        subtitulo="Introduce el PIN del cliente o empleado autorizado."
+        textoCancelar="Cancelar"
+        textoConfirmar="Liquidar Cuenta"
+        iconoConfirmar={Check}
+        procesando={state.procesandoGuardado}
+        onConfirmar={actions.confirmarConsumoInterno}
       >
-        <DialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 p-5 shadow-2xl gap-4">
-          <DialogHeader>
-            <div className="flex items-center gap-3 pr-6">
-              <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
-                <Gift className="w-5 h-5" />
-              </div>
-              <div className="text-left min-w-0">
-                <DialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
-                  Consumo Interno
-                </DialogTitle>
-                <DialogDescription className="text-xs text-slate-400 mt-0.5 truncate">
-                  Introduce el PIN del cliente autorizado.
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-
-          <div className="space-y-3.5">
-            <div className="flex items-center justify-between gap-2 p-3 bg-[#252526] border border-[#2e2e2e] rounded-lg">
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-slate-100 truncate">
-                  {state.ventaParaConsumo?.nombreCliente}
-                </p>
-                <p className="text-[11px] text-slate-400">Monto en cortesía</p>
-              </div>
-              <span className="text-sm font-bold text-amber-400 tabular-nums shrink-0">
-                Q{(state.ventaParaConsumo?.saldo ?? 0).toFixed(2)}
-              </span>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="pin-consumo"
-                className="text-center block text-xs font-medium text-slate-300"
-              >
-                PIN de Autorización
-              </Label>
-              <Input
-                id="pin-consumo"
-                type="password"
-                value={state.pinConsumo}
-                onChange={(e) => actions.setPinConsumo(e.target.value)}
-                className="text-center rounded-full h-11 text-xl font-bold tracking-[0.5em]"
-                placeholder="••••"
-                maxLength={4}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    actions.confirmarConsumoInterno();
-                  }
-                }}
-                autoFocus
-              />
-            </div>
+        <div className="flex items-center justify-between gap-2 p-3 bg-[#252526] border border-[#2e2e2e] rounded-xl text-left">
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-100 truncate">
+              {state.ventaParaConsumo?.nombreCliente}
+            </p>
+            <p className="text-[11px] text-slate-400">Monto en cortesía</p>
           </div>
+          <span className="text-sm font-black text-amber-400 tabular-nums shrink-0">
+            Q{(state.ventaParaConsumo?.saldo ?? 0).toFixed(2)}
+          </span>
+        </div>
 
-          <DialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0 pt-1">
-            <Button
-              type="button"
-              variant="secondary"
-              className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
-              onClick={() => actions.setDialogoConsumoInternoAbierto(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="button"
-              onClick={actions.confirmarConsumoInterno}
-              className="rounded-full h-9 px-5 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md"
-            >
-              <Check className="mr-1.5 h-3.5 w-3.5" />
-              Liquidar Cuenta
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <div className="space-y-1.5 text-left">
+          <Label
+            htmlFor="pin-consumo"
+            className="text-center block text-[11px] font-semibold text-slate-300"
+          >
+            PIN de Autorización
+          </Label>
+          <Input
+            id="pin-consumo"
+            type="password"
+            value={state.pinConsumo}
+            onChange={(e) => actions.setPinConsumo(e.target.value)}
+            className="text-center rounded-full h-9 text-sm font-bold tracking-[0.5em] text-sky-400"
+            placeholder="••••"
+            maxLength={4}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                actions.confirmarConsumoInterno();
+              }
+            }}
+            autoFocus
+          />
+        </div>
+      </ModalConfirmacion>
 
       {/* Confirmación: ¿Descartar Cambios? */}
-      <AlertDialog
+      <ModalConfirmacion
         open={state.alertaCancelarVentaAbierta}
         onOpenChange={(abierta) => {
           if (!abierta) actions.manejarPermanecerEnVenta?.();
           actions.setAlertaCancelarVentaAbierta(abierta);
         }}
-      >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
-          <AlertDialogHeader>
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                <AlertTriangle className="w-4 h-4" />
-              </div>
-              <div className="text-left min-w-0">
-                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
-                  ¿Descartar Cambios?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Se descartarán los artículos nuevos sin guardar y se devolverán automáticamente al
-                  stock.
-                </AlertDialogDescription>
-              </div>
-            </div>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
-            <AlertDialogCancel
-              onClick={actions.manejarPermanecerEnVenta}
-              className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200"
-            >
-              Permanecer
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={actions.manejarConfirmarCancelacion}
-              className="rounded-full h-9 px-5 text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-md"
-            >
-              Sí, Descartar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        tipo="destructivo"
+        swalTipo="error"
+        titulo="¿Descartar Cambios?"
+        subtitulo="Se descartarán los artículos nuevos sin guardar y se devolverán automáticamente al stock."
+        textoCancelar="Permanecer"
+        textoConfirmar="Sí, Descartar"
+        iconoConfirmar={Trash2}
+        onCancelar={actions.manejarPermanecerEnVenta}
+        onConfirmar={actions.manejarConfirmarCancelacion}
+      />
 
       {/* Confirmación: ¿Eliminar Cliente? */}
-      <AlertDialog
+      <ModalConfirmacion
         open={state.alertaEliminarAbierta}
-        onOpenChange={state.procesandoGuardado ? undefined : actions.setAlertaEliminarAbierta}
-      >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
-          <AlertDialogHeader>
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0 mt-0.5">
-                <Trash2 className="w-4 h-4" />
-              </div>
-              <div className="text-left min-w-0">
-                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
-                  ¿Eliminar Cliente?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Se borrará permanentemente el registro de{' '}
-                  <strong className="text-slate-100 font-semibold">
-                    {state.clienteParaEliminar?.nombre}
-                  </strong>
-                  . Esta acción no se puede deshacer.
-                </AlertDialogDescription>
-              </div>
-            </div>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
-            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200">
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={actions.manejarConfirmarEliminarCliente}
-              className="bg-rose-600 hover:bg-rose-500 text-white rounded-full h-9 px-5 text-xs font-semibold shadow-md"
-            >
-              <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-              Sí, Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onOpenChange={actions.setAlertaEliminarAbierta}
+        tipo="destructivo"
+        swalTipo="error"
+        titulo="¿Eliminar Cliente?"
+        subtitulo={`Se borrará permanentemente el registro de ${state.clienteParaEliminar?.nombre || 'este cliente'}. Esta acción no se puede deshacer.`}
+        textoCancelar="Cancelar"
+        textoConfirmar="Sí, Eliminar"
+        iconoConfirmar={Trash2}
+        procesando={state.procesandoGuardado}
+        onConfirmar={actions.manejarConfirmarEliminarCliente}
+      />
 
-      {/* Confirmación: Confirmar Crédito */}
-      <AlertDialog
+      {/* Confirmación: ¿Mover Cuenta a Crédito? */}
+      <ModalConfirmacion
         open={state.alertaCreditoMonedasAbierta}
         onOpenChange={actions.setAlertaCreditoMonedasAbierta}
+        tipo="advertencia"
+        swalTipo="question"
+        titulo="¿Mover Cuenta a Crédito?"
+        subtitulo="Autorización de traslado a cuentas por cobrar"
+        textoCancelar="Cancelar"
+        textoConfirmar="Confirmar Crédito"
+        iconoConfirmar={CreditCard}
+        procesando={state.procesandoPagoCredito}
+        onConfirmar={() => {
+          if (state.ventaParaPagar) {
+            return actions.confirmarPasarACredito(state.ventaParaPagar);
+          }
+        }}
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-2xl font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-4 sm:p-5 gap-3 shadow-2xl">
-          <AlertDialogHeader className="space-y-2.5">
-            <div className="flex items-center gap-2.5">
-              <div className="relative flex items-center justify-center shrink-0">
-                <span className="absolute -inset-1 rounded-full bg-amber-400/25 animate-ping opacity-60" />
-                <span className="absolute -inset-1.5 rounded-full bg-amber-500/15 animate-pulse" />
-                <div className="relative w-9 h-9 rounded-full bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-md shadow-amber-500/10">
-                  <CreditCard className="w-4 h-4 animate-pulse" />
-                </div>
-              </div>
-              <div className="text-left min-w-0">
-                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
-                  ¿Mover Cuenta a Crédito?
-                </AlertDialogTitle>
-                <p className="text-[11px] text-slate-400 mt-0.5 truncate">
-                  Autorización de traslado a cuentas por cobrar
-                </p>
-              </div>
-            </div>
+        <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[#252526] border border-[#2e2e2e]">
+          <div className="flex items-center gap-2 min-w-0">
+            <User className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+            <span className="text-xs font-bold text-slate-100 truncate">
+              {state.ventaParaPagar?.nombreCliente || 'Cliente'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0 ml-2">
+            <span className="text-[11px] text-slate-400">Saldo:</span>
+            <span className="text-sm font-black text-amber-400 tabular-nums">
+              Q{(state.ventaParaPagar?.saldo ?? state.ventaParaPagar?.total ?? 0).toFixed(2)}
+            </span>
+          </div>
+        </div>
+        <p className="text-xs text-slate-300 leading-relaxed text-center">
+          La cuenta se moverá a <strong className="text-amber-400 font-semibold">Créditos Activos</strong> para liquidación posterior.
+        </p>
+      </ModalConfirmacion>
 
-            <AlertDialogDescription asChild>
-              <div className="space-y-2.5 text-left">
-                {/* Resumen Compacto en 1 sola fila */}
-                <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#252526] border border-[#2e2e2e]">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <User className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                    <span className="text-xs font-bold text-slate-100 truncate">
-                      {state.ventaParaPagar?.nombreCliente || 'Cliente'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                    <span className="text-[11px] text-slate-400">Saldo:</span>
-                    <span className="text-sm font-bold text-amber-400 tabular-nums">
-                      Q{(state.ventaParaPagar?.saldo ?? state.ventaParaPagar?.total ?? 0).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Explicación Compacta */}
-                <p className="text-xs text-slate-300 leading-snug">
-                  La cuenta se moverá a <strong className="text-amber-400 font-semibold">Créditos Activos</strong> para liquidación posterior.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
-            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200">
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                state.ventaParaPagar && actions.confirmarPasarACredito(state.ventaParaPagar)
-              }
-              className="rounded-full h-9 px-5 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md inline-flex items-center gap-1.5 transition-colors"
-            >
-              <CreditCard className="w-3.5 h-3.5" />
-              Confirmar Crédito
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Confirmación: Cliente con Deuda */}
-      <AlertDialog
+      {/* Confirmación: Cliente con Deuda Activa */}
+      <ModalConfirmacion
         open={state.alertaClienteConCreditoAbierta}
         onOpenChange={actions.setAlertaClienteConCreditoAbierta}
-      >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
-          <AlertDialogHeader>
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                <AlertTriangle className="w-4 h-4" />
-              </div>
-              <div className="text-left min-w-0">
-                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
-                  Cliente con Deuda Activa
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Este cliente ya tiene un crédito pendiente. ¿Deseas abrir una nueva cuenta por
-                  separado?
-                </AlertDialogDescription>
-              </div>
-            </div>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-1 sm:space-x-0">
-            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200">
-              Revisar Deuda
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={actions.procederAGuardarVenta}
-              className="rounded-full h-9 px-5 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md"
-            >
-              Continuar Venta
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        tipo="advertencia"
+        swalTipo="warning"
+        titulo="Cliente con Deuda Activa"
+        subtitulo="Este cliente ya tiene un crédito pendiente. ¿Deseas abrir una nueva cuenta por separado?"
+        textoCancelar="Revisar Deuda"
+        textoConfirmar="Continuar Venta"
+        procesando={state.procesandoGuardado}
+        onConfirmar={actions.procederAGuardarVenta}
+      />
 
       {/* Confirmación: ¿Eliminar Producto de la Venta? */}
-      <AlertDialog
+      <ModalConfirmacion
         open={state.alertaEliminarItemAbierta}
-        onOpenChange={
-          state.procesandoEliminarItem ? undefined : actions.setAlertaEliminarItemAbierta
-        }
+        onOpenChange={actions.setAlertaEliminarItemAbierta}
+        tipo="destructivo"
+        swalTipo="error"
+        titulo="¿Eliminar Producto?"
+        subtitulo="Confirma la eliminación del artículo de la venta"
+        textoCancelar="Cancelar"
+        textoConfirmar="Sí, Eliminar"
+        iconoConfirmar={Trash2}
+        procesando={state.procesandoEliminarItem}
+        onConfirmar={actions.confirmarEliminarItem}
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
-          <AlertDialogHeader>
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
-                <Trash2 className="w-4 h-4" />
-              </div>
-              <div className="text-left min-w-0">
-                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
-                  ¿Eliminar Producto?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-[11px] text-slate-400 mt-0.5 truncate">
-                  Confirma la eliminación del artículo de la venta
-                </AlertDialogDescription>
-              </div>
-            </div>
-          </AlertDialogHeader>
-
-          <div className="rounded-lg bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-slate-100 truncate">
-                  {state.itemParaEliminar?.item.nombreProducto}
+        <div className="rounded-xl bg-[#252526] border border-[#2e2e2e] p-3.5 space-y-2 text-left">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-slate-100 truncate">
+                {state.itemParaEliminar?.item.nombreProducto}
+              </p>
+              {state.itemParaEliminar?.item.cantidad !== undefined && (
+                <p className="text-[11px] text-slate-400 mt-0.5 tabular-nums">
+                  {state.itemParaEliminar.item.cantidad} &times; Q
+                  {Number(state.itemParaEliminar.item.precioUnitario ?? 0).toFixed(2)} c/u
                 </p>
-                {state.itemParaEliminar?.item.cantidad !== undefined && (
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    {state.itemParaEliminar.item.cantidad} &times; Q
-                    {Number(state.itemParaEliminar.item.precioUnitario ?? 0).toFixed(2)} c/u
-                  </p>
-                )}
-              </div>
-              {state.itemParaEliminar?.item.subtotal !== undefined && (
-                <span className="text-xs font-bold text-sky-400 tabular-nums shrink-0 mt-0.5">
-                  Q{Number(state.itemParaEliminar.item.subtotal || 0).toFixed(2)}
-                </span>
               )}
             </div>
-
-            {state.itemParaEliminar?.item.idDetalle !== 0 && (
-              <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
-                {state.itemParaEliminar?.item.idProducto === 'item-manual' ||
-                state.itemParaEliminar?.item.idProducto?.startsWith('mesa-') ||
-                state.itemParaEliminar?.item.idProducto?.startsWith('division-mesa-')
-                  ? 'El cargo se descontará inmediatamente del saldo de la cuenta.'
-                  : 'Se reintegrará el stock al inventario y el movimiento quedará registrado en el Kardex.'}
-              </div>
+            {state.itemParaEliminar?.item.subtotal !== undefined && (
+              <span className="text-xs font-bold text-sky-400 tabular-nums shrink-0 mt-0.5">
+                Q{Number(state.itemParaEliminar.item.subtotal || 0).toFixed(2)}
+              </span>
             )}
           </div>
 
-          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-0.5 sm:space-x-0">
-            <AlertDialogCancel
-              disabled={state.procesandoEliminarItem}
-              className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200"
-            >
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={actions.confirmarEliminarItem}
-              disabled={state.procesandoEliminarItem}
-              className="bg-rose-600 hover:bg-rose-500 text-white rounded-full h-9 px-5 text-xs font-semibold shadow-md"
-            >
-              {state.procesandoEliminarItem ? (
-                <>
-                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                  Eliminando...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                  Sí, Eliminar
-                </>
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          {state.itemParaEliminar?.item.idDetalle !== 0 && (
+            <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
+              {state.itemParaEliminar?.item.idProducto === 'item-manual' ||
+              state.itemParaEliminar?.item.idProducto?.startsWith('mesa-') ||
+              state.itemParaEliminar?.item.idProducto?.startsWith('division-mesa-')
+                ? 'El cargo se descontará inmediatamente del saldo de la cuenta.'
+                : 'Se reintegrará el stock al inventario y el movimiento quedará registrado en el Kardex.'}
+            </div>
+          )}
+        </div>
+      </ModalConfirmacion>
     </>
   );
 }

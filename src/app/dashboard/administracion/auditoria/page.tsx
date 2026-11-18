@@ -1,16 +1,21 @@
 'use client';
 
 import React from 'react';
-import { PageHeader, SurfaceCard } from '@/components/comunes';
-import { ShieldCheck, RefreshCw, Edit3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { PageHeader, SurfaceCard, Paginacion, BotonVolverArriba } from '@/components/comunes';
+import { ShieldCheck, Clock } from 'lucide-react';
 import { Loader } from '@/components/ui/loader';
+import { Accordion } from '@/components/ui/accordion';
+import { Separator } from '@/components/ui/separator';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAuditoria } from './_hooks/use-auditoria';
 import { AuditoriaFiltros } from './_components/auditoria-filtros';
 import { AuditoriaFeedItem } from './_components/auditoria-feed-item';
-import { AuditoriaDetalleDialog } from './_components/auditoria-detalle-dialog';
-import { AuditoriaEquipoDialog } from './_components/auditoria-equipo-dialog';
 
 export default function PaginaAuditoria() {
   const {
@@ -27,29 +32,24 @@ export default function PaginaAuditoria() {
     usuarioSeleccionado,
     setUsuarioSeleccionado,
     listaUsuarios,
-    limiteConsulta,
-    setLimiteConsulta,
     registrosFiltrados,
+    paginatedRegistros,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    totalPages,
+    filtrosActivosCount,
     registrosRaw,
     registroDetalle,
     setRegistroDetalle,
     articulosRecuperados,
     cargandoArticulos,
-    infoDispositivoLocal,
-    nombreEquipoLocal,
-    dialogoEquipoAbierto,
-    setDialogoEquipoAbierto,
-    inputNombreEquipo,
-    setInputNombreEquipo,
-    handleGuardarNombreEquipo,
-    metaDispositivoLocal,
     resolverUsuario,
     formatearFechaHora,
     formatearFechaCorta,
     formatearHoraRelativa,
   } = useAuditoria();
-
-  const CurrentDeviceIcon = metaDispositivoLocal.icon;
 
   if (isLoadingSucursal) {
     return (
@@ -60,70 +60,68 @@ export default function PaginaAuditoria() {
   }
 
   return (
-    <div className="space-y-5">
-      {/* Encabezado Principal usando PageHeader estándar */}
+    <div className="space-y-3.5">
+      {/* 1. Encabezado Principal con Selector de Período en lugar de controles innecesarios */}
       <PageHeader
         title="Auditoría de Operaciones"
         description="Registro cronológico y trazabilidad completa de transacciones, usuarios, computadoras, tablets y teléfonos."
         icon={ShieldCheck}
         action={
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Identificador interactivo de este equipo con su icono real (PC, Tablet o Teléfono) */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setInputNombreEquipo(nombreEquipoLocal);
-                setDialogoEquipoAbierto(true);
-              }}
-              className="h-8 gap-1.5 text-xs bg-app-surface hover:bg-[#2e2e2e] border-app-border rounded-full"
-              title="Haz clic para personalizar el nombre de este equipo o ver sus datos"
-            >
-              <CurrentDeviceIcon className={`h-3.5 w-3.5 ${metaDispositivoLocal.color} shrink-0`} />
-              <span>Este equipo: <strong className="text-slate-100">{nombreEquipoLocal}</strong></span>
-              <Badge variant="outline" className={`text-[9px] px-1 py-0 h-3.5 rounded-full ${metaDispositivoLocal.badgeClass}`}>
-                {metaDispositivoLocal.label}
-              </Badge>
-              <Edit3 className="h-3 w-3 text-muted-foreground ml-0.5" />
-            </Button>
+          <div className="w-full sm:w-64 shrink-0">
+            <Select value={periodoSeleccionado} onValueChange={setPeriodoSeleccionado}>
+              <SelectTrigger className="rounded-full h-9 border-[#2e2e2e] bg-[#252526] text-white text-xs font-semibold focus:ring-1 focus:ring-sky-500 shadow-sm px-3.5">
+                <div className="flex items-center gap-2 min-w-0 truncate">
+                  <Clock className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                  <SelectValue placeholder="Seleccionar turno..." />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-white max-h-72 font-body">
+                <SelectItem value="abierto" className="font-bold text-sky-400 text-xs">
+                  Turno actual
+                </SelectItem>
 
-            <Badge variant="outline" className="px-3 py-1 text-xs text-slate-300 bg-app-surface border-app-border rounded-full">
-              {registrosFiltrados.length} eventos
-            </Badge>
+                {cierres && cierres.length > 0 && (
+                  <>
+                    <Separator className="my-1.5 bg-[#2e2e2e]" />
+                    <p className="px-2 py-1 text-[10px] font-semibold text-slate-400">
+                      Turnos anteriores
+                    </p>
+                    {cierres.map((c) => (
+                      <SelectItem key={c.id} value={c.id} className="text-xs">
+                        Turno #{c.idCuadre} • {formatearFechaCorta(c.fecha)}
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLimiteConsulta((prev) => (prev === 150 ? 300 : 150))}
-              className="text-xs gap-1.5 rounded-full border-app-border bg-app-surface hover:bg-[#2e2e2e]"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              {limiteConsulta === 150 ? 'Cargar 300' : 'Ver 150'}
-            </Button>
+                <Separator className="my-1.5 bg-[#2e2e2e]" />
+                <SelectItem value="todos" className="text-slate-300 font-medium text-xs">
+                  Historial Completo
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         }
       />
 
-      {/* Barra de Filtros, Selector de Período y Búsqueda */}
-      <AuditoriaFiltros
-        periodoSeleccionado={periodoSeleccionado}
-        setPeriodoSeleccionado={setPeriodoSeleccionado}
-        cierres={cierres}
-        formatearFechaCorta={formatearFechaCorta}
-        busqueda={busqueda}
-        setBusqueda={setBusqueda}
-        usuarioSeleccionado={usuarioSeleccionado}
-        setUsuarioSeleccionado={setUsuarioSeleccionado}
-        listaUsuarios={listaUsuarios}
-        categoriaSeleccionada={categoriaSeleccionada}
-        setCategoriaSeleccionada={setCategoriaSeleccionada}
-        totalEventosRaw={registrosRaw?.length || 0}
-      />
+      {/* 2. Contenedor Principal Unificado (Buscador, Filtros Ocultos, Feed y Paginación) */}
+      <SurfaceCard variant="panel" className="p-3.5 sm:p-4 space-y-3.5">
+        {/* Barra de Búsqueda Estándar y Filtros Ocultos integrados en el contenedor */}
+        <AuditoriaFiltros
+          busqueda={busqueda}
+          setBusqueda={setBusqueda}
+          usuarioSeleccionado={usuarioSeleccionado}
+          setUsuarioSeleccionado={setUsuarioSeleccionado}
+          listaUsuarios={listaUsuarios}
+          categoriaSeleccionada={categoriaSeleccionada}
+          setCategoriaSeleccionada={setCategoriaSeleccionada}
+          filtrosActivosCount={filtrosActivosCount}
+          totalEventosRaw={registrosRaw?.length || 0}
+        />
 
-      {/* Feed de Auditoría */}
-      <SurfaceCard variant="panel" className="p-4 space-y-3">
+        {/* Feed de Auditoría en Acordeón Compacto */}
         {(isLoadingRegistros || (periodoSeleccionado === 'abierto' && isLoadingTurnoActual)) ? (
-          <div className="flex flex-col items-center justify-center p-12 bg-app-surface rounded-xl border border-app-border">
+          <div className="flex flex-col items-center justify-center p-12 bg-[#252526] rounded-xl border border-[#2e2e2e]">
             <Loader className="h-8 w-8 animate-spin text-sky-400 mb-2" />
             <p className="text-sm text-muted-foreground">
               {periodoSeleccionado === 'abierto'
@@ -142,8 +140,8 @@ export default function PaginaAuditoria() {
             </p>
           </div>
         ) : (
-          <div className="space-y-2.5">
-            {registrosFiltrados.map((registro) => {
+          <Accordion type="single" collapsible className="w-full space-y-2.5">
+            {paginatedRegistros.map((registro) => {
               const userInfo = resolverUsuario(registro);
               return (
                 <AuditoriaFeedItem
@@ -152,35 +150,36 @@ export default function PaginaAuditoria() {
                   userInfo={userInfo}
                   horaRelativa={formatearHoraRelativa(registro.fecha)}
                   fechaHora={formatearFechaHora(registro.fecha)}
-                  onSelect={setRegistroDetalle}
+                  onExpand={() => setRegistroDetalle(registro)}
+                  articulosRecuperados={registroDetalle?.id === registro.id ? articulosRecuperados : null}
+                  cargandoArticulos={registroDetalle?.id === registro.id && cargandoArticulos}
+                  formatearFechaHora={formatearFechaHora}
                 />
               );
             })}
+          </Accordion>
+        )}
+
+        {/* 3. Paginación Estándar para Vista de Escritorio y Móvil */}
+        {!isLoadingRegistros && registrosFiltrados.length > 0 && (
+          <div className="pt-2 border-t border-app-border">
+            <Paginacion
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={registrosFiltrados.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+              pageSizeOptions={[10, 15, 25, 50, 100]}
+              itemLabel="evento"
+              itemLabelPlural="eventos"
+            />
           </div>
         )}
       </SurfaceCard>
 
-      {/* Modal de Inspección Detallada */}
-      <AuditoriaDetalleDialog
-        registro={registroDetalle}
-        onClose={() => setRegistroDetalle(null)}
-        articulosRecuperados={articulosRecuperados}
-        cargandoArticulos={cargandoArticulos}
-        userInfo={registroDetalle ? resolverUsuario(registroDetalle) : { nombre: '', email: '', rol: '' }}
-        formatearFechaHora={formatearFechaHora}
-      />
-
-      {/* Modal para Renombrar e Identificar este Equipo / Dispositivo */}
-      <AuditoriaEquipoDialog
-        open={dialogoEquipoAbierto}
-        onOpenChange={setDialogoEquipoAbierto}
-        infoDispositivo={infoDispositivoLocal}
-        nombreEquipo={nombreEquipoLocal}
-        inputNombreEquipo={inputNombreEquipo}
-        setInputNombreEquipo={setInputNombreEquipo}
-        onGuardar={handleGuardarNombreEquipo}
-        metaDispositivo={metaDispositivoLocal}
-      />
+      {/* Control Estándar para Regresar al Inicio */}
+      <BotonVolverArriba threshold={150} />
     </div>
   );
 }

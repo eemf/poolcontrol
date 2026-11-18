@@ -1,23 +1,24 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { PillTabs, SurfaceCard } from '@/components/comunes';
 import { 
   PackageSearch, 
-  Search, 
-  History, 
   Loader2, 
   ArrowUp, 
   ArrowDown, 
   Clock, 
   ArrowUpRight, 
-  ArrowDownRight,
-  Boxes,
-  RotateCcw
+  ArrowDownRight, 
+  RotateCcw,
+  Search,
+  X,
+  SlidersHorizontal
 } from 'lucide-react';
 import { Timestamp } from 'firebase/firestore';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -37,20 +38,99 @@ const toDate = (fecha: any): Date => {
 
 interface KardexInventarioProps {
   inventario: any[] | null;
+  productos?: any[];
+  inicioPeriodo: Date;
   isLoading: boolean;
 }
 
-export function KardexInventario({ inventario, isLoading }: KardexInventarioProps) {
+export function KardexInventario({ 
+  inventario, 
+  productos, 
+  inicioPeriodo, 
+  isLoading 
+}: KardexInventarioProps) {
   const [filtroTexto, setFiltroTexto] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'ventas' | 'entradas' | 'eliminados' | 'ajustes'>('todos');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [mostrarOpciones, setMostrarOpciones] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const tieneFiltrosActivos = tipoFiltro !== 'todos' || sortOrder !== 'desc';
+
+  // Cálculo de la existencia inicial de cada producto al inicio del período
+  const aperturasPorProducto = useMemo(() => {
+    const map = new Map<string, {
+      productoId: string;
+      nombreProducto: string;
+      existenciaInicial: number;
+      fecha: Date;
+    }>();
+
+    // 1. Extraer del primer movimiento cronológico de cada producto en el historial del período
+    if (inventario && inventario.length > 0) {
+      const cronologico = [...inventario].sort((a, b) => {
+        return toDate(a.fecha).getTime() - toDate(b.fecha).getTime();
+      });
+
+      cronologico.forEach((item) => {
+        const key = item.productoId || item.nombreProducto;
+        if (!key) return;
+
+        if (!map.has(key)) {
+          map.set(key, {
+            productoId: item.productoId || '',
+            nombreProducto: item.nombreProducto || 'Producto',
+            existenciaInicial: item.existenciaAnterior !== undefined ? Number(item.existenciaAnterior) : 0,
+            fecha: inicioPeriodo,
+          });
+        }
+      });
+    }
+
+    // 2. Si se busca un producto en el catálogo y no tuvo movimientos en este turno
+    if (productos && productos.length > 0 && filtroTexto.trim()) {
+      const q = filtroTexto.trim().toLowerCase();
+      productos.forEach((p) => {
+        const nombre = p.nombre || '';
+        if (nombre.toLowerCase().includes(q)) {
+          const key = p.id || p.nombre;
+          if (!map.has(key)) {
+            map.set(key, {
+              productoId: p.id,
+              nombreProducto: p.nombre,
+              existenciaInicial: Number(p.existencia) || 0,
+              fecha: inicioPeriodo,
+            });
+          }
+        }
+      });
+    }
+
+    let aperturas = Array.from(map.values());
+
+    if (filtroTexto.trim()) {
+      const q = filtroTexto.trim().toLowerCase();
+      aperturas = aperturas.filter(a => a.nombreProducto.toLowerCase().includes(q));
+    }
+
+    aperturas.sort((a, b) => a.nombreProducto.localeCompare(b.nombreProducto));
+    return aperturas;
+  }, [inventario, productos, inicioPeriodo, filtroTexto]);
 
   // Estadísticas del inventario en este período
   const estadisticas = useMemo(() => {
-    if (!inventario) return { total: 0, entradas: 0, salidas: 0, eliminados: 0, unidadesEliminadas: 0 };
+    if (!inventario) return { total: 0, entradas: 0, salidas: 0, eliminados: 0, ajustes: 0, unidadesEliminadas: 0 };
     let entradas = 0;
     let salidas = 0;
     let eliminados = 0;
+    let ajustes = 0;
     let unidadesEliminadas = 0;
 
     inventario.forEach(item => {
@@ -62,10 +142,13 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
       if (esElim) {
         eliminados++;
         unidadesEliminadas += Math.abs(cant);
+      } else if (tipo.includes('ajuste')) {
+        ajustes++;
+      } else if (tipo.includes('venta') || cant < 0) {
+        salidas++;
+      } else if (cant > 0 || tipo.includes('entrada') || tipo.includes('compra')) {
+        entradas++;
       }
-
-      if (cant > 0) entradas += cant;
-      else if (cant < 0) salidas += Math.abs(cant);
     });
 
     return {
@@ -73,6 +156,7 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
       entradas,
       salidas,
       eliminados,
+      ajustes,
       unidadesEliminadas
     };
   }, [inventario]);
@@ -114,229 +198,422 @@ export function KardexInventario({ inventario, isLoading }: KardexInventarioProp
     return result;
   }, [inventario, filtroTexto, tipoFiltro, sortOrder]);
 
-  return (
-    <div className="space-y-4 outline-none animate-in fade-in-50 duration-300">
-      {/* Barra de búsqueda y filtros */}
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary pointer-events-none" />
-          <Input 
-            value={filtroTexto}
-            onChange={(e) => setFiltroTexto(e.target.value)}
-            placeholder="Buscar por producto, referencia o motivo..."
-            className="pl-10 pr-9 h-10 rounded-full bg-[#252526] border-[#2e2e2e] text-white placeholder:text-muted-foreground/70 focus-visible:ring-primary text-xs"
-          />
-          {filtroTexto && (
-            <button
-              onClick={() => setFiltroTexto('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-white"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+  const mostrarAperturas = (tipoFiltro === 'todos' || filtroTexto.trim().length > 0) && aperturasPorProducto.length > 0;
 
-        {/* Filtros de tipo y orden con métricas integradas */}
-        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-between sm:justify-end">
-          <div className="flex items-center p-1 bg-[#252526] border border-[#2e2e2e] rounded-full text-xs">
-            <button
-              onClick={() => setTipoFiltro('todos')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors flex items-center gap-1",
-                tipoFiltro === 'todos' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              <span>Todos</span>
-              <span className="text-[10px] opacity-80 font-mono">({estadisticas.total})</span>
-            </button>
-            <button
-              onClick={() => setTipoFiltro('ventas')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors flex items-center gap-1",
-                tipoFiltro === 'ventas' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              <span>Ventas</span>
-              {estadisticas.salidas > 0 && (
-                <span className="text-[10px] text-amber-300 font-mono">(-{estadisticas.salidas})</span>
-              )}
-            </button>
-            <button
-              onClick={() => setTipoFiltro('entradas')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors flex items-center gap-1",
-                tipoFiltro === 'entradas' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              <span>Entradas</span>
-              {estadisticas.entradas > 0 && (
-                <span className="text-[10px] text-emerald-300 font-mono">(+{estadisticas.entradas})</span>
-              )}
-            </button>
-            <button
-              onClick={() => setTipoFiltro('eliminados')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors flex items-center gap-1",
-                tipoFiltro === 'eliminados' ? "bg-rose-600 text-white font-bold" : "text-rose-400 hover:text-rose-300"
-              )}
-            >
-              <span>Eliminados</span>
-              {estadisticas.eliminados > 0 && (
-                <span className={cn(
-                  "px-1.5 py-0 rounded-full text-[9px] font-mono font-bold",
-                  tipoFiltro === 'eliminados' ? "bg-white/20 text-white" : "bg-rose-500/20 text-rose-300"
-                )}>
-                  {estadisticas.eliminados}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setTipoFiltro('ajustes')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors",
-                tipoFiltro === 'ajustes' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              Ajustes
-            </button>
+  // Total de unidades vendidas en el período para la búsqueda actual (ej. "cocacola")
+  const resumenVentasBusqueda = useMemo(() => {
+    const q = filtroTexto.trim().toLowerCase();
+    if (!q || !inventario) return null;
+    let unidadesVendidas = 0;
+    let operacionesVenta = 0;
+
+    inventario.forEach((item) => {
+      const nombre = (item.nombreProducto || '').toLowerCase();
+      const tipo = (item.tipoMovimiento || '').toLowerCase();
+      const ref = (item.referencia || '').toLowerCase();
+      const matches = nombre.includes(q) || tipo.includes(q) || ref.includes(q);
+      if (!matches) return;
+
+      const cant = Number(item.cantidad) || 0;
+      const esElim = tipo.includes('elimin') || tipo.includes('anula') || ref.includes('elimin') || ref.includes('anula');
+      const esAjuste = tipo.includes('ajuste');
+      const esVenta = !esElim && !esAjuste && (tipo.includes('venta') || cant < 0);
+
+      if (esVenta) {
+        unidadesVendidas += Math.abs(cant);
+        operacionesVenta++;
+      }
+    });
+
+    return {
+      unidadesVendidas,
+      operacionesVenta,
+      existenciaInicialUnica: aperturasPorProducto.length === 1 ? aperturasPorProducto[0].existenciaInicial : null,
+      productoUnico: aperturasPorProducto.length === 1 ? aperturasPorProducto[0].nombreProducto : null,
+    };
+  }, [filtroTexto, inventario, aperturasPorProducto]);
+
+  return (
+    <div className="space-y-4 outline-none animate-in fade-in-50 duration-300 font-body">
+      {/* 1. Control de búsqueda con botón externo de opciones a la par */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 w-full">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+            <Input
+              ref={searchInputRef}
+              value={filtroTexto}
+              onChange={(e) => setFiltroTexto(e.target.value)}
+              placeholder="Buscar por producto, referencia o motivo..."
+              className="pl-10 pr-9 rounded-full h-10 text-xs shadow-sm"
+            />
+            {filtroTexto && (
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setFiltroTexto('');
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-6 w-6 rounded-full flex items-center justify-center text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
+                title="Limpiar búsqueda"
+                aria-label="Limpiar búsqueda"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-            className="h-9 px-3 rounded-full text-xs bg-[#252526] border-[#2e2e2e] text-white hover:bg-[#2e2e2e] shrink-0 gap-1"
+            type="button"
+            variant="ghost"
+            onClick={() => setMostrarOpciones((prev) => !prev)}
+            title={mostrarOpciones ? 'Ocultar opciones y orden' : 'Mostrar opciones y orden'}
+            aria-label={mostrarOpciones ? 'Ocultar opciones y orden' : 'Mostrar opciones y orden'}
+            className={cn(
+              'h-10 w-10 sm:w-auto sm:px-3.5 rounded-full border text-xs font-semibold gap-1.5 shrink-0 transition-colors relative',
+              mostrarOpciones
+                ? 'bg-sky-600 border-sky-500 text-white hover:bg-sky-500 hover:text-white shadow-sm'
+                : tieneFiltrosActivos
+                ? 'bg-[#252526] border-sky-500/60 text-sky-400 hover:bg-[#313131] hover:text-sky-300'
+                : 'bg-[#252526] border-[#2e2e2e] text-slate-300 hover:bg-[#313131] hover:text-white'
+            )}
           >
-            {sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-primary" /> : <ArrowDown className="h-3.5 w-3.5 text-primary" />}
-            <span className="hidden sm:inline">{sortOrder === 'asc' ? 'Antiguos Primero' : 'Recientes Primero'}</span>
+            <SlidersHorizontal className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">{mostrarOpciones ? 'Ocultar' : 'Opciones'}</span>
+            {tieneFiltrosActivos && !mostrarOpciones && (
+              <span className="sm:hidden absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-sky-400" />
+            )}
           </Button>
         </div>
+
+        {/* Opciones selector y ordenamiento desplegables */}
+        {mostrarOpciones && (
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-0.5 animate-in fade-in-50 duration-200">
+            <div className="flex-1 min-w-0">
+              <PillTabs
+                value={tipoFiltro}
+                onValueChange={(val) => setTipoFiltro(val as 'todos' | 'ventas' | 'entradas' | 'eliminados' | 'ajustes')}
+                tabs={[
+                  {
+                    id: 'todos',
+                    label: 'Todos',
+                    count: estadisticas.total,
+                    badgeVariant: tipoFiltro === 'todos' ? 'amber' : 'slate',
+                  },
+                  {
+                    id: 'ventas',
+                    label: 'Ventas',
+                    count: estadisticas.salidas,
+                    badgeVariant: tipoFiltro === 'ventas' ? 'amber' : 'slate',
+                  },
+                  {
+                    id: 'entradas',
+                    label: 'Entradas',
+                    count: estadisticas.entradas,
+                    badgeVariant: tipoFiltro === 'entradas' ? 'amber' : 'slate',
+                  },
+                  {
+                    id: 'eliminados',
+                    label: 'Eliminados',
+                    count: estadisticas.eliminados,
+                    badgeVariant: tipoFiltro === 'eliminados' ? 'amber' : 'slate',
+                  },
+                  {
+                    id: 'ajustes',
+                    label: 'Ajustes',
+                    count: estadisticas.ajustes,
+                    badgeVariant: tipoFiltro === 'ajustes' ? 'amber' : 'slate',
+                  },
+                ]}
+              />
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
+              className="h-10 sm:h-11 px-4 rounded-full text-xs bg-[#252526] border-[#2e2e2e] text-slate-200 hover:text-white hover:bg-[#313131] shrink-0 gap-1.5 font-semibold"
+            >
+              {sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-sky-400" /> : <ArrowDown className="h-3.5 w-3.5 text-sky-400" />}
+              <span>{sortOrder === 'asc' ? 'Antiguos primero' : 'Recientes primero'}</span>
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* 3. Listado de movimientos de inventario */}
-      <Card className="border border-[#2e2e2e] bg-[#17202e] shadow-sm rounded-xl overflow-hidden">
-        {/* Encabezado */}
-        <div className="p-3 sm:p-4 border-b border-[#2e2e2e] bg-[#17202e] flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <PackageSearch className="h-4 w-4 text-primary" />
-            <span className="font-bold text-white">Kardex de Movimientos Físicos</span>
-            <Badge className="bg-[#252526] text-white border-[#2e2e2e] font-mono text-[10px] rounded-full">
-              {inventarioProcesado.length} registro{inventarioProcesado.length !== 1 ? 's' : ''}
-            </Badge>
+      {/* Resumen rápido de unidades vendidas al buscar un producto */}
+      {resumenVentasBusqueda && (
+        <SurfaceCard
+          variant="surface"
+          className="px-3.5 py-2.5 border-sky-500/30 flex flex-wrap items-center justify-between gap-2 text-xs"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-slate-300 font-medium truncate">
+              {resumenVentasBusqueda.productoUnico
+                ? resumenVentasBusqueda.productoUnico
+                : `Resultados para "${filtroTexto.trim()}"`}
+            </span>
+            {resumenVentasBusqueda.existenciaInicialUnica !== null && (
+              <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
+                • Inicial: <strong className="text-slate-200">{resumenVentasBusqueda.existenciaInicialUnica}</strong>
+              </span>
+            )}
           </div>
-          <span className="text-[11px] hidden sm:inline">Auditoría de existencias por producto</span>
-        </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-slate-400">Vendidas en el período:</span>
+            <span className="px-2.5 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-400 font-black tabular-nums">
+              {resumenVentasBusqueda.unidadesVendidas} uds.
+            </span>
+          </div>
+        </SurfaceCard>
+      )}
 
-        <ScrollArea className="h-[440px]">
-          <div className="divide-y divide-[#2e2e2e]/60">
-            {isLoading ? (
-              <div className="flex justify-center p-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : inventarioProcesado.length === 0 ? (
-              <div className="p-16 text-center text-muted-foreground text-xs italic">
-                {filtroTexto ? "No se encontraron movimientos para esta búsqueda." : "No hay movimientos de inventario físico registrados en este turno."}
-              </div>
-            ) : (
-              inventarioProcesado.map((mov, idx) => {
-                const cantidad = Number(mov.cantidad) || 0;
-                const esEntrada = cantidad > 0;
-                const tipoLower = (mov.tipoMovimiento || '').toLowerCase();
-                const refLower = (mov.referencia || '').toLowerCase();
-                const esEliminado = tipoLower.includes('elimin') || tipoLower.includes('anula') || refLower.includes('elimin') || refLower.includes('anula');
-
-                return (
-                  <div 
-                    key={idx} 
-                    className={cn(
-                      "p-3.5 sm:p-4 flex items-center justify-between hover:bg-[#252526]/50 transition-colors gap-3",
-                      esEliminado && "bg-rose-950/10 hover:bg-rose-950/20"
-                    )}
+      {/* 2. Contenedores individuales de movimientos (Cards) */}
+      <div className="space-y-2.5">
+        {isLoading ? (
+          <div className="flex justify-center p-20">
+            <Loader2 className="h-8 w-8 animate-spin text-sky-400" />
+          </div>
+        ) : inventarioProcesado.length === 0 && (!mostrarAperturas || aperturasPorProducto.length === 0) ? (
+          <div className="flex flex-col items-center justify-center text-center text-slate-400 py-16 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40 p-4">
+            <PackageSearch className="h-10 w-10 mb-3 opacity-30 text-slate-500" />
+            <p className="font-bold text-sm text-white">
+              {filtroTexto ? "No se encontraron movimientos para esta búsqueda" : "No hay movimientos de inventario físico registrados en este turno"}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">Los movimientos del kardex aparecerán aquí.</p>
+          </div>
+        ) : (
+          <>
+            {/* Si el orden es Antiguos primero, la apertura del período se muestra al inicio de la lista */}
+            {sortOrder === 'asc' && mostrarAperturas && (
+              <div className="space-y-2.5">
+                {aperturasPorProducto.map((apertura) => (
+                  <SurfaceCard 
+                    key={`apertura-${apertura.productoId || apertura.nombreProducto}`} 
+                    variant="subcard"
+                    className="p-3.5 sm:p-4 flex items-center justify-between border-sky-500/30 bg-[#1e1e1e] hover:border-sky-500/50 transition-all gap-3"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={cn(
-                        "h-9 w-9 rounded-xl flex items-center justify-center shrink-0 shadow-xs",
-                        esEliminado
-                          ? "bg-rose-500/20 text-rose-400"
-                          : esEntrada 
-                          ? "bg-emerald-500/20 text-emerald-400" 
-                          : "bg-amber-500/20 text-amber-400"
-                      )}>
-                        {esEliminado ? (
-                          <RotateCcw className="h-4 w-4" />
-                        ) : esEntrada ? (
-                          <ArrowUpRight className="h-4 w-4" />
-                        ) : (
-                          <ArrowDownRight className="h-4 w-4" />
-                        )}
+                      <div className="hidden sm:flex h-10 w-10 rounded-full items-center justify-center shrink-0 border bg-sky-500/15 border-sky-500/30 text-sky-400">
+                        <PackageSearch className="h-4 w-4" />
                       </div>
 
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-sm text-white truncate max-w-[180px] sm:max-w-[280px]">
-                            {mov.nombreProducto || 'Producto'}
+                          <span className="font-bold text-sm sm:text-base text-white truncate max-w-[180px] sm:max-w-[280px]">
+                            {apertura.nombreProducto}
                           </span>
-                          <Badge variant="outline" className={cn(
-                            "text-[9px] font-medium rounded-full px-1.5 py-0",
-                            esEliminado
-                              ? "border-rose-500/40 text-rose-400 bg-rose-500/10 font-bold"
-                              : esEntrada 
-                              ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" 
-                              : "border-amber-500/40 text-amber-400 bg-amber-500/10"
-                          )}>
-                            {mov.tipoMovimiento || (esEliminado ? 'Producto Eliminado' : (esEntrada ? 'Entrada' : 'Salida'))}
+                          <Badge variant="outline" className="text-[10px] font-bold rounded-full px-2 py-0.5 border border-sky-500/40 text-sky-400 bg-sky-500/10 flex items-center gap-1">
+                            <PackageSearch className="h-2.5 w-2.5 sm:hidden" />
+                            <span>Apertura</span>
                           </Badge>
-                          {mov.referencia && (
-                            <span className={cn(
-                              "text-[10px] truncate hidden sm:inline",
-                              esEliminado ? "text-rose-300/80 font-medium" : "text-muted-foreground"
-                            )}>
-                              Ref: {mov.referencia}
-                            </span>
-                          )}
+                          <span className="text-[10px] truncate hidden sm:inline font-medium text-slate-400">
+                            Inicio de turno
+                          </span>
                         </div>
 
-                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                        <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
                           <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 text-primary/70" />
-                            {format(toDate(mov.fecha), "hh:mm:ss a")}
+                            <Clock className="h-3 w-3 text-slate-500" />
+                            {format(toDate(apertura.fecha), "hh:mm:ss a")}
                           </span>
                           <span>•</span>
-                          <span className="hidden sm:inline">
-                            {formatDistanceToNow(toDate(mov.fecha), { addSuffix: true, locale: es })}
+                          <span>
+                            {format(toDate(apertura.fecha), "dd MMM yyyy", { locale: es })}
                           </span>
-                          {esEliminado && (
-                            <>
-                              <span>•</span>
-                              <span className="text-rose-400 font-medium">Reingresado por eliminación</span>
-                            </>
-                          )}
+                          <span>•</span>
+                          <span className="text-sky-300 font-medium">Existencia inicial</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Variación y Saldo de Stock */}
+                    {/* Existencia al Abrir */}
                     <div className="text-right shrink-0">
-                      <p className={cn(
-                        "text-sm sm:text-base font-black font-mono tabular-nums",
-                        esEliminado ? "text-rose-400" : (esEntrada ? "text-emerald-400" : "text-amber-400")
-                      )}>
-                        {esEntrada ? `+${cantidad}` : cantidad}
+                      <p className="text-sm sm:text-base font-bold tabular-nums text-sky-400">
+                        {apertura.existenciaInicial} uds
                       </p>
-                      <p className="text-[10px] font-mono text-muted-foreground tabular-nums">
-                        Stock final: <span className="text-white font-bold">{mov.existenciaNueva ?? '--'}</span>
-                        {mov.existenciaAnterior !== undefined && (
-                          <span className="opacity-60 hidden sm:inline"> (Antes: {mov.existenciaAnterior})</span>
-                        )}
+                      <p className="text-[10px] text-slate-400 tabular-nums font-medium mt-0.5">
+                        Existencia al abrir
                       </p>
                     </div>
-                  </div>
-                );
-              })
+                  </SurfaceCard>
+                ))}
+              </div>
             )}
-          </div>
-        </ScrollArea>
-      </Card>
+
+            {/* Si no hay movimientos posteriores pero sí apertura */}
+            {inventarioProcesado.length === 0 && mostrarAperturas && (
+              <p className="text-xs text-slate-400 text-center py-4 italic">
+                Sin movimientos posteriores registrados en este turno.
+              </p>
+            )}
+
+            {inventarioProcesado.map((mov, idx) => {
+            const cantidad = Number(mov.cantidad) || 0;
+            const esEntrada = cantidad > 0;
+            const tipoLower = (mov.tipoMovimiento || '').toLowerCase();
+            const refLower = (mov.referencia || '').toLowerCase();
+            const esEliminado = tipoLower.includes('elimin') || tipoLower.includes('anula') || refLower.includes('elimin') || refLower.includes('anula');
+
+            return (
+              <SurfaceCard 
+                key={idx} 
+                variant="surface"
+                className={cn(
+                  "p-3.5 sm:p-4 flex items-center justify-between hover:border-[#383838] transition-all gap-3",
+                  esEliminado && "bg-rose-950/10 border-rose-500/20 hover:border-rose-500/40"
+                )}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={cn(
+                    "hidden sm:flex h-10 w-10 rounded-full items-center justify-center shrink-0 border",
+                    esEliminado
+                      ? "bg-rose-500/15 border-rose-500/30 text-rose-400"
+                      : esEntrada 
+                      ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400" 
+                      : "bg-amber-500/15 border-amber-500/30 text-amber-400"
+                  )}>
+                    {esEliminado ? (
+                      <RotateCcw className="h-4 w-4" />
+                    ) : esEntrada ? (
+                      <ArrowUpRight className="h-4 w-4" />
+                    ) : (
+                      <ArrowDownRight className="h-4 w-4" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-sm sm:text-base text-white truncate max-w-[180px] sm:max-w-[280px]">
+                        {mov.nombreProducto || 'Producto'}
+                      </span>
+                      <Badge variant="outline" className={cn(
+                        "text-[10px] font-semibold rounded-full px-2 py-0.5 border flex items-center gap-1",
+                        esEliminado
+                          ? "border-rose-500/40 text-rose-400 bg-rose-500/10 font-bold"
+                          : esEntrada 
+                          ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" 
+                          : "border-amber-500/40 text-amber-400 bg-amber-500/10"
+                      )}>
+                        <span className="sm:hidden">
+                          {esEliminado ? (
+                            <RotateCcw className="h-2.5 w-2.5" />
+                          ) : esEntrada ? (
+                            <ArrowUpRight className="h-2.5 w-2.5" />
+                          ) : (
+                            <ArrowDownRight className="h-2.5 w-2.5" />
+                          )}
+                        </span>
+                        <span>{mov.tipoMovimiento || (esEliminado ? 'Producto Eliminado' : (esEntrada ? 'Entrada' : 'Salida'))}</span>
+                      </Badge>
+                      {mov.referencia && (
+                        <span className={cn(
+                          "text-[10px] truncate hidden sm:inline font-medium",
+                          esEliminado ? "text-rose-300/80" : "text-slate-400"
+                        )}>
+                          Ref: {mov.referencia}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3 text-slate-500" />
+                        {format(toDate(mov.fecha), "hh:mm:ss a")}
+                      </span>
+                      <span>•</span>
+                      <span className="hidden sm:inline">
+                        {formatDistanceToNow(toDate(mov.fecha), { addSuffix: true, locale: es })}
+                      </span>
+                      {esEliminado && (
+                        <>
+                          <span>•</span>
+                          <span className="text-rose-400 font-medium">Reingresado por eliminación</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Variación y Saldo de Stock */}
+                <div className="text-right shrink-0">
+                  <p className={cn(
+                    "text-sm sm:text-base font-bold tabular-nums",
+                    esEliminado ? "text-rose-400" : (esEntrada ? "text-emerald-400" : "text-amber-400")
+                  )}>
+                    {esEntrada ? `+${cantidad}` : cantidad}
+                  </p>
+                  <p className="text-[10px] text-slate-400 tabular-nums font-medium mt-0.5">
+                    Stock final: <span className="text-white font-bold">{mov.existenciaNueva ?? '--'}</span>
+                    {mov.existenciaAnterior !== undefined && (
+                      <span className="opacity-60 hidden sm:inline"> (Antes: {mov.existenciaAnterior})</span>
+                    )}
+                  </p>
+                </div>
+              </SurfaceCard>
+            );
+          })}
+
+          {/* Si el orden es Recientes primero, la apertura del período se muestra al final de la lista */}
+          {sortOrder === 'desc' && mostrarAperturas && (
+            <div className="space-y-2.5">
+              {aperturasPorProducto.map((apertura) => (
+                <SurfaceCard 
+                  key={`apertura-fin-${apertura.productoId || apertura.nombreProducto}`} 
+                  variant="subcard"
+                  className="p-3.5 sm:p-4 flex items-center justify-between border-sky-500/30 bg-[#1e1e1e] hover:border-sky-500/50 transition-all gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="hidden sm:flex h-10 w-10 rounded-full items-center justify-center shrink-0 border bg-sky-500/15 border-sky-500/30 text-sky-400">
+                      <PackageSearch className="h-4 w-4" />
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-sm sm:text-base text-white truncate max-w-[180px] sm:max-w-[280px]">
+                          {apertura.nombreProducto}
+                        </span>
+                        <Badge variant="outline" className="text-[10px] font-bold rounded-full px-2 py-0.5 border border-sky-500/40 text-sky-400 bg-sky-500/10 flex items-center gap-1">
+                          <PackageSearch className="h-2.5 w-2.5 sm:hidden" />
+                          <span>Apertura</span>
+                        </Badge>
+                        <span className="text-[10px] truncate hidden sm:inline font-medium text-slate-400">
+                          Inicio de turno
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 text-slate-500" />
+                          {format(toDate(apertura.fecha), "hh:mm:ss a")}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          {format(toDate(apertura.fecha), "dd MMM yyyy", { locale: es })}
+                        </span>
+                        <span>•</span>
+                        <span className="text-sky-300 font-medium">Existencia inicial</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Existencia al Abrir */}
+                  <div className="text-right shrink-0">
+                    <p className="text-sm sm:text-base font-bold tabular-nums text-sky-400">
+                      {apertura.existenciaInicial} uds
+                    </p>
+                    <p className="text-[10px] text-slate-400 tabular-nums font-medium mt-0.5">
+                      Existencia al abrir
+                    </p>
+                  </div>
+                </SurfaceCard>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
-  );
+  </div>
+);
 }

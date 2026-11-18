@@ -2,13 +2,12 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
-  collection, query, orderBy, where, doc, Timestamp 
+  collection, query, orderBy, where, doc, Timestamp, limit 
 } from 'firebase/firestore';
 import { useFirebase, useCollection, useMemoFirebase, useDoc, useUser } from '@/firebase';
 import type { Pago, Generales, CierreCaja, UsuarioSucursal } from '@/lib/tipos';
 import { useSucursal } from '@/hooks/use-sucursal';
 import { toDate } from '@/lib/firebase/servicios/utils';
-import { format } from 'date-fns';
 
 export type PagoConDocId = Pago & { id: string };
 
@@ -58,18 +57,17 @@ export function useControlPagos() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
-  // Modal de Comprobante / Ticket
-  const [pagoSeleccionadoTicket, setPagoSeleccionadoTicket] = useState<PagoVisual | null>(null);
-
   // 1. Estado de caja del turno actual
   const generalesRef = useMemoFirebase(() => 
     firestore && sucursalId ? doc(firestore, `sucursales/${sucursalId}/generales/actual`) : null
   , [firestore, sucursalId]);
   const { data: estadoCaja, isLoading: cargandoEstadoCaja } = useDoc<Generales>(generalesRef);
 
-  // 2. Historial de cierres de turno
+  // 2. Historial de cierres de turno (optimizado con limit(25))
   const cierresQuery = useMemoFirebase(() => 
-    (firestore && sucursalId) ? query(collection(firestore, `sucursales/${sucursalId}/cierre_caja`), orderBy('fecha', 'desc')) : null
+    (firestore && sucursalId) 
+      ? query(collection(firestore, `sucursales/${sucursalId}/cierre_caja`), orderBy('fecha', 'desc'), limit(25)) 
+      : null
   , [firestore, sucursalId]);
   const { data: cierres } = useCollection<CierreCaja>(cierresQuery);
 
@@ -158,12 +156,13 @@ export function useControlPagos() {
     return null;
   }, [periodoFiltro, estadoCaja?.fechaInicioPeriodo, cierres, fechaInicioPers, fechaFinPers]);
 
+  // Consulta optimizada a Firestore
   const pagosQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
     const baseCol = collection(firestore, `sucursales/${sucursalId}/pagos`);
 
     if (periodoFiltro === 'todos') {
-      return query(baseCol, orderBy('fecha', 'desc'));
+      return query(baseCol, orderBy('fecha', 'desc'), limit(150));
     }
 
     if (limitesPeriodo?.desde && limitesPeriodo?.hasta) {
@@ -185,17 +184,23 @@ export function useControlPagos() {
 
     if (periodoFiltro === 'actual') return null;
 
-    return query(baseCol, orderBy('fecha', 'desc'));
+    return query(baseCol, orderBy('fecha', 'desc'), limit(150));
   }, [firestore, sucursalId, periodoFiltro, limitesPeriodo]);
 
   const { data: rawPagos, isLoading: cargandoPagos } = useCollection<Pago>(pagosQuery);
 
-  // AGRUPACIÓN MULTI-VENTA
+  // AGRUPACIÓN MULTI-VENTA EFICIENTE
   const pagosVisuales = useMemo((): PagoVisual[] => {
-    const lista = (rawPagos || []).map(p => ({ ...p, id: p.id }));
-    if (lista.length === 0) return [];
+    if (!rawPagos || rawPagos.length === 0) return [];
+    
+    // Pre-calcular timestamps para comparaciones ultra-rápidas
+    const lista = rawPagos.map(p => ({
+      ...p,
+      id: p.id,
+      _time: toDate(p.fecha).getTime(),
+    }));
 
-    const grupos = new Map<string, PagoConDocId[]>();
+    const grupos = new Map<string, typeof lista>();
     const yaAsignados = new Set<string>();
 
     lista.forEach((pago) => {
@@ -208,7 +213,7 @@ export function useControlPagos() {
         return;
       }
 
-      const fechaP = toDate(pago.fecha).getTime();
+      const fechaP = pago._time;
       const coetaneos = lista.filter(x => {
         if (yaAsignados.has(x.id)) return false;
         if (x.id === pago.id) return true;
@@ -217,7 +222,7 @@ export function useControlPagos() {
         if (x.usuarioId !== pago.usuarioId) return false;
         if (x.metodoPago !== pago.metodoPago) return false;
 
-        const diffSec = Math.abs(toDate(x.fecha).getTime() - fechaP) / 1000;
+        const diffSec = Math.abs(x._time - fechaP) / 1000;
         return diffSec <= 5 && x.idVenta !== pago.idVenta;
       });
 
@@ -339,35 +344,6 @@ export function useControlPagos() {
     return c;
   }, [periodoFiltro, metodoFiltro, operadorFiltro, tipoCoberturaFiltro]);
 
-  // Métricas financieras
-  const metricas = useMemo(() => {
-    let totalRecaudado = 0;
-    let totalEfectivo = 0;
-    let totalTarjeta = 0;
-    let totalConsumoInterno = 0;
-    let totalArticulosCubiertos = 0;
-
-    pagosFiltrados.forEach(p => {
-      totalRecaudado += (p.montoTotalPagado || 0);
-      if (p.metodoPago === 'Efectivo') totalEfectivo += (p.montoTotalPagado || 0);
-      else if (p.metodoPago === 'Tarjeta') totalTarjeta += (p.montoTotalPagado || 0);
-      else if (p.metodoPago === 'Consumo Interno') totalConsumoInterno += (p.montoTotalPagado || 0);
-
-      p.todosItemsSaldados.forEach(it => {
-        totalArticulosCubiertos += (it.cantidad || 1);
-      });
-    });
-
-    return {
-      totalRecaudado,
-      totalEfectivo,
-      totalTarjeta,
-      totalConsumoInterno,
-      totalComprobantes: pagosFiltrados.length,
-      totalArticulosCubiertos,
-    };
-  }, [pagosFiltrados]);
-
   // Paginación
   const totalPages = Math.max(1, Math.ceil(pagosFiltrados.length / itemsPerPage));
 
@@ -395,55 +371,6 @@ export function useControlPagos() {
     })).sort((a, b) => a.nombre.localeCompare(b.nombre));
   }, [pagosVisuales, usuariosData, resolverNombreOperador]);
 
-  // Exportar CSV
-  const exportarCSV = useCallback(() => {
-    if (pagosFiltrados.length === 0) return;
-
-    const headers = [
-      'ID Comprobante(s)',
-      'Fecha',
-      'Hora',
-      'Ventas Afectadas',
-      'Cliente',
-      'Operador / Cajero',
-      'Metodo de Pago',
-      'Monto Pagado Total (Q)',
-      'Distribucion en Ventas',
-      'Articulos Saldados'
-    ];
-
-    const rows = pagosFiltrados.map(p => {
-      const fechaStr = format(p.fecha, 'yyyy-MM-dd');
-      const horaStr = format(p.fecha, 'HH:mm:ss');
-      const ventasStr = p.ventas.map(v => `#${v.idVenta}`).join(', ');
-      const distribucionStr = p.ventas.map(v => `Venta #${v.idVenta}: Q${v.montoPagadoVenta.toFixed(2)}`).join(' | ');
-      const articulosStr = p.todosItemsSaldados.map(it => `${it.cantidad}x ${it.nombreProducto} (Q${it.subtotal.toFixed(2)})`).join('; ');
-
-      return [
-        `"${p.idsPagoTexto}"`,
-        `"${fechaStr}"`,
-        `"${horaStr}"`,
-        `"${ventasStr}"`,
-        `"${p.clienteNombre.replace(/"/g, '""')}"`,
-        `"${resolverNombreOperador(p.usuarioId).replace(/"/g, '""')}"`,
-        `"${p.metodoPago}"`,
-        p.montoTotalPagado.toFixed(2),
-        `"${distribucionStr.replace(/"/g, '""')}"`,
-        `"${articulosStr.replace(/"/g, '""')}"`,
-      ].join(',');
-    });
-
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `Control_Pagos_${sucursal?.nombre || 'Sucursal'}_${format(new Date(), 'yyyyMMdd_HHmm')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, [pagosFiltrados, sucursal, resolverNombreOperador]);
-
   return {
     isLoadingSucursal,
     cargandoEstadoCaja,
@@ -470,15 +397,11 @@ export function useControlPagos() {
     itemsPerPage,
     setItemsPerPage,
     totalPages,
-    pagoSeleccionadoTicket,
-    setPagoSeleccionadoTicket,
     pagosFiltrados,
     paginatedPagos,
-    metricas,
     filtrosActivosCount,
     operadoresDisponibles,
     cierres,
     resolverNombreOperador,
-    exportarCSV,
   };
 }

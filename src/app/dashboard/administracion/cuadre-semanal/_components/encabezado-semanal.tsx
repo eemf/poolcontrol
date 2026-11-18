@@ -17,13 +17,13 @@ export function EncabezadoSemanal({ }: EncabezadoSemanalProps) {
       icon={CalendarDays}
       action={
         <Button
-          variant="outline"
+          variant="secondary"
           asChild
-          className="w-full sm:w-auto rounded-full h-9 px-4 text-xs font-semibold border-[#2e2e2e] bg-[#252526] text-slate-200 hover:text-white"
+          className="w-full sm:w-auto rounded-full h-9 px-4 text-xs font-semibold border border-[#2e2e2e] bg-[#252526] hover:bg-[#313131] text-slate-200 transition-colors"
         >
-          <Link href="/dashboard/administracion/cuadre-semanal/historial">
-            <History className="mr-1.5 h-3.5 w-3.5 text-primary" />
-            Historial
+          <Link href="/dashboard/administracion/cuadre-semanal/historial" className="flex items-center justify-center gap-2">
+            <History className="h-4 w-4 text-emerald-400" />
+            <span>Historial</span>
           </Link>
         </Button>
       }

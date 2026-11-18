@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { PillTabs, SurfaceCard } from '@/components/comunes';
 import { 
   Coins, 
   ShoppingCart, 
@@ -15,12 +15,13 @@ import {
   MinusCircle, 
   ArrowUp, 
   ArrowDown, 
-  Search, 
   Clock, 
-  Sparkles,
-  ArrowUpRight,
-  ArrowDownRight,
-  Banknote
+  ArrowUpRight, 
+  ArrowDownRight, 
+  Banknote,
+  Search,
+  X,
+  SlidersHorizontal
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -50,52 +51,56 @@ interface FlujoMonedasProps {
 
 export function FlujoMonedas({ 
   lista, 
-  ventaNetaPeriodo, 
   monedasIniciales, 
   efectivoInicialMonedas = 0,
-  efectivoAcumuladoMonedas, 
   inicioPeriodo, 
   isLoading 
 }: FlujoMonedasProps) {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [filtroTexto, setFiltroTexto] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'ventas' | 'despachos' | 'premios' | 'maquinas'>('todos');
+  const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'ventas_despachos' | 'premios' | 'maquinas'>('todos');
+  const [mostrarOpciones, setMostrarOpciones] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Existencia final calculada
-  const existenciaFinal = useMemo(() => {
-    if (!lista || lista.length === 0) return monedasIniciales;
-    const sortedChronologically = [...lista].sort((a, b) => toDate(a.fecha).getTime() - toDate(b.fecha).getTime());
-    return sortedChronologically[sortedChronologically.length - 1].stockAcumulado;
-  }, [lista, monedasIniciales]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
-  // Totales para métricas
-  const estadisticas = useMemo(() => {
-    let monedasDespachadas = 0;
-    let efectivoVentas = 0;
-    let monedasPremios = 0;
-    let efectivoPremios = 0;
+  const tieneFiltrosActivos = tipoFiltro !== 'todos' || sortOrder !== 'desc';
 
-    lista.forEach(m => {
-      if (m.tipo === 'venta_rapida' || m.tipo === 'venta') {
-        monedasDespachadas += (m.cantidad || 0);
-        efectivoVentas += (m.monto || 0);
-      } else if (m.tipo === 'despacho') {
-        monedasDespachadas += (m.cantidad || 0);
-      } else if (m.tipo === 'eliminacion') {
-        monedasDespachadas -= (m.cantidad || 0);
-      } else if (m.tipo === 'abono' || m.tipo === 'cobro') {
-        efectivoVentas += (m.monto || 0);
-      } else if (m.tipo === 'premio') {
-        monedasPremios += (m.cantidad || 0);
-        efectivoPremios += Math.abs(m.monto || 0);
+  // Conteo de elementos por categoría
+  const conteos = useMemo(() => {
+    let ventasDespachos = 0;
+    let premios = 0;
+    let maquinas = 0;
+
+    lista.forEach((m) => {
+      if (
+        m.tipo === 'venta_rapida' ||
+        m.tipo === 'venta' ||
+        m.tipo === 'abono' ||
+        m.tipo === 'cobro' ||
+        m.tipo === 'despacho' ||
+        m.tipo === 'eliminacion'
+      ) {
+        ventasDespachos++;
+      }
+      if (m.tipo === 'premio') {
+        premios++;
+      }
+      if (m.tipo === 'base' || m.tipo === 'extraccion' || m.tipo === 'ajuste') {
+        maquinas++;
       }
     });
 
-    return { 
-      monedasVendidas: Math.max(0, monedasDespachadas), 
-      efectivoVentas, 
-      monedasPremios, 
-      efectivoPremios 
+    return {
+      todos: lista.length,
+      ventasDespachos,
+      premios,
+      maquinas,
     };
   }, [lista]);
 
@@ -114,11 +119,15 @@ export function FlujoMonedas({
 
     if (tipoFiltro !== 'todos') {
       result = result.filter(m => {
-        if (tipoFiltro === 'ventas') {
-          return m.tipo === 'venta_rapida' || m.tipo === 'venta' || m.tipo === 'abono' || m.tipo === 'cobro';
-        }
-        if (tipoFiltro === 'despachos') {
-          return m.tipo === 'despacho' || m.tipo === 'eliminacion' || m.tipo === 'venta_rapida';
+        if (tipoFiltro === 'ventas_despachos') {
+          return (
+            m.tipo === 'venta_rapida' ||
+            m.tipo === 'venta' ||
+            m.tipo === 'abono' ||
+            m.tipo === 'cobro' ||
+            m.tipo === 'despacho' ||
+            m.tipo === 'eliminacion'
+          );
         }
         if (tipoFiltro === 'premios') {
           return m.tipo === 'premio';
@@ -140,376 +149,325 @@ export function FlujoMonedas({
   }, [lista, filtroTexto, tipoFiltro, sortOrder]);
 
   return (
-    <div className="space-y-6 outline-none animate-in fade-in-50 duration-300">
-      {/* 1. Tarjetas de métricas de monedas y tragamonedas */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* Existencia Inicial */}
-        <Card className="bg-[#252526] border-[#2e2e2e] shadow-sm rounded-xl overflow-hidden">
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground">Existencia inicial</span>
-              <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400">
-                <Coins className="h-4 w-4" />
-              </div>
-            </div>
-            <p className="text-xl sm:text-2xl font-black font-mono text-white mt-1">
-              {monedasIniciales}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              Efectivo base: <span className="text-emerald-400 font-mono font-bold">Q{efectivoInicialMonedas.toFixed(2)}</span>
-            </p>
-          </div>
-        </Card>
-
-        {/* Monedas Vendidas */}
-        <Card className="bg-[#252526] border-[#2e2e2e] shadow-sm rounded-xl overflow-hidden">
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground">Venta de monedas</span>
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-                <ShoppingCart className="h-4 w-4" />
-              </div>
-            </div>
-            <p className="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-1">
-              +Q{estadisticas.efectivoVentas.toFixed(2)}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{estadisticas.monedasVendidas} monedas vendidas</p>
-          </div>
-        </Card>
-
-        {/* Premios Pagados */}
-        <Card className="bg-[#252526] border-[#2e2e2e] shadow-sm rounded-xl overflow-hidden">
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground">Premios pagados</span>
-              <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
-                <Trophy className="h-4 w-4" />
-              </div>
-            </div>
-            <p className="text-xl sm:text-2xl font-black font-mono text-amber-400 mt-1">
-              -Q{estadisticas.efectivoPremios.toFixed(2)}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{estadisticas.monedasPremios} monedas canjeadas</p>
-          </div>
-        </Card>
-
-        {/* Existencia Actual de Monedas */}
-        <Card className="bg-[#17202e] border-purple-500/40 shadow-sm rounded-xl overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/5 rounded-full -mr-6 -mt-6 pointer-events-none" />
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-purple-300">Stock actual en caja</span>
-              <Badge className="bg-purple-500/20 text-purple-400 border-none text-[9px] px-1.5 py-0 rounded-full">
-                Monedas
-              </Badge>
-            </div>
-            <p className="text-xl sm:text-2xl font-black font-mono text-purple-300 mt-1">
-              {existenciaFinal}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              Neto período: <span className="text-emerald-400 font-bold font-mono">Q{ventaNetaPeriodo.toFixed(2)}</span>
-            </p>
-          </div>
-        </Card>
-      </div>
-
-      {/* 2. Barra de búsqueda y filtros */}
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary pointer-events-none" />
-          <Input 
-            value={filtroTexto}
-            onChange={(e) => setFiltroTexto(e.target.value)}
-            placeholder="Buscar por cliente, descripción de premio o máquina..."
-            className="pl-10 pr-9 h-10 rounded-full bg-[#252526] border-[#2e2e2e] text-white placeholder:text-muted-foreground/70 focus-visible:ring-primary text-xs"
-          />
-          {filtroTexto && (
-            <button
-              onClick={() => setFiltroTexto('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-white"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-
-        {/* Filtros de tipo y orden */}
-        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-between sm:justify-end">
-          <div className="flex items-center p-1 bg-[#252526] border border-[#2e2e2e] rounded-full text-xs overflow-x-auto scrollbar-none">
-            <button
-              onClick={() => setTipoFiltro('todos')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
-                tipoFiltro === 'todos' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              Todos
-            </button>
-            <button
-              onClick={() => setTipoFiltro('ventas')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
-                tipoFiltro === 'ventas' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              Cobros y Ventas
-            </button>
-            <button
-              onClick={() => setTipoFiltro('despachos')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
-                tipoFiltro === 'despachos' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              Despachos
-            </button>
-            <button
-              onClick={() => setTipoFiltro('premios')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
-                tipoFiltro === 'premios' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              Premios
-            </button>
-            <button
-              onClick={() => setTipoFiltro('maquinas')}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
-                tipoFiltro === 'maquinas' ? "bg-primary text-primary-foreground font-bold" : "text-muted-foreground hover:text-white"
-              )}
-            >
-              Máquinas
-            </button>
+    <div className="space-y-4 outline-none animate-in fade-in-50 duration-300 font-body">
+      {/* 1. Control de búsqueda con botón externo de opciones a la par */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 w-full">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+            <Input
+              ref={searchInputRef}
+              value={filtroTexto}
+              onChange={(e) => setFiltroTexto(e.target.value)}
+              placeholder="Buscar por cliente, descripción de premio o máquina..."
+              className="pl-10 pr-9 rounded-full h-10 text-xs shadow-sm"
+            />
+            {filtroTexto && (
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setFiltroTexto('');
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-6 w-6 rounded-full flex items-center justify-center text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
+                title="Limpiar búsqueda"
+                aria-label="Limpiar búsqueda"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-            className="h-9 px-3 rounded-full text-xs bg-[#252526] border-[#2e2e2e] text-white hover:bg-[#2e2e2e] shrink-0 gap-1"
+            type="button"
+            variant="ghost"
+            onClick={() => setMostrarOpciones((prev) => !prev)}
+            title={mostrarOpciones ? 'Ocultar opciones y orden' : 'Mostrar opciones y orden'}
+            aria-label={mostrarOpciones ? 'Ocultar opciones y orden' : 'Mostrar opciones y orden'}
+            className={cn(
+              'h-10 w-10 sm:w-auto sm:px-3.5 rounded-full border text-xs font-semibold gap-1.5 shrink-0 transition-colors relative',
+              mostrarOpciones
+                ? 'bg-sky-600 border-sky-500 text-white hover:bg-sky-500 hover:text-white shadow-sm'
+                : tieneFiltrosActivos
+                ? 'bg-[#252526] border-sky-500/60 text-sky-400 hover:bg-[#313131] hover:text-sky-300'
+                : 'bg-[#252526] border-[#2e2e2e] text-slate-300 hover:bg-[#313131] hover:text-white'
+            )}
           >
-            {sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-primary" /> : <ArrowDown className="h-3.5 w-3.5 text-primary" />}
-            <span className="hidden sm:inline">{sortOrder === 'asc' ? 'Antiguos primero' : 'Recientes primero'}</span>
+            <SlidersHorizontal className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">{mostrarOpciones ? 'Ocultar' : 'Opciones'}</span>
+            {tieneFiltrosActivos && !mostrarOpciones && (
+              <span className="sm:hidden absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-sky-400" />
+            )}
           </Button>
         </div>
+
+        {/* Opciones selector y ordenamiento desplegables */}
+        {mostrarOpciones && (
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-0.5 animate-in fade-in-50 duration-200">
+            <div className="flex-1 min-w-0">
+              <PillTabs
+                value={tipoFiltro}
+                onValueChange={(val) => setTipoFiltro(val as 'todos' | 'ventas_despachos' | 'premios' | 'maquinas')}
+                tabs={[
+                  {
+                    id: 'todos',
+                    label: 'Todos',
+                    count: conteos.todos,
+                    badgeVariant: tipoFiltro === 'todos' ? 'amber' : 'slate',
+                  },
+                  {
+                    id: 'ventas_despachos',
+                    label: 'Ventas y Despachos',
+                    count: conteos.ventasDespachos,
+                    badgeVariant: tipoFiltro === 'ventas_despachos' ? 'amber' : 'slate',
+                  },
+                  {
+                    id: 'premios',
+                    label: 'Premios',
+                    count: conteos.premios,
+                    badgeVariant: tipoFiltro === 'premios' ? 'amber' : 'slate',
+                  },
+                  {
+                    id: 'maquinas',
+                    label: 'Máquinas',
+                    count: conteos.maquinas,
+                    badgeVariant: tipoFiltro === 'maquinas' ? 'amber' : 'slate',
+                  },
+                ]}
+              />
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
+              className="h-10 sm:h-11 px-4 rounded-full text-xs bg-[#252526] border-[#2e2e2e] text-slate-200 hover:text-white hover:bg-[#313131] shrink-0 gap-1.5 font-semibold"
+            >
+              {sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-sky-400" /> : <ArrowDown className="h-3.5 w-3.5 text-sky-400" />}
+              <span>{sortOrder === 'asc' ? 'Antiguos primero' : 'Recientes primero'}</span>
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* 3. Listado de movimientos de monedas */}
-      <Card className="border border-[#2e2e2e] bg-[#17202e] shadow-sm rounded-xl overflow-hidden">
-        {/* Encabezado */}
-        <div className="p-3 sm:p-4 border-b border-[#2e2e2e] bg-[#17202e] flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Coins className="h-4 w-4 text-purple-400" />
-            <span className="font-bold text-white">Auditoría de monedas y tragamonedas</span>
-            <Badge className="bg-[#252526] text-white border-[#2e2e2e] font-mono text-[10px] rounded-full">
-              {listaFiltrada.length} movimiento{listaFiltrada.length !== 1 ? 's' : ''}
-            </Badge>
+      {/* 2. Contenedores individuales de monedas (Cards) */}
+      <div className="space-y-2.5">
+        {/* Fila de Apertura (orden ASC) */}
+        {sortOrder === 'asc' && (
+          <SurfaceCard
+            variant="subcard"
+            className="p-3.5 sm:p-4 flex items-center justify-between border-purple-500/30 bg-[#1e1e1e] transition-all gap-3"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="hidden sm:flex h-10 w-10 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 items-center justify-center shrink-0">
+                <Coins className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <div className="font-bold text-sm sm:text-base text-white flex items-center gap-2 flex-wrap">
+                  <span>Apertura de monedas del período</span>
+                  <Badge className="text-[10px] bg-purple-500/20 text-purple-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
+                    <Coins className="h-2.5 w-2.5 sm:hidden" />
+                    <span>Apertura</span>
+                  </Badge>
+                </div>
+                <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
+                  <Clock className="h-3 w-3 text-slate-500" /> {format(inicioPeriodo, "dd/MM/yyyy hh:mm a", { locale: es })}
+                </p>
+              </div>
+            </div>
+            <div className="text-right shrink-0">
+              <div className="flex items-baseline justify-end gap-1.5">
+                <span className="text-[11px] text-slate-400 font-medium">Efectivo:</span>
+                <span className="text-sm sm:text-base font-bold text-emerald-400 tabular-nums">
+                  Q{efectivoInicialMonedas.toFixed(2)}
+                </span>
+              </div>
+              <p className="text-[10px] font-bold text-purple-300 tabular-nums mt-0.5">
+                Stock: {monedasIniciales} monedas
+              </p>
+              <p className="text-[9px] text-slate-400 font-medium">Existencia y saldo inicial</p>
+            </div>
+          </SurfaceCard>
+        )}
+
+        {isLoading ? (
+          <div className="flex justify-center p-20">
+            <Loader2 className="h-8 w-8 animate-spin text-sky-400" />
           </div>
-          <span className="text-[11px] hidden sm:inline">Rastro de efectivo y existencia física</span>
-        </div>
+        ) : listaFiltrada.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-center text-slate-400 py-16 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40 p-4">
+            <Coins className="h-10 w-10 mb-3 opacity-30 text-slate-500" />
+            <p className="font-bold text-sm text-white">
+              {filtroTexto ? "No se encontraron movimientos para esta búsqueda" : "No se registraron ventas ni premios en este turno"}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">Los movimientos de fichas y tragamonedas aparecerán aquí.</p>
+          </div>
+        ) : (
+          listaFiltrada.map((mov, idx) => {
+            const getIcon = (isMini: boolean = false) => {
+              const cls = isMini ? "h-2.5 w-2.5" : "h-4 w-4";
+              if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return <ShoppingCart className={cls} />;
+              if (mov.tipo === 'despacho') return <ArrowDownRight className={cls} />;
+              if (mov.tipo === 'eliminacion') return <ArrowUpRight className={cls} />;
+              if (mov.tipo === 'abono' || mov.tipo === 'cobro') return <Banknote className={cls} />;
+              if (mov.tipo === 'premio') return <Trophy className={cls} />;
+              if (mov.tipo === 'base') return <Landmark className={cls} />;
+              if (mov.tipo === 'extraccion') return <MinusCircle className={cls} />;
+              return <Coins className={cls} />;
+            };
 
-        <ScrollArea className="h-[440px]">
-          <div className="divide-y divide-[#2e2e2e]/60">
-            {/* Fila de Apertura (orden ASC) */}
-            {sortOrder === 'asc' && (
-              <div className="p-3.5 sm:p-4 flex items-center justify-between bg-purple-500/10 transition-colors gap-3">
+            const getIconColor = () => {
+              if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return "bg-emerald-500/15 border-emerald-500/30 text-emerald-400";
+              if (mov.tipo === 'despacho') return "bg-sky-500/15 border-sky-500/30 text-sky-400";
+              if (mov.tipo === 'eliminacion') return "bg-amber-500/15 border-amber-500/30 text-amber-400";
+              if (mov.tipo === 'abono' || mov.tipo === 'cobro') return "bg-emerald-500/15 border-emerald-500/30 text-emerald-300";
+              if (mov.tipo === 'premio') return "bg-purple-500/15 border-purple-500/30 text-purple-400";
+              if (mov.tipo === 'base') return "bg-indigo-500/15 border-indigo-500/30 text-indigo-300";
+              if (mov.tipo === 'extraccion') return "bg-cyan-500/15 border-cyan-500/30 text-cyan-400";
+              return "bg-slate-500/15 border-slate-500/30 text-slate-300";
+            };
+
+            const getBadgeLabel = () => {
+              if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return 'Venta rápida';
+              if (mov.tipo === 'despacho') return 'Despacho a cuenta';
+              if (mov.tipo === 'eliminacion') return 'Monedas devueltas';
+              if (mov.tipo === 'abono' || mov.tipo === 'cobro') return 'Cobro / Abono';
+              if (mov.tipo === 'premio') return 'Premio pagado';
+              if (mov.tipo === 'base') return 'Base de máquina';
+              if (mov.tipo === 'extraccion') return 'Extracción';
+              if (mov.tipo === 'ajuste') return 'Ajuste manual';
+              return 'Movimiento';
+            };
+
+            const esIngresoEfectivo = mov.monto > 0;
+
+            return (
+              <SurfaceCard 
+                key={idx} 
+                variant="surface"
+                className="p-3.5 sm:p-4 flex items-center justify-between hover:border-[#383838] transition-all gap-3"
+              >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-9 w-9 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
-                    <Coins className="h-5 w-5" />
+                  <div className={cn(
+                    "hidden sm:flex h-10 w-10 rounded-full items-center justify-center shrink-0 border",
+                    getIconColor()
+                  )}>
+                    {getIcon(false)}
                   </div>
-                  <div>
-                    <div className="font-bold text-sm text-white flex items-center gap-2 flex-wrap">
-                      Apertura de monedas del período
-                      <Badge className="text-[9px] bg-purple-500/20 text-purple-300 border-none rounded-full">Apertura</Badge>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                      <Clock className="h-3 w-3" /> {format(inicioPeriodo, "dd/MM/yyyy hh:mm a", { locale: es })}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="flex items-baseline justify-end gap-1.5">
-                    <span className="text-[11px] text-muted-foreground font-medium">Efectivo:</span>
-                    <span className="text-sm sm:text-base font-black font-mono text-emerald-400 tabular-nums">
-                      Q{efectivoInicialMonedas.toFixed(2)}
-                    </span>
-                  </div>
-                  <p className="text-[10px] font-mono font-bold text-purple-300 tabular-nums mt-0.5">
-                    Stock: {monedasIniciales} monedas
-                  </p>
-                  <p className="text-[9px] text-muted-foreground">Existencia y saldo inicial</p>
-                </div>
-              </div>
-            )}
 
-            {isLoading ? (
-              <div className="flex justify-center p-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : listaFiltrada.length === 0 ? (
-              <div className="p-16 text-center text-muted-foreground text-xs italic">
-                {filtroTexto ? "No se encontraron movimientos para esta búsqueda." : "No se registraron ventas ni premios en este turno."}
-              </div>
-            ) : (
-              listaFiltrada.map((mov, idx) => {
-                const getIcon = () => {
-                  if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return <ShoppingCart className="h-4 w-4" />;
-                  if (mov.tipo === 'despacho') return <ArrowDownRight className="h-4 w-4" />;
-                  if (mov.tipo === 'eliminacion') return <ArrowUpRight className="h-4 w-4" />;
-                  if (mov.tipo === 'abono' || mov.tipo === 'cobro') return <Banknote className="h-4 w-4" />;
-                  if (mov.tipo === 'premio') return <Trophy className="h-4 w-4" />;
-                  if (mov.tipo === 'base') return <Landmark className="h-4 w-4" />;
-                  if (mov.tipo === 'extraccion') return <MinusCircle className="h-4 w-4" />;
-                  return <Coins className="h-4 w-4" />;
-                };
-
-                const getIconColor = () => {
-                  if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return "bg-emerald-500/20 text-emerald-400";
-                  if (mov.tipo === 'despacho') return "bg-blue-500/20 text-blue-400";
-                  if (mov.tipo === 'eliminacion') return "bg-amber-500/20 text-amber-400";
-                  if (mov.tipo === 'abono' || mov.tipo === 'cobro') return "bg-emerald-500/20 text-emerald-300";
-                  if (mov.tipo === 'premio') return "bg-purple-500/20 text-purple-400";
-                  if (mov.tipo === 'base') return "bg-indigo-500/20 text-indigo-300";
-                  if (mov.tipo === 'extraccion') return "bg-cyan-500/20 text-cyan-400";
-                  return "bg-slate-500/20 text-slate-300";
-                };
-
-                const getBadgeLabel = () => {
-                  if (mov.tipo === 'venta_rapida' || mov.tipo === 'venta') return 'Venta rápida';
-                  if (mov.tipo === 'despacho') return 'Despacho a cuenta';
-                  if (mov.tipo === 'eliminacion') return 'Monedas devueltas';
-                  if (mov.tipo === 'abono' || mov.tipo === 'cobro') return 'Cobro / Abono';
-                  if (mov.tipo === 'premio') return 'Premio pagado';
-                  if (mov.tipo === 'base') return 'Base de máquina';
-                  if (mov.tipo === 'extraccion') return 'Extracción';
-                  if (mov.tipo === 'ajuste') return 'Ajuste manual';
-                  return 'Movimiento';
-                };
-
-                const esIngresoEfectivo = mov.monto > 0;
-                const esGastoEfectivo = mov.monto < 0;
-
-                return (
-                  <div 
-                    key={idx} 
-                    className="p-3.5 sm:p-4 flex items-center justify-between hover:bg-[#252526]/50 transition-colors gap-3"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={cn(
-                        "h-9 w-9 rounded-xl flex items-center justify-center shrink-0 shadow-xs",
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-sm sm:text-base text-white truncate max-w-[180px] sm:max-w-[280px]">
+                        {mov.desc}
+                      </span>
+                      <Badge className={cn(
+                        "text-[10px] font-semibold rounded-full px-2 py-0.5 border-none flex items-center gap-1",
                         getIconColor()
                       )}>
-                        {getIcon()}
-                      </div>
-
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-sm text-white truncate max-w-[180px] sm:max-w-[280px]">
-                            {mov.desc}
-                          </span>
-                          <Badge className={cn(
-                            "text-[9px] font-medium rounded-full px-1.5 py-0 border-none",
-                            getIconColor()
-                          )}>
-                            {getBadgeLabel()}
-                          </Badge>
-                          {mov.ref && (
-                            <span className="text-[10px] text-muted-foreground truncate hidden sm:inline">
-                              Ref: {mov.ref}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 text-primary/70" />
-                            {format(toDate(mov.fecha), "hh:mm:ss a")}
-                          </span>
-                          <span>•</span>
-                          <span className="hidden sm:inline">
-                            {formatDistanceToNow(toDate(mov.fecha), { addSuffix: true, locale: es })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Importe e impacto en stock y efectivo */}
-                    <div className="text-right shrink-0">
-                      <div className="flex items-baseline justify-end gap-1.5">
-                        {mov.monto !== 0 ? (
-                          <span className={cn(
-                            "text-sm sm:text-base font-black font-mono tabular-nums",
-                            esIngresoEfectivo ? "text-emerald-400" : "text-amber-400"
-                          )}>
-                            {esIngresoEfectivo ? '+' : ''}Q{mov.monto.toFixed(2)}
-                          </span>
-                        ) : (
-                          <span className="text-xs font-mono text-muted-foreground/70">--</span>
-                        )}
-                      </div>
-
-                      {/* Efectivo acumulado de monedas en el período */}
-                      <p className="text-[10px] font-mono text-muted-foreground tabular-nums mt-0.5">
-                        Efectivo en período: <span className={cn(
-                          "font-bold",
-                          (mov.cashAcumulado ?? 0) >= 0 ? "text-white" : "text-amber-400"
-                        )}>
-                          Q{(mov.cashAcumulado ?? 0).toFixed(2)}
+                        <span className="sm:hidden">{getIcon(true)}</span>
+                        <span>{getBadgeLabel()}</span>
+                      </Badge>
+                      {mov.ref && (
+                        <span className="text-[10px] text-slate-400 truncate hidden sm:inline font-medium">
+                          Ref: {mov.ref}
                         </span>
-                      </p>
-
-                      {/* Stock acumulado de monedas */}
-                      <p className="text-[10px] font-mono text-purple-300 tabular-nums">
-                        Stock: {mov.stockAcumulado} monedas{' '}
-                        {mov.tipo === 'abono' || mov.tipo === 'cobro' ? (
-                          <span className="text-muted-foreground/70 font-normal">(Cobro sin salida de stock)</span>
-                        ) : mov.tipo === 'despacho' || mov.tipo === 'venta_rapida' || mov.tipo === 'venta' || mov.tipo === 'base' ? (
-                          <span className="text-amber-400 font-bold">(-{mov.cantidad})</span>
-                        ) : (
-                          <span className="text-emerald-400 font-bold">(+{mov.cantidad})</span>
-                        )}
-                      </p>
+                      )}
                     </div>
-                  </div>
-                );
-              })
-            )}
 
-            {/* Fila de Apertura (orden DESC) */}
-            {sortOrder === 'desc' && (
-              <div className="p-3.5 sm:p-4 flex items-center justify-between bg-purple-500/10 transition-colors gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-9 w-9 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
-                    <Coins className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm text-white flex items-center gap-2 flex-wrap">
-                      Apertura de monedas del período
-                      <Badge className="text-[9px] bg-purple-500/20 text-purple-300 border-none rounded-full">Apertura</Badge>
+                    <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3 text-slate-500" />
+                        {format(toDate(mov.fecha), "hh:mm:ss a")}
+                      </span>
+                      <span>•</span>
+                      <span className="hidden sm:inline">
+                        {formatDistanceToNow(toDate(mov.fecha), { addSuffix: true, locale: es })}
+                      </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                      <Clock className="h-3 w-3" /> {format(inicioPeriodo, "dd/MM/yyyy hh:mm a", { locale: es })}
-                    </p>
                   </div>
                 </div>
+
+                {/* Importe e impacto en stock y efectivo */}
                 <div className="text-right shrink-0">
                   <div className="flex items-baseline justify-end gap-1.5">
-                    <span className="text-[11px] text-muted-foreground font-medium">Efectivo:</span>
-                    <span className="text-sm sm:text-base font-black font-mono text-emerald-400 tabular-nums">
-                      Q{efectivoInicialMonedas.toFixed(2)}
-                    </span>
+                    {mov.monto !== 0 ? (
+                      <span className={cn(
+                        "text-sm sm:text-base font-bold tabular-nums",
+                        esIngresoEfectivo ? "text-emerald-400" : "text-amber-400"
+                      )}>
+                        {esIngresoEfectivo ? '+' : ''}Q{mov.monto.toFixed(2)}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-500">--</span>
+                    )}
                   </div>
-                  <p className="text-[10px] font-mono font-bold text-purple-300 tabular-nums mt-0.5">
-                    Stock: {monedasIniciales} monedas
+
+                  {/* Efectivo acumulado de monedas en el período */}
+                  <p className="text-[10px] text-slate-400 tabular-nums mt-0.5 font-medium">
+                    Efectivo en período: <span className={cn(
+                      "font-bold",
+                      (mov.cashAcumulado ?? 0) >= 0 ? "text-white" : "text-amber-400"
+                    )}>
+                      Q{(mov.cashAcumulado ?? 0).toFixed(2)}
+                    </span>
                   </p>
-                  <p className="text-[9px] text-muted-foreground">Existencia y saldo inicial</p>
+
+                  {/* Stock acumulado de monedas */}
+                  <p className="text-[10px] text-purple-300 tabular-nums font-medium">
+                    Stock: <span className="font-bold">{mov.stockAcumulado} monedas</span>{' '}
+                    {mov.tipo === 'abono' || mov.tipo === 'cobro' ? (
+                      <span className="text-slate-400 font-normal">(Cobro sin salida de stock)</span>
+                    ) : mov.tipo === 'despacho' || mov.tipo === 'venta_rapida' || mov.tipo === 'venta' || mov.tipo === 'base' ? (
+                      <span className="text-amber-400 font-bold">(-{mov.cantidad})</span>
+                    ) : (
+                      <span className="text-emerald-400 font-bold">(+{mov.cantidad})</span>
+                    )}
+                  </p>
                 </div>
+              </SurfaceCard>
+            );
+          })
+        )}
+
+        {/* Fila de Apertura (orden DESC) */}
+        {sortOrder === 'desc' && (
+          <SurfaceCard
+            variant="subcard"
+            className="p-3.5 sm:p-4 flex items-center justify-between border-purple-500/30 bg-[#1e1e1e] transition-all gap-3"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="hidden sm:flex h-10 w-10 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 items-center justify-center shrink-0">
+                <Coins className="h-4 w-4" />
               </div>
-            )}
-          </div>
-        </ScrollArea>
-      </Card>
+              <div className="min-w-0">
+                <div className="font-bold text-sm sm:text-base text-white flex items-center gap-2 flex-wrap">
+                  <span>Apertura de monedas del período</span>
+                  <Badge className="text-[10px] bg-purple-500/20 text-purple-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
+                    <Coins className="h-2.5 w-2.5 sm:hidden" />
+                    <span>Apertura</span>
+                  </Badge>
+                </div>
+                <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
+                  <Clock className="h-3 w-3 text-slate-500" /> {format(inicioPeriodo, "dd/MM/yyyy hh:mm a", { locale: es })}
+                </p>
+              </div>
+            </div>
+            <div className="text-right shrink-0">
+              <div className="flex items-baseline justify-end gap-1.5">
+                <span className="text-[11px] text-slate-400 font-medium">Efectivo:</span>
+                <span className="text-sm sm:text-base font-bold text-emerald-400 tabular-nums">
+                  Q{efectivoInicialMonedas.toFixed(2)}
+                </span>
+              </div>
+              <p className="text-[10px] font-bold text-purple-300 tabular-nums mt-0.5">
+                Stock: {monedasIniciales} monedas
+              </p>
+              <p className="text-[9px] text-slate-400 font-medium">Existencia y saldo inicial</p>
+            </div>
+          </SurfaceCard>
+        )}
+      </div>
     </div>
   );
 }

@@ -55,28 +55,28 @@ export function DetalleTrasladoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100 print:bg-white print:text-black">
-        <DialogHeader className="space-y-1 pb-3 border-b border-[#2c3b4f] print:border-black">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-white print:text-black">
-              <FileText className="h-5 w-5 text-primary" />
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl font-body bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 print:bg-white print:text-black">
+        <DialogHeader className="space-y-1 pb-3 border-b border-[#2e2e2e] print:border-black">
+          <div className="flex items-center justify-between pr-6">
+            <DialogTitle className="text-lg sm:text-xl font-bold flex items-center gap-2 text-white print:text-black">
+              <FileText className="h-5 w-5 text-sky-400" />
               Comprobante de Traslado #{traslado.idTraslado}
             </DialogTitle>
             <div>
               {traslado.estado === 'en_transito' && (
-                <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 flex items-center gap-1">
+                <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   En Tránsito
                 </Badge>
               )}
               {traslado.estado === 'recibido' && (
-                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 flex items-center gap-1">
+                <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1">
                   <CheckCircle2 className="h-3 w-3" />
                   Recibido
                 </Badge>
               )}
               {traslado.estado === 'cancelado' && (
-                <Badge className="bg-rose-500/20 text-rose-300 border-rose-500/30 flex items-center gap-1">
+                <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full flex items-center gap-1">
                   <XCircle className="h-3 w-3" />
                   Cancelado
                 </Badge>
@@ -90,17 +90,17 @@ export function DetalleTrasladoDialog({
 
         <div className="flex-1 overflow-y-auto space-y-4 py-3 pr-1">
           {/* Sucursales Origen y Destino */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-[#233144]/80 border border-[#2d3e55] print:bg-gray-100 print:border-gray-300">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-[#252526] border border-[#2e2e2e] print:bg-gray-100 print:border-gray-300">
             <div className="space-y-1">
               <span className="text-xs font-semibold text-slate-400 print:text-gray-600 flex items-center gap-1.5">
-                <Building2 className="h-3.5 w-3.5 text-primary" />
+                <Building2 className="h-3.5 w-3.5 text-sky-400" />
                 Sucursal de origen
               </span>
               <p className="text-sm font-bold text-white print:text-black">{traslado.sucursalOrigenNombre}</p>
             </div>
 
             <div className="flex flex-col items-center px-4">
-              <ArrowRight className="h-5 w-5 text-primary print:text-gray-800" />
+              <ArrowRight className="h-5 w-5 text-sky-400 print:text-gray-800" />
               <span className="text-[10px] text-slate-400 print:text-gray-500 font-medium">Traslado</span>
             </div>
 
@@ -115,7 +115,7 @@ export function DetalleTrasladoDialog({
 
           {/* Fechas y Usuarios */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 rounded-lg bg-[#182330] border border-[#2d3e55] space-y-1">
+            <div className="p-3 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-1">
               <div className="flex items-center gap-1.5 text-slate-400">
                 <Calendar className="h-3.5 w-3.5 text-amber-400" />
                 <span>Fecha de Envío:</span>
@@ -128,7 +128,7 @@ export function DetalleTrasladoDialog({
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-[#182330] border border-[#2d3e55] space-y-1">
+            <div className="p-3 rounded-xl bg-[#252526] border border-[#2e2e2e] space-y-1">
               <div className="flex items-center gap-1.5 text-slate-400">
                 <Calendar className="h-3.5 w-3.5 text-emerald-400" />
                 <span>Fecha de Recepción:</span>
@@ -145,10 +145,10 @@ export function DetalleTrasladoDialog({
           {/* Tabla de Productos */}
           <div className="space-y-1.5">
             <span className="text-xs font-semibold text-slate-300 px-1">Productos Trasladados</span>
-            <div className="rounded-xl border border-[#2d3e55] overflow-hidden bg-[#182330]">
+            <div className="rounded-xl border border-[#2e2e2e] overflow-hidden bg-[#252526]">
               <Table>
-                <TableHeader className="bg-[#202d3e]">
-                  <TableRow className="border-[#2d3e55]">
+                <TableHeader className="bg-[#1e1e1e]">
+                  <TableRow className="border-[#2e2e2e] hover:bg-transparent">
                     <TableHead className="text-slate-300 text-xs py-2">Producto</TableHead>
                     <TableHead className="text-slate-300 text-xs text-center py-2">Cantidad</TableHead>
                     <TableHead className="text-slate-300 text-xs text-right py-2">Costo U.</TableHead>
@@ -157,11 +157,11 @@ export function DetalleTrasladoDialog({
                 </TableHeader>
                 <TableBody>
                   {traslado.items.map((it, idx) => (
-                    <TableRow key={idx} className="border-[#2d3e55] hover:bg-[#233144]">
+                    <TableRow key={idx} className="border-[#2e2e2e] hover:bg-[#313131]">
                       <TableCell className="py-2 text-xs font-medium text-white">
                         <div>{it.nombreProducto}</div>
                         {it.nombreProductoDestino && it.nombreProductoDestino.trim().toLowerCase() !== it.nombreProducto.trim().toLowerCase() && (
-                          <div className="text-[10px] text-primary font-normal mt-0.5">
+                          <div className="text-[10px] text-sky-400 font-normal mt-0.5">
                             Recibido en destino como: {it.nombreProductoDestino}
                           </div>
                         )}
@@ -177,7 +177,7 @@ export function DetalleTrasladoDialog({
           </div>
 
           {/* Totales */}
-          <div className="flex justify-end p-3 rounded-xl bg-[#233144] border border-[#2d3e55] text-xs">
+          <div className="flex justify-end p-3 rounded-xl bg-[#252526] border border-[#2e2e2e] text-xs">
             <div className="space-y-1 text-right">
               <div>Total de Unidades: <strong className="text-white ml-1">{traslado.cantidadTotalItems}</strong></div>
               <div>Total Valor Traslado: <strong className="text-emerald-400 text-sm ml-1">Q{traslado.costoTotalTraslado.toFixed(2)}</strong></div>
@@ -188,13 +188,13 @@ export function DetalleTrasladoDialog({
           {(traslado.observacionesEnvio || traslado.observacionesRecepcion) && (
             <div className="space-y-2 text-xs">
               {traslado.observacionesEnvio && (
-                <div className="p-3 rounded-lg bg-[#182330] border border-[#2d3e55]">
+                <div className="p-3 rounded-xl bg-[#252526] border border-[#2e2e2e]">
                   <span className="font-semibold text-slate-300 block mb-0.5">Observaciones de Envío:</span>
                   <p className="text-slate-400">{traslado.observacionesEnvio}</p>
                 </div>
               )}
               {traslado.observacionesRecepcion && (
-                <div className="p-3 rounded-lg bg-[#182330] border border-[#2d3e55]">
+                <div className="p-3 rounded-xl bg-[#252526] border border-[#2e2e2e]">
                   <span className="font-semibold text-slate-300 block mb-0.5">Observaciones de Recepción / Cancelación:</span>
                   <p className="text-slate-400">{traslado.observacionesRecepcion}</p>
                 </div>
@@ -203,12 +203,12 @@ export function DetalleTrasladoDialog({
           )}
         </div>
 
-        <DialogFooter className="pt-3 border-t border-[#2c3b4f] flex flex-row gap-2 justify-between items-center print:hidden">
+        <DialogFooter className="pt-3 border-t border-[#2e2e2e] flex flex-row gap-2 justify-between items-center print:hidden">
           <Button
             type="button"
             variant="outline"
             onClick={handlePrint}
-            className="border-[#2d3e55] text-slate-300 hover:bg-[#233144] rounded-full text-xs h-11 px-6 font-semibold"
+            className="bg-[#252526] border-[#2e2e2e] text-slate-200 hover:bg-[#313131] rounded-full text-xs h-10 px-5 font-semibold"
           >
             <Printer className="h-4 w-4 mr-2" />
             Imprimir
@@ -216,7 +216,7 @@ export function DetalleTrasladoDialog({
           <Button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full text-xs h-11 px-8 shadow-md shadow-primary/20"
+            className="bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-full text-xs h-10 px-7 shadow-md"
           >
             Cerrar
           </Button>

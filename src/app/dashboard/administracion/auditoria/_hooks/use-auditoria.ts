@@ -1,20 +1,13 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useFirebase, useUser, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
-import { collection, query, orderBy, limit, doc, getDoc, getDocs, where, Timestamp } from 'firebase/firestore';
-import type { RegistroAuditoria, CategoriaAuditoria, UsuarioSucursal, Generales, CierreCaja } from '@/lib/tipos';
+import { collection, query, orderBy, limit, doc, getDoc, where, Timestamp } from 'firebase/firestore';
+import type { RegistroAuditoria, UsuarioSucursal, Generales, CierreCaja } from '@/lib/tipos';
 import { toDate } from '@/lib/firebase/servicios/utils';
 import { 
-  obtenerInfoDetalladaDispositivo, 
-  guardarNombreEquipo, 
-  EVENTO_EQUIPO_CAMBIADO,
-  type InfoDispositivo
-} from '@/lib/utils/dispositivo';
-import { 
   extraerArticulosDeRegistro, 
-  resolverMetaDispositivo, 
   type ItemAuditoriaVisual 
 } from '../_utils/auditoria-helpers';
 
@@ -23,7 +16,7 @@ export function useAuditoria() {
   const { user: currentUser, profile: currentProfile } = useUser();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
 
-  // Selector de Período (Predeterminado: 'abierto')
+  // Selector de Período (Predeterminado: 'abierto' = Período Actual)
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState<string>('abierto');
 
   // Filtros generales
@@ -31,50 +24,19 @@ export function useAuditoria() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('TODAS');
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState<string>('TODOS');
   const [filtroFecha, setFiltroFecha] = useState<'HOY' | '7DIAS' | '30DIAS' | 'TODOS'>('HOY');
-  const [limiteConsulta, setLimiteConsulta] = useState<number>(150);
 
-  // Modal de detalles de registro
+  // Paginación estándar
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(15);
+
+  // Detalles de registro seleccionado para recuperación diferida de artículos si hiciera falta
   const [registroDetalle, setRegistroDetalle] = useState<RegistroAuditoria | null>(null);
-
-  // Artículos recuperados dinámicamente si el registro antiguo no los traía en detalles
   const [articulosRecuperados, setArticulosRecuperados] = useState<ItemAuditoriaVisual[] | null>(null);
   const [cargandoArticulos, setCargandoArticulos] = useState<boolean>(false);
 
-  // Gestión e Información del Dispositivo Local Actual
-  const [infoDispositivoLocal, setInfoDispositivoLocal] = useState<InfoDispositivo>({
-    tipo: 'computadora',
-    nombre: 'Terminal POS',
-    so: 'Windows',
-    navegador: 'Chrome',
-  });
-  const [nombreEquipoLocal, setNombreEquipoLocal] = useState<string>('Terminal POS');
-  const [dialogoEquipoAbierto, setDialogoEquipoAbierto] = useState<boolean>(false);
-  const [inputNombreEquipo, setInputNombreEquipo] = useState<string>('');
-
   // Cache dinámico de usuarios consultados desde Firestore
   const [usuariosExtra, setUsuariosExtra] = useState<Record<string, { nombre: string; email: string; rol: string }>>({});
-
-  // Cargar y escuchar el dispositivo y nombre configurado localmente
-  useEffect(() => {
-    const info = obtenerInfoDetalladaDispositivo();
-    setInfoDispositivoLocal(info);
-    setNombreEquipoLocal(info.nombre);
-    setInputNombreEquipo(info.nombre);
-
-    const handleCambioEquipo = (e: any) => {
-      const nuevoNom = typeof e?.detail === 'string' ? e.detail : e?.detail?.nombre;
-      if (nuevoNom) {
-        setNombreEquipoLocal(nuevoNom);
-        const actual = obtenerInfoDetalladaDispositivo();
-        setInfoDispositivoLocal(actual);
-      }
-    };
-
-    window.addEventListener(EVENTO_EQUIPO_CAMBIADO, handleCambioEquipo);
-    return () => {
-      window.removeEventListener(EVENTO_EQUIPO_CAMBIADO, handleCambioEquipo);
-    };
-  }, []);
+  const uidsConsultadosRef = useRef<Set<string>>(new Set());
 
   // Efecto para recuperar artículos de una venta si el registro de auditoría es antiguo
   useEffect(() => {
@@ -121,60 +83,11 @@ export function useAuditoria() {
             return;
           }
         }
-
-        const num = parseInt(idVentaFinal, 10);
-        if (!isNaN(num)) {
-          const q = query(
-            collection(firestore, `sucursales/${sucursalId}/ventas`),
-            where('idVenta', '==', num),
-            limit(1)
-          );
-          const snap = await getDocs(q);
-          if (activo && !snap.empty) {
-            const data = snap.docs[0].data();
-            if (Array.isArray(data.detalles) && data.detalles.length > 0) {
-              setArticulosRecuperados(data.detalles.map((d: any) => ({
-                nombre: d.nombreProducto || 'Producto',
-                cantidad: Number(d.cantidad) || 1,
-                precioUnitario: d.precioUnitario ? Number(d.precioUnitario) : undefined,
-                subtotal: d.subtotal ? Number(d.subtotal) : ((Number(d.cantidad) || 1) * (Number(d.precioUnitario) || 0)),
-                tipo: 'agregado' as const,
-              })));
-              setCargandoArticulos(false);
-              return;
-            }
-          }
-        }
-
-        const qHist = query(
-          collection(firestore, `sucursales/${sucursalId}/historial_inventario`),
-          where('referencia', '==', `Venta #${idVentaFinal}`),
-          limit(20)
-        );
-        const snapHist = await getDocs(qHist);
-        if (activo && !snapHist.empty) {
-          setArticulosRecuperados(snapHist.docs.map((d: any) => {
-            const hist = d.data();
-            return {
-              nombre: hist.nombreProducto || 'Producto',
-              cantidad: Math.abs(Number(hist.cantidad) || 1),
-              tipo: 'agregado' as const,
-            };
-          }));
-          setCargandoArticulos(false);
-          return;
-        }
-
-        if (activo) {
-          setArticulosRecuperados(null);
-          setCargandoArticulos(false);
-        }
-      } catch (err) {
-        console.warn('Error al recuperar artículos de auditoría:', err);
-        if (activo) {
-          setArticulosRecuperados(null);
-          setCargandoArticulos(false);
-        }
+      } catch (e) {
+        console.warn('No se pudo recuperar venta para auditoría:', idVentaFinal);
+      }
+      if (activo) {
+        setCargandoArticulos(false);
       }
     };
 
@@ -185,14 +98,6 @@ export function useAuditoria() {
     };
   }, [registroDetalle, firestore, sucursalId]);
 
-  const handleGuardarNombreEquipo = useCallback((nombreAGuardar?: string) => {
-    const valor = (nombreAGuardar || inputNombreEquipo).trim();
-    if (!valor) return;
-    const finalGuardado = guardarNombreEquipo(valor);
-    setNombreEquipoLocal(finalGuardado);
-    setDialogoEquipoAbierto(false);
-  }, [inputNombreEquipo]);
-
   // Turno actual
   const generalesRef = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
@@ -201,13 +106,13 @@ export function useAuditoria() {
 
   const { data: turnoActual, isLoading: isLoadingTurnoActual } = useDoc<Generales>(generalesRef);
 
-  // Cierres de caja anteriores
+  // Cierres de caja anteriores (optimizado a 40)
   const cierresQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
     return query(
       collection(firestore, `sucursales/${sucursalId}/cierre_caja`),
       orderBy('fecha', 'desc'),
-      limit(60)
+      limit(40)
     );
   }, [firestore, sucursalId]);
 
@@ -219,7 +124,7 @@ export function useAuditoria() {
       const inicio = turnoActual?.fechaInicioPeriodo ? toDate(turnoActual.fechaInicioPeriodo) : null;
       return {
         tipo: 'abierto' as const,
-        label: 'Período Abierto (En curso)',
+        label: 'Período Actual',
         inicio,
         fin: null,
         esAbierto: true,
@@ -229,7 +134,7 @@ export function useAuditoria() {
     if (periodoSeleccionado === 'todos') {
       return {
         tipo: 'todos' as const,
-        label: 'Historial Completo (Todos los períodos)',
+        label: 'Historial Completo',
         inicio: null,
         fin: null,
         esAbierto: false,
@@ -265,14 +170,14 @@ export function useAuditoria() {
 
     return {
       tipo: 'abierto' as const,
-      label: 'Período Abierto',
+      label: 'Período Actual',
       inicio: null,
       fin: null,
       esAbierto: true,
     };
   }, [periodoSeleccionado, turnoActual, cierres]);
 
-  // Consulta de auditoría delimitada
+  // Consulta de auditoría delimitada (carga exhaustiva del turno)
   const auditoriaQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
 
@@ -281,8 +186,7 @@ export function useAuditoria() {
         return query(
           collection(firestore, `sucursales/${sucursalId}/auditoria`),
           where('fecha', '>=', Timestamp.fromDate(infoPeriodo.inicio)),
-          orderBy('fecha', 'desc'),
-          limit(limiteConsulta)
+          orderBy('fecha', 'desc')
         );
       }
       if (isLoadingTurnoActual) return null;
@@ -292,8 +196,7 @@ export function useAuditoria() {
       return query(
         collection(firestore, `sucursales/${sucursalId}/auditoria`),
         where('fecha', '>=', Timestamp.fromDate(inicioHoy)),
-        orderBy('fecha', 'desc'),
-        limit(limiteConsulta)
+        orderBy('fecha', 'desc')
       );
     }
 
@@ -303,15 +206,13 @@ export function useAuditoria() {
           collection(firestore, `sucursales/${sucursalId}/auditoria`),
           where('fecha', '>=', Timestamp.fromDate(infoPeriodo.inicio)),
           where('fecha', '<=', Timestamp.fromDate(infoPeriodo.fin)),
-          orderBy('fecha', 'desc'),
-          limit(limiteConsulta)
+          orderBy('fecha', 'desc')
         );
       } else if (infoPeriodo.fin) {
         return query(
           collection(firestore, `sucursales/${sucursalId}/auditoria`),
           where('fecha', '<=', Timestamp.fromDate(infoPeriodo.fin)),
-          orderBy('fecha', 'desc'),
-          limit(limiteConsulta)
+          orderBy('fecha', 'desc')
         );
       }
     }
@@ -319,9 +220,9 @@ export function useAuditoria() {
     return query(
       collection(firestore, `sucursales/${sucursalId}/auditoria`),
       orderBy('fecha', 'desc'),
-      limit(limiteConsulta)
+      limit(300)
     );
-  }, [firestore, sucursalId, periodoSeleccionado, infoPeriodo, isLoadingTurnoActual, limiteConsulta]);
+  }, [firestore, sucursalId, periodoSeleccionado, infoPeriodo, isLoadingTurnoActual]);
 
   const { data: registrosRaw, isLoading: isLoadingRegistros } = useCollection<RegistroAuditoria>(auditoriaQuery);
 
@@ -348,11 +249,11 @@ export function useAuditoria() {
     return map;
   }, [usuariosRegistrados]);
 
-  // Cargar usuarios faltantes
+  // Cargar usuarios faltantes sin loops infinitos de red
   useEffect(() => {
     if (!firestore || !registrosRaw || registrosRaw.length === 0) return;
 
-    const uidsFaltantes = new Set<string>();
+    const uidsParaConsultar: string[] = [];
     registrosRaw.forEach((reg) => {
       const uid = reg.usuarioId;
       if (
@@ -360,15 +261,17 @@ export function useAuditoria() {
         uid !== 'desconocido' && 
         !mapaUsuarios.has(uid) && 
         !usuariosExtra[uid] && 
+        !uidsConsultadosRef.current.has(uid) &&
         uid !== currentUser?.uid
       ) {
-        uidsFaltantes.add(uid);
+        uidsConsultadosRef.current.add(uid);
+        uidsParaConsultar.push(uid);
       }
     });
 
-    if (uidsFaltantes.size === 0) return;
+    if (uidsParaConsultar.length === 0) return;
 
-    uidsFaltantes.forEach(async (uid) => {
+    uidsParaConsultar.forEach(async (uid) => {
       try {
         const snap = await getDoc(doc(firestore, 'user_auth_lookup', uid));
         if (snap.exists()) {
@@ -402,9 +305,9 @@ export function useAuditoria() {
         console.warn('No se pudo cargar información del usuario para auditoría:', uid);
       }
     });
-  }, [firestore, registrosRaw, mapaUsuarios, usuariosExtra, currentUser]);
+  }, [firestore, registrosRaw, mapaUsuarios, currentUser]);
 
-  // Resolver usuario de un registro
+  // Resolver usuario de un registro de forma memorizada
   const resolverUsuario = useCallback((reg: RegistroAuditoria) => {
     const esNombreValido = (nom?: string) => {
       if (!nom) return false;
@@ -462,16 +365,6 @@ export function useAuditoria() {
       };
     }
 
-    if (infoSucursal?.email && infoSucursal.email.includes('@')) {
-      const parteCorreo = infoSucursal.email.split('@')[0];
-      const capitalizado = parteCorreo.charAt(0).toUpperCase() + parteCorreo.slice(1);
-      return {
-        nombre: capitalizado,
-        email: infoSucursal.email,
-        rol: infoSucursal.rol || 'Operador',
-      };
-    }
-
     return {
       nombre: 'Operador del sistema',
       email: reg.usuarioEmail || '',
@@ -508,7 +401,7 @@ export function useAuditoria() {
     return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
   }, [registrosRaw, usuariosRegistrados, currentUser, currentProfile, resolverUsuario]);
 
-  // Filtrado de registros
+  // Filtrado de registros multidimensional
   const registrosFiltrados = useMemo(() => {
     if (!registrosRaw) return [];
 
@@ -516,6 +409,7 @@ export function useAuditoria() {
     const inicioHoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
     const hace7Dias = ahora.getTime() - 7 * 24 * 60 * 60 * 1000;
     const hace30Dias = ahora.getTime() - 30 * 24 * 60 * 60 * 1000;
+    const queryTerm = busqueda.toLowerCase().trim();
 
     return registrosRaw.filter((reg) => {
       if (categoriaSeleccionada !== 'TODAS' && reg.categoria !== categoriaSeleccionada) {
@@ -533,27 +427,18 @@ export function useAuditoria() {
         if (filtroFecha === '30DIAS' && fechaMs < hace30Dias) return false;
       }
 
-      if (busqueda.trim() !== '') {
-        const queryTerm = busqueda.toLowerCase().trim();
+      if (queryTerm !== '') {
         const userResolved = resolverUsuario(reg);
         const textoTitulo = (reg.titulo || '').toLowerCase();
         const textoDesc = (reg.descripcion || '').toLowerCase();
         const textoUsuario = (userResolved.nombre || '').toLowerCase();
-        const textoEmail = (userResolved.email || '').toLowerCase();
         const textoEquipo = (reg.nombreEquipo || 'Terminal POS').toLowerCase();
-        const textoTipoDisp = (reg.tipoDispositivo || '').toLowerCase();
-        const textoAccion = (reg.accion || '').toLowerCase();
-        const textoDetalles = JSON.stringify(reg.detalles || {}).toLowerCase();
 
         const coincide =
           textoTitulo.includes(queryTerm) ||
           textoDesc.includes(queryTerm) ||
           textoUsuario.includes(queryTerm) ||
-          textoEmail.includes(queryTerm) ||
-          textoEquipo.includes(queryTerm) ||
-          textoTipoDisp.includes(queryTerm) ||
-          textoAccion.includes(queryTerm) ||
-          textoDetalles.includes(queryTerm);
+          textoEquipo.includes(queryTerm);
 
         if (!coincide) return false;
       }
@@ -562,36 +447,35 @@ export function useAuditoria() {
     });
   }, [registrosRaw, categoriaSeleccionada, usuarioSeleccionado, filtroFecha, periodoSeleccionado, busqueda, resolverUsuario]);
 
-  const metaDispositivoLocal = useMemo(() => {
-    return resolverMetaDispositivo(
-      infoDispositivoLocal.tipo, 
-      nombreEquipoLocal, 
-      infoDispositivoLocal.so
-    );
-  }, [infoDispositivoLocal, nombreEquipoLocal]);
-
-  // Formateadores de fecha
-  const formatearFechaHora = (fecha: any) => {
-    if (!fecha) return 'Fecha no disponible';
-    const dateObj = toDate(fecha);
-    return new Intl.DateTimeFormat('es-GT', {
-      dateStyle: 'medium',
-      timeStyle: 'medium',
-    }).format(dateObj);
-  };
-
-  const formatearFechaCorta = (fecha: any) => {
+  // Formateadores de fecha de alta eficiencia
+  const formatearFechaHora = useCallback((fecha: any) => {
     if (!fecha) return '';
     const dateObj = toDate(fecha);
-    return new Intl.DateTimeFormat('es-GT', {
+    return dateObj.toLocaleString('es-GT', {
       day: '2-digit',
       month: '2-digit',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(dateObj);
-  };
+      second: '2-digit',
+      hour12: true,
+    });
+  }, []);
 
-  const formatearHoraRelativa = (fecha: any) => {
+  const formatearFechaCorta = useCallback((fecha: any) => {
+    if (!fecha) return '';
+    const dateObj = toDate(fecha);
+    return dateObj.toLocaleDateString('es-GT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  }, []);
+
+  const formatearHoraRelativa = useCallback((fecha: any) => {
     if (!fecha) return '';
     const dateObj = toDate(fecha);
     const ahora = new Date();
@@ -606,7 +490,25 @@ export function useAuditoria() {
     if (diffDias === 1) return 'Ayer';
     if (diffDias < 7) return `Hace ${diffDias} días`;
     return dateObj.toLocaleDateString('es-GT');
-  };
+  }, []);
+
+  // Paginación y contador de filtros activos
+  const totalPages = Math.max(1, Math.ceil(registrosFiltrados.length / itemsPerPage));
+  const paginatedRegistros = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return registrosFiltrados.slice(start, start + itemsPerPage);
+  }, [registrosFiltrados, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [busqueda, categoriaSeleccionada, usuarioSeleccionado, periodoSeleccionado, itemsPerPage]);
+
+  const filtrosActivosCount = useMemo(() => {
+    let count = 0;
+    if (categoriaSeleccionada !== 'TODAS') count++;
+    if (usuarioSeleccionado !== 'TODOS') count++;
+    return count;
+  }, [categoriaSeleccionada, usuarioSeleccionado]);
 
   return {
     isLoadingSucursal,
@@ -626,22 +528,19 @@ export function useAuditoria() {
     listaUsuarios,
     filtroFecha,
     setFiltroFecha,
-    limiteConsulta,
-    setLimiteConsulta,
     registrosFiltrados,
+    paginatedRegistros,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    totalPages,
+    filtrosActivosCount,
     registrosRaw,
     registroDetalle,
     setRegistroDetalle,
     articulosRecuperados,
     cargandoArticulos,
-    infoDispositivoLocal,
-    nombreEquipoLocal,
-    dialogoEquipoAbierto,
-    setDialogoEquipoAbierto,
-    inputNombreEquipo,
-    setInputNombreEquipo,
-    handleGuardarNombreEquipo,
-    metaDispositivoLocal,
     resolverUsuario,
     formatearFechaHora,
     formatearFechaCorta,

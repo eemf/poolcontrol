@@ -1,13 +1,18 @@
 'use client'
 
-import { PageHeader } from "@/components/comunes/page-header"
+import dynamic from "next/dynamic"
+import { PageHeader, BotonVolverArriba } from "@/components/comunes"
 import { Button } from "@/components/ui/button"
 import { PiggyBank, History, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useCuadreTragamonedasCierre } from "./_hooks/use-cuadre-tragamonedas-cierre"
 import { MaquinaCuadreCard } from "./_components/maquina-cuadre-card"
 import { CuadreTragamonedasResumen } from "./_components/cuadre-tragamonedas-resumen"
-import { CuadreConfirmacionDialog } from "./_components/cuadre-confirmacion-dialog"
+
+const CuadreConfirmacionDialog = dynamic(
+  () => import("./_components/cuadre-confirmacion-dialog").then(m => m.CuadreConfirmacionDialog),
+  { ssr: false }
+)
 
 export default function PaginaCuadreTragamonedas() {
   const {
@@ -44,16 +49,20 @@ export default function PaginaCuadreTragamonedas() {
   }
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-2">
       <PageHeader
         title="Cuadre de Tragamonedas"
         description="Control y cierre de las operaciones de las máquinas tragamonedas."
         icon={PiggyBank}
         action={
-          <Button variant="outline" asChild className="rounded-full h-9 px-5 border-[#2e2e2e] text-white hover:bg-[#252526] w-full sm:w-auto">
-            <Link href="/dashboard/administracion/cuadre-tragamonedas/historial">
-              <History className="mr-2 h-4 w-4" />
-              Historial
+          <Button
+            variant="secondary"
+            asChild
+            className="rounded-full h-9 px-4 bg-[#252526] hover:bg-[#313131] text-slate-200 border border-[#2e2e2e] shadow-sm transition-colors text-xs font-semibold w-full sm:w-auto"
+          >
+            <Link href="/dashboard/administracion/cuadre-tragamonedas/historial" className="flex items-center justify-center gap-2">
+              <History className="h-4 w-4 text-emerald-400" />
+              <span>Historial</span>
             </Link>
           </Button>
         }
@@ -102,6 +111,8 @@ export default function PaginaCuadreTragamonedas() {
         onConfirm={handleFinalizarCuadre}
         procesando={procesando}
       />
+
+      <BotonVolverArriba />
     </div>
   )
 }

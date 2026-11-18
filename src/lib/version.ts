@@ -12,9 +12,2088 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
+    build: 172,
+    fecha: "2026-11-17",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b172",
+    descripcion: "Controles estándar, PillTabs, acordeones y Paginacion en Historial de Cuadres Semanales.",
+    cambios: [
+      "Historial de Cuadres Semanales (`historial/page.tsx`, `use-historial-cuadre-semanal.ts`, `cuadre-item-acordeon.tsx`): Integrado `<PageHeader>` con `backHref`, `<PillTabs>` con buscador, conteos y `collapsibleMobileTabs`, `<Paginacion>` estándar, `<BotonVolverArriba />`, filtrado en una sola pasada y acordeones con paleta oficial `#1e1e1e`/`#252526`/`#2e2e2e`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 171,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b171",
+    descripcion: "Centrado vertical de checkboxes en acordeones de Cuadre Semanal.",
+    cambios: [
+      "Cuadre Semanal (`ingresos-tarjeta.tsx`, `lista-compras.tsx`, `lista-traslados-cobro.tsx`): Envuelta la cabecera del acordeón en `div.relative` con `top-1/2 -translate-y-1/2` para centrar verticalmente el `Checkbox` respecto a la fila de cabecera."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 170,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b170",
+    descripcion: "Interior estándar de acordeones en todas las listas de Cuadre Semanal.",
+    cambios: [
+      "Cuadre Semanal (`ingresos-tarjeta.tsx`, `lista-traslados-cobro.tsx`, `lista-compras.tsx`): Aplicado el modelo estándar de `AccordionContent` en `bg-[#1e1e1e]`, encabezado con icono y conteo de ítems, y tarjetas internas en `bg-[#252526] border-[#2e2e2e]`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 169,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b169",
+    descripcion: "Iconos en títulos, badges unificados y vista móvil de traslados en Cuadre Semanal.",
+    cambios: [
+      "Cuadre Semanal (`ingresos-fisicos.tsx`, `ingresos-tarjeta.tsx`, `lista-compras.tsx`, `lista-gastos.tsx`, `lista-traslados-cobro.tsx`): Agregados iconos a todos los títulos de contenedores, reducido título a `Traslados por Cobrar`, unificado el badge `Pendiente` en ámbar/naranja (`bg-amber-500/20 text-amber-300`) en todas las listas, y simplificadas las tarjetas de traslado con un único badge de estado (`Pendiente` / `Procesado`) y estructura móvil idéntica a las demás listas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 168,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b168",
+    descripcion: "Estandarización visual y de controles en Cuadre Semanal.",
+    cambios: [
+      "Cuadre Semanal (`page.tsx`, `encabezado-semanal.tsx`, `barra-resumen.tsx`, `ingresos-fisicos.tsx`, `ingresos-tarjeta.tsx`, `lista-compras.tsx`, `lista-gastos.tsx`): Migrado el panel de resumen a `SurfaceCard` (`#1e1e1e`/`#252526`/`#2e2e2e`) eliminando clases de modo claro, cabecera estilo `PageHeader`, input `Balance a Liquidar` con prefijo `Q` y selección automática, botón `Historial` unificado con icono `emerald-400`, diálogo de confirmación en `#1e1e1e`, badges `rounded-full` y `<BotonVolverArriba />`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 167,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b167",
+    descripcion: "Optimización de carga, memoización y reducción de código en Cuadre de Tragamonedas e Historial.",
+    cambios: [
+      "Cuadre de Tragamonedas (`use-cuadre-tragamonedas-cierre.ts`, `maquina-cuadre-card.tsx`, `page.tsx`): Reemplazada búsqueda O(N²) por `Map`, eliminados estados/efectos redundantes para cuentas estáticas, memoizadas tarjetas con `React.memo` y `useCallback`, y carga diferida (`next/dynamic`) para el diálogo de confirmación.",
+      "Historial (`use-historial-cuadre-tragamonedas.ts`, `cuadre-tragamonedas-item-acordeon.tsx`): Filtrado y conteo en una sola pasada sin copias innecesarias de arreglos, `React.memo` en ítems del acordeón y renderizado parametrizado de KPIs."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 166,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b166",
+    descripcion: "Presentación optimizada y clara del detalle en los acordeones de Historial de Cuadres.",
+    cambios: [
+      "Historial de Cuadres (`cuadre-tragamonedas-item-acordeon.tsx`): Reorganizado el contenido del acordeón con tarjetas KPI compactas con icono, lista limpia de máquinas con desglose legible (`Manual` y `Deuda` en `11px`) y panel proporcionado de `Siguiente Turno y Traslado`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 165,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b165",
+    descripcion: "Corregida paleta de 3 capas dentro del acordeón en Historial de Cuadre de Tragamonedas.",
+    cambios: [
+      "Historial de Cuadres (`cuadre-tragamonedas-item-acordeon.tsx`): Actualizados los bloques internos de `AccordionContent` (`Manual`, `Base`, `Deuda`, `Extracción Neta`, `Rendimiento por Máquina`, `Preparación Turno Siguiente` y `Notas del Cierre`) a `bg-[#252526]` con hover `#313131` sobre el fondo `bg-[#1e1e1e]`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 164,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b164",
+    descripcion: "Cabecera estilo PageHeader en el contenedor Resumen y Cierre de Cuadre de Tragamonedas.",
+    cambios: [
+      "Cuadre de Tragamonedas (`cuadre-tragamonedas-resumen.tsx`): Actualizada la cabecera de `Resumen y Cierre` con icono circular translúcido (`bg-sky-500/10 text-sky-400`), título y descripción alineados al estilo de `PageHeader`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 163,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b163",
+    descripcion: "Corregido error de sintaxis JSX en Cuadre de Tragamonedas.",
+    cambios: [
+      "Cuadre de Tragamonedas (`page.tsx`): Eliminadas líneas duplicadas de `<Link>` y `className` en el botón `Historial`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 162,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b162",
+    descripcion: "Texto Historial agregado al botón de Cuadre de Tragamonedas.",
+    cambios: [
+      "Cuadre de Tragamonedas (`page.tsx`): Agregado el texto `Historial` al botón manteniendo los colores oficiales (`bg-[#252526] hover:bg-[#313131] border-[#2e2e2e]` e icono `text-emerald-400`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 161,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b161",
+    descripcion: "Botones de Historial y Regresar en Cuadre de Tragamonedas unificados con POS Ventas.",
+    cambios: [
+      "Cuadre de Tragamonedas (`page.tsx`, `historial/page.tsx`): Botón `Historial` en formato circular compacto (`h-9 w-9 bg-[#252526] hover:bg-[#313131] border-[#2e2e2e]`) con icono `History` en `text-emerald-400`, y botón de regreso en el historial mediante `backHref` estándar de `<PageHeader>` igual que en Historial de Ventas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 160,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b160",
+    descripcion: "Corregida jerarquía de 3 capas e inputs con prefijo Q en Cuadre de Tragamonedas.",
+    cambios: [
+      "Cuadre de Tragamonedas (`maquina-cuadre-card.tsx`, `cuadre-tragamonedas-resumen.tsx`): Invertida la jerarquía incorrecta para usar tarjetas principales en `#1e1e1e` (Capa 2) sobre el lienzo `#121212`, con inputs, selectores, textarea y pie de total en `#252526` (Capa 3) y prefijo `Q` en `text-sky-400` dentro de los inputs."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 159,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b159",
+    descripcion: "Actualización visual y de controles en Cuadre de Tragamonedas y su Historial.",
+    cambios: [
+      "Cuadre de Tragamonedas (`page.tsx`, `maquina-cuadre-card.tsx`, `cuadre-tragamonedas-resumen.tsx`, `cuadre-confirmacion-dialog.tsx`): Estandarizados botones, selectores, selección de texto al hacer clic/foco, hover de tarjetas y `<BotonVolverArriba />`.",
+      "Historial de Cuadres (`historial/page.tsx`, `use-historial-cuadre-tragamonedas.ts`, `cuadre-tragamonedas-item-acordeon.tsx`): Integrado `<PillTabs>` con buscador, conteo de pendientes/todos y `collapsibleMobileTabs`, acordeones de 2 columnas con paleta oficial `#1e1e1e`/`#252526`/`#2e2e2e` y `<Paginacion>` estándar."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 158,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b158",
+    descripcion: "Controles de paginación siempre visibles incluso con una sola página.",
+    cambios: [
+      "Paginación (`src/components/comunes/paginacion.tsx`): Mostrados siempre los botones `Anterior`, números de página y `Siguiente` (deshabilitados cuando corresponde) tanto en móvil como en escritorio aunque `totalPages` sea 1."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 157,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b157",
+    descripcion: "Rediseño completo de Registro de Gastos con paleta oficial, PillTabs, acordeones, Paginacion y modal actualizado.",
+    cambios: [
+      "Registro de Gastos (`page.tsx`, `encabezado-gastos.tsx`, `lista-gastos.tsx`, `modal-gasto.tsx`): Migrado a `PageHeader`, `SurfaceCard`, `PillTabs` con buscador y `collapsibleMobileTabs` (botón `Opciones` a la par en móvil), acordeones de 2 columnas con paleta `#1e1e1e`/`#252526`/`#2e2e2e`, `Paginacion`, `BotonVolverArriba` y modal de gasto con input de monto centrado y prefijo `Q`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 156,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b156",
+    descripcion: "Corregido recorte del anillo de foco y transición de foco al seleccionar destino en Nuevo Traslado.",
+    cambios: [
+      "Traslados (`nuevo-traslado-dialog.tsx`): Agregado padding (`p-1`) al contenedor desplazable para evitar el recorte del anillo de foco azul en los controles, y ajustado el retardo de foco hacia `Cantidad` tras cerrar el `Select` de sucursal destino."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 155,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b155",
+    descripcion: "Rediseño completo del modal Nuevo Traslado alineado con el modal de Compras.",
+    cambios: [
+      "Traslados (`nuevo-traslado-dialog.tsx`): Reestructurado siguiendo el diseño de `purchase-modal.tsx` (`sm:max-w-4xl`, `bg-[#1e1e1e]`, controles `bg-[#252526] border-[#2e2e2e] rounded-full h-10`, `Monto Total` alineado con el selector de destino, inputs `Cantidad` y `Precio` centrados, flujo continuo con Enter y selección al hacer clic, bloqueo de controles sin destino y listado de ítems con `SurfaceCard`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 154,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b154",
+    descripcion: "Listado de Traslados con PillTabs, buscador integrado, menú móvil Opciones, acordeones y paginación.",
+    cambios: [
+      "Traslados (`traslado-list.tsx`, `use-traslados.ts`, `page.tsx`): Integrado `PillTabs` con buscador y `collapsibleMobileTabs` (input de búsqueda y botón `Opciones` a la par en móvil), reemplazadas las tarjetas en grilla por `Accordion` de 2 columnas con detalle expandible de productos/acciones, y agregada paginación estándar (`Paginacion`) y `BotonVolverArriba`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 153,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b153",
+    descripcion: "Unificación de paleta oscura, controles redondeados y limpieza de búsqueda en Traslados.",
+    cambios: [
+      "Traslados (`page.tsx`, `traslado-card.tsx`, `detalle-traslado-dialog.tsx`, `recibir-traslado-dialog.tsx`, `nuevo-traslado-dialog.tsx`): Reemplazada la paleta azulada heredada (`#1b2533`, `#182330`, `#233144`) por las 3 capas oficiales (`#121212` / `#1e1e1e` / `#252526`, bordes `#2e2e2e`, hover `#313131`, acento `sky-600`/`sky-400`), botones e inputs en píldora (`rounded-full`) y botón `X` de limpieza integrado en los buscadores."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 152,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b152",
+    descripcion: "Manejo explícito de Enter y validación con redirección de foco en el botón Añadir.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Añadido `onKeyDown` explícito para `Enter` en el botón `Añadir` evitando interferencia del formulario, y redirección de foco al campo faltante si alguna validación impide agregar el ítem."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 151,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b151",
+    descripcion: "Foco en el botón Añadir tras Enter en Precio y bloqueo con spinner al agregar ítems.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Al presionar `Enter` en `Precio` pasa el foco al botón `Añadir`; al confirmar con `Enter` o clic, bloquea brevemente el botón mostrando `Loader2` (`isAddingItem`), agrega el ítem y repite el ciclo enfocando y seleccionando `Cantidad`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 150,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b150",
+    descripcion: "Corregido el foco inicial en Cantidad al seleccionar proveedor en el modal de Compras.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Evitado que el efecto de cambio de modo (`isGastoManualMode`) robe el foco hacia `Producto` al habilitarse los controles tras seleccionar un proveedor, manteniendo el foco en `Cantidad`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 149,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b149",
+    descripcion: "Flujo continuo de foco y selección automática de texto en el modal de Compras.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Al seleccionar proveedor pasa el foco y selecciona `Cantidad`; con Enter avanza a `Producto`/`Concepto o gasto` y luego a `Precio` seleccionando todo el texto; con Enter en `Precio` añade el ítem y repite el ciclo desde `Cantidad`. Todos los inputs seleccionan su texto al hacer clic."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 148,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b148",
+    descripcion: "Bloqueo de controles en el modal de Compras cuando no hay proveedor seleccionado.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Deshabilitados `Cantidad`, switch `Modo`, `Producto`/`Concepto o gasto`, `Precio`, botón `Añadir`, eliminación de ítems, atajo `F6` y botón de guardar mientras no exista un proveedor seleccionado."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 147,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b147",
+    descripcion: "Input de Precio centrado en el modal de Compras.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Centrado el texto del input `Precio` (`text-center px-8`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 146,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b146",
+    descripcion: "Switch Modo separado a la par del input Cantidad en el modal de Compras.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Separado el switch `Normal / Gasto` del input `Cantidad` en móvil, ubicado a la par con el label `Modo` y manteniendo el diseño de píldora con acento azul."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 145,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b145",
+    descripcion: "Ajustes de centrado, color azul del switch y texto F6 en escritorio del modal de Compras.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Centrado el valor en el input `Cantidad` en móvil (`text-center px-28`), aplicado color azul del sistema (`sky-600`) al `Switch` integrado y restaurado el texto de ayuda `Presiona F6 para alternar entre producto y gasto directo` en vista escritorio (`hidden lg:block`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 144,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b144",
+    descripcion: "Switch Normal/Gasto integrado dentro del input de Cantidad y etiquetas actualizadas en el modal de Compras.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Integrado el switch `Normal / Gasto` dentro del propio campo de `Cantidad` en vista móvil, y actualizadas las etiquetas `Cant.` -> `Cantidad` y `P. unit.` -> `Precio`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 143,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b143",
+    descripcion: "Distribución móvil compacta en el modal de Nueva Compra.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Centrado `Monto Total` en móvil, etiqueta dinámica (`Producto` / `Concepto o gasto`) según el switch `Normal / Gasto`, botón `Añadir` a la par de `P. unit.` en la misma fila y eliminado el texto inferior de ayuda F6 para ahorrar espacio vertical."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 142,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b142",
+    descripcion: "Margen móvil, Monto Total en fila del proveedor y sin sombra residual en Nueva Compra.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Eliminado `w-full` en `DialogContent` para respetar el margen lateral móvil estándar (`w-[calc(100%-2rem)]`), ubicado `Monto Total` en la misma fila que `Buscar proveedor...` y aplicada `shadow-none` sin scroll contenedor sobre el buscador para evitar sombras residuales al perder foco."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 141,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b141",
+    descripcion: "Corregido recorte de anillos de foco y desplegables en el modal de Nueva Compra.",
+    cambios: [
+      "Modal de Compras (`purchase-modal.tsx`): Cambiado `overflow-hidden` a `overflow-visible` en `DialogContent` y `<form>`, y agregado `px-1.5 -mx-1.5 py-1` al área de contenido para que los anillos de foco (`ring-sky-500`) y listas desplegables nunca se recorten."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 140,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b140",
+    descripcion: "Paginación estándar con <Paginacion /> en Compras.",
+    cambios: [
+      "Compras (`compras/page.tsx`, `purchase-list.tsx`): Reemplazada la paginación manual por el componente oficial `<Paginacion />` de `@/components/comunes`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 139,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b139",
+    descripcion: "Reubicación de estado, fecha y conteo de artículos en acordeones de Compras.",
+    cambios: [
+      "Compras (`purchase-list.tsx`): Colocada fecha y hora debajo del nombre a la izquierda, badge de estado debajo del total a la derecha, y el conteo de artículos dentro de la cabecera del acordeón expandido."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 138,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b138",
+    descripcion: "Acordeón de Compras simplificado a 2 columnas con la información relevante.",
+    cambios: [
+      "Compras (`purchase-list.tsx`): Convertido el encabezado del acordeón de 3 columnas a 2 columnas (`grid-cols-[1fr_auto]`), integrando estado y fecha junto al proveedor a la izquierda y total/artículos a la derecha."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 137,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b137",
+    descripcion: "Homologación completa de Compras (acordeones, controles y modal) con la paleta oficial de 3 capas.",
+    cambios: [
+      "Lista y Acordeones (`purchase-list.tsx`, `compras/page.tsx`, `purchase-header.tsx`): Integrado `<PillTabs>` con buscador y `collapsibleMobileTabs`, acordeones con jerarquía oficial (`AccordionTrigger` `#252526` + `AccordionContent` `#1e1e1e` + ítems `#252526`), botón `Nueva Compra` en `sky-600`, botón `Eliminar` en píldora `rose` y `<BotonVolverArriba />`.",
+      "Modal de Compras (`purchase-modal.tsx`): Rediseñado al estándar oficial (`bg-[#1e1e1e]`, controles `#252526` con `h-10` y lupa `Search`, historial de proveedor interactivo en `SurfaceCard` `#252526`, carrito `SurfaceCard` y botones `h-9 rounded-full`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 136,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b136",
+    descripcion: "Badge de tipo de operación alineado a la derecha en vista móvil en Auditoría.",
+    cambios: [
+      "Auditoría móvil (`auditoria-feed-item.tsx`): Alineado el badge de categoría (`Ventas y Cobros`, `Sala de Juegos`, etc.) al extremo derecho en vista móvil (`justify-between sm:justify-start`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 135,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b135",
+    descripcion: "Vista móvil compacta y ordenada en las tarjetas de Auditoría de Operaciones.",
+    cambios: [
+      "Auditoría móvil (`auditoria-feed-item.tsx`): Reorganizado el encabezado móvil en 3 líneas limpias (título + categoría, resumen, y pie operador + tiempo relativo), eliminando el punto `•` huérfano y el rol redundante."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 134,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b134",
+    descripcion: "Eliminado el botón redundante 'Limpiar' en Auditoría y Control de Pagos al contar con el botón X en el buscador.",
+    cambios: [
+      "Filtros (`auditoria-filtros.tsx`, `control-pagos-filtros.tsx`): Eliminado el botón externo `Limpiar` para dejar únicamente el ícono `X` dentro del input de búsqueda y el botón `Opciones / Ocultar`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 133,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b133",
+    descripcion: "Selector de turno, botón externo Opciones/Ocultar y paleta oficial en Auditoría de Operaciones.",
+    cambios: [
+      "Selector de turno (`auditoria/page.tsx`): Estandarizado al mismo diseño de Monitoreo Integral y Control de Pagos (`Clock` + `Turno actual` alineados a la izquierda, `bg-[#252526] border-[#2e2e2e] rounded-full h-9`).",
+      "Buscador y filtros (`auditoria-filtros.tsx`): Movido el botón `Opciones` / `Ocultar` fuera a la par del input (`h-10 rounded-full` con `hover:text-white`), agregado botón `X` de limpieza, eliminado `bg-[#141414]` y unificados selectores a `h-9`.",
+      "Acordeón de eventos (`auditoria-feed-item.tsx`): Aplicada la jerarquía oficial de 3 capas sin negros (`AccordionTrigger` `#252526`, `AccordionContent` `#1e1e1e`, bloques `#252526` y sub-fichas `#1e1e1e`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 132,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b132",
+    descripcion: "Distribución móvil ordenada en el acordeón de Control de Pagos.",
+    cambios: [
+      "Control de Pagos móvil (`control-pagos-card.tsx`): Eliminado el separador `•` huérfano entre fecha y cajero en móvil, y reorganizada la cabecera interna de cada venta en dos filas limpias (`Venta # + estado + Ver Venta` arriba, `Cubierto + Total` debajo) para evitar amontonamiento."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 131,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b131",
+    descripcion: "Unificado botón 'Opciones / Ocultar' y corregido el color de texto en hover en Control de Pagos y Monitoreo Integral.",
+    cambios: [
+      "Control de Pagos (`control-pagos-filtros.tsx`) y Monitoreo Integral (`flujo-gaveta.tsx`, `flujo-monedas.tsx`, `kardex-inventario.tsx`): Agregado `hover:text-white` al estado activo del botón `Ocultar` para evitar que `variant=\"ghost\"` cambie el texto a azul oscuro al pasar el cursor, y unificada la etiqueta a `Opciones` / `Ocultar` en Control de Pagos."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 130,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b130",
+    descripcion: "Alineación visual y opciones limpias en el selector de turno de Control de Pagos y Monitoreo Integral.",
+    cambios: [
+      "Selector de turno (`control-pagos/page.tsx`, `monitoreo-integral/page.tsx`): Agrupados icono `Clock` y `<SelectValue />` dentro de un contenedor flex izquierdo para evitar que el texto quede centrado/distorsionado por `justify-between`.",
+      "Opciones y etiqueta (`control-pagos/page.tsx`, `monitoreo-integral/page.tsx`): Dejadas únicamente las opciones de `Turno actual` y `Turnos anteriores` en el selector superior de Control de Pagos, y texto único `Turno actual` en ambas páginas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 129,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b129",
+    descripcion: "Simplificación visual del acordeón y etiqueta limpia 'Turno actual' en Control de Pagos.",
+    cambios: [
+      "Selector de turno (`control-pagos/page.tsx`, `control-pagos-filtros.tsx`): Simplificado el texto a `Turno actual` sin sufijos adicionales.",
+      "Acordeón sin ruido visual (`control-pagos-card.tsx`): Eliminado el segundo contenedor redundante y el título repetitivo dentro del acordeón, mostrando directamente las filas de artículos en tarjetas `#252526` sobre fondo `#1e1e1e`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 128,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b128",
+    descripcion: "Selector de turno en cabecera y unificación a la paleta oficial de 3 capas en Control de Pagos.",
+    cambios: [
+      "Control de Pagos (`control-pagos/page.tsx`): Agregado selector de turno directo en la cabecera (`PageHeader`) con soporte para Turno actual, rangos rápidos y turnos anteriores.",
+      "Filtros y Buscador (`control-pagos-filtros.tsx`): Movido el botón `Filtros` fuera del buscador (`h-10 rounded-full bg-[#252526]`), agregado botón `X` de limpieza dentro del input, eliminado `bg-[#141414]` en el panel desplegable y estandarizados los selectores a `h-9`.",
+      "Tarjetas de Pago (`control-pagos-card.tsx`): Alineada la jerarquía exacta de *Historial de Ventas* (`AccordionTrigger` `#252526` con `border-b` al abrir, `AccordionContent` `#1e1e1e`, fichas de venta `#252526` y filas de artículos `#1e1e1e`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 127,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b127",
+    descripcion: "Etiqueta compacta 'Turno actual' en vista móvil en Monitoreo Integral.",
+    cambios: [
+      "Monitoreo Integral (`monitoreo-integral/page.tsx`): Ocultado el sufijo `(abierto)` en vista móvil (`hidden sm:inline`) dentro del selector de turno para mostrar únicamente `Turno actual`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 126,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b126",
+    descripcion: "Botón externo de opciones en Monitoreo Integral, total vendido por búsqueda en Kardex y botón X visible en Inventario.",
+    cambios: [
+      "Monitoreo Integral (`flujo-gaveta.tsx`, `flujo-monedas.tsx`, `kardex-inventario.tsx`): Movido el botón de opciones (`SlidersHorizontal`) fuera del input de búsqueda a la par (`h-10 rounded-full bg-[#252526]`), dejando el botón `X` de limpieza dentro del input (`z-10`) y reemplazando `#141414` por `#1e1e1e` en tarjetas de apertura.",
+      "Kardex (`kardex-inventario.tsx`): Agregada barra resumen automática al buscar un producto mostrando la existencia inicial y el total de unidades vendidas en el período.",
+      "Inventario (`inventario-filtros.tsx`, `inventario/historial/page.tsx`): Asegurada la visibilidad (`z-10`) del botón `X` para limpiar los buscadores en principal, revisión e historial."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 125,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b125",
+    descripcion: "Eliminado el espacio vacío inferior y el doble scroll en vista móvil en toda la aplicación.",
+    cambios: [
+      "Contenedor principal (`sidebar.tsx`, `dashboard/layout.tsx`): Cambiado `SidebarProvider` a `h-[100dvh] flex flex-col overflow-hidden` con `flex-1 min-h-0` en el área de contenido para que el header de dos filas en móvil nunca desborde el alto de pantalla ni genere doble scroll.",
+      "Espaciado inferior global (22 páginas en `src/app/dashboard/**/page.tsx`): Reemplazado `pb-20` (80px de espacio vacío al final) por `pb-2` para que las páginas terminen justo al pie de su contenido."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 124,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b124",
+    descripcion: "Eliminado el espacio vacío inferior de 320px en vista móvil en toda la aplicación.",
+    cambios: [
+      "Manejador de teclado móvil (`mobile-keyboard-handler.tsx`): Eliminado el `paddingBottom = '320px'` artificial que se inyectaba al contenedor `<main>` al enfocar cualquier input, evitando que las páginas móviles tuvieran scroll extra vacío al final; ahora solo desplaza el campo si un teclado virtual real reduce el `visualViewport`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 123,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b123",
+    descripcion: "Filtros externos en móvil / inline en escritorio y paleta oficial en Inventario y su Historial.",
+    cambios: [
+      "Filtros de Inventario (`inventario-filtros.tsx`): En móvil (`< sm`) el botón de filtros pasa fuera del input a su derecha (`h-10 w-10 rounded-full`); en escritorio (`sm+`) los selectores de ubicación y ordenamiento se muestran directamente a la par del buscador.",
+      "Historial y Revisión de Inventario (`ajuste-inventario-acordeon.tsx`, `inventario-revision-footer.tsx`): Aplicado `bg-[#1e1e1e]` al contenido expandido del acordeón y `bg-[#252526]` a las tarjetas internas y barra de revisión (eliminado `#141414`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 122,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b122",
+    descripcion: "Ocultadas las 4 tarjetas KPI superiores en vista móvil en el Historial de Cierres de Caja.",
+    cambios: [
+      "Historial de Cierres (`cierre-caja-item-acordeon.tsx`): Aplicado `hidden sm:grid` al bloque de 4 métricas rápidas (`Efectivo Esperado`, `Efectivo Contado`, `Fondo Sig. Turno`, `Efectivo Liquidado`) para ahorrar espacio en móvil."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 121,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b121",
+    descripcion: "Alineación exacta del acordeón de Historial de Cierres con la jerarquía de capas de Historial de Ventas.",
+    cambios: [
+      "Historial de Cierres (`cierre-caja-item-acordeon.tsx`): Aplicado `bg-[#1e1e1e]` al contenido expandido (`AccordionContent`) con `border-b` al abrir el `AccordionTrigger`, elevando las tarjetas KPI, bloques de desglose y observaciones a `bg-[#252526]` (y sub-filas a `bg-[#1e1e1e]`), idéntico a Historial de Ventas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 120,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b120",
+    descripcion: "Botón colapsable de filtros en móvil para Historial de Cierres e Historial de Ventas.",
+    cambios: [
+      "Historial de Cierres (`cierre-caja/historial/page.tsx`) e Historial de Ventas (`historial-ventas/page.tsx`): Activado `collapsibleMobileTabs` en `<PillTabs />` para mostrar el botón de filtros junto al buscador únicamente en vista móvil."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 119,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b119",
+    descripcion: "Regla obligatoria de paleta oscura en AGENTS.md y unificación final en Historial de Ventas e Historial de Cierres.",
+    cambios: [
+      "Regla de diseño (`AGENTS.md`): Agregado punto obligatorio en el Pre-Flight Checklist para respetar la paleta oficial de 3 capas sin negros (`#121212` / `#1e1e1e` / `#252526`) en cada cambio.",
+      "Historial de Ventas e Historial de Cierres (`historial-ventas/page.tsx`, `cierre-caja/historial/page.tsx`, `cierre-caja-item-acordeon.tsx`): Unificados los fondos translúcidos restantes a sólido `#252526`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 118,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b118",
+    descripcion: "Guía gráfica interactiva de la paleta oficial del modo oscuro en Pruebas > Modo Oscuro.",
+    cambios: [
+      "Paleta gráfica (`pruebas/modo-oscuro/page.tsx`): Rediseñada la vista con muestras copiables de las 3 capas oficiales (`#121212`, `#1e1e1e`, `#252526`, `#313131`, `#2e2e2e`), colores semánticos (`sky-600`, `emerald-600`, `amber-500`, `rose-600`) y un diagrama interactivo de anidamiento real."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 117,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b117",
+    descripcion: "Estandarización global de la paleta oscura a 3 capas sin negros (#121212 / #1e1e1e / #252526).",
+    cambios: [
+      "Componente `SurfaceCard` (`surface-card.tsx`): Unificado `variant=\"subcard\"` de `#141414` a `#1e1e1e` para eliminar bloques negros en toda la aplicación.",
+      "Guía de diseño (`AGENTS.md`): Actualizada la paleta oficial a 3 capas consistentes (`#121212` base, `#1e1e1e` paneles/modales/sub-bloques, `#252526` tarjetas/inputs/controles, `#313131` hover, `#2e2e2e` bordes)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 116,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b116",
+    descripcion: "Alineación del historial de Cierre de Caja a la paleta oficial #1e1e1e / #252526.",
+    cambios: [
+      "Historial de Cierres (`cierre-caja-item-acordeon.tsx`): Reemplazados los fondos negros `#141414` en la píldora de folio, tarjetas KPI, bloques de desglose y observaciones por `#1e1e1e`, elevando las sub-filas internas (`Entrega Efectivo`, `Cobros con Tarjeta`, `Existencia en Caja`) a `#252526`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 115,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b115",
+    descripcion: "Estandarización de tamaños de controles y colores en la página de Cierre de Caja.",
+    cambios: [
+      "Controles uniformes (`cierre-conteo-card.tsx`, `cierre-liquidacion-card.tsx`): Estandarizados `Total Físico en Caja`, `Efectivo para el Siguiente Período`, `Cuenta Destino de la Liquidación` y `Finalizar y Registrar Cierre` a altura estándar `h-10 rounded-full`.",
+      "Colores oficiales (`cierre-conteo-card.tsx`, `cierre-liquidacion-card.tsx`): Reemplazados los bloques negros `subcard` (`#141414`) por `#1e1e1e` / `#252526` y eliminadas las sobrescrituras de color en `SelectTrigger`, `SelectContent` y `Textarea`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 114,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b114",
+    descripcion: "Espaciado compacto en móvil y botón flotante para subir al inicio en el modal de historial de máquinas.",
+    cambios: [
+      "Componente `BotonVolverArriba` (`boton-volver-arriba.tsx`): Agregada la prop opcional `containerRef` para detectar scroll y regresar al inicio suavemente dentro de listas de modales.",
+      "Historial de Tragamonedas (`historial-modal.tsx`): Reducido el espaciado en móvil entre cabecera, buscador y tarjetas (`gap-2.5`, `pb-0`, sin `pt-2` ni `mt-2`), e incorporado `<BotonVolverArriba containerRef={listContainerRef} />` visible en móvil y escritorio."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 113,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b113",
+    descripcion: "Botón colapsable de filtros en móvil junto al buscador en PillTabs (probado en Historial de Máquinas).",
+    cambios: [
+      "Componente `PillTabs` (`pill-tabs.tsx`): Agregada la opción `collapsibleMobileTabs` para mostrar un botón circular con ícono `SlidersHorizontal` a la par del buscador en móvil (`< sm`) que despliega/oculta suavemente los interruptores de pestañas.",
+      "Historial de Tragamonedas (`historial-modal.tsx`): Activado `collapsibleMobileTabs` para liberar espacio vertical en pantallas móviles."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 112,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b112",
+    descripcion: "Unificación de colores y tamaños de controles en modales de Base y Extracción de tragamonedas.",
+    cambios: [
+      "Modales Base y Extracción (`modal-operacion-maquina.tsx`): Cambiadas las tarjetas de resumen de `variant=\"subcard\"` (`#141414`) a `variant=\"surface\"` (`#252526`), estandarizado el campo de monto (`h-9 text-sm`) y los botones del pie (`h-9 rounded-full`, con `bg-sky-600` para Confirmar Base)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 111,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b111",
+    descripcion: "Animación estándar y unificación visual del modal de historial en Tragamonedas.",
+    cambios: [
+      "Animación de apertura y cierre (`gestion-tragamonedas/page.tsx`): Mantenido `<HistorialModal />` montado permanentemente para que Radix `Dialog` ejecute correctamente la animación estándar `swal2-modal-anim` al abrir y cerrar.",
+      "Estética unificada (`historial-modal.tsx`): Eliminada la línea de luz superior decorativa, los divisores extra y los fondos negros `#141414` en estado vacío y chips de detalle (usando `#252526` y `#1e1e1e`) para igualarlo al resto de los modales."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 110,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b110",
+    descripcion: "Unificación a #252526 en los modales de Consumo Interno, Mover a Crédito y Eliminar Producto del POS.",
+    cambios: [
+      "Modales de confirmación POS (`pos-dialogs.tsx`): Reemplazado `bg-[#141414]` por `bg-[#252526]` en las tarjetas de resumen de `Consumo Interno`, `¿Mover Cuenta a Crédito?` y `¿Eliminar Producto?`, y eliminado `bg-[#141414]` del campo `PIN de Autorización` para usar el estilo estándar de controles."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 109,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b109",
+    descripcion: "Unificación de tarjetas a superficie #252526 en el modal de Traslado de Cuenta.",
+    cambios: [
+      "Traslado de Cuenta (`dialogo-traslado-cuenta.tsx`): Cambiadas las tarjetas `Cuenta de Origen` y `Resumen de Impacto Financiero` de `variant=\"subcard\"` (`#141414`) a `variant=\"surface\"` (`#252526`), y el selector de cantidad parcial a `#1e1e1e` para eliminar bloques negros inconsistentes."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 108,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b108",
+    descripcion: "Corrección de bordes redondeados y colores en modales de Cobro de Cuenta, Pago con Tarjeta y Registrar Abono.",
+    cambios: [
+      "Cobro de Cuenta (`pos-dialogs.tsx`): Reemplazado el fondo oscuro `#1e1e1e` de la fila `Incluir Total Créditos` por `bg-[#2e2e2e]/60` para integrarse correctamente en la tarjeta `#252526`.",
+      "Sub-modales de Tarjeta y Abono (`pos-dialogs.tsx`): Estandarizadas las esquinas a `rounded-2xl` (eliminado `sm:rounded-lg`), unificada la fila `Deuda Total` a `bg-[#2e2e2e]/40` y eliminado `bg-[#141414]` en el campo `Monto a Recibir (Q)` para usar el control oficial `#252526`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 107,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b107",
+    descripcion: "Estandarización global de colores en controles SelectTrigger y Textarea.",
+    cambios: [
+      "Componente base `Textarea` (`textarea.tsx`): Actualizado al estándar `#252526` con borde `#2e2e2e`, texto `#f1f5f9` y foco `sky-500` (eliminado `bg-background`).",
+      "Selectores consistentes (`transfer-dialog.tsx`, `cuadre-tragamonedas-resumen.tsx`, `nuevo-traslado-dialog.tsx`, `recibir-traslado-dialog.tsx`, `ListaUsuarios.tsx`, `ListaPagos.tsx`): Eliminadas sobrescrituras oscuras/azules (`#141414`, `#1e1e1e`, `#182330`, `bg-background`) en `<SelectTrigger>` y `<SelectContent>` para usar de forma uniforme la superficie oficial `#252526`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 106,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b106",
+    descripcion: "Aspecto idéntico al POS en el modal de consumo de mesas y optimización crítica de navegación en el menú lateral.",
+    cambios: [
+      "Modal de consumo idéntico al POS (`consumption-dialog.tsx`): Eliminado el borde recesivo alrededor de `Cant. / Producto / Agregar` y la altura mínima fija del carrito vacío para replicar exactamente la vista del POS.",
+      "Corrección de congelamiento al cambiar de menú (`layout.tsx`, `global-table-alarm.tsx`): Aislado el temporizador de 1 segundo de alarmas en `<GlobalTableAlarm />` (activo solo con mesas de tiempo definido) para evitar re-renderizar todo el dashboard y menú lateral cada segundo.",
+      "Optimización de navegación (`client-dashboard-nav.tsx`, `next.config.ts`): Desactivado prefetch masivo en enlaces del menú (`prefetch={false}`), eliminados `TooltipProvider` anidados, cierre limpio de `DropdownMenuItem` en modo colapsado y agregado `optimizePackageImports` para reducir picos de CPU/RAM en Windows."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 105,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b105",
+    descripcion: "Homologación de colores e íconos del modal de consumos de mesa con el POS y variante de contraste en inicio de sesión.",
+    cambios: [
+      "Controles idénticos al POS (`consumption-dialog.tsx`): Eliminado el fondo oscuro sobrescrito (`#1e1e1e`) en `Cant.`, `Producto`, `Descripción`, `Precio (Q)` y selector `Manual` móvil para usar el estilo oficial `#252526` sobre contenedor `subcard` (`#141414`), e incorporado el ícono `Search` en `AutocompleteInput`.",
+      "Listado de consumos (`consumption-dialog.tsx`): Alineado el estado vacío del carrito temporal con `POSCart` (`pos-cart.tsx`) manteniendo `SurfaceCard` (`#252526`) y divisores `#2e2e2e`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 104,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b104",
+    descripcion: "Bloqueo preventivo con spinner en 'Iniciar Juego' y unificación de colores/tamaños en el modal de inicio de sesión.",
+    cambios: [
+      "Estado de carga y bloqueo en Iniciar Juego (`start-session-dialog.tsx`): Al hacer clic en `Iniciar Juego`, el botón muestra el spinner animado (`Loader2`) con `Iniciando...`, deshabilita `Cancelar` y la `X` de cierre para evitar dobles inicios de sesión.",
+      "Consistencia visual (`start-session-dialog.tsx`): Ajustado el fondo del modal a `#1e1e1e` (Capa 1) y estandarizada la altura de botones a `h-9` (36px) en formato `rounded-full`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 103,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b103",
+    descripcion: "Estandarización definitiva de la jerarquía de 4 capas de color en modales y controles PillTabs.",
+    cambios: [
+      "Jerarquía única Panel/Modal (`dialog.tsx`, `alert-dialog.tsx`, `modal-confirmacion.tsx`, `historial-modal.tsx`): Todos los paneles principales y modales utilizan `#1e1e1e`, los controles encima (`PillTabs`, `Input`, `Select`, tarjetas de lista, botones secundarios) usan `#252526`, y los bloques o chips interiores recesivos usan `#141414`.",
+      "Foco inteligente en `PillTabs` (`pill-tabs.tsx`): Cambiado `focus-within` por `has-[input:focus]` para que el contorno azul de foco se active únicamente al escribir en el buscador y no al cambiar de pestaña."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 102,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b102",
+    descripcion: "Restaurada la animación oficial SweetAlert2 (swal2-show) y estabilizada la altura del modal de Historial para eliminar saltos.",
+    cambios: [
+      "Animación oficial `swal2-show` restaurada (`globals.css`): Restablecidos los keyframes exactos de SweetAlert2 (`scale(0.7) ➔ 1.05 ➔ 0.95 ➔ 1` en `0.3s` y `swal2-hide` en `0.15s`) para todos los modales.",
+      "Eliminación de saltos de altura al abrir (`historial-modal.tsx`): Fijada la altura del contenedor de lista a `h-[50vh]` para que el modal no cambie de tamaño a mitad de la animación cuando Firestore responde."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 101,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b101",
+    descripcion: "Estilizado completo de contenido interno en Historial de Máquina: píldora de búsqueda recesiva, chips de desglose y supresión de redundancias.",
+    cambios: [
+      "Barra `PillTabs` estilizada con `listClassName='bg-[#141414] border-[#2e2e2e]'` (`historial-modal.tsx`): Aplicado correctamente el contraste negro sobre el fondo gris `#252526` del modal y desactivado el autofocus automático para evitar el contorno azul al abrir.",
+      "Contenido de tarjetas estructurado sin redundancias: Desglose de detalles entre paréntesis (ej. `Deuda: Q0`, `Base: Q20`, `Neta: Q0`) transformado en píldoras individuales `bg-[#1e1e1e]`, eliminando la repetición de texto como `Extracción` debajo del badge.",
+      "Distribución responsiva móvil y escritorio: En móvil muestra `Badge + Monto` en cabecera, detalle en el centro y `Fecha + Anular (h-8)` al pie sin iconos distractores."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 100,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b100",
+    descripcion: "Alineación integral del modal Historial de Máquina a las reglas oficiales de diseño (AGENTS.md).",
+    cambios: [
+      "Jerarquía de capas y color (`historial-modal.tsx`): Agregada línea de luz superior (Línea 1 Antigravity), aplicada capa recesiva `bg-[#141414]` en `PillTabs` sobre el modal `bg-[#252526]` y botón `Cerrar` en `bg-[#1e1e1e] hover:bg-[#313131]`.",
+      "Controles y badges estándar: Ajustados los botones `Anular` (`h-8 rounded-full`) y `Cerrar` (`h-9 rounded-full`) y añadidos `badgeVariant` dinámicos (`amber`/`sky`) de alto contraste en las pestañas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 99,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b99",
+    descripcion: "Contraste oficial negro-sobre-gris (#141414 sobre #252526) en tarjetas de Historial de Máquina.",
+    cambios: [
+      "Jerarquía visual de capas (`historial-modal.tsx`): Cambiadas las tarjetas de movimientos y el estado vacío de `variant='surface'` (`#252526`) a `variant='subcard'` (`bg-[#141414] border-[#2e2e2e]`), logrando el contraste limpio negro sobre fondo gris del modal tanto en vista escritorio como móvil."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 98,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b98",
+    descripcion: "Ocultación del icono circular en vista móvil de Historial de Máquina y estabilización fluida de la animación global de modales.",
+    cambios: [
+      "Vista móvil limpia en Historial de Máquina (`historial-modal.tsx`): Ocultado el icono circular (`hidden sm:block`) en dispositivos móviles para liberar ancho horizontal y evitar cortes en fechas y descripciones; estandarizado el fondo a `#252526`.",
+      "Animación de apertura fluida y estable (`globals.css`): Refinada la curva `swal2-show` a `0.92 ➔ 1.015 ➔ 1` en `240ms cubic-bezier(0.22, 1, 0.36, 1)` para eliminar saltos en modales grandes con scroll e inputs.",
+      "Autofocus sincronizado (`historial-modal.tsx` y `dialogo-ultimos-movimientos.tsx`): Ajustado el retardo del foco a `280ms` para ejecutarse justo después de completarse la animación de entrada, evitando desplazamientos o parpadeos."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 97,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b97",
+    descripcion: "Tarjetas compactas de 3 líneas en el modal 'Últimos Movimientos del Turno' para escritorio y móvil.",
+    cambios: [
+      "Diseño compacto y legible (`dialogo-ultimos-movimientos.tsx`): Eliminadas cajas anidadas redundantes y etiquetas repetitivas; cada movimiento ahora muestra en 3 líneas limpias: 1) Badge + #Venta + Cliente + Monto Total a la derecha; 2) Productos en línea; 3) Tiempo, método y operador."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 96,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b96",
+    descripcion: "Tarjeta móvil de 'Última Operación' compactada a exactamente 2 filas interactivas.",
+    cambios: [
+      "Diseño compacto móvil de 2 filas (`pos-ultima-accion.tsx`): Eliminada la fila extra del botón `Ver Movimientos`; toda la tarjeta es ahora táctil/clicable con una flecha discreta a la derecha y muestra en la fila 1 `#venta + operación + tiempo` y en la fila 2 el detalle de productos en una línea."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 95,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b95",
+    descripcion: "Estados vacíos uniformes en Carrito y Cuentas Activas con icono ampliado sin círculo y mayor tamaño de texto.",
+    cambios: [
+      "Estado vacío limpio y unificado (`pos-cart.tsx` y `pos-accounts.tsx`): Eliminado el contenedor circular alrededor de los iconos, ampliado el tamaño de los iconos a `h-10 w-10` (`stroke-[1.75]`) y aumentada la fuente a `text-sm font-medium` en ambos paneles."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 94,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b94",
+    descripcion: "Restaurado el desenfoque automático tras cada Venta Rápida manteniendo el acceso directo global con F8.",
+    cambios: [
+      "Comportamiento seguro tras venta (`quick-dispatch-input.tsx`): Restaurado `disabled` durante el envío y llamado a `blur()` al finalizar para liberar el foco después de cada Venta Rápida y prevenir cobros accidentales repetidos.",
+      "Atajo `F8` preservado: Para realizar otra venta rápida seguida sin usar el ratón, basta con presionar `F8`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 93,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b93",
+    descripcion: "Acceso directo global con F8 y retención automática de foco en el input de Venta Rápida.",
+    cambios: [
+      "Atajo de teclado global `F8` (`quick-dispatch-input.tsx`): Al presionar `F8` desde cualquier módulo de la aplicación, el cursor enfoca y selecciona automáticamente el campo de Venta Rápida (`ej: 3*coca*p1 (F8)`).",
+      "Ventas rápidas consecutivas sin usar el ratón: Reemplazado `disabled` por `readOnly` durante el guardado y añadido reenfoque diferido tras completar el despacho para que el campo nunca pierda el foco al realizar múltiples ventas seguidas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 92,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b92",
+    descripcion: "Contenedores dinámicos en Punto de Venta y Cuentas Activas, con estado vacío unificado al estándar de Cuentas.",
+    cambios: [
+      "Crecimiento dinámico según contenido (`ventas/page.tsx`, `pos-cart.tsx`, `pos-accounts.tsx`): Eliminada la altura fija forzada en paneles vacíos (`items-start` y `max-h` con scroll automático al alcanzar el tope de pantalla). Ahora tanto el carrito como cuentas ocupan el mínimo espacio cuando están vacíos y crecen conforme se agregan elementos.",
+      "Estado vacío unificado (`pos-cart.tsx` y `pos-accounts.tsx`): Igualados ambos estados vacíos con icono dentro de contenedor circular (`w-12 h-12 rounded-full border-[#2e2e2e]`) y tipografía `text-xs text-slate-400` con `py-7`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 91,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b91",
+    descripcion: "Equilibrio en cabecera del POS: etiquetas restauradas en Movimientos, Mesas y Tragamonedas manteniendo Historial solo con icono.",
+    cambios: [
+      "Cabecera equilibrada (`pos-header.tsx`): Restaurado el texto descriptivo en `Movimientos`, `Mesas` y `Tragamonedas` en pantallas `xl+`, manteniendo `Historial` en formato circular compacto de solo icono.",
+      "Píldora adaptable (`pos-ultima-accion.tsx`): Ajustado el ancho máximo a `w-auto max-w-[280px] xl:max-w-[360px] 2xl:max-w-[460px]` para convivir cómodamente con los botones etiquetados."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 90,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b90",
+    descripcion: "Integración de 'Última Operación' en la cabecera del POS y botones de acceso rápido con solo icono.",
+    cambios: [
+      "Cabecera optimizada (`pos-header.tsx` y `pos-ultima-accion.tsx`): Convertidos los 4 botones de navegación (Movimientos, Mesas, Tragamonedas, Historial) a botones circulares de solo icono (`h-9 w-9`), liberando todo el espacio central para mostrar la píldora interactiva de Última Operación entre el título y los botones.",
+      "Máximo espacio vertical para transacciones (`ventas/page.tsx`): Eliminada la fila extra en escritorio (`lg:`), devolviendo toda la altura disponible al Carrito y a Cuentas Activas mientras la Última Operación permanece siempre visible en la parte superior."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 89,
+    fecha: "2026-11-17",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b89",
+    descripcion: "Barra compacta 'Última Operación' siempre visible en la parte superior del POS y scroll independiente en Carrito y Cuentas.",
+    cambios: [
+      "Visibilidad sin scroll en todas las pantallas (`ventas/page.tsx` y `pos-ultima-accion.tsx`): Rediseñado el bloque de Última Operación a una tira compacta de 1 línea (~46px) ubicada justo debajo del encabezado del Punto de Venta, quedando 100% visible al primer vistazo en móviles, laptops y escritorio.",
+      "Scroll independiente en Carrito (`pos-cart.tsx`) y Cuentas Activas (`pos-accounts.tsx`): Añadido scroll interno (`lg:flex-1 lg:min-h-0 lg:overflow-y-auto`) para que las listas extensas no desborden la altura de la pantalla."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 88,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b88",
+    descripcion: "Estandarización obligatoria del radio de borde `rounded-2xl` (16px) en todos los modales de la aplicación.",
+    cambios: [
+      "Blindaje global en primitivas (`dialog.tsx` y `alert-dialog.tsx`): Aplicado `rounded-2xl sm:rounded-2xl` al cierre de `cn(..., className, ...)` para garantizar que ningún modal sea sobrescrito con radios menores (`rounded-lg`, `rounded-xl`) o mayores (`rounded-3xl`) desde páginas individuales.",
+      "Limpieza explícita en modales de Mesas (`start-session-dialog.tsx`, `time-adjust-dialog.tsx`): Unificado el fondo a `#252526` y eliminado el override `rounded-xl sm:rounded-lg`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 87,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b87",
+    descripcion: "Corrección de posicionamiento centrado de modales (`fixed` protegido contra sobreescritura de `relative`).",
+    cambios: [
+      "Centrado exacto en viewport (`modal-confirmacion.tsx`): Eliminada la clase `relative` del `DialogContent` que anulaba `fixed` mediante `tailwind-merge` y desplazaba el modal hacia abajo.",
+      "Protección global en primitivas (`dialog.tsx` y `alert-dialog.tsx`): Asegurado `fixed` al final del `cn(...)` para garantizar que ningún modal pierda el centrado absoluto en el viewport aunque reciba clases externas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 86,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b86",
+    descripcion: "Despliegue global del estándar oficial de modales (Línea 1 Antigravity + SweetAlert2) en toda la aplicación.",
+    cambios: [
+      "Estilos e Iconos Globales (`globals.css`, `swal-icono.tsx` y `modal-confirmacion.tsx`): Exportado el componente reutilizable `ModalConfirmacion` y `SwalIcono` en `@/components/comunes` con bloqueo automático anti-doble clic, botón Cancelar a la izquierda y cierre protegido.",
+      "Primitivas Globales (`dialog.tsx` y `alert-dialog.tsx`): Aplicada globalmente la animación `swal2-show`/`swal2-hide`, superficie Antigravity `#252526`, bordes `#2e2e2e`, pies alineados con `justify-between` y bloqueo por defecto de clics externos y tecla Escape.",
+      "Migración de Módulos Operativos: Actualizados los diálogos en Punto de Venta (`pos-dialogs.tsx`), Mesas (`transfer-dialog.tsx`, `mesas-dialogs.tsx`), Compras (`delete-confirm-dialog.tsx`), Gastos (`dialogo-eliminar-gasto.tsx`), Mantenimiento (`dialogo-eliminar-cliente.tsx`, `DialogoEliminarProducto.tsx`) y Usuarios (`DialogoEliminarUsuario.tsx`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 85,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b85",
+    descripcion: "Bloqueo preventivo anti-doble clic y estado de carga en botones de confirmación y cierre de modales.",
+    cambios: [
+      "Componente compartido `ModalFooterCompartido` (`modal-footer-compartido.tsx`): Unificado el pie de las 4 líneas de diseño con manejo nativo del estado `procesando`.",
+      "Bloqueo seguro durante la ejecución (`comparador-casos-reales.tsx`): Al confirmar cualquier acción, el botón principal muestra spinner (`Loader2`) con el texto `Procesando...` y se deshabilitan simultáneamente el botón Confirmar, Cancelar y la `X` de cierre hasta que finaliza la operación."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 84,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b84",
+    descripcion: "Iconos exactos de SweetAlert2 (success, error, warning, info, question) con sus animaciones CSS oficiales diferidas.",
+    cambios: [
+      "Iconos nativos idénticos a SweetAlert2 (`swal-icono.tsx` y `swal-iconos.css`): Implementados los 5 iconos canónicos con la estructura geométrica y proporciones exactas (`5em` = 80px): checkmark de éxito con trazado secuencial (`line-tip`/`line-long`), cruz de error (`x-mark` en rotación 3D), exclamación `!` de advertencia (`animate-i-mark`), `i` informativa y `?` de pregunta.",
+      "Asignación semántica en casos reales (`datos-casos-reales.ts`): Cada uno de los 7 modales de prueba muestra el icono SweetAlert2 correspondiente (`question`, `warning`, `info`, `error`, `success`).",
+      "Sincronización secuencial (`0.28s` de retardo): Todas las animaciones de los iconos inician justo después de completarse la entrada `swal2-show` del modal."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 83,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b83",
+    descripcion: "Sincronización secuencial de animación: el icono inicia justo al finalizar la entrada del modal.",
+    cambios: [
+      "Retardo sincronizado en `SwalIcono` (`comparador-casos-reales.tsx`): Añadido `animation-delay: 0.28s` con modo `both` en `swal2-anim-warning`, `swal2-anim-error` y `swal2-anim-info`. De este modo, el modal completa su entrada `swal2Show` (0.3s) primero y, justo al estabilizarse, se despliega por completo la animación 3D del icono."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 82,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b82",
+    descripcion: "Animación de entrada y diseño de iconos inspirados en SweetAlert2 en el comparador de modales.",
+    cambios: [
+      "Animación estilo SweetAlert2 (`comparador-casos-reales.tsx`): Implementados los keyframes oficiales `swal2Show` (0.3s con rebote sutil 0.7 ➔ 1.05 ➔ 0.95 ➔ 1) y `swal2Hide` (0.15s) en el diálogo del comparador.",
+      "Componente `SwalIcono` (`swal-icono.tsx`): Anillo circular de borde grueso (`border-[3px]`) con las animaciones 3D de entrada únicas de SweetAlert2 (`swal2AnimateWarningIcon`/`IMark` en advertencias, `swal2AnimateErrorIcon`/`XMark` en errores y `swal2AnimateInfoIcon` en operaciones normales).",
+      "Integración en las 4 líneas: Aplicado `SwalIcono` de manera uniforme en `linea-antigravity-oficial.tsx`, `linea-borde-superior.tsx`, `linea-glow-capsula.tsx` y `linea-pos-tactil.tsx`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 81,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b81",
+    descripcion: "Animación GPU fluida de entrada en modales, animación única de iconos al abrir y bloqueo de cierre accidental externo.",
+    cambios: [
+      "Animación de entrada 60fps (`comparador-casos-reales.tsx`): Eliminado `filter: blur`, `backdrop-blur` y clases de `tailwindcss-animate` en conflicto; reemplazada por transición GPU pura (`translate3d` + `scale(0.975 ➔ 1)` + `opacity` en 220ms) para apertura sedosa sin saltos.",
+      "Animación de icono solo al entrar (`modalIconPop` y `modalHaloOnce`): Suprimidos los bucles infinitos (`animate-ping` / `animate-pulse`) en las 4 líneas de diseño; ahora el icono y su onda sutil se animan una sola vez al abrir el modal.",
+      "Bloqueo de cierre fuera del modal: Configurados `onPointerDownOutside`, `onInteractOutside` y `onEscapeKeyDown` para evitar cierres accidentales al hacer clic en el fondo oscuro; el modal solo se cierra mediante los botones de acción o la 'X'."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 80,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b80",
+    descripcion: "Animación sutil profesional en comparador de modales y unificación estricta de tamaños en controles (botones, inputs y selects).",
+    cambios: [
+      "Animación sutil de entrada y salida (`comparador-casos-reales.tsx`): Implementada transición `modalProIn`/`modalProOut` con curva `cubic-bezier(0.16, 1, 0.3, 1)` (desplazamiento suave de 12px, escala 0.96 ➔ 1 y desenfoque sutil) más animación elástica `modalIconPop` en el icono principal, probada primero en el comparador.",
+      "Uniformidad de tamaños en controles (`modal-campos-compartidos.tsx` y las 4 líneas): Reemplazados selectores y campos simulados por controles reales (`<Select>`, `<Input>`, `<Button>`) todos bloqueados a altura estándar `h-9` (36px) y geometría `rounded-full`.",
+      "Eliminación de duplicación JSX: Extraído el subcomponente compartido `ModalCamposCompartidos` para renderizar los 7 casos reales sin código repetido.",
+      "Accesibilidad en Diálogo: Añadido `DialogTitle` (`sr-only`) y ocultado el botón de cierre redundante del contenedor padre."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 79,
+    fecha: "2026-11-16",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b79",
+    descripcion: "Modernización de las 4 líneas de modales: iconos más grandes con animaciones, estética moderna y botón Cancelar a la izquierda.",
+    cambios: [
+      "Iconos ampliados con animación (`linea-antigravity-oficial.tsx`, `linea-borde-superior.tsx`, `linea-glow-capsula.tsx`, `linea-pos-tactil.tsx`): Contenedores de 56px-60px (`h-7 w-7`) con halos animados (`animate-ping`, `animate-pulse`) y micro-interacciones suaves al pasar el cursor.",
+      "Alineación consistente de acciones: Botón Cancelar posicionado al lado izquierdo (`justify-between`) y acción principal a la derecha en las 4 líneas de diseño.",
+      "Estética moderna: Líneas de luz superior, degradados sutiles, sombras con profundidad y superficies translúcidas acordes al Antigravity Dark Theme.",
+      "Nuevo caso real agregado (`datos-casos-reales.ts`): Añadido el modal '¡Tiempo Culminado!' de sesión de mesa como 7.º caso estándar de aviso."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 78,
+    fecha: "2026-11-14",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b78",
+    descripcion: "Estandarización de modales: 4 propuestas de líneas de diseño unificadas y comparador interactivo de los 6 casos reales de la aplicación.",
+    cambios: [
+      "Comparador de Casos Reales (`comparador-casos-reales.tsx`): Modelados los 6 modales exactos de la aplicación (Trasladar Mesa, Mover a Crédito, Cliente con Deuda, Consumo Interno, Descartar Cambios y Registrar Abono) con alternador dinámico de líneas de diseño.",
+      "Línea 1 - Antigravity Oficial (`linea-antigravity-oficial.tsx`): Estándar sobrio y jerárquico con botón cancelar siempre neutro, botón confirmar semántico y botón cerrar 'X' universal.",
+      "Línea 2 - Borde Superior Semántico (`linea-borde-superior.tsx`): Barra superior acentuada de 4px para identificación visual inmediata del tipo de evento.",
+      "Línea 3 - Glow / Cápsula Suave (`linea-glow-capsula.tsx`): Esquinas pronunciadas y sombra perimetral atmosférica de color suave.",
+      "Línea 4 - Táctil POS Ergonómico (`linea-pos-tactil.tsx`): Optimizado para pantallas táctiles con botones anchos al 50/50 en el pie del diálogo.",
+      "Reglas Maestras de Modales (`page.tsx`): Documentadas las 5 reglas de oro para evitar inconsistencias de botones y bordes en futuros desarrollos."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 77,
+    fecha: "2026-11-14",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b77",
+    descripcion: "5 Diseños oficiales de mensajes en modales de diálogo emergente (éxito heroico, advertencia con impacto, error con diagnóstico, ficha informativa y decisión táctil).",
+    cambios: [
+      "Diseño 1 - Modal de Éxito Heroico (`modal-exito-hero.tsx`): Centrado ceremonial con halo esmeralda pulsante, desglose financiero inset (#141414) y acción rápida para imprimir ticket y encadenar siguiente venta.",
+      "Diseño 2 - Modal de Advertencia con Impacto (`modal-advertencia-riesgo.tsx`): Borde superior ámbar brillante, caja descriptiva de consecuencias (impacto en caja, retorno de inventario y auditoría) y botones de confirmación duales.",
+      "Diseño 3 - Modal de Error Crítico y Diagnóstico (`modal-error-diagnostico.tsx`): Mensaje humano para el operador y acordeón desplegable con código y timestamp para soporte técnico, con botón de reintento.",
+      "Diseño 4 - Modal Informativo Multi-Dato (`modal-informativo-datos.tsx`): Ficha corporativa en azul Antigravity con cuadrícula de 4 datos operativos y lista de checkpoints verificados.",
+      "Diseño 5 - Modal de Decisión Táctil (`modal-decision-tarjetas.tsx`): Interfaz de selección interactiva mediante tarjetas táctiles con radio para guiar al usuario entre opciones mutuamente excluyentes.",
+      "Galería y Lanzadores Interactivos (`page.tsx`): Incorporada previsualización directa en tarjeta y disparadores rápidos para abrir los modales reales con overlay oscuro y animación completa."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 76,
+    fecha: "2026-11-14",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b76",
+    descripcion: "Nueva página de pruebas con 5 diseños visuales de mensajes y alertas operativas.",
+    cambios: [
+      "Diseño 1 (Acento Lateral y Píldora Inset): Borde lateral grueso de alto contraste, icono circular translúcido y botón de acción en píldora compacta.",
+      "Diseño 2 (Tarjeta Resplandor / Glow Card): Degradado atmosférico suave, bloque recesivo (#141414) con desglose de valores clave y botones de acción duales.",
+      "Diseño 3 (Banner Inline Táctil con Dismiss): Barra horizontal ultracompacta de baja altura con badge de severidad y botón de reintento/cierre rápido.",
+      "Diseño 4 (Tarjeta Contextual Enriquecida): Cuadrícula estructurada para metadatos operativos (operador, terminal, correlativo y auditoría).",
+      "Diseño 5 (Callout de Sugerencia Inteligente): Cápsula envolvente con gradiente púrpura/índigo y botón interactivo con acción reversible 'Deshacer'.",
+      "Probador Interactivo Sandbox: Simulador con selector dinámico de variantes (éxito, advertencia, error, info) y alternador responsivo (Escritorio vs Móvil).",
+      "Integración en Menú Lateral: Añadido enlace directo en la barra de navegación bajo la sección de Pruebas (`/dashboard/pruebas/disenos-mensajes`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 75,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b75",
+    descripcion: "Optimización profunda de rendimiento, saneamiento de código y estandarización completa en Auditoría de Operaciones.",
+    cambios: [
+      "Optimización de Hook `use-auditoria.ts`: Eliminado código muerto y listeners innecesarios de hardware local; implementado control de UIDs consultados mediante `useRef` para evitar solicitudes en cascada a Firestore y ciclos de re-renderizado.",
+      "Saneamiento de componentes: Eliminados archivos huérfanos (`auditoria-detalle-dialog.tsx` y `auditoria-equipo-dialog.tsx`), aligerando el bundle y simplificando el árbol de dependencias.",
+      "Filtrado ágil y eficiente: Algoritmo de búsqueda optimizado para evaluar campos clave en lugar de serializar objetos completos, mejorando drásticamente el tiempo de respuesta al escribir en el buscador.",
+      "Verificación de Controles Estándar: Confirmada la adhesión plena al Design System (`PageHeader`, `SurfaceCard`, `Paginacion`, `BotonVolverArriba` y controles tipo píldora `rounded-full`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 74,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b74",
+    descripcion: "Texto limpio 'Período Actual' sin iconos en selector de Auditoría y carga completa sin límites por turno.",
+    cambios: [
+      "Texto sin iconos en selector de período (`page.tsx`): Actualizado el texto a 'Período Actual' eliminando iconos y emojis tanto en el disparador como en las opciones del selector de turnos.",
+      "Carga exhaustiva de todos los registros del turno (`use-auditoria.ts`): Removido el límite restrictivo de 150 registros en consultas acotadas a turnos (tanto para el turno actual en curso como para turnos anteriores seleccionados), garantizando la visualización del 100% de los eventos del período seleccionado."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 73,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b73",
+    descripcion: "Presentación concisa, no redundante y estructurada del contenido expandido en acordeones de Auditoría.",
+    cambios: [
+      "Eliminación de redundancias en acordeón (`auditoria-feed-item.tsx`): Suprimidas las repeticiones triples de productos, descripciones idénticas y volcados de metadatos crudos (`producto`, `cantidad`, `total`, `esVirtual`).",
+      "Organización en 2 bloques semánticos limpios: Bloque 1 enfocado en la Operación (artículos, método de pago detectado, total liquidado y observaciones reales) y Bloque 2 enfocado en la Trazabilidad (operador responsable, terminal/equipo, marca de tiempo y parámetros útiles no redundantes).",
+      "Diseño responsivo optimizado: Cuadrícula de 2 columnas en escritorio y flujo vertical compacto y ergonómico en vista móvil."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 72,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b72",
+    descripcion: "Estandarización integral de Auditoría: paginación oficial, selector de período en encabezado, buscador con panel de filtros integrado y tarjetas móviles ultracompactas.",
+    cambios: [
+      "Paginación oficial estándar (`page.tsx` y `use-auditoria.ts`): Implementada paginación con `<Paginacion>` de `@/components/comunes` tanto para escritorio como para móvil, con selector de tamaño de página (10, 15, 25, 50, 100) y reseteo automático al filtrar.",
+      "Selector de período en encabezado (`page.tsx`): Reemplazados los controles de 'Este equipo', 'Número de eventos' y 'Cargar 300' por el selector de período directamente en la barra de acciones del `PageHeader`.",
+      "Buscador estándar con panel de filtros ocultos integrado (`auditoria-filtros.tsx`): Integrado el buscador en el contenedor principal con autoenfoque, botón de ajustes/filtros (`SlidersHorizontal`) y panel colapsable interior para usuarios y categorías.",
+      "Tarjetas móviles ultracompactas (`auditoria-feed-item.tsx`): Reducida la altura vertical en móvil ocultando chips duplicados, dispositivo y marca de tiempo exacta de la cabecera colapsada, trasladándolos al interior del acordeón para una visualización táctil limpia de 2 líneas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 71,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b71",
+    descripcion: "Disposición en 2 columnas (izquierda/derecha) en tarjetas de Auditoría para un diseño compacto.",
+    cambios: [
+      "Cabecera en 2 columnas compactas (`auditoria-feed-item.tsx`): Reorganizada la cabecera del acordeón en una columna izquierda (icono, título, categoría, tiempo relativo, descripción y chips) y una columna derecha (operador responsable, rol, terminal/dispositivo y marca de tiempo exacta), eliminando el espacio en blanco vacío y reduciendo la altura vertical en un 50%.",
+      "Contenido expandido en 2 columnas (`auditoria-feed-item.tsx`): Estructurado el desglose expandido en 2 columnas balanceadas (Columna izquierda: artículos y descripción; Columna derecha: operador, dispositivo, marca de tiempo y parámetros estructurados)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 70,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b70",
+    descripcion: "Rediseño de tarjetas de Auditoría de Operaciones en acordeón interactivo con desglose enriquecido.",
+    cambios: [
+      "Tarjetas de Auditoría en Acordeón (`auditoria-feed-item.tsx` y `page.tsx`): Rediseñadas las tarjetas de operaciones usando componentes estándar `<AccordionItem>`, `<AccordionTrigger>` y `<AccordionContent>`. Ahora cada tarjeta se expande directamente in-situ para revelar los detalles de la operación.",
+      "Desglose integrado sin modales redundantes: Muestra dentro del acordeón la información del operador, dispositivo (PC/Tablet/Teléfono), marca de tiempo exacta, lista detallada de artículos involucrados con insignias y subtotales en `tabular-nums font-bold`, descripción completa y parámetros estructurados.",
+      "Optimización responsiva y control volver arriba: Icono de categoría visible exclusivamente en vista normal (`hidden sm:flex`), badges en píldora (`rounded-full`) e incorporación de `<BotonVolverArriba threshold={150} />`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 69,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b69",
+    descripcion: "Integración unificada del buscador y preferencias en el contenedor principal de Control de Pagos.",
+    cambios: [
+      "Unificación en contenedor principal (`page.tsx` y `control-pagos-filtros.tsx`): Integrado el buscador de pagos y su panel colapsable de preferencias y filtros avanzados directamente dentro del contenedor principal (`SurfaceCard variant='panel'`), eliminando el contenedor separado superior tanto en la vista móvil como en la de escritorio."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 68,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b68",
+    descripcion: "Visibilidad adaptativa de iconos en acordeones de Control de Pagos: exclusivo para vista normal/escritorio.",
+    cambios: [
+      "Ocultación de iconos de acordeón en vista móvil (`control-pagos-card.tsx`): Configurada la clase `hidden sm:flex` y ajuste de margen `gap-0 sm:gap-3` en el contenedor del método de pago de cada acordeón, de modo que los iconos circulares solo se muestren en la vista normal (pantallas `sm+`) y permanezcan ocultos en móviles para un diseño táctil ultracompacto sin desbordes."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 67,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b67",
+    descripcion: "Estandarización y optimización integral de Control de Pagos: eliminación de métricas y CSV, iconos en acordeón, autoenfoque y paginación estándar.",
+    cambios: [
+      "Eliminación de métricas y exportación CSV (`page.tsx`): Removido el botón de exportación CSV del PageHeader y eliminadas las tarjetas métricas ejecutivas para maximizar el espacio útil y simplificar la pantalla.",
+      "Iconos distintivos en acordeones (`control-pagos-card.tsx`): Añadidos iconos circulares en el encabezado de cada acordeón acorde al método de pago (Banknote para Efectivo, CreditCard para Tarjeta, Coins para Consumo Interno y ReceiptText para pagos múltiples/generales).",
+      "Eliminación de botón de ticket unificado (`control-pagos-card.tsx`): Removido el botón 'Imprimir comprobante unificado' del pie de cada tarjeta acorde a lo solicitado.",
+      "Foco automático en buscador y remoción de conteo de resultados (`control-pagos-filtros.tsx`): Agregado useRef con autoenfoque al cargar la vista y eliminado el badge de conteo de resultados ('X resultados') tanto en móvil como en escritorio.",
+      "Paginación estándar del Design System y botón Volver Arriba (`page.tsx`): Integrados los componentes oficiales `<Paginacion>` y `<BotonVolverArriba threshold={150} />` de `@/components/comunes`.",
+      "Optimización y carga ultrarrápida (`use-control-pagos.ts`): Agregados límites de seguridad en consultas Firestore (`limit(25)` en cierres y `limit(150)` en historial general), pre-cálculo de timestamps numéricos en la agrupación multi-venta y eliminación de loops innecesarios."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 66,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b66",
+    descripcion: "Optimización de carga, autoenfoque de buscadores y acomodo responsivo multi-fila en selectores.",
+    cambios: [
+      "Acomodo adaptativo en selectores multi-fila (`src/components/comunes/pill-tabs.tsx`): Corregida la colisión visual cuando los selectores tienen más de una fila en móvil (`hasMultipleRows`). El contenedor ahora transiciona dinámicamente a `h-auto rounded-2xl` con separación `gap-1.5` y botones en píldora con altura propia `h-8`, evitando que los badges y textos de filas inferiores se salgan o choquen entre sí.",
+      "Foco automático en buscadores al montar/cambiar de pestaña: Incorporado autoenfoque instantáneo (`autoFocus` con `useRef`) en el input de búsqueda de Flujo de Efectivo/Gaveta al cargar la página, así como en los buscadores de Flujo de Monedas y Kardex de Inventario al alternar entre pestañas.",
+      "Optimización de consultas y rendimiento en `useMonitoreoIntegral` (`_hooks/use-monitoreo-integral.ts`): Añadido límite de 30 registros a la consulta de cierres históricos (`limit(30)`), y eliminados bloques de código huérfano y dependencias innecesarias para maximizar la velocidad de respuesta inicial de la página."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 65,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b65",
+    descripcion: "Limpieza de bloque duplicado de Apertura en Flujo de Gaveta.",
+    cambios: [
+      "Corrección de sintaxis en `FlujoGaveta` (`src/app/dashboard/administracion/monitoreo-integral/_components/flujo-gaveta.tsx`): Eliminado bloque de código duplicado al final del archivo, restaurando la compilación limpia en Next.js."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 64,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b64",
+    descripcion: "Optimización de espacio vertical, botón de opciones en buscador y diseño móvil ergonómico sin iconos circulares invasivos.",
+    cambios: [
+      "Reducción de espacio vertical en `PaginaMonitoreoIntegral` (`src/app/dashboard/administracion/monitoreo-integral/page.tsx`): Ajustada la separación entre cabecera, pestañas y contenedor principal a `space-y-2.5 sm:space-y-3.5` para eliminar espacios vacíos excesivos.",
+      "Control de búsqueda con botón de opciones integrado en `FlujoGaveta`, `FlujoMonedas` y `KardexInventario`: Añadido botón con icono `SlidersHorizontal` en el input de búsqueda para desplegar y ocultar a demanda el selector de pestañas/categorías y el botón de ordenamiento, ganando valioso espacio en pantalla.",
+      "Diseño móvil optimizado en tarjetas de datos en las 3 pestañas: Ocultado el icono circular grande de la izquierda en pantallas móviles (`hidden sm:flex`) e integrado el indicador de tipo de movimiento mediante micro-iconos directamente en las insignias (badges) de color, eliminando el apiñamiento horizontal."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 63,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b63",
+    descripcion: "Ubicación dinámica de la Apertura de Kardex según el ordenamiento (inicio o final).",
+    cambios: [
+      "Posicionamiento condicional en `KardexInventario` (`src/app/dashboard/administracion/monitoreo-integral/_components/kardex-inventario.tsx`): La tarjeta de Apertura del período se muestra al inicio del listado cuando el orden es 'Antiguos primero' (orden cronológico ascendente) y al final del listado cuando el orden es 'Recientes primero' (orden cronológico descendente)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 62,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b62",
+    descripcion: "Corrección de cierre de fragmento JSX en Kardex de Inventario.",
+    cambios: [
+      "Corrección de sintaxis JSX en `KardexInventario` (`src/app/dashboard/administracion/monitoreo-integral/_components/kardex-inventario.tsx`): Corregido el cierre del mapeo de movimientos cronológicos y fragmento condicional para restaurar la compilación limpia de Turbopack."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 61,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b61",
+    descripcion: "Unificación de pestaña 'Ventas y Despachos' en Flujo de Monedas y visualización de Apertura de existencia como primer registro en Kardex.",
+    cambios: [
+      "Unificación de pestaña en `FlujoMonedas` (`src/app/dashboard/administracion/monitoreo-integral/_components/flujo-monedas.tsx`): Integradas las categorías de 'Ventas' y 'Despachos' en una sola pestaña unificada ('Ventas y Despachos') con su contador global sumado y filtro combinado para ventas rápidas, consumos, abonos, cobros y despachos.",
+      "Registro de apertura de stock como primer registro en `KardexInventario` (`src/app/dashboard/administracion/monitoreo-integral/_components/kardex-inventario.tsx`): Incorporada tarjeta inicial `<SurfaceCard variant=\"subcard\">` destacada con acento azul Antigravity al inicio del listado por cada producto, mostrando la fecha/hora de inicio de turno y las unidades exactas de existencia con que se aperturó el período antes de los movimientos cronológicos.",
+      "Soporte de catálogo en `useMonitoreoIntegral` (`_hooks/use-monitoreo-integral.ts` y `page.tsx`): Añadida consulta de productos de la sucursal y paso de fecha de inicio del período para alimentar las aperturas iniciales de inventario."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 60,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b60",
+    descripcion: "Exclusión de pestañas principales del contenedor y unificación de buscador con filtros y conteos en Monitoreo Integral.",
+    cambios: [
+      "Pestañas principales externas en `PaginaMonitoreoIntegral` (`src/app/dashboard/administracion/monitoreo-integral/page.tsx`): Excluidas las pestañas principales (`PillTabs`) del contenedor `SurfaceCard`, ubicándolas de forma independiente entre la cabecera y el panel de contenido.",
+      "Integración de buscador y pestañas con conteos en `FlujoGaveta` (`flujo-gaveta.tsx`): Unificado el input de búsqueda con las pestañas de filtro ('Todos', 'Productos', 'Mesas') en un único control `PillTabs` con sus conteos numéricos respectivos y botón de ordenamiento alineado.",
+      "Integración en `FlujoMonedas` y `KardexInventario` (`flujo-monedas.tsx` y `kardex-inventario.tsx`): Integrados los buscadores con sus correspondientes pestañas y badges de conteo numérico.",
+      "Eliminación de franjas de título repetitivas: Suprimidos los encabezados ('Registro cronológico de cobros', 'Auditoría de monedas y tragamonedas', 'Kardex de movimientos físicos') para dar paso directo a las tarjetas de datos individuales."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 59,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b59",
+    descripcion: "Visualización en tarjetas y contenedores individuales independientes para todos los listados de Monitoreo Integral.",
+    cambios: [
+      "Reemplazo de vista de tabla por tarjetas individuales en `FlujoGaveta` (`src/app/dashboard/administracion/monitoreo-integral/_components/flujo-gaveta.tsx`): Eliminado el contenedor único continuo con líneas de división (`divide-y`), transformando cada cobro y la apertura del período en tarjetas independientes `<SurfaceCard variant=\"surface\">` con separación `space-y-2.5`, bordes e iconos circulares.",
+      "Contenedores individuales en `FlujoMonedas` (`src/app/dashboard/administracion/monitoreo-integral/_components/flujo-monedas.tsx`): Reemplazado el listado corrido por tarjetas individuales `<SurfaceCard>` con badges de estado, fecha, hora y métricas de importe y stock de monedas.",
+      "Contenedores individuales en `KardexInventario` (`src/app/dashboard/administracion/monitoreo-integral/_components/kardex-inventario.tsx`): Convertido el registro de movimientos físicos a tarjetas independientes con distinción visual para entradas, salidas y productos eliminados."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 58,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b58",
+    descripcion: "Depuración y estandarización visual oficial en Monitoreo Integral de Turno.",
+    cambios: [
+      "Depuración de cabecera en `PaginaMonitoreoIntegral` (`src/app/dashboard/administracion/monitoreo-integral/page.tsx`): Removido el botón 'Exportar CSV' y simplificada la cabecera manteniendo únicamente el selector de turnos en cápsula (`SelectTrigger rounded-full h-9 bg-[#252526] border-[#2e2e2e]`).",
+      "Eliminación de tarjetas y pestaña de balance: Removidas las 3 tarjetas superiores de KPI ('Total efectivo esperado', 'Efectivo en gaveta' y 'Flujo neto monedas'), eliminada la pestaña 'Balance General' de `PillTabs` y retirado el subcomponente no utilizado `balance-turno.tsx`.",
+      "Eliminación de métricas en pestañas de flujos (`flujo-gaveta.tsx` y `flujo-monedas.tsx`): Suprimidas las tiras de 4 tarjetas de métricas en ambas pestañas, dando acceso directo e inmediato al buscador y a las listas cronológicas de movimientos.",
+      "Estandarización corporativa del Design System: Sustitución de paleta azulada residual (`#17202e`) por la paleta oficial Antigravity IDE Dark Theme (`#1e1e1e`, `#252526`, `#141414`, `#2e2e2e`), eliminación de fuentes monoespaciadas (`font-mono`) en importes a favor de `tabular-nums font-bold`, integración de `<CountBadge>` en cabeceras de listado y agregado del control estándar `<BotonVolverArriba />`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 57,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b57",
+    descripcion: "Auditoría integral, modularización y controles estándar en Inventario, Revisión Física e Historial de Revisiones.",
+    cambios: [
+      "Paginación y contenedor estándar en `PaginaInventario` (`src/app/dashboard/administracion/inventario/page.tsx`): Reemplazo del componente antiguo `InventarioPaginacion` por el componente oficial `<Paginacion />` de `@/components/comunes` con numeración circular y selector de filas, y unificación de espaciado en `<SurfaceCard variant=\"panel\" className=\"p-4 sm:p-5 space-y-4\">`.",
+      "Sincronización segura y resumen de revisión en `useInventario` (`use-inventario.ts`), `InventarioFiltros` (`inventario-filtros.tsx`), `InventarioRevisionFooter` (`inventario-revision-footer.tsx`) y `realizarAjusteInventario` (`inventario.ts`): Preservación de conteos físicos en curso ante actualizaciones en tiempo real de Firestore, auto-foco reactivo al finalizar carga o cambiar modo, barra de resumen con `<CountBadge>` y uso de `serverTimestamp()`.",
+      "Modularización en Historial de Revisiones (`src/app/dashboard/administracion/inventario/historial/`): División de la página en el hook `useHistorialAjustes` (`_hooks/use-historial-ajustes.ts`) y el subcomponente `AjusteInventarioAcordeon` (`_components/ajuste-inventario-acordeon.tsx`) cumpliendo la regla anti-código monolítico."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 56,
+    fecha: "2026-11-11",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b56",
+    descripcion: "Badge compacto de una sola línea para la diferencia en tarjetas de Revisión de Inventario.",
+    cambios: [
+      "Ajuste en `InventarioRevisionItem` (`src/app/dashboard/administracion/inventario/_components/inventario-revision-item.tsx`): Simplificado el badge de diferencia a formato compacto de una sola fila (`Dif: +N` / `Dif: -N` con `h-5 whitespace-nowrap`) alineado junto a la ubicación del producto."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 55,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b55",
+    descripcion: "Registro completo de todos los productos en revisiones de inventario y visualización diferenciada de productos con y sin cambios.",
+    cambios: [
+      "Cabecera de 2 columnas en `PaginaHistorialAjustes` (`src/app/dashboard/administracion/inventario/historial/page.tsx`): Primera columna con 'Ajuste #N' arriba y fecha/hora abajo; segunda columna con el número de productos e indicador de modificados.",
+      "Persistencia del estado de todos los productos (`use-inventario.ts` e `inventario.ts`): Al guardar una revisión de inventario se registra la instantánea de todos los productos (actualizando stock y kardex únicamente en los que tuvieron diferencias).",
+      "Visualización adaptativa en revisión e historial (`inventario-revision-item.tsx` y `historial/page.tsx`): Los productos sin modificación se muestran en formato normal limpio ('Existencia: N') y los que tuvieron modificaciones despliegan el detalle completo ('Sistema ➔ Físico' y badge de 'Diferencia')."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 54,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b54",
+    descripcion: "Estandarización de cabecera PageHeader, tarjetas, paginación y BotonVolverArriba en Historial de Revisiones de Inventario.",
+    cambios: [
+      "Estandarización en `PaginaHistorialAjustes` (`src/app/dashboard/administracion/inventario/historial/page.tsx`): Reemplazo del encabezado antiguo por `<PageHeader>` oficial con botón 'Regresar' alineado, contenedor `<SurfaceCard variant=\"panel\">`, buscador con auto-foco, acordeón con tipografía `tabular-nums`, `<Paginacion>` oficial y `<BotonVolverArriba />`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 53,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b53",
+    descripcion: "Optimización de cabecera móvil, filtros desplegables, auto-foco y BotonVolverArriba en Inventario.",
+    cambios: [
+      "Cabecera en `PaginaInventario` (`src/app/dashboard/administracion/inventario/page.tsx`): Removido el botón redundante 'Traslados', configurados los botones 'Historial' y 'Hacer Revisión' como iconos circulares compactos en vista móvil (`h-9 w-9 p-0 rounded-full`) y texto completo en escritorio, e integrado `<BotonVolverArriba />`.",
+      "Filtros colapsables y auto-foco en `InventarioFiltros` (`src/app/dashboard/administracion/inventario/_components/inventario-filtros.tsx`): Añadido botón `SlidersHorizontal` dentro de la barra de búsqueda para mostrar u ocultar los selectores de ubicación y ordenamiento (ocultos por defecto) y auto-foco automático en el buscador al abrir la página."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 52,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b52",
+    descripcion: "Botón circular de solo icono en vista móvil para el acceso a Historial en Cierre de Caja.",
+    cambios: [
+      "Ajuste responsivo en `PaginaCierreCaja` (`src/app/dashboard/cierre-caja/page.tsx`): El botón de acceso al historial en la cabecera muestra ahora únicamente su icono circular (`h-9 w-9 p-0 rounded-full`) en vista móvil (`< sm`) y el texto completo 'Historial de Cierres' en escritorio (`sm+`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 51,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b51",
+    descripcion: "Botones circulares de solo icono en vista móvil para los accesos directos de Gestión de Tragamonedas.",
+    cambios: [
+      "Cabecera responsiva en `PaginaGestionTragamonedas` (`src/app/dashboard/gestion-tragamonedas/page.tsx`): Los accesos directos a 'Ventas' y 'Sala de Juegos' muestran únicamente sus iconos circulares en vista móvil (`h-9 w-9 p-0 rounded-full`) y despliegan icono + texto en pantallas de escritorio (`sm:w-auto sm:px-3.5`), permitiendo ver el título de la página sin recortes."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 50,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b50",
+    descripcion: "Texto compacto 'Historial' en vista móvil para el botón de cabecera en Cierre de Caja.",
+    cambios: [
+      "Ajuste responsivo en `PaginaCierreCaja` (`src/app/dashboard/cierre-caja/page.tsx`): El botón de acción en la cabecera muestra ahora 'Historial' en vista móvil (`< sm`) e 'Historial de Cierres' en escritorio (`sm+`), dando espacio para visualizar el título completo 'Cierre de Caja'."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 49,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b49",
+    descripcion: "Creación del control estándar BotonVolverArriba e integración en Cierre de Caja e Historiales.",
+    cambios: [
+      "Componente común `BotonVolverArriba` (`src/components/comunes/boton-volver-arriba.tsx`): Creado el botón flotante circular estándar del Design System para volver al inicio de la página, con detección automática de desplazamiento tanto en el contenedor `<main>` del dashboard como en `window`.",
+      "Integración en `PaginaCierreCaja` (`src/app/dashboard/cierre-caja/page.tsx`), `HistorialCierresCajaPage` (`src/app/dashboard/cierre-caja/historial/page.tsx`) e `HistorialVentasPage` (`src/app/dashboard/historial-ventas/page.tsx`): Unificados el lugar, acción y aspecto del control de subida al inicio."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 48,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b48",
+    descripcion: "Optimización móvil del encabezado de acordeón en Historial de Cierres de Caja.",
+    cambios: [
+      "Diseño responsivo en `CierreCajaItemAcordeon` (`src/app/dashboard/cierre-caja/historial/_components/cierre-caja-item-acordeon.tsx`): Ocultado el icono circular en vista móvil (`hidden sm:flex`) y reestructurada la cabecera en 2 columnas balanceadas (`grid-cols-[1fr_auto]`) con 3 filas ordenadas a la izquierda (Fecha + Cierre #N, Horario del turno, Cajero) y cifras + badge de estado a la derecha, evitando que los montos se recorten o se amontonen."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 47,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b47",
+    descripcion: "Auto-foco automático en el campo Total Físico en Caja al cargar Cierre de Caja.",
+    cambios: [
+      "Ajuste en `useCierreCaja` (`src/app/dashboard/cierre-caja/_hooks/use-cierre-caja.ts`) y `CierreConteoCard` (`src/app/dashboard/cierre-caja/_components/cierre-conteo-card.tsx`): Sincronizado el foco inicial con la finalización de carga de datos del período (`!cargando && estadoCaja && fechaInicioPeriodo`) y propiedad `autoFocus` para posicionar el cursor inmediatamente en el input 'Total Físico en Caja'."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 46,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b46",
+    descripcion: "Eliminación de paneles y botones de detalle de flujos en Cierre de Caja.",
+    cambios: [
+      "Simplificación en `CierreConteoCard` (`cierre-conteo-card.tsx`), `PaginaCierreCaja` (`page.tsx`) y `useCierreCaja` (`use-cierre-caja.ts`): Removidos los botones 'Detalle', estados de apertura y paneles desplegables de flujo de efectivo, tarjeta y monedas (incluyendo la eliminación de `historial-pagos-efectivo.tsx`, `historial-pagos-tarjeta.tsx` e `historial-monedas.tsx`), dado que dicha consulta está centralizada en Monitoreo Integral y Auditoría."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 45,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b45",
+    descripcion: "Mejoras de distribución, auto-foco y desglose explicativo en Historial de Cierres de Caja.",
+    cambios: [
+      "Ajuste en `HistorialCierresCajaPage` (`src/app/dashboard/cierre-caja/historial/page.tsx`) y `PillTabs` (`src/components/comunes/pill-tabs.tsx`): Integrado el buscador a la izquierda y las pestañas ('Pendientes' y 'Todos los Registros') a la derecha en la misma píldora estándar, con auto-foco automático en el buscador al iniciar la página y padding interno (`p-4 sm:p-5`) en el contenedor principal.",
+      "Rediseño comprensible en `CierreCajaItemAcordeon` (`src/app/dashboard/cierre-caja/historial/_components/cierre-caja-item-acordeon.tsx`): Cabecera enriquecida con folio, rango horario, cajero y estado; interior organizado con franja de 4 indicadores clave y 3 bloques explicativos paso a paso (1. Origen del Efectivo y Arqueo, 2. Liquidación y Estado, 3. Control de Monedas)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 44,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b44",
+    descripcion: "Unificación tipográfica de cantidades, optimización de carga y controles estándar en Cierre de Caja e Historial de Cierres.",
+    cambios: [
+      "Unificación tipográfica en `CierreConteoCard`, `CierreLiquidacionCard`, `PaginaCierreCaja`, `HistorialPagosEfectivo`, `HistorialPagosTarjeta`, `HistorialMonedas` y `CierreCajaItemAcordeon`: Eliminada por completo la mezcla de `font-mono` con otras fuentes en cantidades y desgloses, estandarizando todos los montos y campos numéricos con `font-body` / `font-headline` y `tabular-nums`.",
+      "Optimización de carga y modularización en `useCierreCaja` (`use-cierre-caja.ts`) y `HistorialPagosMetodo` (`historial-pagos-efectivo.tsx` / `historial-pagos-tarjeta.tsx`): Desbloqueo de renderizado inicial (`cargando` acotado a `generales/actual` y sucursal) y consolidación de los historiales de pagos en efectivo y tarjeta en un componente compartido con buscador y `CountBadge`.",
+      "Optimización y controles estándar en `HistorialCierresCajaPage` (`src/app/dashboard/cierre-caja/historial/`): Carga inicial ligera acotada para mostrar primero los cierres pendientes y consulta completa al pulsar 'Todos los Registros', reemplazando el switch y paginación manual por `<PillTabs>` y `<Paginacion>`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 43,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b43",
+    descripcion: "Optimización de consultas Firestore (eliminación N+1), modularización de bloques y carga diferida en Gestión de Tragamonedas.",
+    cambios: [
+      "Optimización en `useGestionTragamonedas` (`src/app/dashboard/gestion-tragamonedas/_hooks/use-gestion-tragamonedas.ts`): Reemplazo de listeners individuales por tarjeta (`N+1`) por una suscripción única a la colección `generales_tragamonedas` y precarga de `fechaInicioPeriodo`.",
+      "Modularización en `MaquinaCard` (`maquina-card.tsx`) y nuevo `ModalOperacionMaquina` (`modal-operacion-maquina.tsx`): Extracción de los modales de Base y Extracción a una sola instancia compartida en la página y aplicación de `React.memo`.",
+      "Carga diferida en `HistorialModal` (`src/app/dashboard/gestion-tragamonedas/_components/historial-modal.tsx`): Al abrir el modal se cargan por defecto únicamente los registros del turno actual, ejecutando la consulta de todos los registros históricos solo cuando el usuario selecciona la pestaña 'Todos los Registros' (con paginación estándar integrada)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 42,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b42",
+    descripcion: "Centrado vertical del icono circular en las tarjetas de HistorialModal de tragamonedas.",
+    cambios: [
+      "Ajuste en `HistorialModal` (`src/app/dashboard/gestion-tragamonedas/_components/historial-modal.tsx`): Alineado verticalmente al centro (`items-center`) el icono circular de cada tarjeta de movimiento."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 41,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b41",
+    descripcion: "Ubicación del monto a la derecha sobre el botón Anular en HistorialModal de tragamonedas.",
+    cambios: [
+      "Ajuste en `HistorialModal` (`src/app/dashboard/gestion-tragamonedas/_components/historial-modal.tsx`): Reubicado el monto de cada movimiento al extremo derecho superior de la tarjeta, justo encima del botón 'Anular'."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 40,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b40",
+    descripcion: "Estandarización visual de modales y tarjetas en Gestión y Configuración de Tragamonedas.",
+    cambios: [
+      "Estandarización en `MaquinaCard` (`src/app/dashboard/gestion-tragamonedas/_components/maquina-card.tsx`), `HistorialModal` (`src/app/dashboard/gestion-tragamonedas/_components/historial-modal.tsx`), `PremioForm` (`src/app/dashboard/gestion-tragamonedas/_components/premio-form.tsx`) y `PaginaGestionTragamonedas` (`src/app/dashboard/gestion-tragamonedas/page.tsx`): Cabeceras con icono circular translúcido, tipografía `font-body` / `font-headline` con cifras `tabular-nums`, buscador integrado con `PillTabs`, contenedores `SurfaceCard` y botones de pie de modal alineados (`Cancelar` a la izquierda y confirmación a la derecha).",
+      "Estandarización en `TragamonedasDialog` y `EliminarMaquinaDialog` (`src/app/dashboard/configuraciones/tragamonedas/_components/`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 39,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b39",
+    descripcion: "Botones de acción perfectamente circulares en modo solo icono en cuentas activas.",
+    cambios: [
+      "Ajuste en `FilaBotonesAccionCuenta` (`src/app/dashboard/ventas/_components/pos-accounts.tsx`): Aplicado `h-7 w-7 p-0 rounded-full` cuando los botones se muestran en modo compacto de solo icono, logrando una proporción circular exacta (28x28px) en lugar de ovalada."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 38,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b38",
+    descripcion: "Adaptación dinámica de botones de acción en cuentas activas según el ancho disponible.",
+    cambios: [
+      "Mejora en `POSAccounts` (`src/app/dashboard/ventas/_components/pos-accounts.tsx`): Implementado `FilaBotonesAccionCuenta` con `ResizeObserver` para mostrar iconos y textos en todos los botones cuando el ancho de la tarjeta lo permite, o colapsar automáticamente a solo iconos (manteniendo siempre icono + texto en el botón 'Pagar') cuando el espacio es reducido."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 37,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b37",
+    descripcion: "Auto-foco en buscador de Nueva Cuenta y etiqueta descriptiva en contador de productos a trasladar.",
+    cambios: [
+      "Mejora en `DialogoTrasladoCuenta` (`src/app/dashboard/ventas/_components/dialogo-traslado-cuenta.tsx`): Auto-foco automático en el campo `AutocompleteInput` al seleccionar la pestaña 'Nueva Cuenta', y etiqueta descriptiva 'Productos a trasladar:' junto al `CountBadge`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 36,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b36",
+    descripcion: "Buscador de cliente en Traslado de Cuenta restringido solo a búsqueda de clientes existentes.",
+    cambios: [
+      "Ajuste en `DialogoTrasladoCuenta` (`src/app/dashboard/ventas/_components/dialogo-traslado-cuenta.tsx`) y `useVentas` (`src/app/dashboard/ventas/_hooks/use-ventas.ts`): Deshabilitada la opción de crear cliente nuevo en el `AutocompleteInput` del traslado de cuenta para permitir únicamente buscar y seleccionar clientes existentes."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 35,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b35",
+    descripcion: "Ajuste de altura uniforme en PillTabs, AutocompleteInput en Traslado de Cuenta y corrección de márgenes.",
+    cambios: [
+      "Ajuste en `PillTabs` (`src/components/comunes/pill-tabs.tsx`): Añadido `h-full py-0` en `TabsTrigger` para que las pestañas con y sin `CountBadge` tengan exactamente la misma altura.",
+      "Optimización en `DialogoTrasladoCuenta` (`src/app/dashboard/ventas/_components/dialogo-traslado-cuenta.tsx`) y `useVentas` (`src/app/dashboard/ventas/_hooks/use-ventas.ts`): Reemplazo del doble buscador/select en 'Nueva Cuenta' por el control único `AutocompleteInput` del POS, alineación del botón 'Cancelar' a la izquierda (`sm:justify-between`) y margen interior (`px-1.5 -mx-1.5`) para evitar recortes en los bordes de foco."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 34,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b34",
+    descripcion: "Estandarización del modal de Traslado de Cuenta con los controles oficiales del Design System.",
+    cambios: [
+      "Estandarización en `DialogoTrasladoCuenta` (`src/app/dashboard/ventas/_components/dialogo-traslado-cuenta.tsx`) y `POSAccounts` (`src/app/dashboard/ventas/_components/pos-accounts.tsx`): Reemplazo de estilos personalizados por los componentes oficiales del sistema (`PillTabs`, `SurfaceCard`, `CountBadge`, `Checkbox` y `Button` primario en paleta oficial Azul Antigravity)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 33,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b33",
+    descripcion: "Limpieza de bloques duplicados en DialogoUltimosMovimientos, POSAccounts y useVentas.",
+    cambios: [
+      "Depuración de archivos en módulo de Ventas (`dialogo-ultimos-movimientos.tsx`, `pos-accounts.tsx`, `use-ventas.ts`, `version.ts`): Eliminadas líneas y propiedades duplicadas para garantizar compilación limpia."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 32,
+    fecha: "2026-11-10",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b32",
+    descripcion: "Corrección de sintaxis en desestructuración de propiedades de PaginaVentasPOS.",
+    cambios: [
+      "Corrección en `PaginaVentasPOS` (`src/app/dashboard/ventas/page.tsx`): Eliminada la línea duplicada `dialogsProps` en la desestructuración del hook `useVentas`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 31,
+    fecha: "2026-11-09",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b31",
+    descripcion: "Traslado y fusión atómica de cuentas activas en Punto de Venta (traslado total o parcial con eliminación de cuenta en cero).",
+    cambios: [
+      "Transacción atómica en `trasladarItemsDeCuenta` (`src/lib/firebase/servicios/ventas.ts`): Implementada la lógica de traspaso atómico de productos o cuentas completas entre clientes mediante `runTransaction`. Si la cuenta de origen queda con saldo Q0.00 o sin ítems, se elimina automáticamente de Firestore.",
+      "Componente modal `DialogoTrasladoCuenta` (`src/app/dashboard/ventas/_components/dialogo-traslado-cuenta.tsx`): Creada interfaz con selección de cuenta destino (existente o nueva cuenta de catálogo), modo de traslado (toda la cuenta o selección por ítem y cantidades) y resumen de impacto financiero en tiempo real.",
+      "Acción en Cuentas Activas (`pos-accounts.tsx`): Integrado el botón `[ ⇄ Trasladar ]` en el acordeón de cada cuenta activa y conectado al flujo de auditoría de Últimos Movimientos del Turno."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 30,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b30",
+    descripcion: "Eliminación de paginación en auditoría rápida de Últimos Movimientos del Turno a favor de scroll continuo.",
+    cambios: [
+      "Scroll fluido en `DialogoUltimosMovimientos` (`src/app/dashboard/ventas/_components/dialogo-ultimos-movimientos.tsx`): Removida la paginación innecesaria en el modal de auditoría de turno tanto en vista móvil como de escritorio, permitiendo la exploración inmediata y continua de todas las operaciones del turno actual con scrollbar nativo optimizado."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 29,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b29",
+    descripcion: "Separación vertical responsiva en PillTabs para móvil con texto, iconos y badges legibles.",
+    cambios: [
+      "Diseño responsivo móvil en `PillTabs` (`src/components/comunes/pill-tabs.tsx`): Al incluir buscador integrado, en vista móvil (`< sm`) se desacopla en dos filas ordenadas: Fila 1 con buscador a 100% de ancho y Fila 2 con las pestañas completas mostrando icono, texto de etiqueta y badge de conteo sin recortes. En escritorio (`sm+`) se conserva la píldora horizontal unificada.",
+      "Iconos informativos en pestañas de auditoría (`dialogo-ultimos-movimientos.tsx`): Asignados iconos (`Layers` para Todos, `ShoppingCart` para Ventas, `CreditCard` para Cobros) mejorando la identificación visual inmediata."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 28,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b28",
+    descripcion: "Botones responsivos en cabecera de Control de Estaciones (solo icono en vista móvil).",
+    cambios: [
+      "Cabecera responsiva en `MesasPage` (`src/app/dashboard/mesas/page.tsx`): Configurados los botones de acceso rápido a 'Punto de Venta' y 'Tragamonedas' para mostrar únicamente sus iconos circulares en vista móvil (`h-9 w-9 p-0 rounded-full`) y desplegar el texto completo en pantallas de escritorio (`sm:inline sm:px-3.5`), evitando que el título de la página se comprima o mutile."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 27,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b27",
+    descripcion: "Arquitectura responsiva dual profesional (móvil y escritorio) para el componente Paginacion.",
+    cambios: [
+      "Diseño responsivo dual desacoplado en `Paginacion` (`src/components/comunes/paginacion.tsx`): Separadas las interfaces móvil (`sm:hidden`) y escritorio (`hidden sm:flex`). En móvil se distribuye en dos filas ordenadas: Fila 1 con resumen de página y selector de filas, y Fila 2 con barra de navegación de ancho completo (`[ < Anterior ]`, botones circulares perfectos `w-8 h-8 aspect-square` y `[ Siguiente > ]`), eliminando desbordamientos, cortes de botones y scrolls horizontales."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 26,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b26",
+    descripcion: "Botones circulares redondos sin distorsión ovalada y aprovechamiento total del ancho del contenedor en paginación.",
+    cambios: [
+      "Geometría circular perfecta (`w-8 h-8 aspect-square p-0 rounded-full`) en `Paginacion` (`src/components/comunes/paginacion.tsx`): Corregida la relación de aspecto de los números de página eliminando paddings asimétricos para que sean 100% redondos y nunca ovalados.",
+      "Distribución de ancho completo (`w-full flex justify-between`): Se habilitó la visualización completa de elementos numéricos aprovechando todo el ancho del contenedor en una sola fila equilibrada."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 25,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b25",
+    descripcion: "Garantía de fila única en controles de paginación para vistas móviles sin salto de línea.",
+    cambios: [
+      "Fila única estricta en `Paginacion` (`src/components/comunes/paginacion.tsx`): Implementada la función `generarItemsPaginacion` con bandera reactiva `ocultarEnMovil` y contenedor `flex-nowrap`, permitiendo que los botones `[ < Anterior ]`, números circulares y `[ Siguiente > ]` permanezcan siempre alineados en una sola fila en móviles sin desbordar ni partirse en dos líneas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 24,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b24",
+    descripcion: "Adición de etiquetas de texto 'Anterior' y 'Siguiente' junto a sus iconos en los controles de paginación.",
+    cambios: [
+      "Botones de navegación en `Paginacion` (`src/components/comunes/paginacion.tsx`): Actualizados los controles de página previa y siguiente para incluir texto explícito junto a su icono (`[ < Anterior ]` y `[ Siguiente > ]`) manteniendo el formato ergonómico de píldora redondeada `rounded-full` y la numeración circular central."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 23,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b23",
+    descripcion: "Integración de numeración circular estándar en componente Paginacion con salto directo a páginas.",
+    cambios: [
+      "Numeración circular en `Paginacion` (`src/components/comunes/paginacion.tsx`): Implementada la visualización de páginas con botones circulares (`[ < ] [ 1 ] [ 2 ] ... [ 108 ] [ > ]` y vista intermedia `[ < ] [ 1 ] ... [ 5 ] [ 6 ] [ 7 ] ... [ 108 ] [ > ]`), con estilo activo azul Antigravity (`bg-sky-600 font-black text-white`) y botones inactivos en superficie estándar (`bg-[#252526] hover:bg-[#313131] border-[#2e2e2e]`).",
+      "Navegación directa en `HistorialVentasPage` y `useHistorialVentas`: Expuesto `setCurrentPage` para permitir saltos directos a cualquier página al hacer clic en su número correspondiente."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 22,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b22",
+    descripcion: "Reubicación de botón Regresar al lado derecho con texto y habilitación de descripción en vista móvil.",
+    cambios: [
+      "Botón Regresar al lado derecho en `PageHeader` (`src/components/comunes/page-header.tsx`): Reubicado el botón de retroceso a la derecha de la cabecera mostrando icono y texto 'Regresar' (`[ ← Regresar ]`) tanto en escritorio como en vista móvil.",
+      "Descripción visible en móvil: Removida la clase `hidden sm:block` en `PageHeader`, permitiendo que el subtítulo explicativo de la página se visualice también en pantallas móviles."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 21,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b21",
+    descripcion: "Estandarización del componente común Paginacion e integración en Historial de Ventas y Últimos Movimientos.",
+    cambios: [
+      "Componente común `Paginacion` (`src/components/comunes/paginacion.tsx`): Creado el componente estándar oficial del Design System para paginación ('Página X de Y (N registros) | Mostrar: [10 filas ⌵]' con botones redondeados '[ < Anterior ] [ Siguiente > ]').",
+      "Documentación en `AGENTS.md`: Registrado `<Paginacion>` en la sección de componentes comunes oficiales disponibles.",
+      "Integración en `HistorialVentasPage` y `DialogoUltimosMovimientos`: Sustitución de controles manuales por el componente común `<Paginacion />` en historial de ventas y adición de paginación fluida en el modal de auditoría de turno."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 20,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b20",
+    descripcion: "Estandarización de badges activos en pestañas a color ámbar corporativo.",
+    cambios: [
+      "Badge activo ámbar en `dialogo-ultimos-movimientos.tsx` y `pill-tabs.tsx`: Configurado el badge numérico de conteo (`CountBadge`) con la variante 'amber' (`bg-amber-400 text-slate-950 font-black`) para la pestaña actualmente activa, garantizando contraste óptimo y cumplimiento estricto de la regla de diseño 2C."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 19,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b19",
+    descripcion: "Inclusión de ventas rápidas de contado en la pestaña de cobros y visualización del método de pago en auditoría.",
+    cambios: [
+      "Inclusión de ventas rápidas en cobros (`src/app/dashboard/ventas/_components/dialogo-ultimos-movimientos.tsx`): Las ventas rápidas (`venta_rapida`), al ser transacciones cobradas de contado en el acto, ahora se contabilizan y listan tanto en la pestaña 'Ventas' como en 'Cobros'.",
+      "Indicador de método de pago en auditoría (`use-ventas.ts` y `dialogo-ultimos-movimientos.tsx`): Integrada la visualización del método de pago (`Efectivo`, `Tarjeta`) en la línea de autoría de cada tarjeta de movimiento."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 18,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b18",
+    descripcion: "Corrección de categorización de cobros y abonos en auditoría POS y autofoco automático en el buscador al cambiar de pestaña.",
+    cambios: [
+      "Categorización de cobros en `use-ventas.ts`: Mapeo exhaustivo insensible a mayúsculas para acciones `VENTA_PAGAR`, `PAGO_REGISTRAR`, `PAGO_UNIFICADO`, `VENTA_ABONAR`, `PAGO_ABONO` y `ABONO_REGISTRADO`, permitiendo que la pestaña 'Cobros' filtre y muestre correctamente todos los pagos y abonos del turno con sus montos reales (`montoPagado`, `montoAbonado`, `totalLiquidado`).",
+      "Autofoco automático en buscador (`src/components/comunes/pill-tabs.tsx` y `dialogo-ultimos-movimientos.tsx`): Al hacer clic en cualquiera de las pestañas ('Todos', 'Ventas', 'Cobros'), el foco del cursor se traslada de inmediato al campo de búsqueda."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 17,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b17",
+    descripcion: "Estandarización de botones en cabecera de ventas, botón de cortesía compacto en móvil e integración del control estándar PillTabs en modal de últimos movimientos.",
+    cambios: [
+      "Cabecera de ventas responsive (`src/app/dashboard/ventas/_components/pos-header.tsx`): Los botones superiores muestran texto e icono en escritorio (`hidden sm:inline`) y se compactan en iconos circulares (`w-9 h-9`) en vistas móviles.",
+      "Botón de Cortesía compacto en móvil (`src/app/dashboard/ventas/_components/pos-accounts.tsx`): El botón 'Cortesía' en cuentas abiertas ahora oculta el texto en móvil (`hidden sm:inline`) mostrando únicamente el icono para no saturar la fila de acciones.",
+      "Modal de Últimos Movimientos con control estándar (`src/app/dashboard/ventas/_components/dialogo-ultimos-movimientos.tsx`): Integrado el componente oficial `PillTabs` con buscador a la izquierda y pestañas a la derecha, eliminación de mayúsculas sostenidas (`Artículos procesados:`) y aplicación de la paleta oficial Antigravity (`#1e1e1e`, `#252526`, `#141414`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 16,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b16",
+    descripcion: "Menú lateral desplegable flotante sobre la página y adición de icono de búsqueda estándar en buscador de clientes del POS.",
+    cambios: [
+      "Menú lateral flotante (`src/components/ui/sidebar.tsx`): El menú ahora se despliega por encima de la página (`absolute z-50 shadow-2xl`) manteniendo constante el ancho del riel base (`w-[var(--sidebar-width-icon)]`), eliminando el redimensionamiento, desplazamiento y reducción de espacio de las vistas principales.",
+      "Cierre al hacer clic fuera: Integrado listener para replegar automáticamente el menú flotante al hacer clic sobre la página.",
+      "Icono de búsqueda estándar en `AutocompleteInput` (`src/components/ui/autocomplete-input.tsx` y `pos-form.tsx`): Integrado el icono estándar `Search` centrado con padding simétrico `pl-10` en el campo de 'Buscar o crear cliente...' del Punto de Venta."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 15,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b15",
+    descripcion: "Optimización de la tarjeta de Última Operación en POS: icono centrado y ampliado, eliminación de duplicidad de datos y corrección de folio en despacho rápido.",
+    cambios: [
+      "Icono centrado y ampliado en `POSUltimaAccion` (`src/app/dashboard/ventas/_components/pos-ultima-accion.tsx`): Contenedor circular incrementado a `w-11 h-11` con icono de `w-5 h-5` / `w-6 h-6`, centrado verticalmente con la información.",
+      "Eliminación de duplicidad de datos: Reorganización limpia de badges y texto (`[Última Operación] [#Folio] Acción (Cliente)`), eliminando la repetición del número de venta y el nombre en el título.",
+      "Corrección de folio en venta rápida: Integrado retorno de `idVenta` y `idPago` en la transacción de `procesarVentaRapidaConId` (`src/lib/firebase/servicios/ventas.ts`) y validación estricta contra `#undefined` en `quick-dispatch-input.tsx`, `use-ventas.ts` y `pos-ultima-accion.tsx`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 14,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b14",
+    descripcion: "Reubicación de la tarjeta de última operación en la columna derecha (cuentas) al fondo de la pantalla.",
+    cambios: [
+      "Reubicación en `PaginaVentasPOS` (`src/app/dashboard/ventas/page.tsx`): Trasladada la tarjeta de última operación a la columna derecha (debajo del listado de cuentas abiertas) fijada en la parte inferior de la pantalla con `mt-auto`, dejando la columna de venta completamente despejada."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 13,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b13",
+    descripcion: "Anclaje de la tarjeta de última operación hasta el borde inferior de la pantalla en Punto de Venta.",
+    cambios: [
+      "Alineación vertical completa en `PaginaVentasPOS` (`src/app/dashboard/ventas/page.tsx`): Configurada la altura dinámica `min-h-[calc(100vh-6.5rem)]` con distribución `flex-1 items-stretch` y `mt-auto` en la columna del POS, asegurando que la tarjeta de última operación se fije en el extremo inferior de la pantalla eliminando el espacio vacío."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 12,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b12",
+    descripcion: "Reubicación de la barra de última operación al final del panel del Punto de Venta.",
+    cambios: [
+      "Reubicación en `PaginaVentasPOS` (`src/app/dashboard/ventas/page.tsx`): La tarjeta de última operación se trasladó debajo del contenedor de venta y carrito de compras, despejando la parte superior para un acceso inmediato al buscador de clientes y controles principales.",
+      "Eliminación de mayúsculas sostenidas: Ajustado el badge de `Última Operación` a formato título legible sin clase `uppercase`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 11,
+    fecha: "2026-11-08",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b11",
+    descripcion: "Certeza operativa en Punto de Venta: barra de última acción persistente, feed de movimientos y highlight de cuentas.",
+    cambios: [
+      "Barra de Última Acción (`pos-ultima-accion.tsx`): Tarjeta persistente visible en todo momento en el Punto de Venta que confirma al instante la última venta, despacho rápido o cobro procesado con detalle de artículos, folio, monto y tiempo transcurrido.",
+      "Diálogo de Últimos Movimientos (`dialogo-ultimos-movimientos.tsx`): Modal de auditoría rápida accesible con 1 clic desde la cabecera del POS o desde la barra de última acción, con filtros por tipo (Ventas/Cobros), buscador y desglose de artículos en tiempo real.",
+      "Resaltado en Cuentas Pendientes (`pos-accounts.tsx`): Indicador de confirmación visual ('Recién actualizada') con pulso de color para saber con certeza que los productos agregados ya forman parte de la cuenta del cliente.",
+      "Sincronización unificada en `use-ventas.ts` y `quick-dispatch-input.tsx`: Integración bidireccional inmediata en memoria y con la bitácora de auditoría de Firestore."
+    ]
+  },
+  {
+    version: "2.0.0",
     build: 10,
     fecha: "2026-11-08",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b10",
     descripcion: "Jerarquía de elevación en 4 capas para separación nítida de contenedores principales.",
@@ -2115,9 +4194,9 @@ export const releaseHistory: ReleaseItem[] = [
 
 export const appVersion = {
   version: "2.0.0",
-  build: 10,
+  build: 14,
   date: "2026-11-08",
-  publicadaActual: releaseHistory[0], // Build 10 (v2.0.0)
-  publicadaAnterior: releaseHistory[1], // Build 9 (v2.0.0)
+  publicadaActual: releaseHistory[0], // Build 14 (v2.0.0)
+  publicadaAnterior: releaseHistory[1], // Build 13 (v2.0.0)
   historial: releaseHistory
 };

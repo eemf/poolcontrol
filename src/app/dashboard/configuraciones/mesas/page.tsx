@@ -52,7 +52,7 @@ export default function PaginaConfiguracionMesasUnificada() {
   if (!isMounted) return null
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-2">
       <PageHeader
         title="Configuración de Estaciones"
         description="Administra las tarifas y el inventario de estaciones (Mesas de Billar y Consolas)."

@@ -54,25 +54,29 @@ export default function PaginaMesas() {
         description="Gestión en vivo de mesas de billar y consolas de videojuegos."
         icon={Gamepad2}
         action={
-          <div className="flex items-center justify-center sm:justify-end gap-2">
+          <div className="flex items-center justify-end gap-2 shrink-0">
             <Button
               variant="secondary"
               asChild
-              className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]"
+              className="rounded-full h-9 w-9 sm:w-auto p-0 sm:px-3.5 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e] shadow-sm transition-colors text-xs font-semibold gap-1.5 inline-flex items-center justify-center"
+              title="Punto de Venta"
+              aria-label="Punto de Venta"
             >
               <Link href="/dashboard/ventas">
-                <ShoppingCart className="mr-1.5 h-3.5 w-3.5 text-sky-400" />
-                Punto de Venta
+                <ShoppingCart className="h-4 w-4 text-sky-400 shrink-0" />
+                <span className="hidden sm:inline">Punto de Venta</span>
               </Link>
             </Button>
             <Button
               variant="secondary"
               asChild
-              className="rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]"
+              className="rounded-full h-9 w-9 sm:w-auto p-0 sm:px-3.5 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e] shadow-sm transition-colors text-xs font-semibold gap-1.5 inline-flex items-center justify-center"
+              title="Tragamonedas"
+              aria-label="Tragamonedas"
             >
               <Link href="/dashboard/gestion-tragamonedas">
-                <Dices className="mr-1.5 h-3.5 w-3.5 text-amber-400" />
-                Tragamonedas
+                <Dices className="h-4 w-4 text-amber-400 shrink-0" />
+                <span className="hidden sm:inline">Tragamonedas</span>
               </Link>
             </Button>
           </div>

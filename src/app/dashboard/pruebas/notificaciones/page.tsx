@@ -122,7 +122,7 @@ export default function NotificacionesPruebasPage() {
   ]
 
   return (
-    <div className="space-y-8 font-body max-w-5xl mx-auto pb-20">
+    <div className="space-y-8 font-body max-w-5xl mx-auto pb-2">
       <div>
         <h1 className="text-2xl font-bold tracking-tight font-headline flex items-center gap-3">
           <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center">

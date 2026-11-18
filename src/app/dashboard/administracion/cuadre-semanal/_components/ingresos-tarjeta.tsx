@@ -35,17 +35,27 @@ const DetalleVentasTarjeta = ({ firestore, sucursalId, inicio, fin }: { firestor
     if (!pagos || pagos.length === 0) return <p className="text-[10px] text-muted-foreground italic text-center p-2">Sin detalles de ventas con tarjeta.</p>;
 
     return (
-        <div className="space-y-1.5 p-2 bg-muted/20 rounded-xl mt-1">
-            <p className="text-[9px] font-bold text-muted-foreground mb-1 px-1">Desglose de Ventas con Tarjeta</p>
-            {pagos.map(pago => (
-                <div key={pago.id} className="flex justify-between items-center text-[10px] px-2 py-1.5 border-b border-muted-foreground/10 last:border-0 hover:bg-background/40 transition-colors rounded-md">
-                    <div className="flex flex-col min-w-0 text-left">
-                        <span className="font-bold text-foreground/80 truncate">Venta #{pago.idVenta} — {pago.clienteNombre}</span>
-                        <span className="text-[8px] text-muted-foreground font-medium">{format(toDate(pago.fecha), 'hh:mm a')}</span>
+        <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+                <h4 className="font-semibold text-xs text-slate-300 flex items-center gap-1.5">
+                    <CreditCard className="h-3.5 w-3.5 text-sky-400" />
+                    <span>Desglose de ventas con tarjeta</span>
+                </h4>
+                <span className="text-[11px] font-medium text-slate-400 tabular-nums">
+                    {pagos.length} {pagos.length === 1 ? 'pago' : 'pagos'}
+                </span>
+            </div>
+            <div className="space-y-1.5">
+                {pagos.map(pago => (
+                    <div key={pago.id} className="flex justify-between items-center bg-[#252526] border border-[#2e2e2e] p-2.5 rounded-xl text-xs">
+                        <div className="min-w-0 pr-2">
+                            <p className="font-semibold text-slate-100 truncate">Venta #{pago.idVenta} — {pago.clienteNombre}</p>
+                            <p className="text-[10px] text-slate-400">{format(toDate(pago.fecha), 'hh:mm a')}</p>
+                        </div>
+                        <p className="font-bold text-sky-400 tabular-nums shrink-0">Q{pago.montoTotalPagado.toFixed(2)}</p>
                     </div>
-                    <span className="font-bold text-blue-600 ml-2">Q{pago.montoTotalPagado.toFixed(2)}</span>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 };
@@ -68,7 +78,10 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
       style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
-        <CardTitle className="font-bold text-base sm:text-lg text-foreground">Ingresos por Tarjeta</CardTitle>
+        <CardTitle className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
+          <CreditCard className="h-5 w-5 text-sky-400 shrink-0" />
+          Ingresos por Tarjeta
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-1">
         <div className="space-y-3">
@@ -90,16 +103,17 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
                 style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
                 className="border-b-0 rounded-xl border !border-[#2e2e2e] !bg-[#252526] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
               >
-                {/* Checkbox anclado a la cabecera del acordeón */}
-                <div className="absolute left-3 top-6 -translate-y-1/2 z-20 flex items-center justify-center">
-                  <Checkbox 
-                    id={`cierre-tarjeta-${cierre.id}`} 
-                    checked={selected.has(cierre.id)} 
-                    onCheckedChange={(checked) => onSelect(cierre.id, !!checked)}
-                  />
-                </div>
+                {/* Checkbox centrado verticalmente en la cabecera del acordeón */}
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center">
+                    <Checkbox 
+                      id={`cierre-tarjeta-${cierre.id}`} 
+                      checked={selected.has(cierre.id)} 
+                      onCheckedChange={(checked) => onSelect(cierre.id, !!checked)}
+                    />
+                  </div>
 
-                <AccordionTrigger className="pl-10 pr-3 hover:no-underline py-3 w-full">
+                  <AccordionTrigger className="pl-10 pr-3 hover:no-underline py-3 w-full data-[state=open]:border-b data-[state=open]:border-[#2e2e2e]">
                   <div className="flex-1 min-w-0 flex items-center justify-between gap-2 mr-2 text-left">
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       <div className="hidden sm:flex h-8 w-8 rounded-full bg-blue-500/10 items-center justify-center shrink-0">
@@ -121,22 +135,21 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
                       <p className="font-bold text-xs sm:text-sm text-blue-400 whitespace-nowrap tabular-nums leading-tight">
                         Q{cierre.pagosTarjeta.toFixed(2)}
                       </p>
-                      <Badge className="h-4 text-[9px] font-semibold border-none bg-blue-500/20 text-blue-300 px-1.5 py-0">
+                      <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                         Pendiente
                       </Badge>
                     </div>
                   </div>
-                </AccordionTrigger>
+                  </AccordionTrigger>
+                </div>
 
-                <AccordionContent className="px-3 pb-3">
-                  <div className="pt-2 border-t !border-[#2e2e2e]">
-                    <DetalleVentasTarjeta 
-                      firestore={firestore} 
-                      sucursalId={sucursalId} 
-                      inicio={cierre.inicioDelPeriodo} 
-                      fin={cierre.fecha} 
-                    />
-                  </div>
+                <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e]">
+                  <DetalleVentasTarjeta 
+                    firestore={firestore} 
+                    sucursalId={sucursalId} 
+                    inicio={cierre.inicioDelPeriodo} 
+                    fin={cierre.fecha} 
+                  />
                 </AccordionContent>
               </AccordionItem>
             ))}

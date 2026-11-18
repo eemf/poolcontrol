@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { SurfaceCard, PillTabs } from '@/components/comunes';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,8 @@ import {
   PieChart, 
   Clock, 
   User, 
-  Sigma 
+  Sigma,
+  ArrowRightLeft 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -48,6 +49,7 @@ interface POSAccountsProps {
     clientesConCreditoIds: Set<string>;
     clientesConConsumoInternoIds: Set<string>;
     procesandoCredito: string | null;
+    ultimaCuentaModificadaId?: string | null;
   };
   actions: {
     setVistaCuentas: (val: 'pendientes' | 'credito') => void;
@@ -57,10 +59,174 @@ interface POSAccountsProps {
     abrirDialogoConsumoInterno: (venta: Venta) => void;
     manejarClickPasarACredito: (venta: Venta) => void;
     abrirDialogoPago: (venta: Venta) => void;
+    abrirDialogoTraslado?: (venta: Venta) => void;
   };
   refs: {
     filtroCuentasInputRef: React.RefObject<HTMLInputElement>;
   };
+}
+
+interface FilaBotonesAccionCuentaProps {
+  venta: Venta;
+  permiteConsumoInterno: boolean;
+  esVentaCredito: boolean;
+  idVentaActiva: string | null;
+  procesandoCredito: string | null;
+  actions: POSAccountsProps['actions'];
+}
+
+function FilaBotonesAccionCuenta({
+  venta,
+  permiteConsumoInterno,
+  esVentaCredito,
+  idVentaActiva,
+  procesandoCredito,
+  actions,
+}: FilaBotonesAccionCuentaProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [mostrarTexto, setMostrarTexto] = useState(true);
+
+  useEffect(() => {
+    const checkSpace = () => {
+      if (!containerRef.current || !measureRef.current) return;
+      const availableWidth = containerRef.current.clientWidth;
+      const requiredWidth = measureRef.current.offsetWidth;
+      if (availableWidth > 0 && requiredWidth > 0) {
+        setMostrarTexto(availableWidth >= requiredWidth);
+      }
+    };
+
+    checkSpace();
+
+    const observer = new ResizeObserver(() => {
+      checkSpace();
+    });
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [permiteConsumoInterno, esVentaCredito, Boolean(actions.abrirDialogoTraslado)]);
+
+  const renderBotones = (conTexto: boolean) => (
+    <>
+      {permiteConsumoInterno && (
+        <Button
+          type="button"
+          className={cn(
+            'h-7 rounded-full text-[11px] font-semibold bg-violet-500/20 hover:bg-violet-600 text-violet-300 hover:text-white border border-violet-500/35 shadow-sm transition-colors shrink-0',
+            conTexto ? 'px-2.5' : 'w-7 p-0'
+          )}
+          onClick={() => actions.abrirDialogoConsumoInterno(venta)}
+          disabled={idVentaActiva === venta.id}
+          title="Cortesía"
+        >
+          <Gift className={cn('h-3.5 w-3.5 shrink-0', conTexto && 'mr-1 h-3 w-3')} />
+          {conTexto && <span>Cortesía</span>}
+        </Button>
+      )}
+
+      {esVentaCredito ? (
+        <PermissionGuard permission="ventas.editar_credito">
+          <Button
+            type="button"
+            className={cn(
+              'h-7 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
+              conTexto ? 'px-2.5' : 'w-7 p-0'
+            )}
+            onClick={() => actions.manejarClickEditar(venta)}
+            disabled={idVentaActiva === venta.id}
+            title="Editar cuenta"
+          >
+            <PencilIcon className={cn('h-3.5 w-3.5 shrink-0', conTexto && 'mr-1 h-3 w-3')} />
+            {conTexto && <span>Editar</span>}
+          </Button>
+        </PermissionGuard>
+      ) : (
+        <Button
+          type="button"
+          className={cn(
+            'h-7 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
+            conTexto ? 'px-2.5' : 'w-7 p-0'
+          )}
+          onClick={() => actions.manejarClickEditar(venta)}
+          disabled={idVentaActiva === venta.id}
+          title="Editar cuenta"
+        >
+          <PencilIcon className={cn('h-3.5 w-3.5 shrink-0', conTexto && 'mr-1 h-3 w-3')} />
+          {conTexto && <span>Editar</span>}
+        </Button>
+      )}
+
+      {!esVentaCredito && (
+        <Button
+          type="button"
+          className={cn(
+            'h-7 rounded-full text-[11px] font-semibold bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border border-amber-500/35 shadow-sm transition-colors shrink-0',
+            conTexto ? 'px-2.5' : 'w-7 p-0'
+          )}
+          onClick={() => actions.manejarClickPasarACredito(venta)}
+          disabled={procesandoCredito === venta.id || idVentaActiva === venta.id}
+          title="Pasar a crédito"
+        >
+          {procesandoCredito === venta.id ? (
+            <Clock className={cn('h-3.5 w-3.5 animate-spin shrink-0', conTexto && 'mr-1 h-3 w-3')} />
+          ) : (
+            <CreditCard className={cn('h-3.5 w-3.5 shrink-0', conTexto && 'mr-1 h-3 w-3')} />
+          )}
+          {conTexto && <span>Crédito</span>}
+        </Button>
+      )}
+
+      {!esVentaCredito && actions.abrirDialogoTraslado && (
+        <Button
+          type="button"
+          className={cn(
+            'h-7 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
+            conTexto ? 'px-2.5' : 'w-7 p-0'
+          )}
+          onClick={() => actions.abrirDialogoTraslado!(venta)}
+          disabled={idVentaActiva === venta.id}
+          title="Trasladar cuenta o productos a otro cliente"
+        >
+          <ArrowRightLeft className={cn('h-3.5 w-3.5 shrink-0', conTexto && 'mr-1 h-3 w-3')} />
+          {conTexto && <span>Trasladar</span>}
+        </Button>
+      )}
+
+      {/* El botón Pagar siempre muestra icono + texto */}
+      <Button
+        type="button"
+        className="h-7 px-3 rounded-full text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shrink-0"
+        onClick={() => actions.abrirDialogoPago(venta)}
+        disabled={idVentaActiva === venta.id}
+        title="Pagar cuenta"
+      >
+        <CheckCircle className="mr-1 h-3 w-3 shrink-0" />
+        <span>Pagar</span>
+      </Button>
+    </>
+  );
+
+  return (
+    <div ref={containerRef} className="w-full relative">
+      {/* Medidor invisible del ancho total requerido con todos los textos visibles */}
+      <div
+        ref={measureRef}
+        aria-hidden="true"
+        className="fixed -top-[9999px] left-0 invisible pointer-events-none flex items-center gap-1.5 flex-nowrap w-max"
+      >
+        {renderBotones(true)}
+      </div>
+
+      {/* Barra real renderizada según quepa o no el texto completo */}
+      <div className="flex items-center justify-center gap-1.5 flex-nowrap w-full">
+        {renderBotones(mostrarTexto)}
+      </div>
+    </div>
+  );
 }
 
 export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
@@ -166,7 +332,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
   }, [state.ventasACredito, state.ventasPendientes, cuentasFiltradas, state.filtroCuentas]);
 
   return (
-    <SurfaceCard variant="panel" className="w-full p-4 space-y-3.5 font-body">
+    <SurfaceCard variant="panel" className="w-full p-4 flex flex-col gap-3.5 font-body">
       {/* Pestañas Oficiales con Lupa Expandible Integrada */}
       <PillTabs
         value={state.vistaCuentas}
@@ -237,20 +403,19 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
       )}
 
       {cuentasFiltradas.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-10 text-center text-slate-400 gap-2">
-          <div className="w-12 h-12 rounded-full bg-[#252526] border border-[#2e2e2e] flex items-center justify-center text-slate-500">
-            {state.vistaCuentas === 'pendientes' ? (
-              <FileClock className="h-5 w-5" />
-            ) : (
-              <CreditCard className="h-5 w-5" />
-            )}
-          </div>
-          <p className="text-xs">
+        <div className="flex flex-col items-center justify-center py-7 text-center text-slate-400 gap-2.5">
+          {state.vistaCuentas === 'pendientes' ? (
+            <FileClock className="h-10 w-10 text-slate-500 stroke-[1.75]" />
+          ) : (
+            <CreditCard className="h-10 w-10 text-slate-500 stroke-[1.75]" />
+          )}
+          <p className="text-sm font-medium">
             No hay cuentas {state.vistaCuentas === 'pendientes' ? 'pendientes' : 'a crédito'}.
           </p>
         </div>
       ) : (
-        <Accordion type="single" collapsible className="w-full space-y-2.5">
+        <div className="lg:max-h-[calc(100vh-15.5rem)] lg:overflow-y-auto custom-scrollbar lg:pr-1">
+          <Accordion type="single" collapsible className="w-full space-y-2.5">
           {cuentasFiltradas.map((venta) => {
             const tieneCredito = state.clientesConCreditoIds.has(venta.clienteId);
             const permiteConsumoInterno = state.clientesConConsumoInternoIds.has(venta.clienteId);
@@ -278,6 +443,12 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                   .reduce((acc, v) => acc + v.saldo, 0)
               : 0;
 
+            const esRecienActualizada = Boolean(
+              state.ultimaCuentaModificadaId &&
+                (state.ultimaCuentaModificadaId === venta.id ||
+                  String(state.ultimaCuentaModificadaId) === String(venta.idVenta))
+            );
+
             return (
               <AccordionItem
                 value={venta.id}
@@ -286,6 +457,8 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                   'border rounded-xl transition-all overflow-hidden',
                   state.idVentaActiva === venta.id
                     ? 'border-sky-500 bg-sky-500/10'
+                    : esRecienActualizada
+                    ? 'border-sky-400/80 bg-sky-500/15 shadow-md shadow-sky-500/10 ring-1 ring-sky-400/50'
                     : 'bg-[#252526] border-[#2e2e2e]'
                 )}
               >
@@ -302,6 +475,11 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                           <p className="text-sm font-bold text-slate-100 truncate leading-tight">
                             {venta.nombreCliente}
                           </p>
+                          {esRecienActualizada && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/35 animate-pulse shrink-0">
+                              Recién actualizada
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm font-bold text-sky-400 tabular-nums leading-tight shrink-0">
                           Q{venta.saldo.toFixed(2)}
@@ -357,71 +535,14 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                 </AccordionTrigger>
                 <AccordionContent className="px-3.5 pb-3.5 pt-0">
                   <div className="border-t border-[#2e2e2e] pt-3 space-y-3">
-                    <div className="flex items-center justify-center gap-1.5 flex-nowrap w-full">
-                      {permiteConsumoInterno && (
-                        <Button
-                          type="button"
-                          className="h-7 px-2.5 rounded-full text-[11px] font-semibold bg-violet-500/20 hover:bg-violet-600 text-violet-300 hover:text-white border border-violet-500/35 shadow-sm transition-colors shrink-0"
-                          onClick={() => actions.abrirDialogoConsumoInterno(venta)}
-                          disabled={state.idVentaActiva === venta.id}
-                        >
-                          <Gift className="mr-1 h-3 w-3 shrink-0" />
-                          Cortesía
-                        </Button>
-                      )}
-
-                      {esVentaCredito ? (
-                        <PermissionGuard permission="ventas.editar_credito">
-                          <Button
-                            type="button"
-                            className="h-7 px-2.5 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0"
-                            onClick={() => actions.manejarClickEditar(venta)}
-                            disabled={state.idVentaActiva === venta.id}
-                          >
-                            <PencilIcon className="mr-1 h-3 w-3 shrink-0" />
-                            Editar
-                          </Button>
-                        </PermissionGuard>
-                      ) : (
-                        <Button
-                          type="button"
-                          className="h-7 px-2.5 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0"
-                          onClick={() => actions.manejarClickEditar(venta)}
-                          disabled={state.idVentaActiva === venta.id}
-                        >
-                          <PencilIcon className="mr-1 h-3 w-3 shrink-0" />
-                          Editar
-                        </Button>
-                      )}
-
-                      {!esVentaCredito && (
-                        <Button
-                          type="button"
-                          className="h-7 px-2.5 rounded-full text-[11px] font-semibold bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border border-amber-500/35 shadow-sm transition-colors shrink-0"
-                          onClick={() => actions.manejarClickPasarACredito(venta)}
-                          disabled={
-                            state.procesandoCredito === venta.id || state.idVentaActiva === venta.id
-                          }
-                        >
-                          {state.procesandoCredito === venta.id ? (
-                            <Clock className="mr-1 h-3 w-3 animate-spin shrink-0" />
-                          ) : (
-                            <CreditCard className="mr-1 h-3 w-3 shrink-0" />
-                          )}
-                          Crédito
-                        </Button>
-                      )}
-
-                      <Button
-                        type="button"
-                        className="h-7 px-3 rounded-full text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shrink-0"
-                        onClick={() => actions.abrirDialogoPago(venta)}
-                        disabled={state.idVentaActiva === venta.id}
-                      >
-                        <CheckCircle className="mr-1 h-3 w-3 shrink-0" />
-                        Pagar
-                      </Button>
-                    </div>
+                    <FilaBotonesAccionCuenta
+                      venta={venta}
+                      permiteConsumoInterno={permiteConsumoInterno}
+                      esVentaCredito={esVentaCredito}
+                      idVentaActiva={state.idVentaActiva}
+                      procesandoCredito={state.procesandoCredito}
+                      actions={actions}
+                    />
 
                     <ul className="divide-y divide-[#2e2e2e]">
                       {venta.detalles.map((detalle) => (
@@ -448,7 +569,8 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
               </AccordionItem>
             );
           })}
-        </Accordion>
+          </Accordion>
+        </div>
       )}
     </SurfaceCard>
   );

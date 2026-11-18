@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useCallback, useRef } from "react"
 import { useFirebase, useCollection, useDoc, useMemoFirebase } from "@/firebase"
 import { collection, query, orderBy, doc } from "firebase/firestore"
 import type { Tragamonedas, GeneralesTragamonedas, Generales as GeneralesCaja, Cuenta } from "@/lib/tipos"
@@ -9,82 +9,89 @@ import { useToast } from "@/hooks/use-toast"
 import { getFullGenerales } from "@/lib/firebase/servicios"
 import { useSucursal } from "@/hooks/use-sucursal"
 
+const CUENTAS_DISPONIBLES: Cuenta[] = [
+  { id: 'caja_chica_1', nombre: 'Caja Chica', saldo: 5000, tipo: 'Efectivo', idCuenta: 1 },
+]
+
 export function useCuadreTragamonedasCierre() {
   const { firestore } = useFirebase()
   const { toast } = useToast()
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal()
 
-  const [montosManuales, setMontosManuales] = useState<{ [key: string]: number | '' }>({})
+  const [montosManuales, setMontosManuales] = useState<Record<string, number | ''>>({})
   const [existenciaSiguiente, setExistenciaSiguiente] = useState<number | ''>('')
   const [efectivoSiguientePeriodo, setEfectivoSiguientePeriodo] = useState<number | ''>('')
   const [gananciaATrasladar, setGananciaATrasladar] = useState<number | ''>(0)
-  const [cuentaDestinoId, setCuentaDestinoId] = useState('')
+  const [cuentaDestinoId, setCuentaDestinoId] = useState(CUENTAS_DISPONIBLES[0].id)
   const [observaciones, setObservaciones] = useState('')
   const [alertaAbierta, setAlertaAbierta] = useState(false)
   const [procesando, setProcesando] = useState(false)
-  const [cuentas, setCuentas] = useState<Cuenta[]>([])
+  const initializedRef = useRef(false)
 
-  const maquinasQuery = useMemoFirebase(() =>
-    (firestore && sucursalId) ? query(collection(firestore, `sucursales/${sucursalId}/tragamonedas`), orderBy('idTragamonedas')) : null,
-  [firestore, sucursalId])
+  const maquinasQuery = useMemoFirebase(
+    () => (firestore && sucursalId)
+      ? query(collection(firestore, `sucursales/${sucursalId}/tragamonedas`), orderBy('idTragamonedas'))
+      : null,
+    [firestore, sucursalId]
+  )
   const { data: maquinas, isLoading: isLoadingMaquinas } = useCollection<Tragamonedas>(maquinasQuery)
 
-  const generalesQuery = useMemoFirebase(() =>
-    (firestore && sucursalId) ? query(collection(firestore, `sucursales/${sucursalId}/generales_tragamonedas`)) : null,
-  [firestore, sucursalId])
+  const generalesQuery = useMemoFirebase(
+    () => (firestore && sucursalId)
+      ? query(collection(firestore, `sucursales/${sucursalId}/generales_tragamonedas`))
+      : null,
+    [firestore, sucursalId]
+  )
   const { data: generalesData, isLoading: isLoadingGenerales } = useCollection<GeneralesTragamonedas>(generalesQuery)
 
-  const generalesCajaRef = useMemoFirebase(() =>
-    (firestore && sucursalId) ? doc(firestore, `sucursales/${sucursalId}/generales/actual`) : null,
-  [firestore, sucursalId])
+  const generalesCajaRef = useMemoFirebase(
+    () => (firestore && sucursalId) ? doc(firestore, `sucursales/${sucursalId}/generales/actual`) : null,
+    [firestore, sucursalId]
+  )
   const { data: generalesCajaData, isLoading: isLoadingGeneralesCaja } = useDoc<GeneralesCaja>(generalesCajaRef)
 
   const configuracionGeneral = useMemo(() => getFullGenerales(generalesCajaData), [generalesCajaData])
 
   useEffect(() => {
-    if (generalesCajaData) {
+    if (generalesCajaData && !initializedRef.current) {
+      initializedRef.current = true
       setExistenciaSiguiente(configuracionGeneral.monedasIniciales || '')
     }
-    const cuentasDeEjemplo: Cuenta[] = [{ id: 'caja_chica_1', nombre: 'Caja Chica', saldo: 5000, tipo: 'Efectivo', idCuenta: 1 }]
-    setCuentas(cuentasDeEjemplo)
-    if (cuentasDeEjemplo.length > 0) setCuentaDestinoId(cuentasDeEjemplo[0].id)
-  }, [generalesCajaData, configuracionGeneral])
+  }, [generalesCajaData, configuracionGeneral.monedasIniciales])
 
   const maquinasConGenerales = useMemo(() => {
     if (!maquinas || !generalesData) return []
-    return maquinas.map(maquina => {
-      const generales = generalesData.find(g => g.id === maquina.id)
-      return {
-        ...maquina,
-        ...generales,
-      }
-    })
+    const generalesMap = new Map(generalesData.map(g => [g.id, g]))
+    return maquinas.map(maquina => ({ ...maquina, ...generalesMap.get(maquina.id) }))
   }, [maquinas, generalesData])
 
-  const handleMontoManualChange = (id: string, valor: string) => {
+  const handleMontoManualChange = useCallback((id: string, valor: string) => {
     setMontosManuales(prev => ({ ...prev, [id]: valor === '' ? '' : Number(valor) }))
-  }
+  }, [])
 
   const resumen = useMemo(() => {
     let totalManual = 0, totalBase = 0, totalDeuda = 0, totalExtraccionNeta = 0
-
-    maquinasConGenerales.forEach(m => {
+    for (const m of maquinasConGenerales) {
       totalManual += Number(montosManuales[m.id] || 0)
       totalBase += m.totalBase || 0
       totalDeuda += m.totalDeuda || 0
       totalExtraccionNeta += m.totalExtraccion || 0
-    })
-
+    }
     const totalExtraido = totalManual + totalExtraccionNeta
-    const totalNeto = totalExtraido - totalBase
-
-    return { totalManual, totalBase, totalDeuda, totalExtraccionNeta, totalExtraido, totalNeto }
+    return {
+      totalManual,
+      totalBase,
+      totalDeuda,
+      totalExtraccionNeta,
+      totalExtraido,
+      totalNeto: totalExtraido - totalBase,
+    }
   }, [maquinasConGenerales, montosManuales])
 
   const porcentajeGanancia = configuracionGeneral.porcentajetragamonedas || 100
   const gananciaEstimada = resumen.totalNeto * (porcentajeGanancia / 100)
 
-  const handleFinalizarCuadre = async () => {
+  const handleFinalizarCuadre = useCallback(async () => {
     if (!firestore || !sucursalId) return
     setProcesando(true)
     try {
@@ -95,7 +102,7 @@ export function useCuadreTragamonedasCierre() {
           montoManual: Number(montosManuales[m.id] || 0),
           base: m.totalBase,
           deuda: m.totalDeuda,
-          extraccion: m.totalExtraccion
+          extraccion: m.totalExtraccion,
         })),
         resumen: {
           totalManual: resumen.totalManual,
@@ -121,12 +128,13 @@ export function useCuadreTragamonedasCierre() {
       setProcesando(false)
       setAlertaAbierta(false)
     }
-  }
-
-  const isLoading = isLoadingMaquinas || isLoadingGenerales || isLoadingGeneralesCaja || isLoadingSucursal
+  }, [
+    firestore, sucursalId, maquinasConGenerales, montosManuales, resumen,
+    existenciaSiguiente, efectivoSiguientePeriodo, gananciaATrasladar, observaciones, toast,
+  ])
 
   return {
-    isLoading,
+    isLoading: isLoadingMaquinas || isLoadingGenerales || isLoadingGeneralesCaja || isLoadingSucursal,
     maquinasConGenerales,
     montosManuales,
     handleMontoManualChange,
@@ -141,7 +149,7 @@ export function useCuadreTragamonedasCierre() {
     setGananciaATrasladar,
     cuentaDestinoId,
     setCuentaDestinoId,
-    cuentas,
+    cuentas: CUENTAS_DISPONIBLES,
     observaciones,
     setObservaciones,
     alertaAbierta,

@@ -323,6 +323,7 @@ export function useHistorialVentas() {
     mostrarTodas,
     setMostrarTodas,
     currentPage,
+    setCurrentPage,
     totalPages,
     itemsPerPage,
     setItemsPerPage,

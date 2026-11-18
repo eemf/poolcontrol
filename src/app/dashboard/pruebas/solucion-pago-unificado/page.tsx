@@ -59,7 +59,7 @@ export default function SolucionPagoUnificadoPage() {
   };
 
   return (
-    <div className="space-y-10 pb-20 font-body max-w-5xl mx-auto">
+    <div className="space-y-10 pb-2 font-body max-w-5xl mx-auto">
       {/* HEADER DE PÁGINA */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-3 text-foreground">

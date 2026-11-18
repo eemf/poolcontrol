@@ -30,7 +30,7 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
->(({ className, ...props }, ref) => {
+>(({ className, onEscapeKeyDown, ...props }, ref) => {
   React.useEffect(() => {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement && document.activeElement !== document.body) {
       document.activeElement.blur();
@@ -42,9 +42,14 @@ const AlertDialogContent = React.forwardRef<
       <AlertDialogOverlay />
       <AlertDialogPrimitive.Content
         ref={ref}
+        onEscapeKeyDown={(e) => {
+          e.preventDefault();
+          onEscapeKeyDown?.(e);
+        }}
         className={cn(
-          "fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] sm:w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-5 sm:p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl sm:rounded-lg",
-          className
+          "swal2-modal-anim data-[state=open]:animate-none data-[state=closed]:animate-none left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] sm:w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-[#2e2e2e] bg-[#1e1e1e] p-5 sm:p-6 shadow-2xl",
+          className,
+          "fixed rounded-2xl sm:rounded-2xl"
         )}
         {...props}
       />
@@ -73,7 +78,7 @@ const AlertDialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      "flex items-center justify-between gap-3 pt-3 border-t border-[#2e2e2e]/70",
       className
     )}
     {...props}
@@ -112,7 +117,7 @@ const AlertDialogAction = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Action
     ref={ref}
-    className={cn(buttonVariants(), className)}
+    className={cn(buttonVariants({ size: "sm" }), "rounded-full px-5 font-bold text-xs", className)}
     {...props}
   />
 ))
@@ -125,8 +130,8 @@ const AlertDialogCancel = React.forwardRef<
   <AlertDialogPrimitive.Cancel
     ref={ref}
     className={cn(
-      buttonVariants({ variant: "outline" }),
-      "mt-2 sm:mt-0",
+      buttonVariants({ variant: "outline", size: "sm" }),
+      "rounded-full px-4 text-xs border-[#2e2e2e] bg-[#1e1e1e] text-slate-300 hover:bg-[#313131] hover:text-white",
       className
     )}
     {...props}

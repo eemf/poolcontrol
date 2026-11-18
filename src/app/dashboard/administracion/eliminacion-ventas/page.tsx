@@ -49,7 +49,7 @@ export default function PaginaMantenimientoVentas() {
   }
 
   return (
-    <div className="space-y-6 pb-20 max-w-5xl mx-auto">
+    <div className="space-y-6 pb-2 max-w-5xl mx-auto">
       <PageHeader
         title="Mantenimiento de Ventas"
         description="Borrado masivo de registros por rango de identificación con reglas de protección."

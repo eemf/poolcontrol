@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { collection, query, orderBy, where, Timestamp } from 'firebase/firestore'
+import { collection, query, orderBy, Timestamp } from 'firebase/firestore'
 import { useFirebase, useCollection, useMemoFirebase } from '@/firebase'
 import { useSucursal } from '@/hooks/use-sucursal'
 import type { CuadreTragamonedas } from '@/lib/tipos'
@@ -27,62 +27,58 @@ export function useHistorialCuadreTragamonedas() {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
-  const cuadresQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null
-    const baseQuery = collection(firestore, `sucursales/${sucursalId}/cuadre_tragamonedas`)
-    if (mostrarTodos) {
-      return query(baseQuery, orderBy('fecha', 'desc'))
-    } else {
-      return query(baseQuery, where('estado', '==', 'pendiente'), orderBy('fecha', 'desc'))
-    }
-  }, [firestore, sucursalId, mostrarTodos])
+  const cuadresQuery = useMemoFirebase(
+    () => (firestore && sucursalId)
+      ? query(collection(firestore, `sucursales/${sucursalId}/cuadre_tragamonedas`), orderBy('fecha', 'desc'))
+      : null,
+    [firestore, sucursalId]
+  )
 
   const { data: cuadres, isLoading, error } = useCollection<CuadreTragamonedas>(cuadresQuery)
 
-  const cuadresConId = useMemo((): CuadreConId[] => {
-    return (cuadres || []).map(c => ({ ...c, id: c.id }))
-  }, [cuadres])
+  const { totalPendientes, totalTodos, cuadresFiltrados } = useMemo(() => {
+    const lista = (cuadres || []) as CuadreConId[]
+    const q = filtro.trim().toLowerCase()
+    let pendientes = 0
+    const filtrados: CuadreConId[] = []
 
-  const cuadresFiltrados = useMemo(() => {
-    if (!filtro) return cuadresConId
-    const filtroLower = filtro.toLowerCase()
-    return cuadresConId.filter(c => String(c.idCuadre).includes(filtroLower))
-  }, [cuadresConId, filtro])
+    for (const c of lista) {
+      if (c.estado === 'pendiente') pendientes++
+      if (!mostrarTodos && c.estado !== 'pendiente') continue
+      if (q && !String(c.idCuadre).includes(q)) continue
+      filtrados.push(c)
+    }
 
-  const totalPages = Math.ceil(cuadresFiltrados.length / itemsPerPage) || 1
+    return { totalPendientes: pendientes, totalTodos: lista.length, cuadresFiltrados: filtrados }
+  }, [cuadres, mostrarTodos, filtro])
 
+  const totalPages = Math.max(1, Math.ceil(cuadresFiltrados.length / itemsPerPage))
   const cuadresPaginados = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return cuadresFiltrados.slice(startIndex, startIndex + itemsPerPage)
+    const start = (currentPage - 1) * itemsPerPage
+    return cuadresFiltrados.slice(start, start + itemsPerPage)
   }, [cuadresFiltrados, currentPage, itemsPerPage])
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
-  }
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
-  }
 
   useEffect(() => {
     setCurrentPage(1)
   }, [itemsPerPage, filtro, mostrarTodos])
 
-  const cargando = isLoading || isLoadingSucursal
-
   return {
-    cargando,
+    cargando: isLoading || isLoadingSucursal,
     error,
     filtro,
     setFiltro,
     mostrarTodos,
     setMostrarTodos,
-    currentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    totalPages,
+    totalPendientes,
+    totalTodos,
+    totalItems: cuadresFiltrados.length,
     cuadresPaginados,
-    handleNextPage,
-    handlePreviousPage,
+    pagination: {
+      currentPage,
+      itemsPerPage,
+      totalPages,
+      onPageChange: setCurrentPage,
+      onItemsPerPageChange: setItemsPerPage,
+    },
   }
 }

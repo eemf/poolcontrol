@@ -33,15 +33,28 @@ export default function QuickDispatchInput() {
         }
     }, [user, profile]);
 
+    // Acceso directo global con F8 para enfocar Venta Rápida
+    useEffect(() => {
+        const handleGlobalKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'F8') {
+                e.preventDefault();
+                inputRef.current?.focus();
+                inputRef.current?.select();
+            }
+        };
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    }, []);
+
     // Cargar todos los productos (físicos y virtuales) una vez
-    const productosFisicosQuery = useMemoFirebase(() => 
-        (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/productos`) : null, 
+    const productosFisicosQuery = useMemoFirebase(() =>
+        (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/productos`) : null,
         [firestore, sucursalId]
     );
     const { data: productosFisicos, isLoading: isLoadingProductos } = useCollection<Producto>(productosFisicosQuery);
 
-    const productosVirtualesQuery = useMemoFirebase(() => 
-        (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/productos_virtuales`) : null, 
+    const productosVirtualesQuery = useMemoFirebase(() =>
+        (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/productos_virtuales`) : null,
         [firestore, sucursalId]
     );
     const { data: productosVirtuales, isLoading: isLoadingVirtuales } = useCollection<ProductoVirtual>(productosVirtualesQuery);
@@ -52,7 +65,7 @@ export default function QuickDispatchInput() {
 
         try {
             const comando: ComandoAnalizado = analizarComando(inputValue);
-            
+
             // Lógica de búsqueda en el frontend
             let productoEncontrado: (Producto | ProductoVirtual) & { esVirtual: boolean } | null = null;
             const terminoBusqueda = comando.nombreProducto.toLowerCase();
@@ -67,7 +80,7 @@ export default function QuickDispatchInput() {
                     productoEncontrado = { ...fisicoMatchByCode, esVirtual: false };
                 }
             }
-            
+
             // 1.5 Lógica de respaldo para "moneda-virtual" si el codigoBusqueda no está configurado
             if (!productoEncontrado && terminoBusqueda === 'moneda-virtual') {
                 const monedaMatchByName = productosVirtuales.find(p => p.nombre.toLowerCase() === 'monedas');
@@ -82,7 +95,7 @@ export default function QuickDispatchInput() {
                 if (virtualMatchByName) {
                     productoEncontrado = { ...virtualMatchByName, esVirtual: true };
                 } else {
-                    const fisicoMatchByName = productosFisicos.find(p => 
+                    const fisicoMatchByName = productosFisicos.find(p =>
                         p.nombre.toLowerCase().includes(terminoBusqueda)
                     );
                     if (fisicoMatchByName) {
@@ -90,15 +103,15 @@ export default function QuickDispatchInput() {
                     }
                 }
             }
-           
+
             if (!productoEncontrado) {
                 throw new Error(`Producto no encontrado para: "${comando.nombreProducto}"`);
             }
 
             const resultado = await procesarVentaRapidaConId(
-                firestore, 
-                sucursalId, 
-                user.uid, 
+                firestore,
+                sucursalId,
+                user.uid,
                 comando,
                 productoEncontrado.id,
                 productoEncontrado as Producto | ProductoVirtual,
@@ -108,7 +121,7 @@ export default function QuickDispatchInput() {
             // Generar descripción detallada con rastro de stock
             const stockMain = resultado.stockInfo.producto;
             let infoDetallada = `${resultado.cantidad}x ${resultado.nombreProducto} (Q${resultado.totalVenta.toFixed(2)}). Stock: ${stockMain.inicial} → ${stockMain.final}`;
-            
+
             if (resultado.stockInfo.ingredientes.length > 0) {
                 const ingInfo = resultado.stockInfo.ingredientes.map(i => `${i.nombre}: ${i.inicial} → ${i.final}`).join(' | ');
                 infoDetallada += ` | Ingredientes: ${ingInfo}`;
@@ -119,6 +132,29 @@ export default function QuickDispatchInput() {
                 title: 'Venta Rápida Exitosa',
                 description: infoDetallada,
             });
+
+            const idVentaFinal = (resultado as any)?.idVenta;
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('pos:accion-reciente', {
+                    detail: {
+                        id: Date.now().toString(),
+                        tipo: 'venta_rapida',
+                        titulo: 'Venta Rápida',
+                        descripcion: `${resultado.cantidad}x ${resultado.nombreProducto} • Total: Q${resultado.totalVenta.toFixed(2)} (Efectivo)`,
+                        idVenta: idVentaFinal || undefined,
+                        montoTotal: resultado.totalVenta,
+                        metodoPago: 'Efectivo',
+                        fecha: new Date(),
+                        usuarioNombre: profile?.nombre || user.displayName || 'Operador',
+                        items: [{
+                            nombre: resultado.nombreProducto,
+                            cantidad: resultado.cantidad,
+                            subtotal: resultado.totalVenta
+                        }]
+                    }
+                }));
+            }
+
             setInputValue('');
 
         } catch (error) {
@@ -129,18 +165,18 @@ export default function QuickDispatchInput() {
             });
         } finally {
             setLoading(false);
-            inputRef.current?.focus();
+            inputRef.current?.blur();
         }
     };
-    
+
     const isLoading = isLoadingProductos || isLoadingVirtuales || isLoadingSucursal;
 
     return (
         <div className={cn(
             "relative w-full max-w-sm items-center flex h-9 rounded-full border border-input bg-background text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
         )}>
-             <Zap className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-             <Input
+            <Zap className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <Input
                 ref={inputRef}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -150,13 +186,13 @@ export default function QuickDispatchInput() {
                         handleDispatch();
                     }
                 }}
-                placeholder={isLoading ? "Cargando productos..." : "ej: 3*coca*p1"}
+                placeholder={isLoading ? "Cargando productos..." : "ej: 3*coca*p1 (F8)"}
                 className="pl-9 pr-20 h-full bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                 disabled={loading || isLoading}
-             />
-             <Button 
-                type="submit" 
-                size="sm" 
+            />
+            <Button
+                type="submit"
+                size="sm"
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7"
                 onClick={handleDispatch}
                 disabled={loading || isLoading || !inputValue}

@@ -40,7 +40,7 @@ export default function HistorialCuadresMensualesPage() {
   }
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-2">
       <PageHeader
         title="Historial de Cuadres Mensuales"
         description="Consulta los registros de cierres mensuales anteriores y su desglose semanal."

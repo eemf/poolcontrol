@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 
 export default function ModelosMesasPage() {
   return (
-    <div className="space-y-12 pb-20 font-body">
+    <div className="space-y-12 pb-2 font-body">
       <div>
         <h1 className="text-3xl font-black tracking-tight font-headline flex items-center gap-3 text-foreground">
           <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center">

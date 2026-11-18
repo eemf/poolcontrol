@@ -24,13 +24,13 @@ export function CuadreConfirmacionDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2 pt-2">
-          <AlertDialogCancel disabled={procesando} className="rounded-full border-[#2e2e2e] text-slate-300 hover:bg-[#252526]">
+          <AlertDialogCancel disabled={procesando} className="rounded-full h-9 bg-[#252526] border-[#2e2e2e] text-slate-200 hover:bg-[#313131] text-xs">
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={procesando}
-            className="rounded-full bg-sky-600 hover:bg-sky-500 font-bold text-white"
+            className="rounded-full h-9 bg-sky-600 hover:bg-sky-500 font-semibold text-white text-xs"
           >
             {procesando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sí, Finalizar Cuadre

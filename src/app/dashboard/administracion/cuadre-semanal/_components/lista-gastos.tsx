@@ -24,7 +24,10 @@ export function ListaGastos({ items, selected, onSelect, onSelectAll }: ListaGas
       style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
-        <CardTitle className="font-bold text-base sm:text-lg text-foreground">Gastos Pendientes</CardTitle>
+        <CardTitle className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
+          <DollarSign className="h-5 w-5 text-rose-400 shrink-0" />
+          Gastos Pendientes
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-1">
         <div className="space-y-3">
@@ -35,8 +38,7 @@ export function ListaGastos({ items, selected, onSelect, onSelectAll }: ListaGas
           {items.map(gasto => (
             <div 
               key={gasto.docId} 
-              style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
-              className="flex items-center p-3 border !border-[#2e2e2e] rounded-xl !bg-[#252526] hover:brightness-105 transition-all shadow-sm"
+              className="flex items-center p-3 border border-[#2e2e2e] rounded-xl bg-[#252526] hover:bg-[#313131]/60 transition-colors shadow-sm"
             >
               <Checkbox 
                 id={`gasto-${gasto.docId}`} 
@@ -59,7 +61,7 @@ export function ListaGastos({ items, selected, onSelect, onSelectAll }: ListaGas
                     <p className="font-bold text-xs sm:text-sm text-rose-400 whitespace-nowrap tabular-nums leading-tight">
                       - Q{gasto.monto.toFixed(2)}
                     </p>
-                    <Badge className="h-4 text-[9px] font-semibold border-none bg-rose-500/20 text-rose-300 px-1.5 py-0">
+                    <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                       Pendiente
                     </Badge>
                   </div>

@@ -22,6 +22,7 @@ interface AutocompleteInputProps extends Omit<React.ComponentPropsWithoutRef<'in
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  icon?: React.ComponentType<{ className?: string }>;
   onCreateNew?: (inputValue: string) => Promise<string | null | undefined | void>;
   onEnterKey?: () => void;
   onOptionAction?: (option: AutocompleteOption) => void;
@@ -38,6 +39,7 @@ export const AutocompleteInput = React.forwardRef<
   placeholder,
   disabled,
   className,
+  icon: Icon,
   onCreateNew,
   onEnterKey,
   onFocus,
@@ -48,7 +50,7 @@ export const AutocompleteInput = React.forwardRef<
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
-  
+
   const internalInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +71,7 @@ export const AutocompleteInput = React.forwardRef<
       setSearchText('');
     }
   }, [value, options]);
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -104,18 +106,18 @@ export const AutocompleteInput = React.forwardRef<
     setIsOpen(false);
     onEnterKey?.();
   };
-  
+
   const createNewOption = async () => {
     if (onCreateNew && searchText) {
-        const newId = await onCreateNew(searchText.trim());
-        if (newId) {
-            onValueChange(newId);
-        }
+      const newId = await onCreateNew(searchText.trim());
+      if (newId) {
+        onValueChange(newId);
+      }
     }
     setIsOpen(false);
     onEnterKey?.();
   };
-  
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -123,7 +125,7 @@ export const AutocompleteInput = React.forwardRef<
         onEnterKey?.();
         return;
       }
-      
+
       const showCreate = onCreateNew && searchText.trim() && !options.some(o => o.label.toLowerCase() === searchText.trim().toLowerCase());
       if (filteredOptions.length === 0 && !showCreate) return;
 
@@ -159,21 +161,21 @@ export const AutocompleteInput = React.forwardRef<
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSearchText = e.target.value;
     setSearchText(newSearchText);
-    
+
     if (newSearchText.trim().length > 0) {
-        setIsOpen(true);
+      setIsOpen(true);
     } else {
-        setIsOpen(false);
+      setIsOpen(false);
     }
 
     if (value && options.find(o => o.value === value)?.label !== newSearchText) {
       onValueChange('');
     }
   }
-  
+
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     if (searchText.trim().length > 0) {
-        setIsOpen(true);
+      setIsOpen(true);
     }
     onFocus?.(e);
   }
@@ -194,117 +196,125 @@ export const AutocompleteInput = React.forwardRef<
     }, 150);
     onBlur?.(e);
   };
-  
+
   const showCreateOption = onCreateNew && searchText.trim().length > 0 && !options.some(o => o.label.toLowerCase() === searchText.trim().toLowerCase());
   const hasContentToShow = filteredOptions.length > 0 || showCreateOption;
 
   return (
     <div className="relative w-full" ref={containerRef}>
-        <Input
-          id={id}
-          ref={internalInputRef}
-          value={searchText}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          disabled={disabled}
-          className={cn("w-full", searchText && !disabled && "pr-10", className)}
-          autoComplete="off"
-          {...props}
-        />
-        {searchText && !disabled && (
-          <button
-            type="button"
-            aria-label="Limpiar búsqueda"
-            className="absolute right-3 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors z-10"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onValueChange('');
-              setSearchText('');
-              setIsOpen(false);
-              internalInputRef.current?.focus();
-            }}
-          >
-            <X className="h-4 w-4" />
-          </button>
+      {Icon && (
+        <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none z-10" />
+      )}
+      <Input
+        id={id}
+        ref={internalInputRef}
+        value={searchText}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        placeholder={placeholder}
+        disabled={disabled}
+        className={cn(
+          "w-full",
+          Icon ? "pl-10" : "",
+          searchText && !disabled && "pr-10",
+          className
         )}
-        {isOpen && hasContentToShow && (
-            <div className="absolute top-full z-50 mt-1.5 w-full rounded-2xl border border-[#2e2e2e] bg-[#1e1e1e] text-slate-200 shadow-2xl outline-none animate-in fade-in-0 zoom-in-95 overflow-hidden">
-              <ScrollArea className="max-h-60">
-                <div className="p-1.5 space-y-0.5">
-                  {filteredOptions.map((option, index) => (
-                      <div
-                        key={option.value}
-                        onMouseEnter={() => setHighlightedIndex(index)}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          selectOption(option.value);
-                        }}
-                        className={cn(
-                          "flex cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-sm outline-none transition-colors",
-                          highlightedIndex === index
-                            ? "bg-sky-500/20 text-sky-300"
-                            : "text-slate-200 hover:bg-sky-500/20 hover:text-sky-300"
-                        )}
-                      >
-                        <div className="flex flex-col items-start min-w-0">
-                          <div className="flex items-center gap-2 w-full">
-                            <span className="truncate font-medium">{option.label}</span>
-                            {option.badge && (
-                              <Badge variant="secondary" className="h-4 px-1.5 text-[10px] font-semibold rounded-full shrink-0 bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                                {option.badge}
-                              </Badge>
-                            )}
-                          </div>
-                          {option.description && (
-                            <span className={cn(
-                              "text-xs transition-colors truncate w-full",
-                              highlightedIndex === index ? "text-sky-200/80" : "text-slate-400"
-                            )}>{option.description}</span>
-                          )}
-                        </div>
-                        {onOptionAction && (
-                            <button
-                                onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    onOptionAction(option);
-                                }}
-                                className={cn(
-                                  "p-1.5 rounded-full transition-all shadow-sm bg-rose-500/15 text-rose-400 hover:bg-rose-600 hover:text-white ml-2"
-                                )}
-                            >
-                                <Trash2 className="h-3.5 w-3.5"/>
-                            </button>
-                        )}
-                      </div>
-                  ))}
-
-                  {showCreateOption && (
-                    <div
-                      onMouseEnter={() => setHighlightedIndex(filteredOptions.length)}
+        autoComplete="off"
+        {...props}
+      />
+      {searchText && !disabled && (
+        <button
+          type="button"
+          aria-label="Limpiar búsqueda"
+          className="absolute right-3 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors z-10"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onValueChange('');
+            setSearchText('');
+            setIsOpen(false);
+            internalInputRef.current?.focus();
+          }}
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
+      {isOpen && hasContentToShow && (
+        <div className="absolute top-full z-50 mt-1.5 w-full rounded-2xl border border-[#2e2e2e] bg-[#1e1e1e] text-slate-200 shadow-2xl outline-none animate-in fade-in-0 zoom-in-95 overflow-hidden">
+          <ScrollArea className="max-h-60">
+            <div className="p-1.5 space-y-0.5">
+              {filteredOptions.map((option, index) => (
+                <div
+                  key={option.value}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectOption(option.value);
+                  }}
+                  className={cn(
+                    "flex cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-sm outline-none transition-colors",
+                    highlightedIndex === index
+                      ? "bg-sky-500/20 text-sky-300"
+                      : "text-slate-200 hover:bg-sky-500/20 hover:text-sky-300"
+                  )}
+                >
+                  <div className="flex flex-col items-start min-w-0">
+                    <div className="flex items-center gap-2 w-full">
+                      <span className="truncate font-medium">{option.label}</span>
+                      {option.badge && (
+                        <Badge variant="secondary" className="h-4 px-1.5 text-[10px] font-semibold rounded-full shrink-0 bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                          {option.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    {option.description && (
+                      <span className={cn(
+                        "text-xs transition-colors truncate w-full",
+                        highlightedIndex === index ? "text-sky-200/80" : "text-slate-400"
+                      )}>{option.description}</span>
+                    )}
+                  </div>
+                  {onOptionAction && (
+                    <button
                       onMouseDown={(e) => {
+                        e.stopPropagation();
                         e.preventDefault();
-                        createNewOption();
+                        onOptionAction(option);
                       }}
                       className={cn(
-                        "flex cursor-pointer items-center rounded-xl px-3 py-2 text-sm outline-none transition-colors font-semibold",
-                        highlightedIndex === filteredOptions.length 
-                          ? "bg-sky-500/20 text-sky-300" 
-                          : "text-sky-400 hover:bg-sky-500/20 hover:text-sky-300"
+                        "p-1.5 rounded-full transition-all shadow-sm bg-rose-500/15 text-rose-400 hover:bg-rose-600 hover:text-white ml-2"
                       )}
                     >
-                      <PlusCircle className="mr-2 h-4 w-4 inline" />
-                      Crear &quot;{searchText.trim()}&quot;
-                    </div>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   )}
                 </div>
-              </ScrollArea>
+              ))}
+
+              {showCreateOption && (
+                <div
+                  onMouseEnter={() => setHighlightedIndex(filteredOptions.length)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    createNewOption();
+                  }}
+                  className={cn(
+                    "flex cursor-pointer items-center rounded-xl px-3 py-2 text-sm outline-none transition-colors font-semibold",
+                    highlightedIndex === filteredOptions.length
+                      ? "bg-sky-500/20 text-sky-300"
+                      : "text-sky-400 hover:bg-sky-500/20 hover:text-sky-300"
+                  )}
+                >
+                  <PlusCircle className="mr-2 h-4 w-4 inline" />
+                  Crear &quot;{searchText.trim()}&quot;
+                </div>
+              )}
             </div>
-        )}
+          </ScrollArea>
+        </div>
+      )}
     </div>
   );
 });

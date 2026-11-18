@@ -83,7 +83,7 @@ export function ListaPagos({
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <Label htmlFor="periodo-select" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest hidden sm:block shrink-0">Período</Label>
             <Select value={periodoFiltro} onValueChange={onPeriodoFiltroChange}>
-              <SelectTrigger id="periodo-select" className="w-full sm:w-[250px] rounded-full h-10 border-muted-foreground/20 bg-background">
+              <SelectTrigger id="periodo-select" className="w-full sm:w-[250px] rounded-full h-10">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder="Seleccionar período" />
@@ -216,7 +216,7 @@ export function ListaPagos({
               value={`${paginacion.itemsPorPagina}`}
               onValueChange={(value) => paginacion.onItemsPorPaginaChange(Number(value))}
             >
-              <SelectTrigger className="h-8 w-[70px] rounded-full text-xs bg-background">
+              <SelectTrigger className="h-8 w-[70px] rounded-full text-xs">
                 <SelectValue placeholder={paginacion.itemsPorPagina} />
               </SelectTrigger>
               <SelectContent side="top" className="font-body">

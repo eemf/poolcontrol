@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { BotonVolverArriba } from '@/components/comunes';
 import { useCompras } from './_hooks/use-compras';
 import { PurchaseHeader } from './_components/purchase-header';
 import { PurchaseList } from './_components/purchase-list';
@@ -27,6 +28,7 @@ export default function PaginaCompras() {
     totalPendientes,
     totalCompras,
     paginatedCompras,
+    filteredCompras,
     proveedores,
     productosConDocId,
     comprasConDocId,
@@ -39,7 +41,7 @@ export default function PaginaCompras() {
   } = useCompras();
 
   return (
-    <div className="space-y-4 font-body pb-10">
+    <div className="space-y-4 font-body pb-2">
       <PurchaseHeader onNewPurchase={handleNew} />
 
       <PurchaseList
@@ -53,6 +55,7 @@ export default function PaginaCompras() {
         onMostrarTodasChange={setMostrarTodas}
         onEdit={handleEdit}
         onDelete={setCompraToDelete}
+        totalItems={filteredCompras.length}
         pagination={pagination}
       />
 
@@ -85,6 +88,8 @@ export default function PaginaCompras() {
         onConfirm={handleDeleteConfirm}
         loading={loading}
       />
+
+      <BotonVolverArriba />
     </div>
   );
 }

@@ -1,10 +1,9 @@
 import { useState, useMemo } from 'react';
-import { collection, query, orderBy, doc, Timestamp, where, collectionGroup } from 'firebase/firestore';
+import { collection, query, orderBy, doc, Timestamp, where, collectionGroup, limit } from 'firebase/firestore';
 import { useFirebase, useCollection, useMemoFirebase, useDoc } from '@/firebase';
-import type { CierreCaja, Generales, Pago, HistorialInventario, HistorialTragamonedas } from '@/lib/tipos';
+import type { CierreCaja, Generales, Pago, HistorialInventario, HistorialTragamonedas, Producto } from '@/lib/tipos';
 import { useSucursal } from '@/hooks/use-sucursal';
-import { useToast } from '@/hooks/use-toast';
-import { format, formatDistanceStrict } from 'date-fns';
+import { formatDistanceStrict } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 /** Helper para conversión de fechas segura */
@@ -21,15 +20,18 @@ export const toDate = (fecha: any): Date => {
 export function useMonitoreoIntegral() {
   const { firestore } = useFirebase();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
-  const { toast } = useToast();
 
   const [periodoId, setPeriodoId] = useState<string>('actual');
   const [tabActiva, setTabActiva] = useState<string>('gaveta');
 
-  // 1. Obtener cierres pasados para el selector
+  // 1. Obtener cierres pasados para el selector (limitado a los 30 más recientes para máxima velocidad de carga)
   const cierresQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
-    return query(collection(firestore, `sucursales/${sucursalId}/cierre_caja`), orderBy('fecha', 'desc'));
+    return query(
+      collection(firestore, `sucursales/${sucursalId}/cierre_caja`),
+      orderBy('fecha', 'desc'),
+      limit(30)
+    );
   }, [firestore, sucursalId]);
   const { data: cierres } = useCollection<CierreCaja>(cierresQuery);
 
@@ -102,6 +104,12 @@ export function useMonitoreoIntegral() {
     return query(baseRef, where('fecha', '>=', configPeriodo.inicio), orderBy('fecha', 'asc'));
   }, [firestore, sucursalId, configPeriodo]);
   const { data: inventario, isLoading: isLoadingInventario } = useCollection<HistorialInventario>(inventarioQuery);
+
+  const productosQuery = useMemoFirebase(() => {
+    if (!firestore || !sucursalId) return null;
+    return collection(firestore, `sucursales/${sucursalId}/productos`);
+  }, [firestore, sucursalId]);
+  const { data: productos } = useCollection<Producto>(productosQuery);
 
   const tragamonedasQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId || !configPeriodo) return null;
@@ -363,63 +371,6 @@ export function useMonitoreoIntegral() {
     }
   }, [configPeriodo]);
 
-  const totalEfectivoCaja = (resumenGaveta?.totalGaveta || 0) + (flujoMonedasObj?.ventaNetaPeriodo || 0);
-
-  const exportarReporteCSV = () => {
-    if (!configPeriodo) return;
-
-    try {
-      let csvContent = 'data:text/csv;charset=utf-8,';
-      csvContent += `Reporte de monitoreo integral del periodo\n`;
-      csvContent += `Turno:,"${configPeriodo.label}"\n`;
-      csvContent += `Apertura:,"${format(configPeriodo.inicio, 'dd/MM/yyyy HH:mm:ss')}"\n`;
-      csvContent += `Estado:,"${configPeriodo.esTurnoAbierto ? 'Abierto (en curso)' : 'Cerrado'}"\n\n`;
-
-      csvContent += `Resumen contable\n`;
-      csvContent += `Concepto,Importe (Q)\n`;
-      csvContent += `Fondo inicial en gaveta,${resumenGaveta.inicial.toFixed(2)}\n`;
-      csvContent += `Ventas de productos,${resumenGaveta.ventas.toFixed(2)}\n`;
-      csvContent += `Alquiler de mesas,${resumenGaveta.alquileres.toFixed(2)}\n`;
-      csvContent += `Subtotal en gaveta,${resumenGaveta.totalGaveta.toFixed(2)}\n`;
-      csvContent += `Efectivo inicial venta de monedas,${(configPeriodo.efectivoInicialMonedas || 0).toFixed(2)}\n`;
-      csvContent += `Venta neta de monedas,${flujoMonedasObj.ventaNetaPeriodo.toFixed(2)}\n`;
-      csvContent += `Total efectivo esperado en caja,${totalEfectivoCaja.toFixed(2)}\n`;
-      csvContent += `Monedas iniciales,${configPeriodo.monedasIniciales}\n`;
-      csvContent += `Monedas actuales en caja,${flujoMonedasObj.stockFinal}\n\n`;
-
-      csvContent += `Movimientos de gaveta\n`;
-      csvContent += `Pago ID,Venta ID,Cliente,Fecha,Hora,Importe (Q),Saldo acumulado (Q)\n`;
-      flujoGavetaList.forEach((p) => {
-        csvContent += `"${p.idPago}","${p.idVenta}","${p.clienteNombre}","${format(toDate(p.fecha), 'dd/MM/yyyy')}","${format(toDate(p.fecha), 'HH:mm:ss')}",${p.montoConsumo.toFixed(2)},${p.saldoAcumulado.toFixed(2)}\n`;
-      });
-
-      csvContent += `\nMovimientos de monedas\n`;
-      csvContent += `Tipo,Descripción,Referencia,Fecha,Hora,Importe (Q),Saldo acumulado efectivo (Q),Existencia acumulada\n`;
-      flujoMonedasObj.lista.forEach((m) => {
-        csvContent += `"${m.tipo}","${m.desc}","${m.ref || ''}","${format(toDate(m.fecha), 'dd/MM/yyyy')}","${format(toDate(m.fecha), 'HH:mm:ss')}",${m.monto.toFixed(2)},${(m.cashAcumulado || 0).toFixed(2)},${m.stockAcumulado}\n`;
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement('a');
-      link.setAttribute('href', encodedUri);
-      link.setAttribute('download', `monitoreo_${configPeriodo.label.replace(/\s+/g, '_').toLowerCase()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast({
-        title: 'Reporte exportado',
-        description: 'El archivo CSV consolidado se ha descargado correctamente.',
-      });
-    } catch (err: any) {
-      toast({
-        title: 'Error al exportar',
-        description: err.message || 'No se pudo generar el archivo de reporte.',
-        variant: 'destructive',
-      });
-    }
-  };
-
   const isLoading = isLoadingSucursal || isLoadingTurno;
 
   return {
@@ -433,9 +384,8 @@ export function useMonitoreoIntegral() {
     flujoGavetaList,
     flujoMonedasObj,
     inventario,
+    productos,
     duracionPeriodoTexto,
-    totalEfectivoCaja,
-    exportarReporteCSV,
     isLoading,
     isLoadingTraga,
     isLoadingPagos,

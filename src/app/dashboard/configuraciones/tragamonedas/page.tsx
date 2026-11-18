@@ -40,7 +40,7 @@ export default function PaginaConfiguracionTragamonedas() {
   }
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-2">
       <PageHeader
         title="Configuración de Tragamonedas"
         description="Administra el inventario de máquinas tragamonedas de tu negocio."

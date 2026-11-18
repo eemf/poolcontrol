@@ -30,6 +30,7 @@ import {
   ReceiptText,
   BadgeHelp,
   Clock,
+  Search,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
@@ -204,8 +205,8 @@ export function ConsumptionDialog({
         </DialogHeader>
 
         <div className="flex flex-col min-h-0 space-y-3">
-          {/* Sección de entrada de datos (fija, sin scroll) */}
-          <SurfaceCard variant="surface" className="p-4 space-y-2 shrink-0">
+          {/* Sección de entrada de datos (fija, sin scroll, idéntica al POS) */}
+          <div className="space-y-2 shrink-0">
             {isConsumoManual ? (
               <>
                 <div className="grid grid-cols-12 gap-2.5 items-end animate-in fade-in slide-in-from-top-1">
@@ -223,7 +224,7 @@ export function ConsumptionDialog({
                         value={cantidadConsumo}
                         onChange={(e) => setCantidadConsumo(Number(e.target.value) || 1)}
                         onFocus={(e) => e.target.select()}
-                        className="rounded-full text-center h-10 px-2 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
+                        className="text-center h-10 px-2"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
@@ -234,7 +235,7 @@ export function ConsumptionDialog({
                     </div>
                     <div className="sm:hidden flex flex-col items-center gap-1 shrink-0">
                       <Label className="text-xs font-medium text-slate-200">Manual</Label>
-                      <div className="flex items-center justify-center px-3 h-10 border border-[#2e2e2e] rounded-full bg-[#1e1e1e]">
+                      <div className="flex items-center justify-center px-3 h-10 border border-[#2e2e2e] rounded-full bg-[#252526]">
                         <Switch checked={isConsumoManual} onCheckedChange={setIsConsumoManual} />
                       </div>
                     </div>
@@ -253,7 +254,6 @@ export function ConsumptionDialog({
                       onChange={(e) => setDescripcionConsumoManual(e.target.value)}
                       onFocus={(e) => e.target.select()}
                       placeholder="Descripción..."
-                      className="rounded-full h-10 px-3.5 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
@@ -284,7 +284,7 @@ export function ConsumptionDialog({
                         }
                         onFocus={(e) => e.target.select()}
                         placeholder="0.00"
-                        className="rounded-full h-10 pl-7 pr-3 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
+                        className="pl-7 pr-3 h-10"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
@@ -349,7 +349,7 @@ export function ConsumptionDialog({
                         value={cantidadConsumo}
                         onChange={(e) => setCantidadConsumo(Number(e.target.value) || 1)}
                         onFocus={(e) => e.target.select()}
-                        className="rounded-full text-center h-10 px-2 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
+                        className="text-center h-10 px-2"
                         disabled={!mesaParaConsumo}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -361,7 +361,7 @@ export function ConsumptionDialog({
                     </div>
                     <div className="sm:hidden flex flex-col items-center gap-1 shrink-0">
                       <Label className="text-xs font-medium text-slate-200">Manual</Label>
-                      <div className="flex items-center justify-center px-3 h-10 border border-[#2e2e2e] rounded-full bg-[#1e1e1e]">
+                      <div className="flex items-center justify-center px-3 h-10 border border-[#2e2e2e] rounded-full bg-[#252526]">
                         <Switch checked={isConsumoManual} onCheckedChange={setIsConsumoManual} />
                       </div>
                     </div>
@@ -381,10 +381,10 @@ export function ConsumptionDialog({
                       value={productoConsumoId}
                       onValueChange={setProductoConsumoId}
                       placeholder={isLoadingProductos ? 'Cargando...' : 'Buscar producto...'}
+                      icon={Search}
                       disabled={isLoadingProductos || !mesaParaConsumo}
                       onEnterKey={onProductoEnter}
                       onFocus={(e) => e.target.select()}
-                      className="rounded-full h-10 bg-[#1e1e1e] border-[#2e2e2e] text-slate-100"
                     />
                   </div>
 
@@ -473,17 +473,17 @@ export function ConsumptionDialog({
                   </RadioGroup>
                 </div>
               )}
-          </SurfaceCard>
+          </div>
 
           {/* Listado del carrito temporal (scroll exclusivo en la lista con altura controlada) */}
           <SurfaceCard
             variant="surface"
-            className="min-h-[180px] max-h-[240px] overflow-y-auto custom-scrollbar p-2"
+            className="max-h-[240px] overflow-y-auto custom-scrollbar p-2"
           >
             {carritoConsumoTemporal.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-full py-10">
-                <ShoppingCart className="h-12 w-12 mb-4" />
-                <p className="font-medium">Añade productos al carrito</p>
+              <div className="flex flex-col items-center justify-center py-7 text-center text-slate-400 gap-2.5 h-full">
+                <ShoppingCart className="h-10 w-10 text-slate-500 stroke-[1.75]" />
+                <p className="text-sm font-medium">Añade productos al carrito.</p>
               </div>
             ) : (
               <div className="divide-y divide-[#2e2e2e]">

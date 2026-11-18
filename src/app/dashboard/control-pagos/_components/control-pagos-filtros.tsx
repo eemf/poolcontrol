@@ -1,16 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import type { CierreCaja, PeriodoTipo } from '../_hooks/use-control-pagos';
-import { SurfaceCard } from '@/components/comunes';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { 
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
 } from '@/components/ui/select';
 import { 
-  Search, SlidersHorizontal, RotateCcw, Calendar, CreditCard, User, Split 
+  Search, SlidersHorizontal, Calendar, CreditCard, User, Split, X 
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -36,7 +34,7 @@ interface ControlPagosFiltrosProps {
   setFechaFinPers: (v: string) => void;
   operadoresDisponibles: Array<{ uid: string; nombre: string }>;
   cierres?: CierreCaja[];
-  totalPagosFiltrados: number;
+  totalPagosFiltrados?: number;
 }
 
 export function ControlPagosFiltros({
@@ -59,85 +57,89 @@ export function ControlPagosFiltros({
   setFechaFinPers,
   operadoresDisponibles,
   cierres,
-  totalPagosFiltrados,
 }: ControlPagosFiltrosProps) {
-  const resetearFiltros = () => {
-    setFiltroTexto('');
-    setPeriodoFiltro('actual');
-    setMetodoFiltro('todos');
-    setOperadorFiltro('todos');
-    setTipoCoberturaFiltro('todos');
-    setFechaInicioPers('');
-    setFechaFinPers('');
-  };
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Autofoco al montar la vista
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 40);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <SurfaceCard variant="surface" className="p-3.5 space-y-3">
-      {/* Buscador inteligente */}
-      <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className="space-y-3 pb-3 border-b border-[#2e2e2e]">
+      {/* Buscador con botón X interno y botón de Filtros externo a la par */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
           <Input
+            ref={searchInputRef}
             placeholder="Buscar por cliente, # comprobante, # venta, producto o cajero..."
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
-            className="pl-9 pr-28 h-10 text-sm bg-[#1e1e1e] border-app-border rounded-full"
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && filtroTexto) {
+                e.preventDefault();
+                setFiltroTexto('');
+              }
+            }}
+            className="pl-10 pr-9 h-10 text-xs sm:text-sm rounded-full"
           />
-          <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            <Button
-              variant={mostrarFiltros ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setMostrarFiltros((prev) => !prev)}
-              className={`h-7 px-2.5 text-xs rounded-full gap-1.5 ${
-                mostrarFiltros 
-                  ? "bg-sky-600 text-white hover:bg-sky-700" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-[#252526]"
-              }`}
+          {filtroTexto && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setFiltroTexto('');
+                searchInputRef.current?.focus();
+              }}
+              aria-label="Limpiar búsqueda"
+              title="Limpiar búsqueda"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 h-6 w-6 rounded-full flex items-center justify-center text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
             >
-              <SlidersHorizontal className="h-3.5 w-3.5" />
-              <span>Filtros</span>
-              {filtrosActivosCount > 0 && (
-                <span className="min-w-[18px] h-4.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] inline-flex items-center justify-center px-1">
-                  {filtrosActivosCount}
-                </span>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between sm:justify-end gap-2 text-xs text-muted-foreground">
-          <Badge variant="outline" className="px-3 py-1.5 text-xs text-slate-300 bg-[#1e1e1e] border-app-border rounded-full font-medium">
-            {totalPagosFiltrados} {totalPagosFiltrados === 1 ? 'resultado' : 'resultados'}
-          </Badge>
-
-          {(filtrosActivosCount > 0 || filtroTexto) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={resetearFiltros}
-              className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground rounded-full"
-            >
-              <RotateCcw className="h-3.5 w-3.5 mr-1" />
-              Limpiar
-            </Button>
+              <X className="h-3.5 w-3.5" />
+            </button>
           )}
         </div>
+
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setMostrarFiltros((prev) => !prev)}
+          className={`h-10 px-3 sm:px-3.5 text-xs font-semibold rounded-full border gap-1.5 shrink-0 transition-colors ${
+            mostrarFiltros
+              ? 'bg-sky-600 border-sky-500 text-white hover:bg-sky-500 hover:text-white shadow-sm'
+              : filtrosActivosCount > 0
+              ? 'bg-[#252526] border-sky-500/60 text-sky-400 hover:bg-[#313131] hover:text-sky-300'
+              : 'bg-[#252526] border-[#2e2e2e] text-slate-300 hover:text-white hover:bg-[#313131]'
+          }`}
+        >
+          <SlidersHorizontal className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">{mostrarFiltros ? 'Ocultar' : 'Opciones'}</span>
+          {filtrosActivosCount > 0 && (
+            <span className="min-w-[18px] h-[18px] rounded-full bg-amber-400 text-slate-950 font-black text-[10px] inline-flex items-center justify-center px-1">
+              {filtrosActivosCount}
+            </span>
+          )}
+        </Button>
       </div>
 
-      {/* Panel colapsable de filtros avanzados */}
-      {mostrarFiltros && (
-        <div className="pt-2 border-t border-app-border grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+      {/* Panel colapsable de preferencias y filtros avanzados (o rango personalizado visible si está activo) */}
+      {(mostrarFiltros || periodoFiltro === 'personalizado') && (
+        <div className="p-3 rounded-xl bg-[#1e1e1e] border border-[#2e2e2e] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           {/* Período */}
           <div className="space-y-1">
             <label className="font-semibold text-slate-300 flex items-center gap-1">
               <Calendar className="h-3 w-3 text-sky-400" /> Período
             </label>
             <Select value={periodoFiltro} onValueChange={(v) => setPeriodoFiltro(v as PeriodoTipo)}>
-              <SelectTrigger className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full">
+              <SelectTrigger className="h-9 text-xs rounded-full">
                 <SelectValue placeholder="Período" />
               </SelectTrigger>
-              <SelectContent className="bg-app-surface border-app-border text-foreground">
-                <SelectItem value="actual">🟢 Turno Actual (En curso)</SelectItem>
+              <SelectContent>
+                <SelectItem value="actual">Turno actual</SelectItem>
                 <SelectItem value="hoy">Hoy</SelectItem>
                 <SelectItem value="ayer">Ayer</SelectItem>
                 <SelectItem value="7dias">Últimos 7 días</SelectItem>
@@ -146,7 +148,7 @@ export function ControlPagosFiltros({
                 <SelectItem value="personalizado">Rango personalizado</SelectItem>
                 {cierres && cierres.length > 0 && (
                   <>
-                    <div className="px-2 py-1 text-[10px] font-bold text-muted-foreground border-t border-app-border mt-1">
+                    <div className="px-2 py-1 text-[10px] font-bold text-slate-400 border-t border-[#2e2e2e] mt-1">
                       Turnos Anteriores
                     </div>
                     {cierres.slice(0, 10).map((c) => (
@@ -169,7 +171,7 @@ export function ControlPagosFiltros({
                   type="date"
                   value={fechaInicioPers}
                   onChange={(e) => setFechaInicioPers(e.target.value)}
-                  className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full"
+                  className="h-9 text-xs rounded-full"
                 />
               </div>
               <div className="space-y-1">
@@ -178,7 +180,7 @@ export function ControlPagosFiltros({
                   type="date"
                   value={fechaFinPers}
                   onChange={(e) => setFechaFinPers(e.target.value)}
-                  className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full"
+                  className="h-9 text-xs rounded-full"
                 />
               </div>
             </div>
@@ -190,10 +192,10 @@ export function ControlPagosFiltros({
               <CreditCard className="h-3 w-3 text-sky-400" /> Método de Pago
             </label>
             <Select value={metodoFiltro} onValueChange={setMetodoFiltro}>
-              <SelectTrigger className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full">
+              <SelectTrigger className="h-9 text-xs rounded-full">
                 <SelectValue placeholder="Método" />
               </SelectTrigger>
-              <SelectContent className="bg-app-surface border-app-border text-foreground">
+              <SelectContent>
                 <SelectItem value="todos">Todos los métodos</SelectItem>
                 <SelectItem value="Efectivo">Efectivo</SelectItem>
                 <SelectItem value="Tarjeta">Tarjeta</SelectItem>
@@ -208,10 +210,10 @@ export function ControlPagosFiltros({
               <User className="h-3 w-3 text-sky-400" /> Operador / Cajero
             </label>
             <Select value={operadorFiltro} onValueChange={setOperadorFiltro}>
-              <SelectTrigger className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full">
+              <SelectTrigger className="h-9 text-xs rounded-full">
                 <SelectValue placeholder="Operador" />
               </SelectTrigger>
-              <SelectContent className="bg-app-surface border-app-border text-foreground">
+              <SelectContent>
                 <SelectItem value="todos">Todos los operadores</SelectItem>
                 {operadoresDisponibles.map((op) => (
                   <SelectItem key={op.uid} value={op.uid}>
@@ -228,10 +230,10 @@ export function ControlPagosFiltros({
               <Split className="h-3 w-3 text-sky-400" /> Tipo de Cobro
             </label>
             <Select value={tipoCoberturaFiltro} onValueChange={setTipoCoberturaFiltro}>
-              <SelectTrigger className="h-8 text-xs bg-[#1e1e1e] border-app-border rounded-full">
+              <SelectTrigger className="h-9 text-xs rounded-full">
                 <SelectValue placeholder="Cobertura" />
               </SelectTrigger>
-              <SelectContent className="bg-app-surface border-app-border text-foreground">
+              <SelectContent>
                 <SelectItem value="todos">Todos los tipos</SelectItem>
                 <SelectItem value="completo">Saldado 100%</SelectItem>
                 <SelectItem value="abono">Abono parcial</SelectItem>
@@ -240,6 +242,6 @@ export function ControlPagosFiltros({
           </div>
         </div>
       )}
-    </SurfaceCard>
+    </div>
   );
 }

@@ -17,7 +17,7 @@ export function PurchaseHeader({ onNewPurchase }: PurchaseHeaderProps) {
       action={
         <Button
           onClick={onNewPurchase}
-          className="w-full sm:w-auto rounded-full font-semibold h-9 px-4 text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20 flex items-center justify-center gap-1.5"
+          className="w-full sm:w-auto rounded-full font-semibold h-9 px-4 text-xs bg-sky-600 hover:bg-sky-500 text-white shadow-md flex items-center justify-center gap-1.5"
         >
           <PlusCircle className="h-4 w-4" />
           Nueva Compra

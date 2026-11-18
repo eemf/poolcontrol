@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import type { Producto, DetalleAjusteInventario } from '@/lib/tipos';
@@ -32,24 +32,57 @@ export function useInventario() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const productosQuery = useMemoFirebase(
-    () => (firestore && sucursalId ? query(collection(firestore, `sucursales/${sucursalId}/productos`), orderBy('nombre')) : null),
+    () =>
+      firestore && sucursalId
+        ? query(collection(firestore, `sucursales/${sucursalId}/productos`), orderBy('nombre'))
+        : null,
     [firestore, sucursalId]
   );
-  const { data: productos, isLoading: cargandoProductos } = useCollection<Producto>(productosQuery);
+  const { data: productos, isLoading: cargandoProductos, error } = useCollection<Producto>(productosQuery);
 
+  // Sincroniza productos desde Firestore preservando cualquier conteo físico en curso durante el modo revisión
   useEffect(() => {
     if (productos) {
-      setProductosAjuste(
-        productos.map((p) => ({
-          ...p,
-          existenciaFisica: '',
-          diferencia: 0,
-        }))
-      );
+      setProductosAjuste((prev) => {
+        const mapaPrevio = new Map(prev.map((item) => [item.id, item.existenciaFisica]));
+        return productos.map((p) => {
+          const fisicaPrevia = isRevisionMode ? (mapaPrevio.get(p.id) ?? '') : '';
+          const sistema = p.existencia || 0;
+          const diferencia = fisicaPrevia === '' ? 0 : Number(fisicaPrevia) - sistema;
+          return {
+            ...p,
+            existenciaFisica: fisicaPrevia,
+            diferencia,
+          };
+        });
+      });
     }
-  }, [productos]);
+  }, [productos, isRevisionMode]);
 
-  const handleExistenciaFisicaChange = (productoId: string, valor: string) => {
+  const resetFormRevision = useCallback(() => {
+    setObservaciones('');
+    setAlertaGuardado(false);
+    setConfirmadoCheck(false);
+    setProductosAjuste((prev) =>
+      prev.map((p) => ({
+        ...p,
+        existenciaFisica: '',
+        diferencia: 0,
+      }))
+    );
+  }, []);
+
+  const iniciarModoRevision = useCallback(() => {
+    resetFormRevision();
+    setIsRevisionMode(true);
+  }, [resetFormRevision]);
+
+  const salirModoRevision = useCallback(() => {
+    resetFormRevision();
+    setIsRevisionMode(false);
+  }, [resetFormRevision]);
+
+  const handleExistenciaFisicaChange = useCallback((productoId: string, valor: string) => {
     const valorNumerico = valor === '' ? '' : Number(valor);
     setProductosAjuste((prev) =>
       prev.map((p) => {
@@ -61,9 +94,9 @@ export function useInventario() {
         return p;
       })
     );
-  };
+  }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const nextInput = document.querySelector(`input[data-index="${index + 1}"]`) as HTMLInputElement;
@@ -72,7 +105,7 @@ export function useInventario() {
         nextInput.select();
       }
     }
-  };
+  }, []);
 
   const ubicacionesDisponibles = useMemo(() => {
     const set = new Set<string>();
@@ -87,8 +120,8 @@ export function useInventario() {
 
   const productosFiltrados = useMemo(() => {
     let result = [...productosAjuste];
-    if (filtro) {
-      const filtroLower = filtro.toLowerCase();
+    if (filtro.trim()) {
+      const filtroLower = filtro.trim().toLowerCase();
       result = result.filter((p) => p.nombre.toLowerCase().includes(filtroLower));
     }
     if (ubicacionFiltro !== 'todas') {
@@ -100,18 +133,24 @@ export function useInventario() {
     }
 
     if (orden === 'nombre-asc') result.sort((a, b) => a.nombre.localeCompare(b.nombre));
-    if (orden === 'nombre-desc') result.sort((a, b) => a.nombre.localeCompare(b.nombre));
+    if (orden === 'nombre-desc') result.sort((a, b) => b.nombre.localeCompare(a.nombre));
     if (orden === 'stock-asc') result.sort((a, b) => (a.existencia || 0) - (b.existencia || 0));
     if (orden === 'stock-desc') result.sort((a, b) => (b.existencia || 0) - (a.existencia || 0));
 
     return result;
   }, [productosAjuste, filtro, orden, ubicacionFiltro]);
 
-  const totalPages = Math.ceil(productosFiltrados.length / itemsPerPage);
+  const totalItems = productosFiltrados.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   const paginatedProductos = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return productosFiltrados.slice(startIndex, startIndex + itemsPerPage);
   }, [productosFiltrados, currentPage, itemsPerPage]);
+
+  const totalModificados = useMemo(
+    () => productosAjuste.filter((p) => p.existenciaFisica !== '' && p.diferencia !== 0).length,
+    [productosAjuste]
+  );
 
   useEffect(() => {
     setCurrentPage(1);
@@ -120,14 +159,10 @@ export function useInventario() {
   const manejarGuardarAjuste = async () => {
     if (!firestore || !user || !sucursalId) return;
 
-    const productosParaAjustar = productosAjuste.filter(
-      (p) => p.existenciaFisica !== '' && p.existenciaFisica !== p.existencia
-    );
-
-    if (productosParaAjustar.length === 0) {
+    if (productosAjuste.length === 0) {
       toast({
-        title: 'Sin cambios',
-        description: 'No has ingresado ninguna diferencia respecto al inventario actual.',
+        title: 'Sin productos',
+        description: 'No hay productos en el inventario para registrar la revisión.',
         variant: 'destructive',
       });
       return;
@@ -135,37 +170,52 @@ export function useInventario() {
 
     setProcesando(true);
     try {
-      const detalles: DetalleAjusteInventario[] = productosParaAjustar.map((p) => ({
-        productoId: p.id,
-        nombreProducto: p.nombre,
-        existenciaAnterior: p.existencia || 0,
-        existenciaFisica: Number(p.existenciaFisica),
-        diferencia: p.diferencia,
-        costoUnitario: p.costo || 0,
-      }));
+      // Guardar el estado de TODOS los productos del inventario:
+      // Si no se ingresó un conteo distinto para un producto, conserva su existencia actual con diferencia 0.
+      const detalles: DetalleAjusteInventario[] = productosAjuste.map((p) => {
+        const existenciaSistema = p.existencia || 0;
+        const existenciaFisica =
+          p.existenciaFisica === '' ? existenciaSistema : Number(p.existenciaFisica);
+        const diferencia = existenciaFisica - existenciaSistema;
+
+        return {
+          productoId: p.id,
+          nombreProducto: p.nombre,
+          existenciaSistema,
+          existenciaFisica,
+          diferencia,
+        };
+      });
+
+      const modificadosCount = detalles.filter((d) => d.diferencia !== 0).length;
 
       await realizarAjusteInventario(firestore, sucursalId, {
         usuarioId: user.uid,
         usuarioNombre: user.displayName || user.email || 'Usuario',
-        observaciones: observaciones.trim() || 'Ajuste general de conteo físico',
+        observaciones:
+          observaciones.trim() ||
+          (modificadosCount > 0
+            ? 'Revisión física con ajustes de stock'
+            : 'Revisión física sin diferencias de stock'),
         tipoAjuste: 'general',
         detalles,
       });
 
       toast({
-        title: 'Inventario actualizado',
-        description: `Se aplicaron ajustes a ${detalles.length} productos correctamente.`,
+        title: 'Revisión de inventario guardada',
+        description:
+          modificadosCount > 0
+            ? `Se guardó el estado de ${detalles.length} productos (${modificadosCount} con modificación).`
+            : `Se guardó la revisión de los ${detalles.length} productos sin diferencias.`,
       });
 
+      resetFormRevision();
       setIsRevisionMode(false);
-      setObservaciones('');
-      setAlertaGuardado(false);
-      setConfirmadoCheck(false);
-    } catch (error: any) {
-      console.error('Error al guardar ajuste:', error);
+    } catch (err: any) {
+      console.error('Error al guardar ajuste:', err);
       toast({
-        title: 'Error al aplicar ajustes',
-        description: error.message || 'Ocurrió un problema al actualizar las existencias.',
+        title: 'Error al guardar revisión',
+        description: err.message || 'Ocurrió un problema al registrar la revisión de inventario.',
         variant: 'destructive',
       });
     } finally {
@@ -176,8 +226,11 @@ export function useInventario() {
   return {
     sucursalId,
     isLoading: isLoadingSucursal || cargandoProductos,
+    error,
     isRevisionMode,
     setIsRevisionMode,
+    iniciarModoRevision,
+    salirModoRevision,
     productosAjuste,
     productosFiltrados,
     paginatedProductos,
@@ -199,7 +252,9 @@ export function useInventario() {
     setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
+    totalItems,
     totalPages,
+    totalModificados,
     handleExistenciaFisicaChange,
     handleKeyDown,
     manejarGuardarAjuste,

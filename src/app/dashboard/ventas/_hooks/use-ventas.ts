@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { collection, onSnapshot, query, where, Timestamp, orderBy, doc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, Timestamp, orderBy, doc, limit } from 'firebase/firestore';
 import { useFirebase, useUser } from '@/firebase';
 import type { Venta, Producto, Cliente, DetalleVenta, Preparacion, EstadoCaja, ProductoVirtual } from '@/lib/tipos';
+import type { MovimientoRecientePOS } from '../_types/movimiento-pos';
 import { useToast } from '@/hooks/use-toast';
 import { 
   guardarCliente, 
@@ -21,7 +22,10 @@ import {
   devolverStockVirtualTemporal,
   procesarPagoUnificado,
   registrarAbonoGeneral,
-  registrarCacheUsuario
+  registrarCacheUsuario,
+  trasladarItemsDeCuenta,
+  type DestinoTraslado,
+  type ItemATrasladar,
 } from '@/lib/firebase/servicios';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSucursal } from '@/hooks/use-sucursal';
@@ -99,6 +103,17 @@ export function useVentas() {
   // Pago Unificado
   const [incluirCreditoEnPago, setIncluirCreditoEnPago] = useState(false);
 
+  // Estados de certeza operativa: Última Acción y Movimientos del Turno
+  const [ultimaAccion, setUltimaAccion] = useState<MovimientoRecientePOS | null>(null);
+  const [ultimosMovimientos, setUltimosMovimientos] = useState<MovimientoRecientePOS[]>([]);
+  const [dialogoMovimientosAbierto, setDialogoMovimientosAbierto] = useState(false);
+  const [ultimaCuentaModificadaId, setUltimaCuentaModificadaId] = useState<string | null>(null);
+
+  // Estados para Traslado de Cuenta
+  const [ventaParaTrasladar, setVentaParaTrasladar] = useState<Venta | null>(null);
+  const [dialogoTrasladoAbierto, setDialogoTrasladoAbierto] = useState(false);
+  const [procesandoTraslado, setProcesandoTraslado] = useState(false);
+
   const [procesandoGuardado, setProcesandoGuardado] = useState(false);
   const [procesandoAnadir, setProcesandoAnadir] = useState(false);
   const [vistaCuentas, setVistaCuentas] = useState<'pendientes' | 'credito'>('pendientes');
@@ -142,10 +157,99 @@ export function useVentas() {
           detalles: [...(data.detalles || [])].sort((a, b) => toDate(b.fechaAgregado).getTime() - toDate(a.fechaAgregado).getTime()),
         };
       }).sort((a,b) => toDate(b.fecha).getTime() - toDate(a.fecha).getTime()))),
-      onSnapshot(doc(firestore, `sucursales/${sucursalId}/generales`, 'actual'), d => d.exists() && setEstadoCaja(d.data() as EstadoCaja))
+      onSnapshot(doc(firestore, `sucursales/${sucursalId}/generales`, 'actual'), d => d.exists() && setEstadoCaja(d.data() as EstadoCaja)),
+      onSnapshot(
+        query(collection(firestore, `sucursales/${sucursalId}/auditoria`), orderBy('fecha', 'desc'), limit(30)),
+        (s) => {
+          const movs: MovimientoRecientePOS[] = [];
+          s.docs.forEach((d) => {
+            const data = d.data();
+            const categoriaUpper = String(data.categoria || '').toUpperCase();
+            const accionUpper = String(data.accion || '').toUpperCase();
+            if (!['VENTAS', 'PAGOS'].includes(categoriaUpper)) return;
+
+            let tipo: MovimientoRecientePOS['tipo'] = 'venta_creada';
+            if (accionUpper === 'VENTA_RAPIDA') tipo = 'venta_rapida';
+            else if (accionUpper === 'VENTA_EDITAR') tipo = 'productos_agregados';
+            else if (accionUpper === 'VENTA_ELIMINAR_PRODUCTO') tipo = 'item_eliminado';
+            else if (accionUpper === 'VENTA_CONSUMO_INTERNO') tipo = 'consumo_interno';
+            else if (accionUpper === 'VENTA_ANULAR') tipo = 'venta_anulada';
+            else if (accionUpper === 'PAGO_ABONO' || accionUpper === 'ABONO_REGISTRADO' || accionUpper === 'VENTA_ABONAR') tipo = 'abono';
+            else if (
+              accionUpper === 'VENTA_PAGAR' ||
+              accionUpper === 'PAGO_REGISTRAR' ||
+              accionUpper === 'PAGO_UNIFICADO' ||
+              categoriaUpper === 'PAGOS'
+            ) {
+              tipo = 'pago';
+            }
+
+            const detalles = data.detalles || {};
+            const fecha = toDate(data.fecha || data.timestamp);
+
+            let items: MovimientoRecientePOS['items'] = undefined;
+            if (Array.isArray(detalles.itemsAgregados) && detalles.itemsAgregados.length > 0) {
+              items = detalles.itemsAgregados.map((it: any) => ({
+                nombre: it.nombre || 'Producto',
+                cantidad: Number(it.cantidad) || 1,
+                precioUnitario: it.precioUnitario,
+                subtotal: it.subtotal,
+              }));
+            } else if (detalles.producto && detalles.cantidad) {
+              items = [{
+                nombre: detalles.producto,
+                cantidad: Number(detalles.cantidad) || 1,
+                subtotal: detalles.total,
+              }];
+            } else if (detalles.productoEliminado) {
+              items = [{
+                nombre: detalles.productoEliminado,
+                cantidad: Number(detalles.cantidad) || 1,
+                subtotal: detalles.subtotal,
+              }];
+            }
+
+            movs.push({
+              id: d.id,
+              tipo,
+              titulo: data.titulo || 'Operación POS',
+              descripcion: data.descripcion || '',
+              idVenta: detalles.idVenta,
+              clienteNombre: detalles.nombreCliente || detalles.cliente,
+              montoTotal: detalles.total ?? detalles.monto ?? detalles.montoPagado ?? detalles.montoAbonado ?? detalles.totalLiquidado ?? detalles.totalPagadoPrincipal,
+              metodoPago: detalles.metodoDePago || detalles.metodoPago || detalles.metodo || (tipo === 'venta_rapida' ? 'Efectivo' : undefined),
+              fecha,
+              usuarioNombre: data.usuarioNombre || 'Operador',
+              items,
+            });
+          });
+
+          setUltimosMovimientos(movs);
+          if (movs.length > 0) {
+            setUltimaAccion((prev) => {
+              if (!prev) return movs[0];
+              if (movs[0].fecha.getTime() >= prev.fecha.getTime()) return movs[0];
+              return prev;
+            });
+          }
+        }
+      )
     ];
     return () => unsubscribes.forEach(u => u());
   }, [firestore, sucursalId]);
+
+  // Listener para sincronización de acciones inmediatas en la misma ventana
+  useEffect(() => {
+    const handleAccionReciente = (e: any) => {
+      const mov = e?.detail as MovimientoRecientePOS;
+      if (mov) {
+        setUltimaAccion(mov);
+        setUltimosMovimientos((prev) => [mov, ...prev.filter((m) => m.id !== mov.id)].slice(0, 30));
+      }
+    };
+    window.addEventListener('pos:accion-reciente', handleAccionReciente);
+    return () => window.removeEventListener('pos:accion-reciente', handleAccionReciente);
+  }, []);
 
   // Foco inicial al cargar
   useEffect(() => {
@@ -159,14 +263,56 @@ export function useVentas() {
     setProcesandoGuardado(true);
     try {
       const cli = clientes.find(c => c.id === clienteSeleccionadoId);
-      await guardarVentaYActualizarStock(firestore, sucursalId, idVentaActiva, { clienteId: cli!.id, nombreCliente: cli!.nombre, detalles: carrito, tipoVenta: 'POS' }, user.uid);
+      const resultado = await guardarVentaYActualizarStock(
+        firestore, 
+        sucursalId, 
+        idVentaActiva, 
+        { clienteId: cli!.id, nombreCliente: cli!.nombre, detalles: carrito, tipoVenta: 'POS' }, 
+        user.uid
+      );
+
+      // Registrar movimiento reciente para confirmación inmediata del operario
+      const esEdicion = Boolean(idVentaActiva);
+      const itemsNuevos = carrito.filter((d) => d.idDetalle === 0 || !idVentaActiva);
+      const itemsDetalle = (itemsNuevos.length > 0 ? itemsNuevos : carrito).map((c) => ({
+        nombre: c.nombreProducto,
+        cantidad: c.cantidad,
+        subtotal: c.subtotal,
+      }));
+      const totalOperacion = carrito.reduce((a, b) => a + b.saldo, 0);
+      const resumenTexto = itemsDetalle.map((i) => `${i.cantidad}x ${i.nombre}`).join(', ');
+
+      const movLocal: MovimientoRecientePOS = {
+        id: Date.now().toString(),
+        tipo: esEdicion ? 'productos_agregados' : 'venta_creada',
+        titulo: esEdicion ? 'Productos Agregados' : 'Cuenta Creada',
+        descripcion: `${esEdicion ? 'Se agregaron' : 'Productos'}: ${resumenTexto} • Total: Q${totalOperacion.toFixed(2)}`,
+        idVenta: resultado.idVenta,
+        clienteNombre: cli?.nombre,
+        montoTotal: totalOperacion,
+        fecha: new Date(),
+        usuarioNombre: profile?.nombre || user.displayName || 'Operador',
+        items: itemsDetalle,
+      };
+
+      setUltimaAccion(movLocal);
+      setUltimosMovimientos((prev) => [movLocal, ...prev.filter((m) => m.id !== movLocal.id)].slice(0, 30));
+
+      if (resultado.ventaId) {
+        setUltimaCuentaModificadaId(resultado.ventaId);
+        setTimeout(() => setUltimaCuentaModificadaId(null), 12000);
+      }
+
       setClienteSeleccionadoId(''); setCarrito([]); setIdVentaActiva(null);
       setMostrarItemManual(false); setDescripcionItemManual(''); setPrecioUnitarioItemManual(''); setCantidadItemManual(1);
-      toast({ title: "Éxito", description: "Venta guardada." });
+      toast({ 
+        title: esEdicion ? "Productos Agregados a Cuenta" : "Venta Guardada con Éxito", 
+        description: `Venta #${resultado.idVenta} de ${cli?.nombre || 'Cliente'}.` 
+      });
       clienteInputRef.current?.focus();
-    } catch (e: any) { toast({ title: "Error", description: e.message, variant: "destructive" }); }
+    } catch (e: any) { toast({ title: "Error al Guardar Venta", description: e.message, variant: "destructive" }); }
     finally { setProcesandoGuardado(false); }
-  }, [firestore, user, sucursalId, clienteSeleccionadoId, idVentaActiva, carrito, clientes, toast, procesandoGuardado]);
+  }, [firestore, user, sucursalId, clienteSeleccionadoId, idVentaActiva, carrito, clientes, toast, procesandoGuardado, profile]);
 
   const manejarGuardarVenta = useCallback(() => {
     if (procesandoGuardado) return;
@@ -402,6 +548,23 @@ export function useVentas() {
           description: `Se eliminó ${item.nombreProducto} del carrito.` 
         });
       }
+
+      const movElim: MovimientoRecientePOS = {
+        id: Date.now().toString(),
+        tipo: 'item_eliminado',
+        titulo: `Ítem Eliminado`,
+        descripcion: `Se eliminó ${item.cantidad}x ${item.nombreProducto} (Q${(item.subtotal || 0).toFixed(2)})`,
+        fecha: new Date(),
+        usuarioNombre: profile?.nombre || user?.displayName || 'Operador',
+        items: [{
+          nombre: item.nombreProducto,
+          cantidad: item.cantidad,
+          subtotal: item.subtotal
+        }]
+      };
+      setUltimaAccion(movElim);
+      setUltimosMovimientos((prev) => [movElim, ...prev.filter((m) => m.id !== movElim.id)].slice(0, 30));
+
       setAlertaEliminarItemAbierta(false);
       setItemParaEliminar(null);
     } catch (e: any) { 
@@ -457,6 +620,22 @@ export function useVentas() {
         await registrarAbonoACuenta(firestore, sucursalId, ventaParaPagar.id, abonoNum, user.uid);
         toast({ title: "Abono Registrado", description: "Q" + abonoNum.toFixed(2) });
       }
+
+      const movAbono: MovimientoRecientePOS = {
+        id: Date.now().toString(),
+        tipo: 'abono',
+        titulo: 'Abono a Cuenta',
+        descripcion: `Abono de Q${abonoNum.toFixed(2)} registrado para ${ventaParaPagar.nombreCliente || 'Cliente'}`,
+        idVenta: ventaParaPagar.idVenta,
+        clienteNombre: ventaParaPagar.nombreCliente,
+        montoTotal: abonoNum,
+        metodoPago: 'Efectivo',
+        fecha: new Date(),
+        usuarioNombre: profile?.nombre || user.displayName || 'Operador',
+      };
+      setUltimaAccion(movAbono);
+      setUltimosMovimientos((prev) => [movAbono, ...prev.filter((m) => m.id !== movAbono.id)].slice(0, 30));
+
       setDialogoAbonoAbierto(false); 
       setDialogoPagoAbierto(false);
       setMontoAbono('');
@@ -487,6 +666,22 @@ export function useVentas() {
         await procesarPagoVenta(firestore, sucursalId, ventaParaPagar.id, ids, metodo, user.uid);
         toast({ title: "Pago Procesado", description: metodo });
       }
+
+      const movPago: MovimientoRecientePOS = {
+        id: Date.now().toString(),
+        tipo: 'pago',
+        titulo: 'Cobro de Cuenta',
+        descripcion: `Cobro de Q${montoAPagarDialogo.toFixed(2)} procesado en ${metodo} para ${ventaParaPagar.nombreCliente || 'Cliente'}`,
+        idVenta: ventaParaPagar.idVenta,
+        clienteNombre: ventaParaPagar.nombreCliente,
+        montoTotal: montoAPagarDialogo,
+        metodoPago: metodo,
+        fecha: new Date(),
+        usuarioNombre: profile?.nombre || user.displayName || 'Operador',
+      };
+      setUltimaAccion(movPago);
+      setUltimosMovimientos((prev) => [movPago, ...prev.filter((m) => m.id !== movPago.id)].slice(0, 30));
+
       setVistaDialogo('pago');
       setDialogoPagoAbierto(false);
       clienteInputRef.current?.focus();
@@ -566,6 +761,94 @@ export function useVentas() {
     setDialogoPagoAbierto(true); 
   };
 
+  const abrirDialogoTraslado = useCallback((venta: Venta) => {
+    setVentaParaTrasladar(venta);
+    setDialogoTrasladoAbierto(true);
+  }, []);
+
+  const manejarConfirmarTraslado = useCallback(
+    async ({
+      ventaOrigenId,
+      destino,
+      items,
+    }: {
+      ventaOrigenId: string;
+      destino: DestinoTraslado;
+      items: ItemATrasladar[];
+    }) => {
+      if (!firestore || !sucursalId || !user || procesandoTraslado) return;
+      setProcesandoTraslado(true);
+      try {
+        const resultado = await trasladarItemsDeCuenta(
+          firestore,
+          sucursalId,
+          ventaOrigenId,
+          destino,
+          items,
+          user.uid,
+          profile?.nombre || user.displayName || 'Operador'
+        );
+
+        // Si la venta activa en el formulario era la de origen y fue eliminada, limpiar formulario
+        if (idVentaActiva === ventaOrigenId && resultado.ventaOrigenEliminada) {
+          setIdVentaActiva(null);
+          setClienteSeleccionadoId('');
+          setCarrito([]);
+        }
+
+        const itemsDetalle = resultado.itemsTrasladados.map((i) => ({
+          nombre: i.nombre,
+          cantidad: i.cantidad,
+          subtotal: i.subtotal,
+        }));
+        const resumenTexto = itemsDetalle.map((i) => `${i.cantidad}x ${i.nombre}`).join(', ');
+
+        const movLocal: MovimientoRecientePOS = {
+          id: Date.now().toString(),
+          tipo: 'productos_agregados',
+          titulo: resultado.ventaOrigenEliminada ? 'Cuenta Fusionada / Trasladada' : 'Productos Trasladados',
+          descripcion: `De ${resultado.clienteOrigenNombre} a ${resultado.clienteDestinoNombre}: ${resumenTexto} • Total: Q${resultado.montoTotalTrasladado.toFixed(2)}${
+            resultado.ventaOrigenEliminada ? ' (Cuenta origen eliminada al quedar en Q0.00)' : ''
+          }`,
+          idVenta: resultado.idVentaDestino,
+          clienteNombre: resultado.clienteDestinoNombre,
+          montoTotal: resultado.montoTotalTrasladado,
+          fecha: new Date(),
+          usuarioNombre: profile?.nombre || user.displayName || 'Operador',
+          items: itemsDetalle,
+        };
+
+        setUltimaAccion(movLocal);
+        setUltimosMovimientos((prev) => [movLocal, ...prev.filter((m) => m.id !== movLocal.id)].slice(0, 30));
+
+        if (resultado.ventaDestinoId) {
+          setUltimaCuentaModificadaId(resultado.ventaDestinoId);
+          setTimeout(() => setUltimaCuentaModificadaId(null), 12000);
+        }
+
+        setDialogoTrasladoAbierto(false);
+        setVentaParaTrasladar(null);
+
+        toast({
+          title: resultado.ventaOrigenEliminada ? 'Cuenta Trasladada y Cerrada' : 'Productos Trasladados con Éxito',
+          description: `Se pasaron Q${resultado.montoTotalTrasladado.toFixed(2)} a ${resultado.clienteDestinoNombre}.${
+            resultado.ventaOrigenEliminada ? ' La cuenta original se eliminó al quedar en Q0.00.' : ''
+          }`,
+        });
+      } catch (err: any) {
+        console.error('Error al trasladar cuenta:', err);
+        toast({
+          title: 'Error al Trasladar Cuenta',
+          description: err.message || 'No se pudo completar el traslado.',
+          variant: 'destructive',
+        });
+      } finally {
+        setProcesandoTraslado(false);
+      }
+    },
+    [firestore, sucursalId, user, procesandoTraslado, profile, idVentaActiva, toast]
+  );
+
   const onProductoEnter = () => {
     if (productoSeleccionado && 'preparaciones' in productoSeleccionado && productoSeleccionado.preparaciones && productoSeleccionado.preparaciones.length > 0) preparacionesContainerRef.current?.focus();
     else anadirButtonRef.current?.focus();
@@ -612,6 +895,11 @@ export function useVentas() {
   return {
     isLoadingSucursal,
     cargando,
+    ultimaAccion,
+    ultimosMovimientos,
+    dialogoMovimientosAbierto,
+    setDialogoMovimientosAbierto,
+    ultimaCuentaModificadaId,
     formProps: {
       refs: {
         clienteInputRef,
@@ -674,7 +962,8 @@ export function useVentas() {
         idVentaActiva,
         clientesConCreditoIds: new Set(ventasACredito.map(v => v.clienteId)),
         clientesConConsumoInternoIds,
-        procesandoCredito
+        procesandoCredito,
+        ultimaCuentaModificadaId
       },
       actions: {
         setVistaCuentas,
@@ -683,11 +972,21 @@ export function useVentas() {
         handleTap,
         abrirDialogoPago,
         abrirDialogoConsumoInterno,
+        abrirDialogoTraslado,
         manejarClickPasarACredito: manejarPasarACredito
       },
       refs: {
         filtroCuentasInputRef
       }
+    },
+    trasladoProps: {
+      open: dialogoTrasladoAbierto,
+      onOpenChange: setDialogoTrasladoAbierto,
+      ventaOrigen: ventaParaTrasladar,
+      ventasPendientes,
+      clientes,
+      onConfirmarTraslado: manejarConfirmarTraslado,
+      procesando: procesandoTraslado,
     },
     dialogsProps: {
       refs: {

@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { collection, query, orderBy, where } from 'firebase/firestore'
+import { collection, query, orderBy } from 'firebase/firestore'
 import { useFirebase, useCollection, useMemoFirebase } from '@/firebase'
 import { useSucursal } from '@/hooks/use-sucursal'
 import type { CuadreSemanal } from '@/lib/tipos'
 
-type CuadreSemanalConId = CuadreSemanal & { id: string }
+export type CuadreSemanalConId = CuadreSemanal & { id: string }
 
 export function useHistorialCuadreSemanal() {
   const { firestore } = useFirebase()
@@ -18,68 +18,66 @@ export function useHistorialCuadreSemanal() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [openAccordionId, setOpenAccordionId] = useState<string | null>(null)
 
-  const cuadresQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null
-    const baseQuery = collection(firestore, `sucursales/${sucursalId}/cuadre_semanal`)
-    if (mostrarTodos) {
-      return query(baseQuery, orderBy('fecha', 'desc'))
-    } else {
-      return query(baseQuery, where('estadoMensual', '==', 'pendiente'), orderBy('fecha', 'desc'))
-    }
-  }, [firestore, sucursalId, mostrarTodos])
+  const cuadresQuery = useMemoFirebase(
+    () => (firestore && sucursalId)
+      ? query(collection(firestore, `sucursales/${sucursalId}/cuadre_semanal`), orderBy('fecha', 'desc'))
+      : null,
+    [firestore, sucursalId]
+  )
 
   const { data: cuadres, isLoading, error } = useCollection<CuadreSemanal>(cuadresQuery)
 
-  const cuadresConId = useMemo((): CuadreSemanalConId[] => {
-    return (cuadres || []).map(c => ({ ...c, id: c.id }))
-  }, [cuadres])
+  const { totalPendientes, totalTodos, cuadresFiltrados } = useMemo(() => {
+    const lista = (cuadres || []) as CuadreSemanalConId[]
+    const q = filtro.trim().toLowerCase()
+    let pendientes = 0
+    const filtrados: CuadreSemanalConId[] = []
 
-  const cuadresFiltrados = useMemo(() => {
-    if (!filtro) return cuadresConId
-    const filtroLower = filtro.toLowerCase()
-    return cuadresConId.filter(
-      c => String(c.idCuadreSemanal).includes(filtroLower) || c.observaciones.toLowerCase().includes(filtroLower)
-    )
-  }, [cuadresConId, filtro])
+    for (const c of lista) {
+      if (c.estadoMensual === 'pendiente') pendientes++
+      if (!mostrarTodos && c.estadoMensual !== 'pendiente') continue
+      if (q) {
+        const matchId = String(c.idCuadreSemanal).includes(q)
+        const matchObs = c.observaciones?.toLowerCase().includes(q)
+        if (!matchId && !matchObs) continue
+      }
+      filtrados.push(c)
+    }
 
-  const totalPages = Math.ceil(cuadresFiltrados.length / itemsPerPage) || 1
+    return { totalPendientes: pendientes, totalTodos: lista.length, cuadresFiltrados: filtrados }
+  }, [cuadres, mostrarTodos, filtro])
 
+  const totalPages = Math.max(1, Math.ceil(cuadresFiltrados.length / itemsPerPage))
   const cuadresPaginados = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return cuadresFiltrados.slice(startIndex, startIndex + itemsPerPage)
+    const start = (currentPage - 1) * itemsPerPage
+    return cuadresFiltrados.slice(start, start + itemsPerPage)
   }, [cuadresFiltrados, currentPage, itemsPerPage])
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
-  }
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
-  }
 
   useEffect(() => {
     setCurrentPage(1)
   }, [filtro, itemsPerPage, mostrarTodos])
 
-  const cargando = isLoading || isLoadingSucursal
-
   return {
     firestore,
     sucursalId,
-    cargando,
+    cargando: isLoading || isLoadingSucursal,
     error,
     filtro,
     setFiltro,
     mostrarTodos,
     setMostrarTodos,
-    currentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    totalPages,
+    totalPendientes,
+    totalTodos,
+    totalItems: cuadresFiltrados.length,
     cuadresPaginados,
     openAccordionId,
     setOpenAccordionId,
-    handleNextPage,
-    handlePreviousPage,
+    pagination: {
+      currentPage,
+      itemsPerPage,
+      totalPages,
+      onPageChange: setCurrentPage,
+      onItemsPerPageChange: setItemsPerPage,
+    },
   }
 }

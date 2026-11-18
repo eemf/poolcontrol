@@ -29,7 +29,8 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
       style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
-        <CardTitle className="font-bold text-base sm:text-lg text-foreground">
+        <CardTitle className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
+          <Banknote className="h-5 w-5 text-emerald-400 shrink-0" />
           Ingresos del Período (Efectivo y Monedas)
         </CardTitle>
       </CardHeader>
@@ -50,14 +51,13 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
           const monto = isTraga ? item.gananciaATrasladar : item.totalLiquidado;
           const label = isTraga ? `Cierre Tragamonedas #${item.idCuadre}` : `Liquidación Caja #${item.idCuadre}`;
           const Icon = isTraga ? Dices : Banknote;
-          const iconColor = isTraga ? "text-orange-400" : "text-emerald-400";
-          const montoColor = isTraga ? "text-orange-400" : "text-primary";
+          const iconColor = isTraga ? "text-amber-400" : "text-emerald-400";
+          const montoColor = isTraga ? "text-amber-400" : "text-sky-400";
 
           return (
             <div 
               key={`${item.tipoItem}-${item.id}`} 
-              style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
-              className="flex items-center p-3 border !border-[#2e2e2e] rounded-xl !bg-[#252526] hover:brightness-105 transition-all shadow-sm"
+              className="flex items-center p-3 border border-[#2e2e2e] rounded-xl bg-[#252526] hover:bg-[#313131]/60 transition-colors shadow-sm"
             >
               <Checkbox 
                 id={`fisico-${item.tipoItem}-${item.id}`} 
@@ -80,7 +80,7 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
                     <p className={cn("font-bold text-sm sm:text-base whitespace-nowrap tabular-nums leading-tight", montoColor)}>
                       Q{monto.toFixed(2)}
                     </p>
-                    <Badge className="h-4 text-[9px] font-semibold border-none bg-primary/20 text-primary px-1.5 py-0">
+                    <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                       Pendiente
                     </Badge>
                   </div>

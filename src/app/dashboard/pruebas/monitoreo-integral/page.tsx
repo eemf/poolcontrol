@@ -35,7 +35,7 @@ import { cn } from "@/lib/utils";
 
 export default function MonitoreoIntegralPrototipoPage() {
   return (
-    <div className="space-y-10 pb-20 font-body max-w-6xl mx-auto">
+    <div className="space-y-10 pb-2 font-body max-w-6xl mx-auto">
       
       {/* HEADER DE LA PROPUESTA */}
       <div className="space-y-3">

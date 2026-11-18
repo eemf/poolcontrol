@@ -40,7 +40,7 @@ export default function PaginaCatalogoProductos() {
   if (!isMounted) return null
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-2">
       <EncabezadoProductos onNuevoProducto={() => { resetForm(); setIsModalOpen(true); }} />
 
       <ListaProductos

@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { CalendarDays, History, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SurfaceCard } from '@/components/comunes';
+import { SurfaceCard, BotonVolverArriba } from '@/components/comunes';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -94,9 +94,9 @@ export default function CuadreSemanalPage() {
           <Link href="/dashboard/administracion/cuadre-semanal/historial" className="inline-block pt-1">
             <Button
               variant="outline"
-              className="rounded-full px-6 font-semibold text-xs h-9 gap-2 border-[#2e2e2e] bg-[#252526] text-slate-200 hover:text-white"
+              className="rounded-full px-5 font-semibold text-xs h-9 gap-2 border-[#2e2e2e] bg-[#252526] hover:bg-[#313131] text-slate-200 hover:text-white transition-colors"
             >
-              <History className="h-3.5 w-3.5 text-primary" />
+              <History className="h-4 w-4 text-emerald-400" />
               Ver Historial de Cuadres Semanales
             </Button>
           </Link>
@@ -164,7 +164,7 @@ export default function CuadreSemanalPage() {
 
       {/* Modal de Confirmación */}
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <AlertDialogContent className="rounded-2xl font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100">
+        <AlertDialogContent className="rounded-2xl font-body bg-[#1e1e1e] border-[#2e2e2e] text-slate-100">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-lg font-bold text-white">
               Confirmar Cuadre Semanal
@@ -174,18 +174,20 @@ export default function CuadreSemanalPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="rounded-full h-9 px-6 font-semibold text-xs border-[#2e2e2e] bg-[#252526] text-slate-300 hover:text-white">
+            <AlertDialogCancel className="rounded-full h-9 px-5 font-semibold text-xs border-[#2e2e2e] bg-[#252526] text-slate-200 hover:bg-[#313131] hover:text-white">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleProcess}
-              className="rounded-full h-9 px-6 font-semibold text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
+              className="rounded-full h-9 px-6 font-semibold text-xs bg-sky-600 hover:bg-sky-500 text-white shadow-md"
             >
               Sí, procesar cuadre
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BotonVolverArriba />
     </div>
   );
 }

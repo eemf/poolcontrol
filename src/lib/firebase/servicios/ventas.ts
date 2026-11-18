@@ -685,7 +685,14 @@ export async function procesarVentaRapidaConId(
             }
         }, transaction);
 
-        return { nombreProducto: nombreVenta, cantidad: comando.cantidad, totalVenta, stockInfo };
+        return { 
+            idVenta: nuevoIdVenta, 
+            idPago: nuevoIdPago, 
+            nombreProducto: nombreVenta, 
+            cantidad: comando.cantidad, 
+            totalVenta, 
+            stockInfo 
+        };
     });
 }
 
@@ -719,4 +726,229 @@ export async function sincronizarContadorCredito(firestore: Firestore, sucursalI
     }
     
     return totalReal;
+}
+
+export interface ItemATrasladar {
+  idDetalle: number;
+  cantidad: number;
+}
+
+export type DestinoTraslado =
+  | { tipo: 'existente'; ventaId: string }
+  | { tipo: 'nueva'; clienteId: string; nombreCliente: string };
+
+export interface ResultadoTrasladoCuenta {
+  ventaOrigenEliminada: boolean;
+  ventaOrigenId: string;
+  idVentaOrigen: number;
+  clienteOrigenNombre: string;
+  ventaDestinoId: string;
+  idVentaDestino: number;
+  clienteDestinoNombre: string;
+  montoTotalTrasladado: number;
+  itemsTrasladados: {
+    nombre: string;
+    cantidad: number;
+    subtotal: number;
+  }[];
+}
+
+/**
+ * Traslada productos o cuentas completas entre clientes en una transacción atómica.
+ * Si la cuenta de origen queda con saldo 0 o sin ítems, se elimina automáticamente.
+ */
+export async function trasladarItemsDeCuenta(
+  firestore: Firestore,
+  sucursalId: string,
+  ventaOrigenId: string,
+  destino: DestinoTraslado,
+  itemsATrasladar: ItemATrasladar[],
+  usuarioId: string,
+  usuarioNombre?: string
+): Promise<ResultadoTrasladoCuenta> {
+  const sid = validarSucursal(sucursalId);
+
+  return runTransaction(firestore, async (transaction) => {
+    // 1. FASE DE LECTURA (READS FIRST)
+    const ventaOrigenRef = doc(firestore, `sucursales/${sid}/ventas`, ventaOrigenId);
+    const ventaOrigenSnap = await transaction.get(ventaOrigenRef);
+    if (!ventaOrigenSnap.exists()) {
+      throw new Error("La cuenta de origen no existe o ya fue cerrada.");
+    }
+    const ventaOrigen = { id: ventaOrigenSnap.id, ...ventaOrigenSnap.data() } as Venta;
+
+    let ventaDestinoSnap: DocumentSnapshot | null = null;
+    let ventaDestinoRef: any = null;
+    let correlativoVentaDoc: DocumentSnapshot | null = null;
+    let correlativoDetalleDoc: DocumentSnapshot | null = null;
+
+    const correlativoDetalleRef = doc(firestore, `sucursales/${sid}/correlativos`, "ventas_detalles");
+
+    if (destino.tipo === 'existente') {
+      if (destino.ventaId === ventaOrigenId) {
+        throw new Error("No se pueden transferir productos a la misma cuenta.");
+      }
+      ventaDestinoRef = doc(firestore, `sucursales/${sid}/ventas`, destino.ventaId);
+      [ventaDestinoSnap, correlativoDetalleDoc] = await Promise.all([
+        transaction.get(ventaDestinoRef),
+        transaction.get(correlativoDetalleRef)
+      ]);
+      if (!ventaDestinoSnap.exists()) {
+        throw new Error("La cuenta de destino no existe o ya fue liquidada.");
+      }
+    } else {
+      const correlativoVentaRef = doc(firestore, `sucursales/${sid}/correlativos`, "ventas");
+      [correlativoVentaDoc, correlativoDetalleDoc] = await Promise.all([
+        transaction.get(correlativoVentaRef),
+        transaction.get(correlativoDetalleRef)
+      ]);
+      ventaDestinoRef = doc(collection(firestore, `sucursales/${sid}/ventas`));
+    }
+
+    // 2. FASE DE PROCESAMIENTO (IN-MEMORY)
+    let siguienteIdDetalle = correlativoDetalleDoc?.exists()
+      ? (correlativoDetalleDoc.data().correlativo || 0) + 1
+      : 1;
+
+    let ventaDestino: Venta;
+    let idVentaDestino: number;
+    let clienteDestinoNombre: string;
+
+    if (destino.tipo === 'existente') {
+      ventaDestino = { id: ventaDestinoSnap!.id, ...ventaDestinoSnap!.data() } as Venta;
+      idVentaDestino = ventaDestino.idVenta;
+      clienteDestinoNombre = ventaDestino.nombreCliente;
+    } else {
+      idVentaDestino = correlativoVentaDoc?.exists()
+        ? (correlativoVentaDoc.data().correlativo || 0) + 1
+        : 1;
+      clienteDestinoNombre = destino.nombreCliente;
+      ventaDestino = {
+        id: ventaDestinoRef.id,
+        idVenta: idVentaDestino,
+        sucursalId: sid,
+        fecha: Timestamp.now(),
+        clienteId: destino.clienteId,
+        nombreCliente: destino.nombreCliente,
+        total: 0,
+        saldo: 0,
+        tipoVenta: 'POS',
+        metodoPago: null,
+        estado: 'Pendiente de pago',
+        detalles: []
+      };
+    }
+
+    const itemsMap = new Map(itemsATrasladar.map(i => [i.idDetalle, i.cantidad]));
+
+    const detallesOrigenRestantes: DetalleVenta[] = [];
+    const detallesATransferir: DetalleVenta[] = [];
+    const resumenItemsTransferidos: { nombre: string; cantidad: number; subtotal: number }[] = [];
+    let montoTotalTrasladado = 0;
+
+    for (const det of ventaOrigen.detalles) {
+      const cantATrasladar = itemsMap.get(det.idDetalle) || 0;
+
+      if (cantATrasladar <= 0) {
+        detallesOrigenRestantes.push(det);
+        continue;
+      }
+
+      const cantEfectiva = Math.min(cantATrasladar, det.cantidad);
+      const subtotalTraslado = Math.round(cantEfectiva * det.precioUnitario * 100) / 100;
+      montoTotalTrasladado += subtotalTraslado;
+
+      resumenItemsTransferidos.push({
+        nombre: det.nombreProducto,
+        cantidad: cantEfectiva,
+        subtotal: subtotalTraslado
+      });
+
+      const nuevoDetalleDestino: DetalleVenta = {
+        ...det,
+        idDetalle: siguienteIdDetalle++,
+        cantidad: cantEfectiva,
+        subtotal: subtotalTraslado,
+        saldo: subtotalTraslado,
+        pagadoEfectivo: 0,
+        pagadoTarjeta: 0,
+        estado: 'Pendiente de pago',
+        fechaAgregado: Timestamp.now(),
+        metadata: {
+          ...det.metadata,
+          tipo: det.metadata?.tipo || 'consumo',
+          transferidoDe: `Venta #${ventaOrigen.idVenta} (${ventaOrigen.nombreCliente})`
+        } as any
+      };
+      detallesATransferir.push(nuevoDetalleDestino);
+
+      const cantRestante = det.cantidad - cantEfectiva;
+      if (cantRestante > 0) {
+        const subtotalRestante = Math.round(cantRestante * det.precioUnitario * 100) / 100;
+        detallesOrigenRestantes.push({
+          ...det,
+          cantidad: cantRestante,
+          subtotal: subtotalRestante,
+          saldo: Math.min(det.saldo, subtotalRestante)
+        });
+      }
+    }
+
+    if (detallesATransferir.length === 0) {
+      throw new Error("No se seleccionaron productos válidos para trasladar.");
+    }
+
+    const nuevosDetallesDestino = [...ventaDestino.detalles, ...detallesATransferir];
+    const totalDestino = nuevosDetallesDestino.reduce((acc, d) => acc + d.subtotal, 0);
+    const saldoDestino = nuevosDetallesDestino.reduce((acc, d) => acc + d.saldo, 0);
+
+    const totalOrigen = detallesOrigenRestantes.reduce((acc, d) => acc + d.subtotal, 0);
+    const saldoOrigen = detallesOrigenRestantes.reduce((acc, d) => acc + d.saldo, 0);
+
+    // 3. FASE DE ESCRITURA
+    if (destino.tipo === 'existente') {
+      transaction.update(ventaDestinoRef, {
+        detalles: nuevosDetallesDestino,
+        total: totalDestino,
+        saldo: saldoDestino,
+        fechaUltimoPago: Timestamp.now()
+      });
+    } else {
+      const correlativoVentaRef = doc(firestore, `sucursales/${sid}/correlativos`, "ventas");
+      transaction.set(correlativoVentaRef, { correlativo: idVentaDestino }, { merge: true });
+      transaction.set(ventaDestinoRef, {
+        ...ventaDestino,
+        detalles: nuevosDetallesDestino,
+        total: totalDestino,
+        saldo: saldoDestino,
+        fecha: Timestamp.now()
+      });
+    }
+
+    transaction.set(correlativoDetalleRef, { correlativo: siguienteIdDetalle - 1 }, { merge: true });
+
+    // Si la cuenta de origen queda sin ítems o con saldo 0, se elimina
+    const ventaOrigenEliminada = detallesOrigenRestantes.length === 0 || saldoOrigen <= 0.001;
+    if (ventaOrigenEliminada) {
+      transaction.delete(ventaOrigenRef);
+    } else {
+      transaction.update(ventaOrigenRef, {
+        detalles: detallesOrigenRestantes,
+        total: totalOrigen,
+        saldo: saldoOrigen
+      });
+    }
+
+    return {
+      ventaOrigenEliminada,
+      ventaOrigenId,
+      idVentaOrigen: ventaOrigen.idVenta,
+      clienteOrigenNombre: ventaOrigen.nombreCliente,
+      ventaDestinoId: ventaDestinoRef.id,
+      idVentaDestino,
+      clienteDestinoNombre,
+      montoTotalTrasladado,
+      itemsTrasladados: resumenItemsTransferidos
+    };
+  });
 }

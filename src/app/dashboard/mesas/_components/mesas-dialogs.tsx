@@ -5,17 +5,8 @@ import { BillingDialog } from './billing-dialog';
 import { ConsumptionDialog } from './consumption-dialog';
 import { TransferDialog } from './transfer-dialog';
 import { TimeAdjustDialog } from './time-adjust-dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Trash2, Loader2 } from 'lucide-react';
+import { ModalConfirmacion } from '@/components/comunes';
+import { Trash2 } from 'lucide-react';
 import { useFirebase } from '@/firebase';
 import { guardarCliente } from '@/lib/firebase/servicios';
 import type { UseMesasReturn } from '../_hooks/use-mesas';
@@ -228,8 +219,8 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
         processingAjuste={processingAjuste}
       />
 
-      {/* Confirmación Eliminar Consumo Guardado */}
-      <AlertDialog
+      {/* Confirmación Eliminar Consumo Guardado (Línea 1 Antigravity + SweetAlert2) */}
+      <ModalConfirmacion
         open={!!confirmarEliminarConsumo}
         onOpenChange={(o) => {
           if (!o) setConfirmarEliminarConsumo(null);
@@ -239,83 +230,52 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
             }, 50);
           }
         }}
+        tipo="destructivo"
+        swalTipo="error"
+        titulo="¿Eliminar Consumo?"
+        subtitulo={`${confirmarEliminarConsumo?.tipoDeMesa === 'Consola' ? 'Consola' : 'Mesa'} #${confirmarEliminarConsumo?.numeroMesa ?? ''} • Confirma la eliminación`}
+        textoCancelar="Cancelar"
+        textoConfirmar="Sí, Eliminar"
+        iconoConfirmar={Trash2}
+        procesando={procesandoEliminacionConsumo}
+        onConfirmar={handleConfirmarEliminarConsumoPersistido}
       >
-        <AlertDialogContent className="sm:max-w-sm rounded-xl sm:rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 gap-3.5 shadow-2xl">
-          <AlertDialogHeader>
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
-                <Trash2 className="w-4 h-4" />
-              </div>
-              <div className="text-left min-w-0">
-                <AlertDialogTitle className="font-headline text-base font-bold text-slate-100 leading-tight">
-                  ¿Eliminar Consumo?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-[11px] text-slate-400 mt-0.5 truncate">
-                  {confirmarEliminarConsumo?.tipoDeMesa === 'Consola' ? 'Consola' : 'Mesa'} #
-                  {confirmarEliminarConsumo?.numeroMesa} • Confirma la eliminación
-                </AlertDialogDescription>
-              </div>
-            </div>
-          </AlertDialogHeader>
-
-          <div className="rounded-lg bg-[#252526] border border-[#2e2e2e] p-3 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-slate-100 truncate">
-                  {confirmarEliminarConsumo?.nombre}
+        <div className="rounded-xl bg-[#141414] border border-[#2e2e2e] p-3.5 space-y-2 text-left">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-slate-100 truncate">
+                {confirmarEliminarConsumo?.nombre}
+              </p>
+              {confirmarEliminarConsumo?.cantidad !== undefined && (
+                <p className="text-[11px] text-slate-400 mt-0.5 tabular-nums">
+                  {confirmarEliminarConsumo.cantidad} &times; Q
+                  {Number(confirmarEliminarConsumo.precioUnitario ?? 0).toFixed(2)} c/u
                 </p>
-                {confirmarEliminarConsumo?.cantidad !== undefined && (
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    {confirmarEliminarConsumo.cantidad} &times; Q
-                    {Number(confirmarEliminarConsumo.precioUnitario ?? 0).toFixed(2)} c/u
-                  </p>
-                )}
-              </div>
-              {confirmarEliminarConsumo?.total !== undefined && (
-                <span className="text-xs font-bold text-sky-400 tabular-nums shrink-0 mt-0.5">
-                  Q{Number(confirmarEliminarConsumo.total || 0).toFixed(2)}
-                </span>
               )}
             </div>
-
-            <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
-              {confirmarEliminarConsumo?.idProducto !== 'item-manual' ? (
-                <span>
-                  Se devolverá{' '}
-                  <strong className="text-slate-100">
-                    {confirmarEliminarConsumo?.cantidad ?? 1}{' '}
-                    {(confirmarEliminarConsumo?.cantidad ?? 1) === 1 ? 'unidad' : 'unidades'}
-                  </strong>{' '}
-                  al stock de inventario.
-                </span>
-              ) : (
-                <span>Se descontará este cargo manual del total de la estación.</span>
-              )}
-            </div>
+            {confirmarEliminarConsumo?.total !== undefined && (
+              <span className="text-xs font-bold text-sky-400 tabular-nums shrink-0 mt-0.5">
+                Q{Number(confirmarEliminarConsumo.total || 0).toFixed(2)}
+              </span>
+            )}
           </div>
 
-          <AlertDialogFooter className="flex-row items-center justify-between sm:justify-between gap-2 pt-0.5">
-            <AlertDialogCancel className="mt-0 rounded-full h-9 px-4 text-xs font-medium bg-[#252526] hover:bg-[#2e2e2e] border-[#2e2e2e] text-slate-200">
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault();
-                handleConfirmarEliminarConsumoPersistido();
-              }}
-              disabled={procesandoEliminacionConsumo}
-              className="bg-rose-600 hover:bg-rose-500 text-white rounded-full h-9 px-5 text-xs font-semibold shadow-md"
-            >
-              {procesandoEliminacionConsumo ? (
-                <Loader2 className="animate-spin mr-1.5 h-3.5 w-3.5" />
-              ) : (
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-              )}
-              Sí, Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
+            {confirmarEliminarConsumo?.idProducto !== 'item-manual' ? (
+              <span>
+                Se devolverá{' '}
+                <strong className="text-slate-100">
+                  {confirmarEliminarConsumo?.cantidad ?? 1}{' '}
+                  {(confirmarEliminarConsumo?.cantidad ?? 1) === 1 ? 'unidad' : 'unidades'}
+                </strong>{' '}
+                al stock de inventario.
+              </span>
+            ) : (
+              <span>Se descontará este cargo manual del total de la estación.</span>
+            )}
+          </div>
+        </div>
+      </ModalConfirmacion>
     </>
   );
 }

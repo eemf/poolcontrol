@@ -41,7 +41,7 @@ export default function PaginaUsuariosSucursal() {
   if (!isMounted) return null
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-2">
       <EncabezadoUsuarios
         onNuevoUsuario={() => { resetForm(); setIsModalOpen(true); }}
         deshabilitado={errorPermisos}

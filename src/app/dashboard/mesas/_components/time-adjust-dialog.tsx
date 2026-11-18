@@ -56,7 +56,7 @@ export function TimeAdjustDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-xl sm:rounded-lg font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl">
+      <DialogContent className="sm:max-w-md bg-[#252526] border-[#2e2e2e] text-slate-100 rounded-2xl font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl">
         <DialogHeader className="shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">

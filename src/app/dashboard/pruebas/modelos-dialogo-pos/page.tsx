@@ -56,7 +56,7 @@ export default function ModelosDialogoPOSPage() {
   };
 
   return (
-    <div className="space-y-12 pb-20 font-body max-w-6xl mx-auto">
+    <div className="space-y-12 pb-2 font-body max-w-6xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-3 text-foreground">
           <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center">

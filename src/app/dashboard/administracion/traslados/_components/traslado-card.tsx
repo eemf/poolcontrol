@@ -85,7 +85,7 @@ export function TrasladoCard({
         <SurfaceCard variant="subcard" className="p-2.5 flex items-center justify-between text-xs gap-2">
           <div className="flex-1 min-w-0">
             <span className="text-[10px] text-slate-400 block font-medium">Origen</span>
-            <span className={`font-semibold truncate block ${esOrigen ? 'text-primary' : 'text-slate-200'}`}>
+            <span className={`font-semibold truncate block ${esOrigen ? 'text-sky-400' : 'text-slate-200'}`}>
               {traslado.sucursalOrigenNombre}
             </span>
           </div>
@@ -130,7 +130,7 @@ export function TrasladoCard({
             size="sm"
             variant="outline"
             onClick={() => onCancelar(traslado)}
-            className="flex-1 border-rose-500/40 text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 rounded-full text-xs h-8 px-3 flex items-center justify-center gap-1.5 transition-all"
+            className="flex-1 bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-600 hover:text-white rounded-full text-xs h-8 px-3 flex items-center justify-center gap-1.5 transition-all"
           >
             <Undo2 className="h-3.5 w-3.5 shrink-0" />
             <span>Cancelar</span>
@@ -141,7 +141,7 @@ export function TrasladoCard({
           size="sm"
           variant="outline"
           onClick={() => onVerDetalle(traslado)}
-          className={`border-[#2e2e2e] bg-[#1e1e1e] text-slate-300 hover:text-white hover:bg-[#252526] rounded-full text-xs h-8 px-3.5 flex items-center justify-center gap-1.5 transition-all ${
+          className={`border-[#2e2e2e] bg-[#1e1e1e] text-slate-300 hover:text-white hover:bg-[#313131] rounded-full text-xs h-8 px-3.5 flex items-center justify-center gap-1.5 transition-all ${
             !puedeRecibir && !puedeCancelar ? 'w-full' : ''
           }`}
         >

@@ -9,7 +9,7 @@ import {
   TableProperties,
   Truck, Scale, History, HandCoins, Landmark, BookUser, CalendarDays, 
   Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2, Info,
-  BarChart3, ArrowLeftRight, Sliders
+  BarChart3, ArrowLeftRight, Sliders, MessageSquare
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -113,6 +113,7 @@ export const navItems: NavItemType[] = [
     permission: 'pruebas.ver',
     items: [
       { href: '/dashboard/pruebas/controles-estandar', label: 'Controles Estándar', icon: Sliders },
+      { href: '/dashboard/pruebas/disenos-mensajes', label: 'Diseños de Mensajes', icon: MessageSquare },
       { href: '/dashboard/pruebas/monitoreo-integral', label: 'Monitoreo Integral', icon: MonitorCheck },
       { href: '/dashboard/pruebas/solucion-pago-unificado', label: 'Pago Unificado', icon: TableProperties },
       { href: '/dashboard/pruebas/diseno-botones', label: 'Diseño Botones', icon: Palette },
@@ -126,7 +127,7 @@ export const navItems: NavItemType[] = [
   },
 ];
 
-const NavItem = ({ 
+const NavItem = React.memo(function NavItem({ 
     item, 
     pathname, 
     isCollapsed, 
@@ -144,7 +145,7 @@ const NavItem = ({
     hasAnyPermission: (k: string[]) => boolean,
     branchFeatures: { [key: string]: boolean },
     isSubItem?: boolean,
-}) => {
+}) {
   if (item.feature && branchFeatures[item.feature] === false) return null;
 
   const canSeeParent = item.permission ? hasPermission(item.permission) : (item.anyPermission ? hasAnyPermission(item.anyPermission) : true);
@@ -192,6 +193,7 @@ const NavItem = ({
       >
         <Link 
           href={item.href} 
+          prefetch={false}
           onClick={onNavigate} 
           className={cn(
             "flex items-center min-w-0 w-full",
@@ -212,12 +214,10 @@ const NavItem = ({
     );
 
     return isCollapsed ? (
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
-          <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
-          <TooltipContent side="right"><p>{item.label}</p></TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
+        <TooltipContent side="right"><p>{item.label}</p></TooltipContent>
+      </Tooltip>
     ) : (
       buttonContent
     );
@@ -269,24 +269,22 @@ const NavItem = ({
   if (hasSubItems && isCollapsed) {
     return (
       <DropdownMenu modal={false}>
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant={isParentActive ? "default" : "ghost"}
-                  className={cn(
-                    "w-full justify-center rounded-full px-0 h-10 transition-all duration-300 gap-0",
-                    !isParentActive && "hover:bg-primary/10 hover:text-primary"
-                  )}
-                >
-                  <item.icon className="h-5 w-5 shrink-0" />
-                </Button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="right"><p>{item.label}</p></TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant={isParentActive ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-center rounded-full px-0 h-10 transition-all duration-300 gap-0",
+                  !isParentActive && "hover:bg-primary/10 hover:text-primary"
+                )}
+              >
+                <item.icon className="h-5 w-5 shrink-0" />
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="right"><p>{item.label}</p></TooltipContent>
+        </Tooltip>
         <DropdownMenuContent side="right" align="start" className="w-48 p-1 font-body">
           <div className="space-y-1">
             {visibleSubItems.map(subItem => {
@@ -296,12 +294,14 @@ const NavItem = ({
                 }
                 const isSubActive = pathname.startsWith(subItem.href);
                 return (
-                  <Button key={subItem.label} asChild variant={isSubActive ? "default" : "ghost"} size="sm" className={cn("w-full justify-start rounded-full", !isSubActive && "hover:bg-primary/10 hover:text-primary")}>
-                    <Link href={subItem.href} onClick={onNavigate}>
-                      <subItem.icon className="mr-2 h-4 w-4" />
-                      <span className="text-xs">{subItem.label}</span>
-                    </Link>
-                  </Button>
+                  <DropdownMenuItem key={subItem.label} asChild className="p-0 focus:bg-transparent">
+                    <Button asChild variant={isSubActive ? "default" : "ghost"} size="sm" className={cn("w-full justify-start rounded-full", !isSubActive && "hover:bg-primary/10 hover:text-primary")}>
+                      <Link href={subItem.href} prefetch={false} onClick={onNavigate}>
+                        <subItem.icon className="mr-2 h-4 w-4" />
+                        <span className="text-xs">{subItem.label}</span>
+                      </Link>
+                    </Button>
+                  </DropdownMenuItem>
                 )
               }
               return null;
@@ -313,7 +313,7 @@ const NavItem = ({
   }
 
   return null;
-}
+});
 
 export default function ClientDashboardNav({ pathname }: { pathname: string }) {
   const { firestore } = useFirebase();

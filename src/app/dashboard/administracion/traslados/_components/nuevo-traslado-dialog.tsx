@@ -21,19 +21,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { SurfaceCard } from '@/components/comunes';
 import { AutocompleteInput, AutocompleteOption } from '@/components/ui/autocomplete-input';
 import {
   Truck,
   PlusCircle,
   Trash2,
-  AlertCircle,
   Loader2,
   PackageCheck,
-  Building2,
-  Boxes,
   History,
-  Tag
+  Tag,
+  Search,
+  ShoppingCart,
 } from 'lucide-react';
 import type { Sucursal, Producto, Compra } from '@/lib/tipos';
 import { InputItemTraslado, crearTrasladoInterSucursal } from '@/lib/firebase/servicios/traslados';
@@ -91,11 +90,21 @@ export function NuevoTrasladoDialog({
   const [selectedProductoId, setSelectedProductoId] = useState<string>('');
   const [cantidadInput, setCantidadInput] = useState<string>('1');
   const [costoInput, setCostoInput] = useState<string>('');
+  const [isAddingItem, setIsAddingItem] = useState(false);
 
   const productoInputRef = useRef<HTMLInputElement>(null);
   const cantidadInputRef = useRef<HTMLInputElement>(null);
   const costoInputRef = useRef<HTMLInputElement>(null);
   const addItemButtonRef = useRef<HTMLButtonElement>(null);
+
+  const controlsDisabled = !sucursalDestinoId;
+
+  const focusAndSelect = (ref: React.RefObject<HTMLInputElement | null>) => {
+    setTimeout(() => {
+      ref.current?.focus();
+      ref.current?.select();
+    }, 20);
+  };
 
   // Sucursales destino disponibles (excluyendo la sucursal activa)
   const sucursalesDestino = useMemo(() => {
@@ -199,14 +208,16 @@ export function NuevoTrasladoDialog({
   }, [open]);
 
   const handleAddItem = () => {
-    if (!productoSeleccionado) {
-      toast({ title: 'Atención', description: 'Selecciona un producto para agregar.', variant: 'destructive' });
-      return;
-    }
+    if (isAddingItem || controlsDisabled) return;
 
     const cant = Number(cantidadInput);
     if (isNaN(cant) || cant <= 0) {
-      toast({ title: 'Cantidad inválida', description: 'La cantidad debe ser mayor a 0.', variant: 'destructive' });
+      focusAndSelect(cantidadInputRef);
+      return;
+    }
+
+    if (!productoSeleccionado) {
+      focusAndSelect(productoInputRef);
       return;
     }
 
@@ -219,10 +230,11 @@ export function NuevoTrasladoDialog({
         description: `Solo hay ${stockDisponible} unidades disponibles de "${productoSeleccionado.nombre}".`,
         variant: 'destructive',
       });
+      focusAndSelect(cantidadInputRef);
       return;
     }
 
-    const costo = Number(costoInput) >= 0 ? Number(costoInput) : (productoSeleccionado.precioCompra ?? 0);
+    const costo = costoInput !== '' && Number(costoInput) >= 0 ? Number(costoInput) : (productoSeleccionado.precioCompra ?? 0);
 
     setItems((prev) => {
       const idx = prev.findIndex((it) => it.productoOrigenId === productoSeleccionado.id);
@@ -248,13 +260,12 @@ export function NuevoTrasladoDialog({
       ];
     });
 
-    // Resetear formulario de ítem
+    setIsAddingItem(true);
     setSelectedProductoId('');
     setCantidadInput('1');
     setCostoInput('');
-    setTimeout(() => {
-      productoInputRef.current?.focus();
-    }, 50);
+    focusAndSelect(cantidadInputRef);
+    setTimeout(() => setIsAddingItem(false), 250);
   };
 
   const handleRemoveItem = (productoOrigenId: string) => {
@@ -323,296 +334,294 @@ export function NuevoTrasladoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100">
-        <DialogHeader className="space-y-1 pb-3 border-b border-[#2c3b4f]">
-          <DialogTitle className="text-xl font-bold flex items-center gap-2 text-white">
-            <Truck className="h-5 w-5 text-primary" />
-            Nuevo traslado de inventario
-          </DialogTitle>
-          <DialogDescription className="text-xs text-slate-400">
-            Despacha productos hacia otra sucursal. El stock se descontará inmediatamente de origen y quedará en tránsito hasta que el destino lo confirme.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-y-auto space-y-4 py-3 pr-1">
-          {/* Encabezado de Sucursales (Origen -> Destino) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-[#233144]/80 border border-[#2d3e55]">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 ml-1">
-                <Building2 className="h-3.5 w-3.5 text-primary" />
-                Sucursal de origen (emisora)
-              </Label>
-              <div className="px-4 rounded-full bg-[#182330] border border-[#2d3e55] font-semibold text-sm text-white flex items-center h-11">
-                {sucursalOrigenNombre || 'Sucursal actual'}
+      <DialogContent className="sm:max-w-4xl bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-2xl overflow-visible p-5 sm:p-6 shadow-2xl font-body flex flex-col max-h-[90vh]">
+        <div className="flex flex-col flex-1 min-h-0 overflow-visible gap-4">
+          <DialogHeader className="shrink-0">
+            <div className="flex items-center gap-3 pr-6">
+              <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+                <Truck className="w-5 h-5" />
+              </div>
+              <div className="text-left min-w-0">
+                <DialogTitle className="font-headline text-lg font-bold text-slate-100 leading-tight truncate">
+                  Nuevo Traslado
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-400 mt-0.5 truncate">
+                  Desde {sucursalOrigenNombre || 'Sucursal actual'} hacia otra sucursal.
+                </DialogDescription>
               </div>
             </div>
+          </DialogHeader>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 ml-1">
-                <Building2 className="h-3.5 w-3.5 text-emerald-400" />
-                Sucursal de destino (receptora) *
-              </Label>
-              <Select value={sucursalDestinoId} onValueChange={setSucursalDestinoId}>
-                <SelectTrigger className="bg-[#182330] border-[#2d3e55] text-white h-11 rounded-full px-4 text-sm focus:ring-primary">
-                  <SelectValue placeholder="Selecciona la sucursal..." />
-                </SelectTrigger>
-                <SelectContent className="bg-[#182330] border-[#2d3e55] text-white">
-                  {sucursalesDestino.map((s) => (
-                    <SelectItem key={s.id} value={s.id} className="text-xs">
-                      {s.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Selector y agregado de productos */}
-          <div className="space-y-3 p-4 rounded-2xl bg-[#233144]/80 border border-[#2d3e55]">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 ml-1">
-                <Boxes className="h-4 w-4 text-primary" />
-                Agregar producto al traslado
-              </Label>
-              {productoSeleccionado && (
-                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-xs rounded-full px-3 py-1 font-semibold">
-                  Stock disponible: {productoSeleccionado.existencia ?? 0} uds
-                </Badge>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end">
-              <div className="sm:col-span-6 space-y-1.5">
-                <Label htmlFor="producto-search" className="text-xs font-medium text-slate-400 ml-1">
-                  Producto de origen
-                </Label>
-                <AutocompleteInput
-                  id="producto-search"
-                  ref={productoInputRef}
-                  options={opcionesProductos}
-                  value={selectedProductoId}
-                  onValueChange={setSelectedProductoId}
-                  placeholder="Buscar producto por nombre o código..."
-                  onEnterKey={() => cantidadInputRef.current?.focus()}
-                  onFocus={(e) => e.target.select()}
-                  className="rounded-full h-11 border-[#2d3e55] bg-[#182330] text-sm text-white px-4"
-                />
-              </div>
-
-              <div className="sm:col-span-2 space-y-1.5">
-                <Label htmlFor="cantidad" className="text-xs font-medium text-slate-400 ml-1">
-                  Cantidad
-                </Label>
-                <Input
-                  id="cantidad"
-                  ref={cantidadInputRef}
-                  type="number"
-                  min="1"
-                  max={productoSeleccionado?.existencia ?? 99999}
-                  value={cantidadInput}
-                  onChange={(e) => setCantidadInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      costoInputRef.current?.focus();
+          <div className="flex flex-col flex-1 min-h-0 space-y-3.5 overflow-y-auto p-1">
+            {/* Sucursal Destino y Monto Total en la misma fila */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+              <div className="flex-1 min-w-0 sm:max-w-lg">
+                <Select
+                  value={sucursalDestinoId}
+                  onValueChange={(val) => {
+                    setSucursalDestinoId(val);
+                    if (val) {
+                      setTimeout(() => {
+                        cantidadInputRef.current?.focus();
+                        cantidadInputRef.current?.select();
+                      }, 100);
                     }
                   }}
-                  className="bg-[#182330] border-[#2d3e55] text-white h-11 rounded-full text-sm text-center font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
+                >
+                  <SelectTrigger className="h-10 rounded-full px-4 text-sm bg-[#252526] border-[#2e2e2e] hover:bg-[#313131]">
+                    <SelectValue placeholder="Seleccionar sucursal de destino..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sucursalesDestino.map((s) => (
+                      <SelectItem key={s.id} value={s.id} className="text-xs">
+                        {s.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="sm:col-span-2 space-y-1.5">
-                <Label htmlFor="costo" className="text-xs font-medium text-slate-400 ml-1">
-                  Costo unitario
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">
-                    Q
-                  </span>
+              <div className="flex items-baseline justify-center sm:justify-end gap-2 shrink-0 sm:text-right px-1 sm:px-0">
+                <span className="text-xs font-medium text-slate-400">Monto Total</span>
+                <span className="text-2xl font-bold text-sky-400 tabular-nums leading-tight">
+                  Q{totalCosto.toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            {/* Sección de entrada de artículos */}
+            <div className={cn("space-y-2 transition-opacity", controlsDisabled && "opacity-50")}>
+              <div className="flex flex-col lg:flex-row items-end gap-2.5">
+                <div className="w-full lg:w-24 space-y-1 shrink-0">
+                  <Label htmlFor="cantidad" className="text-xs font-medium ml-1 text-slate-200 block">
+                    Cantidad
+                  </Label>
                   <Input
-                    id="costo"
-                    ref={costoInputRef}
+                    id="cantidad"
+                    ref={cantidadInputRef}
                     type="number"
-                    step="0.01"
-                    min="0"
-                    value={costoInput}
-                    onChange={(e) => setCostoInput(e.target.value)}
+                    min="1"
+                    max={productoSeleccionado?.existencia ?? 99999}
+                    placeholder="1"
+                    value={cantidadInput}
+                    onChange={(e) => setCantidadInput(e.target.value)}
+                    onClick={(e) => e.currentTarget.select()}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
-                        addItemButtonRef.current?.focus();
+                        focusAndSelect(productoInputRef);
                       }
                     }}
-                    className="w-full pl-8 bg-[#182330] border-[#2d3e55] text-white h-11 rounded-full text-sm font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    disabled={controlsDisabled}
+                    className="text-center h-10 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <Button
-                  type="button"
-                  ref={addItemButtonRef}
-                  onClick={handleAddItem}
-                  disabled={!selectedProductoId}
-                  className="w-full rounded-full h-11 px-6 font-bold shadow-md shadow-primary/20 shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-1.5"
-                >
-                  <PlusCircle className="h-4 w-4" />
-                  Agregar
-                </Button>
-              </div>
-            </div>
-
-            {/* Historial de precios de compra */}
-            {selectedProductoId && (
-              <div className="pt-2.5 border-t border-[#2d3e55]/60 flex flex-wrap items-center gap-2 animate-in fade-in duration-200">
-                <div className="flex items-center gap-1.5 text-slate-400 shrink-0">
-                  <History className="h-3.5 w-3.5 text-primary shrink-0" />
-                  <span className="text-xs font-semibold text-slate-300">
-                    Historial de precios de compra:
-                  </span>
+                <div className="flex-grow space-y-1 w-full">
+                  <div className="flex items-center justify-between px-1">
+                    <Label htmlFor="producto-search" className="text-xs font-medium text-slate-200 block">
+                      Producto
+                    </Label>
+                    {productoSeleccionado && (
+                      <span className="text-[11px] font-semibold text-sky-400">
+                        Stock: {productoSeleccionado.existencia ?? 0} uds
+                      </span>
+                    )}
+                  </div>
+                  <AutocompleteInput
+                    id="producto-search"
+                    ref={productoInputRef}
+                    options={opcionesProductos}
+                    value={selectedProductoId}
+                    onValueChange={(val) => {
+                      setSelectedProductoId(val);
+                      if (val) focusAndSelect(costoInputRef);
+                    }}
+                    placeholder="Buscar producto..."
+                    onEnterKey={() => focusAndSelect(costoInputRef)}
+                    onClick={(e) => e.currentTarget.select()}
+                    disabled={controlsDisabled}
+                    icon={Search}
+                  />
                 </div>
 
-                {historialCompras.length > 0 ? (
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {historialCompras.map((item, idx) => {
-                      const isSelected = costoInput !== '' && Number(costoInput) === item.costoUnitario;
-                      return (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => {
-                            setCostoInput(item.costoUnitario.toString());
-                            costoInputRef.current?.focus();
-                          }}
-                          title={`Aplicar costo Q${item.costoUnitario.toFixed(2)} (${item.proveedorNombre || 'Compra previa'})`}
-                          className={cn(
-                            'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer',
-                            isSelected
-                              ? 'bg-primary text-primary-foreground border-primary shadow-sm ring-1 ring-primary/40 font-bold'
-                              : 'bg-[#182330] hover:bg-[#202d3e] border-[#2d3e55] hover:border-primary/40 text-slate-200'
-                          )}
-                        >
-                          <span className={cn('text-xs font-bold', isSelected ? 'text-white' : 'text-emerald-400')}>
-                            Q{item.costoUnitario.toFixed(2)}
-                          </span>
-                          <span className={cn('text-[10px]', isSelected ? 'text-primary-foreground/90' : 'text-slate-400')}>
-                            {item.idCompra > 0 ? format(item.fecha, 'dd/MM/yy') : 'Catálogo'}
-                          </span>
-                          {idx === 0 && (
-                            <span
-                              className={cn(
-                                'text-[9px] font-bold px-1.5 py-0.5 rounded-full',
-                                isSelected ? 'bg-white/25 text-white' : 'bg-primary/20 text-primary-foreground'
-                              )}
-                            >
-                              Última
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                {/* Precio + Botón Añadir en la misma fila */}
+                <div className="flex items-end gap-2.5 w-full lg:w-auto shrink-0">
+                  <div className="flex-1 lg:w-28 space-y-1">
+                    <Label htmlFor="costo" className="text-xs font-medium ml-1 text-slate-200 block">
+                      Precio
+                    </Label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-400 text-xs font-bold pointer-events-none">
+                        Q
+                      </span>
+                      <Input
+                        id="costo"
+                        ref={costoInputRef}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                        value={costoInput}
+                        onChange={(e) => setCostoInput(e.target.value)}
+                        onClick={(e) => e.currentTarget.select()}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addItemButtonRef.current?.focus();
+                          }
+                        }}
+                        disabled={controlsDisabled}
+                        className="w-full px-8 text-center h-10 font-bold text-sm tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                    </div>
                   </div>
-                ) : (
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    <Tag className="h-3 w-3 opacity-60" />
-                    Sin historial de compras registrado. Se utilizará el costo actual del producto.
-                  </span>
-                )}
+
+                  <Button
+                    type="button"
+                    ref={addItemButtonRef}
+                    onClick={handleAddItem}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddItem();
+                      }
+                    }}
+                    disabled={controlsDisabled || isAddingItem}
+                    className="rounded-full h-10 px-5 sm:px-6 font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md shrink-0"
+                  >
+                    {isAddingItem ? (
+                      <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                    ) : (
+                      <PlusCircle className="mr-1.5 h-4 w-4" />
+                    )}
+                    Añadir
+                  </Button>
+                </div>
               </div>
-            )}
-          </div>
 
-          {/* Tabla de ítems en el traslado */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-semibold text-slate-300">
-                Productos a trasladar ({items.length})
-              </span>
-              <span className="text-xs text-slate-400">
-                Total unidades: <strong className="text-white">{totalCantidad}</strong> | Total costo: <strong className="text-emerald-400">Q{totalCosto.toFixed(2)}</strong>
-              </span>
-            </div>
+              {/* Historial de precios compacto */}
+              {selectedProductoId && (
+                <SurfaceCard variant="surface" className="p-2.5 flex flex-wrap items-center gap-1.5 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-1.5 text-slate-400 shrink-0">
+                    <History className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                    <span className="text-[11px] font-semibold text-slate-200">
+                      Historial de precios:
+                    </span>
+                  </div>
 
-            <div className="rounded-2xl border border-[#2d3e55] overflow-hidden bg-[#182330]">
-              <Table>
-                <TableHeader className="bg-[#202d3e] text-slate-300">
-                  <TableRow className="border-[#2d3e55] hover:bg-transparent">
-                    <TableHead className="text-slate-300 text-xs py-2.5">Producto</TableHead>
-                    <TableHead className="text-slate-300 text-xs text-center py-2.5">Cantidad</TableHead>
-                    <TableHead className="text-slate-300 text-xs text-right py-2.5">Costo unitario</TableHead>
-                    <TableHead className="text-slate-300 text-xs text-right py-2.5">Subtotal</TableHead>
-                    <TableHead className="w-12 py-2.5 text-center">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.length === 0 ? (
-                    <TableRow className="border-[#2d3e55]">
-                      <TableCell colSpan={5} className="text-center py-8 text-xs text-slate-400">
-                        Aún no has agregado productos a este traslado.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    items.map((it) => (
-                      <TableRow key={it.productoOrigenId} className="border-[#2d3e55] hover:bg-[#233144]">
-                        <TableCell className="py-2.5 text-xs font-medium text-white">
-                          {it.nombreProducto}
-                        </TableCell>
-                        <TableCell className="py-2.5 text-xs text-center">
-                          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                            {it.cantidad}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-xs text-right text-slate-300">
-                          Q{it.costoUnitario.toFixed(2)}
-                        </TableCell>
-                        <TableCell className="py-2.5 text-xs text-right font-bold text-emerald-400">
-                          Q{(it.cantidad * it.costoUnitario).toFixed(2)}
-                        </TableCell>
-                        <TableCell className="py-2.5 text-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveItem(it.productoOrigenId)}
-                            className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 rounded-full"
+                  {historialCompras.length > 0 ? (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {historialCompras.map((item, idx) => {
+                        const isSelected = costoInput !== '' && Number(costoInput) === item.costoUnitario;
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              setCostoInput(item.costoUnitario.toString());
+                              focusAndSelect(costoInputRef);
+                            }}
+                            title={`Aplicar costo Q${item.costoUnitario.toFixed(2)} (${item.proveedorNombre || 'Compra previa'})`}
+                            className={cn(
+                              'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all cursor-pointer',
+                              isSelected
+                                ? 'bg-sky-600 text-white border-sky-500 shadow-sm font-bold'
+                                : 'bg-[#1e1e1e] hover:bg-[#313131] border-[#2e2e2e] text-slate-200'
+                            )}
                           >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                            <span className={cn('text-xs font-bold tabular-nums', isSelected ? 'text-white' : 'text-sky-400')}>
+                              Q{item.costoUnitario.toFixed(2)}
+                            </span>
+                            <span className={cn('text-[10px]', isSelected ? 'text-white/90' : 'text-slate-400')}>
+                              {item.idCompra > 0 ? format(item.fecha, 'dd/MM/yy') : 'Catálogo'}
+                            </span>
+                            {idx === 0 && (
+                              <span
+                                className={cn(
+                                  'text-[9px] font-bold px-1.5 py-0.5 rounded-full',
+                                  isSelected ? 'bg-white/25 text-white' : 'bg-sky-500/15 text-sky-400'
+                                )}
+                              >
+                                Última
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                      <Tag className="h-3 w-3 opacity-60" />
+                      Sin historial registrado. Se utilizará el costo actual del producto.
+                    </span>
                   )}
-                </TableBody>
-              </Table>
+                </SurfaceCard>
+              )}
+            </div>
+
+            {/* Listado de ítems cargados */}
+            <SurfaceCard variant="surface" className="max-h-[200px] overflow-y-auto custom-scrollbar p-2">
+              {items.length > 0 ? (
+                <div className="divide-y divide-[#2e2e2e]">
+                  {items.map((it) => (
+                    <div key={it.productoOrigenId} className="flex items-center justify-between py-2.5 px-2 text-sm">
+                      <div className="min-w-0 flex-1 pr-3">
+                        <p className="font-semibold text-slate-100 truncate text-sm">{it.nombreProducto}</p>
+                        <p className="text-xs text-slate-400 tabular-nums">
+                          {it.cantidad} unidades &times; Q{it.costoUnitario.toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <p className="font-semibold text-slate-100 text-sm tabular-nums">
+                          Q{(it.cantidad * it.costoUnitario).toFixed(2)}
+                        </p>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          disabled={controlsDisabled}
+                          onClick={() => handleRemoveItem(it.productoOrigenId)}
+                          className="h-8 w-8 rounded-full bg-rose-500/15 text-rose-400 hover:bg-rose-600 hover:text-white border border-rose-500/25 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 text-center text-slate-400 gap-2">
+                  <ShoppingCart className="h-9 w-9 text-slate-500 stroke-[1.75]" />
+                  <p className="text-sm font-medium">Aún no has agregado productos</p>
+                </div>
+              )}
+            </SurfaceCard>
+
+            {/* Observaciones */}
+            <div className="space-y-1">
+              <Label htmlFor="obsEnvio" className="text-xs font-medium ml-1 text-slate-300 block">
+                Observaciones (opcional)
+              </Label>
+              <Textarea
+                id="obsEnvio"
+                placeholder="Ej: Reabastecimiento o motivo del traslado..."
+                value={observaciones}
+                onChange={(e) => setObservaciones(e.target.value)}
+                disabled={controlsDisabled}
+                className="bg-[#252526] border-[#2e2e2e] text-slate-100 text-xs rounded-2xl min-h-[52px] resize-none p-3"
+              />
             </div>
           </div>
 
-          {/* Observaciones */}
-          <div className="space-y-1.5">
-            <Label htmlFor="obsEnvio" className="text-xs text-slate-400 ml-1">
-              Observaciones o motivo del traslado (opcional)
-            </Label>
-            <Textarea
-              id="obsEnvio"
-              placeholder="Ej: Reabastecimiento de urgencia, traslado temporal de bebidas..."
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
-              className="bg-[#182330] border-[#2d3e55] text-white text-xs rounded-2xl min-h-[64px] resize-none p-3"
-            />
-          </div>
-        </div>
-
-        <DialogFooter className="pt-3 border-t border-[#2c3b4f] flex flex-col sm:flex-row gap-2 justify-between items-center">
-          <div className="text-xs text-slate-400 flex items-center gap-1.5">
-            <AlertCircle className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-            <span>El costo de traslado quedará registrado para la liquidación semanal del receptor.</span>
-          </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <DialogFooter className="pt-2 shrink-0 flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="border-[#2d3e55] text-slate-300 hover:bg-[#233144] rounded-full text-xs h-11 px-6 font-semibold flex-1 sm:flex-initial"
+              className="rounded-full h-9 px-5 text-xs font-medium bg-[#252526] hover:bg-[#313131] text-slate-200 border border-[#2e2e2e]"
             >
               Cancelar
             </Button>
@@ -620,22 +629,22 @@ export function NuevoTrasladoDialog({
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting || items.length === 0 || !sucursalDestinoId}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full text-xs h-11 px-6 shadow-md shadow-primary/20 flex-1 sm:flex-initial flex items-center gap-2"
+              className="rounded-full h-9 px-6 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Despachando...
                 </>
               ) : (
                 <>
-                  <PackageCheck className="h-4 w-4" />
-                  Despachar traslado (Q{totalCosto.toFixed(2)})
+                  <PackageCheck className="mr-2 h-4 w-4" />
+                  Despachar Traslado
                 </>
               )}
             </Button>
-          </div>
-        </DialogFooter>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

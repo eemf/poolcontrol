@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { realizarCierreDeCaja, inicializarCaja } from '@/lib/firebase/servicios/cierre-caja';
 import { sincronizarContadorCredito } from '@/lib/firebase/servicios/ventas';
 import { toDate } from '@/lib/firebase/servicios/utils';
-import { useFirebase, useDoc, useUser, useMemoFirebase, useCollection } from '@/firebase';
+import { useFirebase, useDoc, useMemoFirebase, useCollection } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
 
 export interface Cuenta {
@@ -17,8 +17,6 @@ export interface Cuenta {
   tipo: 'Efectivo' | 'Bancaria';
   idCuenta: number;
 }
-
-export type VistaHistorial = null | 'efectivo' | 'tarjeta' | 'monedas';
 
 export function useCierreCaja() {
   const { toast } = useToast();
@@ -54,7 +52,6 @@ export function useCierreCaja() {
   const { data: mesasActivasData, isLoading: isLoadingMesas } = useCollection<Mesa>(mesasActivasQuery);
 
   // Estados locales
-  const [historialVisible, setHistorialVisible] = useState<VistaHistorial>(null);
   const [procesandoCierre, setProcesandoCierre] = useState(false);
   const [alertaAbierta, setAlertaAbierta] = useState(false);
   const [cuentaDestinoId, setCuentaDestinoId] = useState('');
@@ -97,11 +94,20 @@ export function useCierreCaja() {
     }
   }, [cuentasData, cuentaDestinoId]);
 
+  const cargando = cargandoContext || isLoadingSucursal;
+  const focoInicialAplicadoRef = useRef(false);
+
   useEffect(() => {
-    if (efectivoFinalInputRef.current) {
-      efectivoFinalInputRef.current.focus();
+    if (!cargando && estadoCaja && fechaInicioPeriodo && !focoInicialAplicadoRef.current) {
+      const timer = setTimeout(() => {
+        if (efectivoFinalInputRef.current) {
+          efectivoFinalInputRef.current.focus();
+          focoInicialAplicadoRef.current = true;
+        }
+      }, 40);
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [cargando, estadoCaja, fechaInicioPeriodo]);
   
   const diferencia = useMemo(() => {
     if (typeof efectivoFinalContado !== 'number') return 0;
@@ -184,18 +190,11 @@ export function useCierreCaja() {
     toast
   ]);
 
-  const toggleHistorial = useCallback((vista: VistaHistorial) => {
-    if (!fechaInicioPeriodo) {
-      toast({ title: 'Aviso', description: 'No hay período de caja activo.' });
-      return;
-    }
-    setHistorialVisible(current => (current === vista ? null : vista));
-  }, [fechaInicioPeriodo, toast]);
-
   return {
     sucursalId,
     estadoCaja,
-    cargando: cargandoContext || isLoadingSucursal || isLoadingVentas || isLoadingMesas,
+    cargando: cargandoContext || isLoadingSucursal,
+    cargandoValidaciones: isLoadingVentas || isLoadingMesas,
     cuentasData,
     cuentasPendientes,
     mesasActivas,
@@ -203,9 +202,6 @@ export function useCierreCaja() {
     hayMesasActivas,
     hayOperacionesPendientes,
     fechaInicioPeriodo,
-    historialVisible,
-    setHistorialVisible,
-    toggleHistorial,
     procesandoCierre,
     alertaAbierta,
     setAlertaAbierta,
@@ -225,14 +221,10 @@ export function useCierreCaja() {
     totalMonedasTarjeta,
     totalPagosTarjeta,
     efectivoEnCaja,
-    inicializando,
-    fondoEfectivoInit,
-    setFondoEfectivoInit,
-    existenciaMonedasInit,
-    setExistenciaMonedasInit,
-    manejarInicializarCaja,
     montoApertura: fondoEfectivoInit,
     setMontoApertura: setFondoEfectivoInit,
+    existenciaMonedasInit,
+    setExistenciaMonedasInit,
     procesandoApertura: inicializando,
     manejarAperturaCaja: manejarInicializarCaja,
     manejarCierre,

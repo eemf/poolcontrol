@@ -56,7 +56,7 @@ const DUMMY_SALE = {
 
 export default function ModeloHistorialVentasPage() {
   return (
-    <div className="space-y-12 pb-20 font-body">
+    <div className="space-y-12 pb-2 font-body">
       <div>
         <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
           <History className="h-8 w-8 text-primary" />

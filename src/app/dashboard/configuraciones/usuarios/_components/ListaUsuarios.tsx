@@ -178,7 +178,7 @@ export function ListaUsuarios({
           <div className="flex items-center space-x-2">
             <p className="text-xs font-medium text-muted-foreground">Filas por página</p>
             <Select value={`${paginacion.itemsPorPagina}`} onValueChange={(v) => paginacion.onItemsPorPaginaChange(Number(v))}>
-              <SelectTrigger className="h-8 w-[70px] rounded-full text-xs bg-background">
+              <SelectTrigger className="h-8 w-[70px] rounded-full text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent side="top" className="font-body">

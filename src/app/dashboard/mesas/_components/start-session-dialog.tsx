@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Mesa } from '@/lib/tipos';
 import {
   Dialog,
@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Clock, Timer, Play, Users, Gamepad2, Dices } from 'lucide-react';
+import { Clock, Timer, Play, Users, Gamepad2, Dices, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const intervalosDeTiempo = [
@@ -39,7 +39,7 @@ interface StartSessionDialogProps {
   setSelectedInterval: (val: number) => void;
   pagadoDeContado: boolean;
   setPagadoDeContado: (val: boolean) => void;
-  onStart: () => void;
+  onStart: () => void | Promise<void>;
   numControles: number;
   setNumControles: (val: number) => void;
 }
@@ -59,10 +59,28 @@ export function StartSessionDialog({
   setNumControles,
 }: StartSessionDialogProps) {
   const isConsola = selectedTable?.tipoDeMesa === 'Consola';
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) setIsSubmitting(false);
+  }, [isOpen]);
+
+  const handleStart = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onStart();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-xl sm:rounded-lg font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl">
+    <Dialog open={isOpen} onOpenChange={(open) => !isSubmitting && onOpenChange(open)}>
+      <DialogContent
+        disableClose={isSubmitting}
+        className="sm:max-w-md bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-2xl font-body p-5 sm:p-6 flex flex-col max-h-[90vh] overflow-hidden shadow-2xl"
+      >
         <DialogHeader className="shrink-0">
           <div className="flex items-center gap-3 pr-6">
             <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
@@ -192,18 +210,29 @@ export function StartSessionDialog({
             <Button
               type="button"
               variant="secondary"
-              className="rounded-full px-5 font-medium h-10 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
+              disabled={isSubmitting}
+              className="rounded-full px-5 font-medium h-9 text-xs bg-[#252526] hover:bg-[#313131] text-slate-200 border border-[#2e2e2e]"
             >
               Cancelar
             </Button>
           </DialogClose>
           <Button
             type="button"
-            onClick={onStart}
-            className="rounded-full px-6 font-semibold h-10 bg-sky-600 hover:bg-sky-500 text-white shadow-md"
+            disabled={isSubmitting}
+            onClick={handleStart}
+            className="rounded-full px-6 font-semibold h-9 text-xs bg-sky-600 hover:bg-sky-500 text-white shadow-md gap-1.5"
           >
-            <Play className="mr-1.5 h-4 w-4" />
-            Iniciar Juego
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>Iniciando...</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5" />
+                <span>Iniciar Juego</span>
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -29,10 +29,15 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+interface DialogContentProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  disableClose?: boolean;
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, onPointerDownOutside, onFocusOutside, onInteractOutside, ...props }, ref) => {
+  DialogContentProps
+>(({ className, children, disableClose = false, onPointerDownOutside, onFocusOutside, onInteractOutside, onEscapeKeyDown, ...props }, ref) => {
   React.useEffect(() => {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement && document.activeElement !== document.body) {
       document.activeElement.blur();
@@ -45,11 +50,7 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         onPointerDownOutside={(e) => {
-          const target = e.target as HTMLElement | null;
-          if (target?.closest?.('[data-global-alert="true"]')) {
-            e.preventDefault();
-            return;
-          }
+          e.preventDefault();
           onPointerDownOutside?.(e);
         }}
         onFocusOutside={(e) => {
@@ -61,22 +62,26 @@ const DialogContent = React.forwardRef<
           onFocusOutside?.(e);
         }}
         onInteractOutside={(e) => {
-          const target = e.target as HTMLElement | null;
-          if (target?.closest?.('[data-global-alert="true"]')) {
-            e.preventDefault();
-            return;
-          }
+          e.preventDefault();
           onInteractOutside?.(e);
         }}
+        onEscapeKeyDown={(e) => {
+          e.preventDefault();
+          onEscapeKeyDown?.(e);
+        }}
         className={cn(
-          "fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] sm:w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-5 sm:p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl sm:rounded-lg",
+          "swal2-modal-anim data-[state=open]:animate-none data-[state=closed]:animate-none left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] sm:w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-[#2e2e2e] bg-[#1e1e1e] p-5 sm:p-6 shadow-2xl",
           "max-h-[90vh] flex flex-col",
-          className
+          className,
+          "fixed rounded-2xl sm:rounded-2xl"
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full p-1 opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <DialogPrimitive.Close
+          disabled={disableClose}
+          className="absolute right-4 top-4 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-[#313131] transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-40 disabled:pointer-events-none"
+        >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
@@ -106,7 +111,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 flex-shrink-0",
+      "flex items-center justify-between gap-3 flex-shrink-0",
       className
     )}
     {...props}

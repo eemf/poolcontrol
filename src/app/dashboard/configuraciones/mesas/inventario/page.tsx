@@ -32,7 +32,7 @@ export default function PaginaInventarioMesas() {
   if (!isMounted) return null
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-2">
       <PageHeader
         title="Inventario de Estaciones"
         description="Añade o edita las mesas de billar y consolas de juego de tu local."

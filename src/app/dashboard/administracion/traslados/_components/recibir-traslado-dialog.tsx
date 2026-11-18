@@ -35,7 +35,8 @@ import {
   ArrowRightLeft,
   Search,
   Check,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import type { TrasladoInterSucursal, ItemTraslado, Producto } from '@/lib/tipos';
 import { recibirTrasladoInterSucursal } from '@/lib/firebase/servicios/traslados';
@@ -100,25 +101,35 @@ function SelectorProductoDestino({
       <div className="space-y-1.5">
         {productosLocales.length > 5 && (
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
             <Input
               placeholder="Filtrar lista de productos locales..."
               value={filtro}
               onChange={(e) => setFiltro(e.target.value)}
-              className="pl-8 text-xs bg-[#131b26] border-[#2d3e55] text-white h-8 rounded-xl"
+              className="pl-9 pr-9 text-xs bg-[#1e1e1e] border-[#2e2e2e] text-white h-9 rounded-full"
             />
+            {filtro && (
+              <button
+                type="button"
+                aria-label="Limpiar filtro"
+                onClick={() => setFiltro('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-5 w-5 flex items-center justify-center rounded-full text-slate-400 hover:text-white hover:bg-[#313131] transition-colors"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
           </div>
         )}
 
         <Select value={selectedId || '__nuevo__'} onValueChange={onChange}>
-          <SelectTrigger className="w-full bg-[#182330] border-[#2d3e55] hover:bg-[#202e3f] text-white text-xs h-10 rounded-xl px-3 font-normal">
+          <SelectTrigger className="w-full bg-[#1e1e1e] border-[#2e2e2e] hover:bg-[#313131] text-xs h-10 rounded-full px-3.5 font-normal">
             <SelectValue placeholder="Seleccionar producto local..." />
           </SelectTrigger>
-          <SelectContent className="bg-[#1b2533] border-[#2c3b4f] text-slate-100 max-h-64 rounded-xl z-50">
+          <SelectContent className="max-h-64 z-50">
             <SelectItem value="__nuevo__" className="text-emerald-400 font-bold py-2 text-xs cursor-pointer">
               + Crear como producto nuevo (&quot;{itemOriginal.nombreProducto}&quot;)
             </SelectItem>
-            <SelectSeparator className="bg-[#2d3e55]" />
+            <SelectSeparator className="bg-[#2e2e2e]" />
             <SelectGroup>
               <SelectLabel className="text-[10px] text-slate-400 font-semibold px-2 py-1">
                 Vincular a producto existente en esta sucursal:
@@ -241,9 +252,9 @@ export function RecibirTrasladoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl font-body bg-[#1b2533] border-[#2c3b4f] text-slate-100">
-        <DialogHeader className="space-y-1 pb-3 border-b border-[#2c3b4f]">
-          <DialogTitle className="text-xl font-bold flex items-center gap-2 text-white">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl font-body bg-[#1e1e1e] border-[#2e2e2e] text-slate-100">
+        <DialogHeader className="space-y-1 pb-3 border-b border-[#2e2e2e]">
+          <DialogTitle className="text-lg sm:text-xl font-bold flex items-center gap-2 text-white">
             <CheckCircle2 className="h-5 w-5 text-emerald-400" />
             Confirmar Recepción de Traslado #{traslado.idTraslado}
           </DialogTitle>
@@ -254,10 +265,10 @@ export function RecibirTrasladoDialog({
 
         <div className="flex-1 overflow-y-auto space-y-4 py-3 pr-1">
           {/* Tarjeta de Metadatos del Traslado */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-[#233144]/80 border border-[#2d3e55]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-[#252526] border border-[#2e2e2e]">
             <div className="space-y-1">
               <span className="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
-                <Building2 className="h-3.5 w-3.5 text-primary" />
+                <Building2 className="h-3.5 w-3.5 text-sky-400" />
                 Sucursal emisora
               </span>
               <p className="text-sm font-bold text-white">{traslado.sucursalOrigenNombre}</p>
@@ -306,10 +317,10 @@ export function RecibirTrasladoDialog({
                 return (
                   <div
                     key={idx}
-                    className="p-3.5 rounded-2xl border border-[#2d3e55] bg-[#182330] space-y-2.5 transition-colors hover:border-[#3b4f6b]"
+                    className="p-3.5 rounded-xl border border-[#2e2e2e] bg-[#252526] space-y-2.5 transition-colors hover:border-sky-500/30"
                   >
                     {/* Fila superior: Información del producto enviado por el origen */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#253346]">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#2e2e2e]">
                       <div>
                         <span className="text-[11px] text-slate-400 font-medium">Producto recibido:</span>
                         <h4 className="text-sm font-bold text-white flex items-center gap-2">
@@ -348,7 +359,7 @@ export function RecibirTrasladoDialog({
           </div>
 
           {/* Impacto Contable y Operativo */}
-          <div className="p-3.5 rounded-xl bg-[#202d3e] border border-emerald-500/30 flex items-start gap-3">
+          <div className="p-3.5 rounded-xl bg-[#252526] border border-emerald-500/30 flex items-start gap-3">
             <FileCheck2 className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
             <div className="text-xs space-y-1">
               <span className="font-semibold text-emerald-300 block flex items-center gap-1.5">
@@ -375,18 +386,18 @@ export function RecibirTrasladoDialog({
               placeholder="Ej: Todo recibido en perfecto estado y verificado físicamente..."
               value={observaciones}
               onChange={(e) => setObservaciones(e.target.value)}
-              className="bg-[#182330] border-[#2d3e55] text-white text-xs rounded-2xl min-h-[60px] resize-none p-3"
+              className="bg-[#252526] border-[#2e2e2e] text-white text-xs rounded-2xl min-h-[60px] resize-none p-3"
             />
           </div>
         </div>
 
-        <DialogFooter className="pt-3 border-t border-[#2c3b4f] flex flex-col sm:flex-row gap-2 justify-end items-center">
+        <DialogFooter className="pt-3 border-t border-[#2e2e2e] flex flex-col sm:flex-row gap-2 justify-end items-center">
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isReceiving}
-            className="border-[#2d3e55] text-slate-300 hover:bg-[#233144] rounded-full text-xs h-11 px-6 font-semibold w-full sm:w-auto"
+            className="bg-[#252526] border-[#2e2e2e] text-slate-200 hover:bg-[#313131] rounded-full text-xs h-10 px-6 font-semibold w-full sm:w-auto"
           >
             Regresar
           </Button>
@@ -394,7 +405,7 @@ export function RecibirTrasladoDialog({
             type="button"
             onClick={handleConfirmarRecepcion}
             disabled={isReceiving}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-full text-xs h-11 px-6 shadow-md shadow-emerald-900/30 w-full sm:w-auto flex items-center gap-2"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-full text-xs h-10 px-6 shadow-md w-full sm:w-auto flex items-center gap-2"
           >
             {isReceiving ? (
               <>

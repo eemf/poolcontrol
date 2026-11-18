@@ -5,7 +5,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, PlusCircle, XCircle } from 'lucide-react';
+import { Save, PlusCircle, XCircle, Search } from 'lucide-react';
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { AutocompleteInput } from '@/components/ui/autocomplete-input';
@@ -76,6 +76,7 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
             value={state.clienteSeleccionadoId}
             onValueChange={actions.manejarSeleccionCliente}
             placeholder="Buscar o crear cliente..."
+            icon={Search}
             onCreateNew={actions.manejarCrearCliente}
             onOptionAction={actions.manejarAbrirAlertaEliminar}
             disabled={state.cargando}
@@ -265,6 +266,7 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
                     value={state.productoSeleccionadoId}
                     onValueChange={actions.setProductoSeleccionadoId}
                     placeholder={state.cargando ? 'Cargando...' : 'Buscar producto...'}
+                    icon={Search}
                     disabled={state.cargando}
                     onEnterKey={actions.onProductoEnter}
                     onFocus={(e) => e.target.select()}
@@ -318,8 +320,8 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
                       value === 'base'
                         ? 'base'
                         : (state.productoSeleccionado as Producto).preparaciones?.find(
-                            (p) => p.nombre === value
-                          ) || null
+                          (p) => p.nombre === value
+                        ) || null
                     )
                   }
                 >

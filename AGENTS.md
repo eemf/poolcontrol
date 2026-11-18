@@ -13,19 +13,20 @@ Antes de escribir o editar cualquier archivo:
    - Mover las vistas secundarias y tarjetas a subcomponentes en `_components/`.
 3. **Build Tracking:** Incrementar el número de `build` en `src/lib/version.ts` en **cada respuesta que contenga cambios de código**.
 4. **No Publicación Automática:** Prohibido hacer commits, crear tags de versión o ejecutar `git push` a repositorios remotos de forma automática o por iniciativa propia. Toda confirmación en Git y publicación/lanzamiento solo se realizará cuando el usuario lo solicite de manera explícita (ej. *"haz la publicación"*, *"publica los cambios"*).
+5. **Cumplimiento Obligatorio de Paleta Oscura:** En cada modificación de UI, verificar que ningún componente introduzca `#141414`, `#000`, `bg-background` ni tonos fuera de las 3 capas oficiales (`#121212` / `#1e1e1e` / `#252526`, bordes `#2e2e2e`, hover `#313131`, acento `sky-600`/`#0078D4`), tomando como referencia gráfica `Pruebas → Modo Oscuro` (`src/app/dashboard/pruebas/modo-oscuro/page.tsx`).
 
 ---
 
 ## 2. Reglas Maestras de Diseño Visual (UI/UX)
 
 ### A. Paleta Oficial de Colores (Estricta - Antigravity IDE Dark Theme)
-La paleta corporativa oficial del modo oscuro está sincronizada con el estándar del IDE Antigravity y sigue una jerarquía estricta de elevación en 4 capas para garantizar profundidad y contraste:
-* **Fondo Base de la Aplicación (Canvas / Body):** `#121212` (variable `--background: 0 0% 7%`).
-* **Contenedor Principal / Listados / Barra Lateral / Paneles:** `bg-[#1e1e1e]` (o clase `bg-app-panel`) con borde `border-[#2e2e2e]` (`border-app-border`).
-* **Tarjetas Secundarias / Acordeones / Inputs / Modales:** `bg-[#252526]` (o clase `bg-app-surface`) con borde `border-[#2e2e2e]`.
-* **Bloques Interiores Recesivos (ej. Rutas Origen ➔ Destino, Píldoras Inset):** `bg-[#141414]` con borde `border-[#2e2e2e]`.
+La paleta corporativa oficial del modo oscuro está sincronizada con el estándar del IDE Antigravity y sigue una jerarquía estricta de elevación en **3 capas sin negros puros** para garantizar profundidad y contraste consistente (modelo de referencia: *Historial de Ventas*):
+* **Capa 1 — Fondo Base de la Aplicación (Canvas / Body):** `#121212` (variable `--background: 0 0% 7%`).
+* **Capa 2 — Contenedor Principal / Listados / Barra Lateral / Paneles / Modales / Sub-bloques internos (`panel` y `subcard`):** `bg-[#1e1e1e]` (o clase `bg-app-panel`) con borde `border-[#2e2e2e]` (`border-app-border`).
+* **Capa 3 — Tarjetas / Acordeones / Inputs / Selectores / Botones secundarios (`surface`):** `bg-[#252526]` (o clase `bg-app-surface`) con borde `border-[#2e2e2e]`.
+* **Evitar negros recesivos (`#141414` / `#000`):** No usar `#141414` en tarjetas, inputs o bloques internos; usar `#1e1e1e` cuando esté dentro de `#252526`, y `#252526` cuando esté sobre `#1e1e1e`.
 * **Hover de superficies táctiles:** `hover:bg-[#313131]` / `hover:bg-[#2e2e2e]`.
-* **Acentos de foco y acción:** Azul Antigravity (`#0078D4` / `text-sky-400` / `bg-sky-500`).
+* **Acentos de foco y acción:** Azul Antigravity (`#0078D4` / `text-sky-400` / `bg-sky-600`).
 
 ### B. Controles Redondeados en Píldora (`rounded-full`)
 * **Botones de acción:** Todo botón de acción táctil (Recibir, Cancelar, Ver Detalle, Nuevo, Filtros) debe ser `rounded-full`, con altura estándar `h-8` o `h-9` y padding ergonómico.
@@ -66,3 +67,5 @@ La paleta corporativa oficial del modo oscuro está sincronizada con el estánda
 * `<PillTabs value={tab} onValueChange={setTab} tabs={[{ id, label, icon, count, badgeVariant }]} />`
 * `<CountBadge count={num} variant="amber" | "white" | "emerald" | "sky" | "slate" />`
 * `<SurfaceCard variant="panel" | "surface" | "subcard">`
+* `<Paginacion currentPage={n} totalPages={n} totalItems={n} itemsPerPage={n} onPageChange={...} onItemsPerPageChange={...} />`
+* `<BotonVolverArriba threshold={150} />`

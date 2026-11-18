@@ -1,129 +1,133 @@
+import { memo } from 'react'
 import { AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
-import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { Target, Square } from 'lucide-react'
+import { Target, ArrowRightLeft, Clock, Landmark, Wallet, Trophy, Banknote } from 'lucide-react'
 import { CuadreConId, toDate } from '../_hooks/use-historial-cuadre-tragamonedas'
 
 interface CuadreTragamonedasItemAcordeonProps {
   cuadre: CuadreConId
 }
 
-export function CuadreTragamonedasItemAcordeon({ cuadre }: CuadreTragamonedasItemAcordeonProps) {
+export const CuadreTragamonedasItemAcordeon = memo(function CuadreTragamonedasItemAcordeon({
+  cuadre,
+}: CuadreTragamonedasItemAcordeonProps) {
+  const fecha = toDate(cuadre.fecha)
+  const kpis = [
+    { label: 'Manual', valor: cuadre.resumen?.totalManual || 0, icon: Banknote, labelClass: 'text-slate-400', iconClass: 'text-sky-400', valueClass: 'text-white' },
+    { label: 'Base', valor: cuadre.resumen?.totalBase || 0, icon: Landmark, labelClass: 'text-slate-400', iconClass: 'text-slate-300', valueClass: 'text-white' },
+    { label: 'Deuda', valor: cuadre.resumen?.totalDeuda || 0, icon: Wallet, labelClass: 'text-rose-400', iconClass: 'text-rose-400', valueClass: 'text-rose-400' },
+    { label: 'Extracción Neta', valor: cuadre.resumen?.totalExtraccionNeta || 0, icon: Trophy, labelClass: 'text-emerald-400', iconClass: 'text-emerald-400', valueClass: 'text-emerald-400' },
+  ]
+
   return (
     <AccordionItem
       value={cuadre.id}
-      className="border border-[#2e2e2e] rounded-xl bg-[#252526] overflow-hidden mb-3 shadow-sm transition-all hover:border-slate-500"
+      className="rounded-xl border border-[#2e2e2e] bg-[#252526] hover:border-[#383838] transition-all overflow-hidden shadow-sm"
     >
-      <AccordionTrigger className="p-4 hover:no-underline text-white">
-        <div className="flex flex-1 items-center justify-between w-full pr-2">
-          <div className="flex flex-col text-left min-w-0">
-            <p className="font-bold text-sm sm:text-base text-white leading-tight">
-              #{cuadre.idCuadre}. {format(toDate(cuadre.fecha), "dd 'de' MMMM, yyyy", { locale: es })}
+      <AccordionTrigger className="px-3.5 py-3 sm:px-4 sm:py-3.5 hover:no-underline hover:bg-[#2e2e2e]/30 transition-colors data-[state=open]:border-b data-[state=open]:border-[#2e2e2e]">
+        <div className="flex-1 grid grid-cols-[1fr_auto] gap-3 sm:gap-4 items-center text-sm text-left pr-1.5 sm:pr-2.5">
+          <div className="flex flex-col items-start gap-1 min-w-0">
+            <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
+              #{cuadre.idCuadre}. {format(fecha, "dd 'de' MMMM, yyyy", { locale: es })}
             </p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-[11px] font-medium text-slate-400">
-                {format(toDate(cuadre.fecha), "hh:mm a", { locale: es })}
-              </span>
-              <span className="text-slate-500">•</span>
-              <Badge
-                className={
-                  cuadre.estado === 'procesado'
-                    ? "rounded-full border border-emerald-500/30 px-2.5 h-5 text-[10px] font-semibold bg-emerald-500/15 text-emerald-400"
-                    : "rounded-full border border-amber-500/30 px-2.5 h-5 text-[10px] font-semibold bg-amber-500/15 text-amber-400"
-                }
-              >
-                {cuadre.estado === 'procesado' ? 'Procesado' : 'Pendiente'}
-              </Badge>
-            </div>
+            <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+              <Clock className="h-3 w-3 text-slate-500 shrink-0" />
+              {format(fecha, 'dd/MM/yyyy • hh:mm a', { locale: es })}
+            </span>
           </div>
-          <div className="text-right shrink-0 ml-4">
-            <p className="text-base sm:text-xl font-bold text-sky-400 leading-none">
+          <div className="flex flex-col items-end gap-1 shrink-0 text-right">
+            <p className="font-bold text-base sm:text-lg text-emerald-400 leading-none tabular-nums">
               Q{(cuadre.gananciaATrasladar || 0).toFixed(2)}
             </p>
-            <p className="text-[10px] text-slate-400 font-medium mt-1">Ganancia Neta</p>
+            <Badge
+              className={
+                cuadre.estado === 'procesado'
+                  ? 'rounded-full border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-semibold bg-emerald-500/20 text-emerald-300'
+                  : 'rounded-full border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-semibold bg-amber-500/20 text-amber-300'
+              }
+            >
+              {cuadre.estado === 'procesado' ? 'Procesado' : 'Pendiente'}
+            </Badge>
           </div>
         </div>
       </AccordionTrigger>
 
-      <AccordionContent className="p-4 pt-0">
-        <div className="border-t border-[#2e2e2e] pt-5 space-y-6">
-          {/* Resumen de Bloques */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-[#1e1e1e] p-3 rounded-xl text-center border border-[#2e2e2e]">
-              <p className="text-xs font-medium text-slate-400 mb-0.5">Manual</p>
-              <p className="text-base font-bold text-white">Q{(cuadre.resumen?.totalManual || 0).toFixed(2)}</p>
-            </div>
-            <div className="bg-[#1e1e1e] p-3 rounded-xl text-center border border-[#2e2e2e]">
-              <p className="text-xs font-medium text-slate-400 mb-0.5">Base</p>
-              <p className="text-base font-bold text-white">Q{(cuadre.resumen?.totalBase || 0).toFixed(2)}</p>
-            </div>
-            <div className="bg-[#1e1e1e] p-3 rounded-xl text-center border border-[#2e2e2e]">
-              <p className="text-xs font-medium text-rose-400 mb-0.5">Deuda</p>
-              <p className="text-base font-bold text-rose-400">Q{(cuadre.resumen?.totalDeuda || 0).toFixed(2)}</p>
-            </div>
-            <div className="bg-[#1e1e1e] p-3 rounded-xl text-center border border-[#2e2e2e]">
-              <p className="text-xs font-medium text-emerald-400 mb-0.5">Extracción Neta</p>
-              <p className="text-base font-bold text-emerald-400">Q{(cuadre.resumen?.totalExtraccionNeta || 0).toFixed(2)}</p>
-            </div>
+      <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e]">
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {kpis.map(({ label, valor, icon: Icon, labelClass, iconClass, valueClass }) => (
+              <div key={label} className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
+                <p className={`text-[11px] font-medium flex items-center gap-1 ${labelClass}`}>
+                  <Icon className={`h-3 w-3 shrink-0 ${iconClass}`} /> {label}
+                </p>
+                <p className={`text-sm font-bold tabular-nums mt-0.5 ${valueClass}`}>
+                  Q{valor.toFixed(2)}
+                </p>
+              </div>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Rendimiento por Máquina */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
-                <Target className="h-4 w-4" /> Rendimiento por Máquina
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
+            <div className="lg:col-span-7 space-y-2">
+              <h4 className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 px-0.5">
+                <Target className="h-3.5 w-3.5 text-sky-400" />
+                <span>Rendimiento por Máquina</span>
               </h4>
-              <div className="border border-[#2e2e2e] rounded-xl overflow-hidden bg-[#1e1e1e]">
-                <div className="grid grid-cols-2 p-2.5 bg-[#252526] border-b border-[#2e2e2e] text-[11px] font-semibold text-slate-300">
-                  <span>Máquina</span>
-                  <span className="text-right">Extracciones</span>
-                </div>
-                <div className="divide-y divide-[#2e2e2e]">
-                  {cuadre.maquinas?.map((m: any) => (
-                    <div key={m.id} className="p-2.5 flex justify-between items-center text-xs hover:bg-[#252526]/50 transition-colors">
-                      <span className="font-semibold text-white">{m.nombre}</span>
-                      <div className="text-right">
-                        <p className="text-emerald-400 font-bold">Q{m.extraccion.toFixed(2)}</p>
-                        <p className="text-[10px] text-slate-400">
-                          Man: Q{m.montoManual.toFixed(0)} | Deu: Q{m.deuda.toFixed(0)}
-                        </p>
+              <div className="rounded-xl border border-[#2e2e2e] bg-[#252526] divide-y divide-[#2e2e2e] overflow-hidden">
+                {cuadre.maquinas?.map((m: any) => (
+                  <div
+                    key={m.id}
+                    className="px-3 py-2.5 flex items-center justify-between gap-3 text-xs hover:bg-[#313131] transition-colors"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-100 truncate">{m.nombre}</p>
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-slate-400 mt-0.5 tabular-nums">
+                        <span>Manual: Q{m.montoManual.toFixed(2)}</span>
+                        <span className={m.deuda > 0 ? 'text-rose-400' : ''}>
+                          Deuda: Q{m.deuda.toFixed(2)}
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <span className="font-bold text-sm text-emerald-400 tabular-nums shrink-0">
+                      Q{m.extraccion.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Preparación Turno Sig. */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
-                <Square className="h-4 w-4" /> Preparación Turno Siguiente
+            <div className="lg:col-span-5 space-y-2">
+              <h4 className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 px-0.5">
+                <ArrowRightLeft className="h-3.5 w-3.5 text-sky-400" />
+                <span>Siguiente Turno y Traslado</span>
               </h4>
-              <Card className="p-4 border-[#2e2e2e] bg-[#1e1e1e] space-y-3">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-medium">Existencia Monedas:</span>
-                  <span className="font-bold text-white">Q{cuadre.existenciaSiguiente.toFixed(2)}</span>
+              <div className="rounded-xl border border-[#2e2e2e] bg-[#252526] p-3 space-y-2.5 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Existencia Monedas</span>
+                  <span className="font-semibold text-slate-100 tabular-nums">
+                    Q{cuadre.existenciaSiguiente.toFixed(2)}
+                  </span>
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-medium">Efectivo Acumulado:</span>
-                  <span className="font-bold text-white">Q{cuadre.efectivoAcumuladoSiguiente.toFixed(2)}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Efectivo Acumulado</span>
+                  <span className="font-semibold text-slate-100 tabular-nums">
+                    Q{cuadre.efectivoAcumuladoSiguiente.toFixed(2)}
+                  </span>
                 </div>
-                <Separator className="border-[#2e2e2e]" />
-                <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs font-semibold text-sky-400">Monto Trasladado:</span>
-                  <span className="text-2xl font-black text-sky-400">Q{cuadre.gananciaATrasladar.toFixed(2)}</span>
+                <div className="pt-2 border-t border-[#2e2e2e] flex justify-between items-center">
+                  <span className="font-semibold text-sky-400">Monto Trasladado</span>
+                  <span className="text-lg font-bold text-sky-400 tabular-nums">
+                    Q{cuadre.gananciaATrasladar.toFixed(2)}
+                  </span>
                 </div>
-              </Card>
+              </div>
 
               {cuadre.observaciones && (
-                <div className="mt-3">
-                  <p className="text-xs font-medium text-slate-400 mb-1">Notas del Cierre:</p>
-                  <div className="bg-[#1e1e1e] p-3 rounded-xl border border-dashed border-[#2e2e2e] italic text-xs text-slate-300 leading-relaxed">
-                    "{cuadre.observaciones}"
-                  </div>
+                <div className="rounded-xl border border-[#2e2e2e] bg-[#252526] p-3 text-xs space-y-1">
+                  <span className="font-semibold text-slate-300 block">Notas del Cierre</span>
+                  <p className="text-slate-400 leading-relaxed">{cuadre.observaciones}</p>
                 </div>
               )}
             </div>
@@ -132,4 +136,4 @@ export function CuadreTragamonedasItemAcordeon({ cuadre }: CuadreTragamonedasIte
       </AccordionContent>
     </AccordionItem>
   )
-}
+})

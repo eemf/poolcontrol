@@ -26,15 +26,10 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
       style={{ backgroundColor: '#1e1e1e', borderColor: '#2e2e2e' }}
     >
       <CardHeader className="p-4 pb-2 bg-transparent">
-        <div className="flex items-center justify-between">
-          <CardTitle className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
-            <ArrowLeftRight className="h-5 w-5 text-emerald-400" />
-            Cobros por Traslados a Sucursales (Ingresos)
-          </CardTitle>
-          <span className="text-xs text-muted-foreground">
-            {items.length} {items.length === 1 ? 'traslado pendiente' : 'traslados pendientes'}
-          </span>
-        </div>
+        <CardTitle className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
+          <ArrowLeftRight className="h-5 w-5 text-emerald-400 shrink-0" />
+          Traslados por Cobrar
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-1">
         <div className="space-y-3">
@@ -45,15 +40,15 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
               onCheckedChange={onSelectAll}
             />
             <Label htmlFor="select-all-traslados" className="ml-3 flex-1 font-bold text-sm text-foreground cursor-pointer">
-              Seleccionar Todos los Traslados
+              Seleccionar Todos
             </Label>
           </div>
 
           <Accordion type="single" collapsible className="w-full space-y-2">
             {items.map((traslado) => {
-              const esRecibido = traslado.estado === 'recibido';
+              const esProcesado = (traslado as any).estadoCuadre === 'procesado';
               const fechaEnvio = traslado.fechaEnvio?.toDate
-                ? format(traslado.fechaEnvio.toDate(), 'dd MMM, yyyy - hh:mm a', { locale: es })
+                ? format(traslado.fechaEnvio.toDate(), 'dd MMM, yyyy', { locale: es })
                 : 'N/A';
 
               return (
@@ -63,16 +58,17 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                   style={{ backgroundColor: '#252526', borderColor: '#2e2e2e' }}
                   className="border-b-0 rounded-xl border !border-[#2e2e2e] !bg-[#252526] hover:brightness-105 transition-all overflow-hidden mb-2 shadow-sm relative"
                 >
-                  {/* Checkbox anclado a la cabecera del acordeón */}
-                  <div className="absolute left-3 top-6 -translate-y-1/2 z-20 flex items-center justify-center">
-                    <Checkbox
-                      id={`traslado-${traslado.id}`}
-                      checked={selected.has(traslado.id)}
-                      onCheckedChange={(checked) => onSelect(traslado.id, !!checked)}
-                    />
-                  </div>
+                  {/* Checkbox centrado verticalmente en la cabecera del acordeón */}
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center">
+                      <Checkbox
+                        id={`traslado-${traslado.id}`}
+                        checked={selected.has(traslado.id)}
+                        onCheckedChange={(checked) => onSelect(traslado.id, !!checked)}
+                      />
+                    </div>
 
-                  <AccordionTrigger className="pl-10 pr-3 hover:no-underline py-3 w-full">
+                    <AccordionTrigger className="pl-10 pr-3 hover:no-underline py-3 w-full data-[state=open]:border-b data-[state=open]:border-[#2e2e2e]">
                     <div className="flex-1 min-w-0 flex items-center justify-between gap-2 mr-2 text-left">
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         <div className="hidden sm:flex h-8 w-8 rounded-full bg-emerald-500/10 items-center justify-center shrink-0">
@@ -80,18 +76,13 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
                           <span className="font-bold text-xs sm:text-sm leading-tight text-foreground truncate">
-                            Traslado #TR-{traslado.idTraslado} — A {traslado.sucursalDestinoNombre}
+                            Traslado #TR-{traslado.idTraslado} — {traslado.sucursalDestinoNombre}
                           </span>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] sm:text-xs text-muted-foreground font-medium flex items-center gap-1">
-                              <Clock className="h-3 w-3 shrink-0" />
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
+                            <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">
                               {fechaEnvio}
                             </span>
-                            {traslado.cantidadTotalItems && (
-                              <span className="text-[10px] text-slate-400">
-                                ({traslado.cantidadTotalItems} unidades)
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -100,66 +91,56 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                         <p className="font-bold text-xs sm:text-sm text-emerald-400 whitespace-nowrap tabular-nums leading-tight">
                           + Q{(traslado.costoTotalTraslado || 0).toFixed(2)}
                         </p>
-                        <div className="flex items-center gap-1">
-                          {esRecibido ? (
-                            <Badge className="h-4 text-[9px] font-semibold border-none bg-emerald-500/20 text-emerald-300 px-1.5 py-0 flex items-center gap-0.5">
-                              <CheckCircle2 className="h-2.5 w-2.5" />
-                              Recibido en destino
-                            </Badge>
-                          ) : (
-                            <Badge className="h-4 text-[9px] font-semibold border-none bg-amber-500/20 text-amber-300 px-1.5 py-0 flex items-center gap-0.5">
-                              <Clock className="h-2.5 w-2.5" />
-                              En tránsito
-                            </Badge>
-                          )}
-                          <Badge className="h-4 text-[9px] font-semibold border-none bg-sky-500/20 text-sky-300 px-1.5 py-0">
-                            Por Cobrar
-                          </Badge>
-                        </div>
+                        <Badge
+                          className={
+                            esProcesado
+                              ? 'rounded-full text-[10px] font-semibold border border-emerald-500/30 bg-emerald-500/20 text-emerald-300 px-2 py-0.5'
+                              : 'rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5'
+                          }
+                        >
+                          {esProcesado ? 'Procesado' : 'Pendiente'}
+                        </Badge>
                       </div>
                     </div>
-                  </AccordionTrigger>
+                    </AccordionTrigger>
+                  </div>
 
-                  <AccordionContent className="px-3 pb-3">
-                    <div className="space-y-2 border-t !border-[#2e2e2e] pt-2.5 mt-1 text-xs">
-                      <div className="flex items-center justify-between text-slate-300 px-1 text-[11px]">
-                        <span className="font-semibold text-slate-400">Detalle de mercancía despachada:</span>
-                        {traslado.idCompraGeneradaDestino && (
-                          <span className="text-muted-foreground font-medium">
-                            Compra registrada en {traslado.sucursalDestinoNombre}: #{traslado.idCompraGeneradaDestino}
-                          </span>
-                        )}
+                  <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e]">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-semibold text-xs text-slate-300 flex items-center gap-1.5">
+                          <PackageCheck className="h-3.5 w-3.5 text-emerald-400" />
+                          <span>Detalle de mercancía despachada</span>
+                        </h4>
+                        <span className="text-[11px] font-medium text-slate-400 tabular-nums">
+                          {traslado.items?.length || 0} {(traslado.items?.length || 0) === 1 ? 'artículo' : 'artículos'}
+                        </span>
                       </div>
 
                       <div className="space-y-1.5">
                         {traslado.items?.map((item, idx) => (
                           <div
                             key={idx}
-                            className="flex justify-between items-center text-[11px] bg-[#1e1e1e]/70 p-2.5 rounded-lg border !border-[#2e2e2e]"
+                            className="flex justify-between items-center bg-[#252526] border border-[#2e2e2e] p-2.5 rounded-xl text-xs"
                           >
-                            <div className="flex flex-col min-w-0 flex-1 mr-2">
-                              <span className="font-bold text-foreground/90 truncate">{item.nombreProducto}</span>
-                              <span className="text-[10px] text-muted-foreground">
-                                {item.cantidad} unidades × Q{item.costoUnitario.toFixed(2)}
-                              </span>
+                            <div className="min-w-0 pr-2">
+                              <p className="font-semibold text-slate-100 truncate">{item.nombreProducto}</p>
+                              <p className="text-[10px] text-slate-400 tabular-nums">
+                                {item.cantidad} unidades &times; Q{item.costoUnitario.toFixed(2)}
+                              </p>
                             </div>
-                            <span className="font-bold text-emerald-400 whitespace-nowrap">
+                            <p className="font-bold text-emerald-400 tabular-nums shrink-0">
                               Q{(item.costoTotal || item.cantidad * item.costoUnitario).toFixed(2)}
-                            </span>
+                            </p>
                           </div>
                         ))}
                       </div>
 
                       {traslado.observacionesEnvio && (
-                        <div className="p-2 rounded-lg bg-[#1e1e1e]/50 border !border-[#2e2e2e] text-[10px] text-slate-300">
-                          <strong className="text-slate-400">Nota de envío:</strong> {traslado.observacionesEnvio}
+                        <div className="p-2.5 rounded-xl bg-[#252526] border border-[#2e2e2e] text-xs text-slate-300">
+                          <span className="font-semibold text-slate-400">Nota de envío: </span>
+                          {traslado.observacionesEnvio}
                         </div>
-                      )}
-
-                      {traslado.usuarioRecepcionNombre && (
-                        <p className="text-[10px] text-slate-400 italic px-1">
-                          Confirmado y recibido por: <span className="text-white font-medium">{traslado.usuarioRecepcionNombre}</span>
-                        </p>
                       )}
                     </div>
                   </AccordionContent>

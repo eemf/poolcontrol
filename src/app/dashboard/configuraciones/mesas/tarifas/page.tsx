@@ -35,7 +35,7 @@ export default function PaginaTarifas() {
   if (!isMounted) return null
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-2">
       <PageHeader
         title="Gestión de Tarifas"
         description="Crea y administra los precios y modelos de cobro para las estaciones de juego."

@@ -3,3 +3,7 @@ export * from './count-badge';
 export * from './pill-tabs';
 export * from './surface-card';
 export * from './mobile-keyboard-handler';
+export * from './paginacion';
+export * from './boton-volver-arriba';
+export * from './swal-icono';
+export * from './modal-confirmacion';
