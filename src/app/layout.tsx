@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/context/theme-provider';
 import { MobileKeyboardHandler } from '@/components/comunes';
 
 export const metadata: Metadata = {
-  title: 'Pool Control 1.0',
+  title: 'Pool Control 2.0',
   description: 'Manage your pool hall with ease.',
 };
 

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { useSucursal } from '@/hooks/use-sucursal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserNav } from './user-nav';
+import { BolaBillarIcon } from '@/components/comunes';
 import { appVersion } from '@/lib/version';
 import Link from 'next/link';
 
@@ -81,7 +82,7 @@ function CashDisplay({ features }: { features?: { [key: string]: boolean } }) {
     // MOSTRAR SOLO CONSUMOS Y TIEMPOS (Excluye monedas por tarjeta ya que están en la otra tarjeta)
     const totalVentasTarjeta = (estadoCaja?.totalVentasTarjeta || 0);
     
-    const cardClasses = "flex-shrink-0 flex items-center gap-1.5 rounded-full bg-muted/50 px-2.5 py-0.5 dark:bg-slate-700 dark:shadow-lg";
+    const cardClasses = "flex-shrink-0 flex items-center gap-1.5 rounded-full bg-[#252526] border border-[#2e2e2e] px-2.5 py-1 text-slate-100 shadow-sm tabular-nums";
 
     // Solo mostrar datos de monedas si el módulo de tragamonedas está activo
     const showSlotMachineData = features?.tragamonedas !== false;
@@ -93,37 +94,37 @@ function CashDisplay({ features }: { features?: { [key: string]: boolean } }) {
             {showSlotMachineData && (
                 <>
                     <div className={cn(cardClasses, "font-semibold")}>
-                        <Dices className="h-3.5 w-3.5 text-orange-500" />
+                        <Dices className="h-3.5 w-3.5 text-amber-400" />
                         <div>
                             <span>{monedaVirtual?.existencia ?? 0}</span>
                             {totalDeuda > 0 && (
-                                <span className="text-destructive ml-1">
+                                <span className="text-rose-400 ml-1">
                                     {' '}+ {totalDeuda.toFixed(0)} Deuda
                                 </span>
                             )}
                             {totalBase > 0 && (
-                                <span className="text-blue-600 ml-1">
+                                <span className="text-sky-400 ml-1">
                                     {' '}+ {totalBase.toFixed(0)} Base
                                 </span>
                             )}
-                            <span className="text-muted-foreground"> / </span>
+                            <span className="text-slate-500"> / </span>
                             <span>{monedasIniciales}</span>
                             {totalExtraccion > 0 && (
-                                <span className="text-green-600 ml-1">
+                                <span className="text-emerald-400 ml-1">
                                     {' '}+ {totalExtraccion.toFixed(0)} Ext.
                                 </span>
                             )}
                         </div>
                     </div>
                     <div className={cn(cardClasses)}>
-                        <Coins className="h-3.5 w-3.5 text-green-600" />
+                        <Coins className="h-3.5 w-3.5 text-emerald-400" />
                         <div>
-                            <span className="font-bold">Q{totalVentasMonedas.toFixed(0)}</span> / <span>Q{efectivoAcumuladoMonedas.toFixed(0)}</span>
+                            <span className="font-bold">Q{totalVentasMonedas.toFixed(0)}</span> <span className="text-slate-500">/</span> <span>Q{efectivoAcumuladoMonedas.toFixed(0)}</span>
                             {totalMonedasCredito > 0 && (
-                                <span className="ml-1 text-blue-600">+ Q{totalMonedasCredito.toFixed(0)} Créd</span>
+                                <span className="ml-1 text-sky-400">+ Q{totalMonedasCredito.toFixed(0)} Créd</span>
                             )}
                             {acumuladoMonedasTarjeta > 0 && (
-                                <span className="ml-1 text-indigo-600">+ Q{acumuladoMonedasTarjeta.toFixed(0)} Tarj.</span>
+                                <span className="ml-1 text-indigo-400">+ Q{acumuladoMonedasTarjeta.toFixed(0)} Tarj.</span>
                             )}
                         </div>
                     </div>
@@ -131,13 +132,13 @@ function CashDisplay({ features }: { features?: { [key: string]: boolean } }) {
             )}
              {totalEfectivo > 0 && (
                 <div className={cn(cardClasses, "font-semibold")}>
-                    <Banknote className="h-3.5 w-3.5 text-teal-600" />
+                    <Banknote className="h-3.5 w-3.5 text-emerald-400" />
                     <span>Q{totalEfectivo.toFixed(2)}</span>
                 </div>
              )}
              {totalVentasTarjeta > 0 && (
                  <div className={cn(cardClasses, "font-semibold")}>
-                    < CreditCard className="h-3.5 w-3.5 text-indigo-600" />
+                    <CreditCard className="h-3.5 w-3.5 text-indigo-400" />
                     <span>Q{totalVentasTarjeta.toFixed(2)}</span>
                 </div>
             )}
@@ -214,14 +215,32 @@ export function Header() {
       <div className="hidden md:flex items-center justify-start gap-4">
         {/* Title */}
         <div className="flex items-center gap-3">
-          <Dices className="h-8 w-8 text-primary shrink-0" />
-          <div className="flex flex-col">
-            <h2 className="text-lg font-headline font-bold leading-none text-foreground">Pool Control</h2>
-            <Link href="/dashboard/configuraciones/acerca-de">
-              <p className="text-[10px] text-muted-foreground font-medium mt-0.5 hover:text-primary hover:underline transition-colors cursor-pointer" title="Ver historial de versiones publicadas">
-                v{appVersion.version} (b{appVersion.build})
-              </p>
-            </Link>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/dashboard/configuraciones/acerca-de"
+                  className="flex items-center justify-center rounded-xl p-1 hover:bg-sky-500/10 transition-colors shrink-0"
+                  aria-label={`Versión v${appVersion.version} (Build ${appVersion.build})`}
+                >
+                  <BolaBillarIcon className="h-7 w-7 text-sky-400 shrink-0" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                align="start"
+                className="bg-[#252526] border border-[#383838] text-slate-100 text-xs font-body px-3 py-1.5 shadow-xl"
+              >
+                <p className="font-semibold">v{appVersion.version} (Build {appVersion.build})</p>
+                <p className="text-[10px] text-slate-400">Clic para ver historial de versiones</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <div className="flex flex-col min-w-0">
+            <h2 className="text-base font-headline font-bold leading-none text-slate-100">Pool Control</h2>
+            <p className="text-[11px] text-sky-400 font-medium mt-1 truncate max-w-[165px]">
+              {sucursalData?.nombre || 'Cargando sucursal...'}
+            </p>
           </div>
         </div>
         <div className="h-8 w-px bg-border" />

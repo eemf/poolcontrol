@@ -253,7 +253,7 @@ const Sidebar = React.forwardRef<
               setOpen(false)
             }}
             className={cn(
-              "absolute top-0 bottom-0 left-0 h-full flex flex-col bg-card text-sidebar-foreground transition-[width,box-shadow] duration-300 ease-out overflow-x-hidden border-r",
+              "absolute top-0 bottom-0 left-0 h-full flex flex-col bg-card text-sidebar-foreground transition-[width] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[width] overflow-x-hidden border-r",
               "w-[var(--sidebar-width)] shadow-2xl z-50",
               "group-data-[state=collapsed]:w-[var(--sidebar-width-icon)] group-data-[state=collapsed]:shadow-none group-data-[state=collapsed]:z-30",
               className

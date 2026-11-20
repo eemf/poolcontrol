@@ -12,9 +12,118 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
-    build: 212,
+    build: 221,
     fecha: "2026-11-20",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b221",
+    descripcion: "Actualización del título de la aplicación a Pool Control 2.0 y nuevo favicon SVG de bola 8.",
+    cambios: [
+      "App (`layout.tsx`, `icon.svg`): Cambiado el título global de `Pool Control 1.0` a `Pool Control 2.0` y reemplazado `favicon.ico` por `icon.svg` con el icono de bola 8 de billar."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 220,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b220",
+    descripcion: "Rediseño nítido de BolaBillarIcon (bola 8 sólida con ventana blanca y número 8 definido).",
+    cambios: [
+      "Comunes (`bola-billar-icon.tsx`): Rediseñado el SVG como bola 8 rellena con reflejo sutil, ventana circular clara (`#f8fafc`) y número 8 nítido de alto contraste (`#121212`) legible en tamaños pequeños."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 219,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b219",
+    descripcion: "Icono personalizado de bola de billar (8) para el logo principal y selector de sucursal.",
+    cambios: [
+      "Comunes & Navegación (`bola-billar-icon.tsx`, `header.tsx`, `client-dashboard-nav.tsx`): Creado `<BolaBillarIcon />` (bola 8 de billar) y aplicado en el logo de Pool Control (escritorio y móvil) y en el selector de sucursal."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 218,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b218",
+    descripcion: "Nombre de sucursal bajo el título y versión/build al pasar o hacer clic en el logo.",
+    cambios: [
+      "Header & Navegación (`header.tsx`, `client-dashboard-nav.tsx`): Reemplazada la etiqueta de versión/build bajo `Pool Control` por el nombre de la sucursal activa (`sucursalData.nombre`), moviendo la información de versión/build al hover (`<Tooltip>`) y clic (`Acerca del Sistema`) del logo."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 217,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b217",
+    descripcion: "Centrado exacto de los iconos del menú principal cuando la barra lateral está plegada.",
+    cambios: [
+      "Navegación (`client-dashboard-nav.tsx`): Ajustado el padding horizontal de los ítems de nivel superior a `px-2.5` (`10px`) y del selector de sucursal plegado a `px-1` (`4px`) para centrar exactamente los iconos dentro de `3.5rem` (`56px`) sin saltos durante la animación."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 216,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b216",
+    descripcion: "Eliminación de montaje/desmontaje de Tooltips y saltos horizontales al plegar el menú.",
+    cambios: [
+      "Navegación (`client-dashboard-nav.tsx`): Eliminado el intercambio de `<Tooltip>` al plegar para evitar bloqueos de renderizado en el hilo principal, fijada la alineación izquierda de los iconos (`justify-start`) con desvanecimiento suave de etiquetas (`opacity-0`) para un pliegue fluido."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 215,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b215",
+    descripcion: "Optimización de animaciones de despliegue y pliegue del menú lateral y submenús.",
+    cambios: [
+      "Sidebar & Navegación (`sidebar.tsx`, `client-dashboard-nav.tsx`): Reemplazado `transition-all duration-300` por `transition-colors duration-150` en ítems para eliminar lag de reflujo al plegar, optimizada la transición del contenedor (`duration-200 will-change-[width]`) y activada animación suave (`animate-collapsible-down` / `animate-collapsible-up`) en submenús y selector móvil de sucursal."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 214,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b214",
+    descripcion: "Corrección de ReferenceError en NavItem y homologación de píldoras de resumen en la barra superior.",
+    cambios: [
+      "Navegación (`client-dashboard-nav.tsx`): Corregido `!isTriggerActive` por `!isParentActive` en la vista colapsada del menú.",
+      "Header (`header.tsx`): Reemplazado `dark:bg-slate-700` por `bg-[#252526] border border-[#2e2e2e]` en las píldoras de monedas y caja, y ajustados los colores de contraste (`-400`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 213,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b213",
+    descripcion: "Eliminada la línea vertical en submenús e iconos con color en el menú principal.",
+    cambios: [
+      "Navegación (`client-dashboard-nav.tsx`): Eliminada `border-l-2 border-muted/50` de los submenús desplegables y agregados colores distintivos (`iconColor`) a los iconos del menú principal y submenús cuando están inactivos."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 212,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b212",
     descripcion: "Sincronización dinámica de appVersion con releaseHistory[0] y publicación en rama v2.0.",
