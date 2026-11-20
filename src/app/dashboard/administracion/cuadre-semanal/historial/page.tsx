@@ -88,7 +88,7 @@ export default function HistorialCuadresSemanalesPage() {
             type="single"
             collapsible
             className="w-full space-y-2.5"
-            value={openAccordionId || undefined}
+            value={openAccordionId ?? ''}
             onValueChange={(val) => setOpenAccordionId(val || null)}
           >
             {cuadresPaginados.map(cuadre => (

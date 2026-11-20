@@ -341,6 +341,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
         onSearchChange={actions.setFiltroCuentas}
         searchPlaceholder="Buscar cuenta o cliente..."
         searchInputRef={refs.filtroCuentasInputRef}
+        inlineMobileTabs
         tabs={[
           {
             id: 'pendientes',

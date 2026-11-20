@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { collection, onSnapshot, query, where, Timestamp, orderBy, doc, limit } from 'firebase/firestore';
 import { useFirebase, useUser } from '@/firebase';
-import type { Venta, Producto, Cliente, DetalleVenta, Preparacion, EstadoCaja, ProductoVirtual } from '@/lib/tipos';
+import type { Venta, Producto, Cliente, DetalleVenta, Preparacion, EstadoCaja, ProductoVirtual, Promocion } from '@/lib/tipos';
+import { calcularPromocionesCarrito, esPromocionVigente } from '@/lib/promociones/calcular-promociones';
 import type { MovimientoRecientePOS } from '../_types/movimiento-pos';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -61,6 +62,7 @@ export function useVentas() {
   // Estados de datos
   const [productos, setProductos] = useState<Producto[]>([]);
   const [productosVirtuales, setProductosVirtuales] = useState<ProductoVirtual[]>([]);
+  const [promociones, setPromociones] = useState<Promocion[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [ventasPendientes, setVentasPendientes] = useState<Venta[]>([]);
   const [ventasACredito, setVentasACredito] = useState<Venta[]>([]);
@@ -140,6 +142,7 @@ export function useVentas() {
     const unsubscribes = [
       onSnapshot(query(collection(firestore, `sucursales/${sucursalId}/productos`), orderBy('nombre')), s => setProductos(s.docs.map(d => ({ id: d.id, ...d.data() } as Producto)))),
       onSnapshot(query(collection(firestore, `sucursales/${sucursalId}/productos_virtuales`), orderBy('nombre')), s => setProductosVirtuales(s.docs.map(d => ({ id: d.id, ...d.data() } as ProductoVirtual)))),
+      onSnapshot(query(collection(firestore, `sucursales/${sucursalId}/promociones`)), s => setPromociones(s.docs.map(d => ({ id: d.id, ...d.data() } as Promocion)))),
       onSnapshot(query(collection(firestore, `sucursales/${sucursalId}/clientes`), orderBy('nombre')), s => { setClientes(s.docs.map(d => ({ id: d.id, ...d.data() } as Cliente))); setCargando(false); }),
       onSnapshot(query(collection(firestore, `sucursales/${sucursalId}/ventas`), where('estado', '==', 'Pendiente de pago')), s => setVentasPendientes(s.docs.map(d => {
         const data = d.data() as Venta;
@@ -218,6 +221,7 @@ export function useVentas() {
               clienteNombre: detalles.nombreCliente || detalles.cliente,
               montoTotal: detalles.total ?? detalles.monto ?? detalles.montoPagado ?? detalles.montoAbonado ?? detalles.totalLiquidado ?? detalles.totalPagadoPrincipal,
               metodoPago: detalles.metodoDePago || detalles.metodoPago || detalles.metodo || (tipo === 'venta_rapida' ? 'Efectivo' : undefined),
+              promocionNombre: detalles.promocionNombre || undefined,
               fecha,
               usuarioNombre: data.usuarioNombre || 'Operador',
               items,
@@ -410,13 +414,99 @@ export function useVentas() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [manejarGuardarVenta, procesandoGuardado]);
 
+  const promocionesPorProducto = useMemo(() => {
+    const map = new Map<string, Promocion>();
+    for (const promo of promociones) {
+      if (!esPromocionVigente(promo)) continue;
+      for (const pid of promo.productosIds || []) {
+        if (!map.has(pid)) map.set(pid, promo);
+      }
+    }
+    return map;
+  }, [promociones]);
+
+  const aplicarPromocionesACarrito = useCallback(
+    (detalles: DetalleVenta[], listaPromos: Promocion[]): DetalleVenta[] => {
+      if (!listaPromos.length) return detalles;
+
+      const indicesElegibles: number[] = [];
+      const itemsParaEval = detalles.flatMap((d, idx) => {
+        const esElegible =
+          d.idDetalle === 0 &&
+          d.estado === 'Pendiente de pago' &&
+          (d.pagadoEfectivo || 0) === 0 &&
+          (d.pagadoTarjeta || 0) === 0 &&
+          d.idProducto !== 'item-manual' &&
+          !d.metadata?.tipo;
+        if (!esElegible) return [];
+        indicesElegibles.push(idx);
+        return [
+          {
+            id: String(idx),
+            productoId: d.idProducto,
+            nombre: d.nombreProducto,
+            precioVenta: d.precioOriginal ?? d.precioUnitario,
+            cantidad: d.cantidad,
+          },
+        ];
+      });
+
+      if (itemsParaEval.length === 0) return detalles;
+      const resultados = calcularPromocionesCarrito(itemsParaEval, listaPromos);
+      const copia = [...detalles];
+
+      resultados.forEach((res, rIdx) => {
+        const origIdx = indicesElegibles[rIdx];
+        const actual = copia[origIdx];
+        if (res.promocionAplicada) {
+          copia[origIdx] = {
+            ...actual,
+            precioOriginal: res.precioOriginal,
+            precioUnitario: res.precioUnitarioEfectivo,
+            subtotal: res.subtotalFinal,
+            saldo: res.subtotalFinal,
+            promocionAplicada: res.promocionAplicada,
+          };
+        } else {
+          const { promocionAplicada: _p, precioOriginal: _o, ...resto } = actual;
+          copia[origIdx] = {
+            ...resto,
+            precioUnitario: res.precioOriginal,
+            subtotal: res.subtotalOriginal,
+            saldo: res.subtotalOriginal,
+          };
+        }
+      });
+
+      return copia;
+    },
+    []
+  );
+
   const opcionesClientes = useMemo(() => clientes.map(c => ({ value: c.id, label: c.nombre })), [clientes]);
   const opcionesProductos = useMemo(() => {
     if (cargando) return [];
-    const fisicos = productos.map(p => ({ value: `prod-${p.id}`, label: p.nombre, description: `Stock: ${p.existencia}${p.precioVenta ? ` - Q${p.precioVenta.toFixed(2)}` : ''}`, badge: (p.preparaciones?.length || 0) > 0 ? `${p.preparaciones?.length} prep.` : undefined }));
-    const virtuales = productosVirtuales.filter(p => p.incluirEnPOS).map(p => ({ value: `virt-${p.id}`, label: p.nombre, description: `Stock: ${p.existencia}${p.precioVenta ? ` - Q${p.precioVenta.toFixed(2)}` : ''}` }));
+    const fisicos = productos.map(p => {
+      const promo = promocionesPorProducto.get(p.id);
+      const prepBadge = (p.preparaciones?.length || 0) > 0 ? `${p.preparaciones?.length} prep.` : undefined;
+      return {
+        value: `prod-${p.id}`,
+        label: p.nombre,
+        description: `Stock: ${p.existencia}${p.precioVenta ? ` - Q${p.precioVenta.toFixed(2)}` : ''}`,
+        badge: promo ? `Promo: ${promo.nombre}` : prepBadge,
+      };
+    });
+    const virtuales = productosVirtuales.filter(p => p.incluirEnPOS).map(p => {
+      const promo = promocionesPorProducto.get(p.id);
+      return {
+        value: `virt-${p.id}`,
+        label: p.nombre,
+        description: `Stock: ${p.existencia}${p.precioVenta ? ` - Q${p.precioVenta.toFixed(2)}` : ''}`,
+        badge: promo ? `Promo: ${promo.nombre}` : undefined,
+      };
+    });
     return [...fisicos, ...virtuales];
-  }, [productos, productosVirtuales, cargando]);
+  }, [productos, productosVirtuales, cargando, promocionesPorProducto]);
 
   const productoSeleccionado = useMemo(() => {
     if (!productoSeleccionadoId) return null;
@@ -471,7 +561,7 @@ export function useVentas() {
         }
       }
       const det: DetalleVenta = { idDetalle: 0, idProducto: id, nombreProducto: n, cantidad: cantNum, precioUnitario: p, subtotal: cantNum*p, saldo: cantNum*p, pagadoEfectivo: 0, pagadoTarjeta: 0, metodoPago: null, estado: 'Pendiente de pago', fechaAgregado: new Date().toISOString(), ingredientesConsumidos: ing, esVirtual };
-      setCarrito(prev => [det, ...prev]);
+      setCarrito(prev => aplicarPromocionesACarrito([det, ...prev], promociones));
     } catch (e: any) { toast({ title: "Error de Stock", description: e.message, variant: "destructive" }); }
     finally { setProductoSeleccionadoId(''); setCantidad(1); setPreparacionSeleccionada(null); setProcesandoAnadir(false); setTimeout(() => { cantidadInputRef.current?.focus(); if (cantidadInputRef.current) cantidadInputRef.current.select(); }, 0); }
   };
@@ -542,7 +632,7 @@ export function useVentas() {
             }
           }
         }
-        setCarrito(prev => prev.filter((_, i) => i !== index));
+        setCarrito(prev => aplicarPromocionesACarrito(prev.filter((_, i) => i !== index), promociones));
         toast({ 
           title: "Ítem Eliminado", 
           description: `Se eliminó ${item.nombreProducto} del carrito.` 

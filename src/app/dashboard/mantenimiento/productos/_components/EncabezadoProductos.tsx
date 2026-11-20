@@ -1,6 +1,6 @@
 'use client'
 
-import { PageHeader } from "@/components/comunes/page-header"
+import { PageHeader } from "@/components/comunes"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, Package } from "lucide-react"
 
@@ -17,10 +17,9 @@ export function EncabezadoProductos({ onNuevoProducto }: EncabezadoProductosProp
       action={
         <Button
           onClick={onNuevoProducto}
-          size="sm"
-          className="rounded-full bg-sky-600 hover:bg-sky-500 text-white font-bold h-9 shadow-sm"
+          className="w-full sm:w-auto rounded-full h-9 px-4 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md flex items-center justify-center gap-2"
         >
-          <PlusCircle className="mr-1.5 h-4 w-4" />
+          <PlusCircle className="h-4 w-4" />
           Añadir Producto
         </Button>
       }

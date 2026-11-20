@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast"
 import type { Rol } from "@/lib/tipos"
 
 // Componentes Refactorizados
+import { BotonVolverArriba } from "@/components/comunes"
 import { EncabezadoRoles } from "./_components/EncabezadoRoles"
 import { ListaRoles } from "./_components/ListaRoles"
 import { ModalRol } from "./_components/ModalRol"
@@ -26,6 +27,7 @@ export default function PaginaRoles() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("id-asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -70,11 +72,28 @@ export default function PaginaRoles() {
 
   const filteredRoles = useMemo(() => {
     const term = searchTerm.toLowerCase();
-    return rolesConDocId.filter(r => 
+    const filtered = rolesConDocId.filter(r => 
       (r.nombre || '').toLowerCase().includes(term) ||
       (r.descripcion || '').toLowerCase().includes(term)
     );
-  }, [rolesConDocId, searchTerm]);
+    return filtered.sort((a, b) => {
+      switch (sortOrder) {
+        case 'name-asc':
+          return (a.nombre || '').localeCompare(b.nombre || '');
+        case 'name-desc':
+          return (b.nombre || '').localeCompare(a.nombre || '');
+        case 'id-desc':
+          return (b.idRol || 0) - (a.idRol || 0);
+        case 'id-asc':
+        default:
+          return (a.idRol || 0) - (b.idRol || 0);
+      }
+    });
+  }, [rolesConDocId, searchTerm, sortOrder]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortOrder]);
 
   const paginatedRoles = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -130,14 +149,17 @@ export default function PaginaRoles() {
   if (!isMounted) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <EncabezadoRoles onNuevoRol={() => { setEditingRol(null); setIsModalOpen(true); }} />
       
       <ListaRoles 
         roles={paginatedRoles}
+        totalItems={filteredRoles.length}
         cargando={isLoadingRoles || isLoadingSucursal}
         terminoBusqueda={searchTerm}
         onSearchChange={setSearchTerm}
+        orden={sortOrder}
+        onSortOrderChange={setSortOrder}
         onEditar={setEditingRol}
         onEliminar={setRolToDelete}
         paginacion={{
@@ -168,6 +190,8 @@ export default function PaginaRoles() {
         onConfirmar={handleDelete}
         procesando={loading}
       />
+
+      <BotonVolverArriba threshold={150} />
     </div>
   );
 }

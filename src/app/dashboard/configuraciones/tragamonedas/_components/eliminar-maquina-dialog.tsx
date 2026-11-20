@@ -46,14 +46,14 @@ export function EliminarMaquinaDialog({
         </AlertDialogHeader>
         <AlertDialogFooter className="pt-3 border-t border-[#2e2e2e] flex flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0">
           <AlertDialogCancel
-            className="mt-0 rounded-full h-10 px-5 text-xs font-semibold bg-[#252526] hover:bg-[#2e2e2e] border border-[#2e2e2e] text-slate-200"
+            className="mt-0 rounded-full h-9 px-5 text-xs font-medium bg-[#252526] hover:bg-[#313131] border border-[#2e2e2e] text-slate-200"
             onClick={onCancel}
           >
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className="bg-rose-600 hover:bg-rose-500 rounded-full h-10 px-5 text-xs font-semibold text-white shadow-md"
+            className="bg-rose-600 hover:bg-rose-500 rounded-full h-9 px-5 text-xs font-semibold text-white shadow-md"
           >
             <Trash2 className="mr-1.5 h-4 w-4" />
             Eliminar Máquina

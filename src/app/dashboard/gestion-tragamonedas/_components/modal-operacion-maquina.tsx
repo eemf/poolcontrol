@@ -61,7 +61,7 @@ export function ModalOperacionMaquina({
   return (
     <Dialog open={Boolean(operacion)} onOpenChange={(val) => !val && !procesando && onClose()}>
       <DialogContent className="sm:max-w-sm w-[95vw] bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 p-5 sm:p-6 rounded-2xl shadow-2xl font-body gap-4">
-        <DialogHeader className="pb-3 border-b border-[#2e2e2e] text-left">
+        <DialogHeader className="text-left">
           <div className="flex items-center gap-3 pr-6">
             {esBase ? (
               <div className="h-10 w-10 rounded-full bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
@@ -154,7 +154,7 @@ export function ModalOperacionMaquina({
           </div>
         </div>
 
-        <DialogFooter className="pt-3 border-t border-[#2e2e2e] flex flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0">
+        <DialogFooter className="pt-1 flex flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0">
           <Button
             type="button"
             variant="secondary"

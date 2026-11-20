@@ -32,6 +32,13 @@ export const CuadreItemAcordeon = memo(function CuadreItemAcordeon({
   const totalEgresos = cuadre.resumen.totalCompras + cuadre.resumen.totalGastos
   const fecha = cuadre.fecha.toDate()
 
+  const kpis = [
+    { label: 'Ingresos', value: `Q${totalIngresos.toFixed(2)}`, valueClass: 'text-emerald-400' },
+    { label: 'Egresos', value: `-Q${totalEgresos.toFixed(2)}`, valueClass: 'text-rose-400' },
+    { label: 'Balance Neto', value: `Q${cuadre.resumen.balanceNetoCalculado.toFixed(2)}`, valueClass: 'text-white' },
+    { label: 'Liquidado', value: `Q${cuadre.resumen.balanceLiquidado.toFixed(2)}`, valueClass: 'text-sky-400' },
+  ]
+
   return (
     <AccordionItem
       value={cuadre.id}
@@ -65,56 +72,52 @@ export const CuadreItemAcordeon = memo(function CuadreItemAcordeon({
         </div>
       </AccordionTrigger>
 
-      <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e]">
-        <div className="space-y-3.5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl p-3 text-center">
-              <p className="text-[11px] font-medium text-slate-400">Balance Neto</p>
-              <p className="text-lg font-bold text-white tabular-nums mt-0.5">
-                Q{cuadre.resumen.balanceNetoCalculado.toFixed(2)}
-              </p>
-            </div>
-            <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl p-3 text-center">
-              <p className="text-[11px] font-medium text-sky-400">Balance Liquidado</p>
-              <p className="text-lg font-bold text-sky-400 tabular-nums mt-0.5">
-                Q{cuadre.resumen.balanceLiquidado.toFixed(2)}
-              </p>
-            </div>
+      <AccordionContent className="p-3 sm:p-4 bg-[#1e1e1e]">
+        <div className="space-y-3">
+          {/* Resumen compacto de 4 KPIs */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {kpis.map(({ label, value, valueClass }) => (
+              <div key={label} className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2 min-w-0">
+                <p className="text-[11px] text-slate-400 font-medium truncate">{label}</p>
+                <p className={`text-sm font-bold tabular-nums mt-0.5 truncate ${valueClass}`}>{value}</p>
+              </div>
+            ))}
           </div>
 
-          <div className="flex items-center justify-between gap-3 p-3 border border-[#2e2e2e] rounded-xl bg-[#252526] text-xs">
+          {/* Ruta de cuentas compacta */}
+          <div className="flex items-center justify-between gap-2 px-3 py-2 border border-[#2e2e2e] rounded-xl bg-[#252526] text-xs">
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-slate-400 font-medium">Origen</p>
-              <p className="font-semibold text-slate-100 truncate">{cuadre.cuentas.origenNombre}</p>
+              <span className="text-[10px] text-slate-400 mr-1.5">Origen:</span>
+              <span className="font-semibold text-slate-100 truncate">{cuadre.cuentas.origenNombre}</span>
             </div>
-            <ArrowRight className="h-4 w-4 text-slate-400 shrink-0" />
+            <ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
             <div className="min-w-0 flex-1 text-right">
-              <p className="text-[10px] text-slate-400 font-medium">Destino</p>
-              <p className="font-semibold text-slate-100 truncate">{cuadre.cuentas.destinoNombre}</p>
+              <span className="text-[10px] text-slate-400 mr-1.5">Destino:</span>
+              <span className="font-semibold text-slate-100 truncate">{cuadre.cuentas.destinoNombre}</span>
             </div>
           </div>
 
+          {/* Registros procesados compactos */}
           {isOpen && firestore && (
-            <div className="border border-[#2e2e2e] bg-[#252526] p-3.5 rounded-xl space-y-3">
-              <p className="text-xs font-semibold text-slate-200">Registros Procesados</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                    <ArrowUp size={14} /> Ingresos (Q{totalIngresos.toFixed(2)})
+            <div className="border border-[#2e2e2e] bg-[#252526] p-3 rounded-xl space-y-2.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-emerald-400 flex items-center gap-1.5 px-0.5">
+                    <ArrowUp size={13} /> Ingresos (Q{totalIngresos.toFixed(2)})
                   </h4>
-                  <div className="space-y-3 border-l-2 border-emerald-500/30 pl-3 ml-1">
+                  <div className="space-y-2">
                     <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosEfectivo} firestore={firestore} sucursalId={sucursalId} tipo="movimiento" titulo="Cajas (Efectivo)" />
-                    <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTarjeta} firestore={firestore} sucursalId={sucursalId} tipo="movimiento" titulo="Cajas (Tarjeta)" />
+                    <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTarjeta} firestore={firestore} sucursalId={sucursalId} tipo="movimiento" titulo="Cajas (Tarjeta)" campoMonto="pagosTarjeta" />
                     <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTragamonedas || []} firestore={firestore} sucursalId={sucursalId} tipo="tragamonedas" titulo="Tragamonedas" />
-                    <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTraslados || []} firestore={firestore} sucursalId={sucursalId} tipo="traslado" titulo="Cobros por Traslados" />
+                    <DetalleRegistrosProcesados ids={cuadre.idsProcesados.ingresosTraslados || []} firestore={firestore} sucursalId={sucursalId} tipo="traslado" titulo="Traslados" />
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-rose-400 flex items-center gap-1.5">
-                    <ArrowDown size={14} /> Egresos (-Q{totalEgresos.toFixed(2)})
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-rose-400 flex items-center gap-1.5 px-0.5">
+                    <ArrowDown size={13} /> Egresos (-Q{totalEgresos.toFixed(2)})
                   </h4>
-                  <div className="space-y-3 border-l-2 border-rose-500/30 pl-3 ml-1">
+                  <div className="space-y-2">
                     <DetalleRegistrosProcesados ids={cuadre.idsProcesados.compras} firestore={firestore} sucursalId={sucursalId} tipo="compra" titulo="Compras Pagadas" />
                     <DetalleRegistrosProcesados ids={cuadre.idsProcesados.gastos} firestore={firestore} sucursalId={sucursalId} tipo="gasto" titulo="Gastos Pagados" />
                   </div>
@@ -124,9 +127,9 @@ export const CuadreItemAcordeon = memo(function CuadreItemAcordeon({
           )}
 
           {cuadre.observaciones && (
-            <div className="bg-[#252526] p-3 rounded-xl border border-[#2e2e2e] text-xs space-y-1">
-              <span className="font-semibold text-slate-300 block">Observaciones</span>
-              <p className="text-slate-400 leading-relaxed">{cuadre.observaciones}</p>
+            <div className="bg-[#252526] px-3 py-2 rounded-xl border border-[#2e2e2e] text-xs">
+              <span className="font-semibold text-slate-300 mr-1.5">Observaciones:</span>
+              <span className="text-slate-400">{cuadre.observaciones}</span>
             </div>
           )}
         </div>

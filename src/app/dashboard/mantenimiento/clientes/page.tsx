@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast"
 import type { Cliente } from "@/lib/tipos"
 
 // Componentes Refactorizados
+import { BotonVolverArriba } from "@/components/comunes"
 import { EncabezadoClientes } from "./_components/encabezado-clientes"
 import { ListaClientes } from "./_components/lista-clientes"
 import { ModalCliente } from "./_components/modal-cliente"
@@ -116,7 +117,11 @@ export default function PaginaClientes() {
     return filteredCustomers.slice(start, start + itemsPerPage);
   }, [filteredCustomers, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / itemsPerPage));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortOrder, itemsPerPage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,11 +173,12 @@ export default function PaginaClientes() {
   if (!isMounted) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 font-body pb-10">
       <EncabezadoClientes onNuevoCliente={() => { setEditingCustomer(null); setIsModalOpen(true); }} />
       
       <ListaClientes 
         clientes={paginatedCustomers}
+        totalItems={filteredCustomers.length}
         cargando={isLoadingCustomers || isLoadingSucursal}
         terminoBusqueda={searchTerm}
         onSearchChange={setSearchTerm}
@@ -213,6 +219,8 @@ export default function PaginaClientes() {
         onConfirmar={handleDelete}
         procesando={loading}
       />
+
+      <BotonVolverArriba />
     </div>
   );
 }

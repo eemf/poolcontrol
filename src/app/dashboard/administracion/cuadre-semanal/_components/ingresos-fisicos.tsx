@@ -31,7 +31,7 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
       <CardHeader className="p-4 pb-2 bg-transparent">
         <CardTitle className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
           <Banknote className="h-5 w-5 text-emerald-400 shrink-0" />
-          Ingresos del Período (Efectivo y Monedas)
+          Ingresos (Efectivo y Monedas)
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-1 space-y-3">

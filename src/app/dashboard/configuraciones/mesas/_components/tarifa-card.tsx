@@ -12,14 +12,14 @@ interface TarifaCardProps {
 
 export function TarifaCard({ tarifa, onEdit, onDelete }: TarifaCardProps) {
   return (
-    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-white shadow-sm hover:border-slate-500 transition-colors">
+    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-slate-100 shadow-sm hover:border-[#383838] transition-colors rounded-xl overflow-hidden">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <CardTitle className="text-base font-bold text-white">{tarifa.nombre}</CardTitle>
+            <CardTitle className="text-base font-bold text-slate-100">{tarifa.nombre}</CardTitle>
             <CardDescription className="text-xs text-slate-400">{tarifa.tipoDeMesa}</CardDescription>
           </div>
-          <Badge variant="secondary" className="text-[11px] font-medium bg-[#1e1e1e] text-slate-200 border-[#2e2e2e]">
+          <Badge variant="secondary" className="rounded-full text-[11px] font-medium bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]">
             {tarifa.tipoDeCalculo}
           </Badge>
         </div>
@@ -59,22 +59,22 @@ export function TarifaCard({ tarifa, onEdit, onDelete }: TarifaCardProps) {
         )}
       </CardContent>
 
-      <CardFooter className="justify-end gap-2 border-t border-[#2e2e2e] bg-[#1e1e1e]/50 p-2.5">
+      <CardFooter className="justify-end gap-2 border-t border-[#2e2e2e] px-4 py-2.5">
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full text-slate-300 hover:text-white hover:bg-slate-700/50"
+          size="sm"
+          className="h-8 px-3.5 rounded-full text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-sm"
           onClick={() => onEdit(tarifa)}
         >
-          <Edit className="h-4 w-4" />
+          <Edit className="mr-1.5 h-3.5 w-3.5" />
+          Editar
         </Button>
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-full"
+          size="sm"
+          className="h-8 px-3.5 rounded-full text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 shadow-sm"
           onClick={() => onDelete(tarifa)}
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+          Eliminar
         </Button>
       </CardFooter>
     </Card>

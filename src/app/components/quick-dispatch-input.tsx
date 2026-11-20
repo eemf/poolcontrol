@@ -8,7 +8,7 @@ import { Loader2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import type { Producto, ProductoVirtual } from '@/lib/tipos';
+import type { Producto, ProductoVirtual, Promocion } from '@/lib/tipos';
 import { analizarComando, type ComandoAnalizado } from '@/lib/utils/analizar-comando';
 import { collection } from 'firebase/firestore';
 import { useSucursal } from '@/hooks/use-sucursal';
@@ -58,6 +58,12 @@ export default function QuickDispatchInput() {
         [firestore, sucursalId]
     );
     const { data: productosVirtuales, isLoading: isLoadingVirtuales } = useCollection<ProductoVirtual>(productosVirtualesQuery);
+
+    const promocionesQuery = useMemoFirebase(() =>
+        (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/promociones`) : null,
+        [firestore, sucursalId]
+    );
+    const { data: promociones } = useCollection<Promocion>(promocionesQuery);
 
     const handleDispatch = async () => {
         if (!inputValue.trim() || !firestore || !user || !productosFisicos || !productosVirtuales || !sucursalId) return;
@@ -115,12 +121,15 @@ export default function QuickDispatchInput() {
                 comando,
                 productoEncontrado.id,
                 productoEncontrado as Producto | ProductoVirtual,
-                productoEncontrado.esVirtual
+                productoEncontrado.esVirtual,
+                'Efectivo',
+                promociones || []
             );
 
             // Generar descripción detallada con rastro de stock
             const stockMain = resultado.stockInfo.producto;
-            let infoDetallada = `${resultado.cantidad}x ${resultado.nombreProducto} (Q${resultado.totalVenta.toFixed(2)}). Stock: ${stockMain.inicial} → ${stockMain.final}`;
+            const promoTag = resultado.promocionAplicada ? ` [${resultado.promocionAplicada.nombre}]` : '';
+            let infoDetallada = `${resultado.cantidad}x ${resultado.nombreProducto} (Q${resultado.totalVenta.toFixed(2)})${promoTag}. Stock: ${stockMain.inicial} → ${stockMain.final}`;
 
             if (resultado.stockInfo.ingredientes.length > 0) {
                 const ingInfo = resultado.stockInfo.ingredientes.map(i => `${i.nombre}: ${i.inicial} → ${i.final}`).join(' | ');
@@ -129,7 +138,9 @@ export default function QuickDispatchInput() {
 
             toast({
                 variant: 'success',
-                title: 'Venta Rápida Exitosa',
+                title: resultado.promocionAplicada
+                    ? `Venta Rápida • ${resultado.promocionAplicada.nombre}`
+                    : 'Venta Rápida Exitosa',
                 description: infoDetallada,
             });
 
@@ -140,10 +151,11 @@ export default function QuickDispatchInput() {
                         id: Date.now().toString(),
                         tipo: 'venta_rapida',
                         titulo: 'Venta Rápida',
-                        descripcion: `${resultado.cantidad}x ${resultado.nombreProducto} • Total: Q${resultado.totalVenta.toFixed(2)} (Efectivo)`,
+                        descripcion: `${resultado.cantidad}x ${resultado.nombreProducto}${promoTag} • Total: Q${resultado.totalVenta.toFixed(2)} (Efectivo)`,
                         idVenta: idVentaFinal || undefined,
                         montoTotal: resultado.totalVenta,
                         metodoPago: 'Efectivo',
+                        promocionNombre: resultado.promocionAplicada?.nombre,
                         fecha: new Date(),
                         usuarioNombre: profile?.nombre || user.displayName || 'Operador',
                         items: [{

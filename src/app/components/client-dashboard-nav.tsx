@@ -9,7 +9,7 @@ import {
   TableProperties,
   Truck, Scale, History, HandCoins, Landmark, BookUser, CalendarDays, 
   Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2, Info,
-  BarChart3, ArrowLeftRight, Sliders, MessageSquare
+  BarChart3, ArrowLeftRight, Sliders, MessageSquare, Percent
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -86,11 +86,12 @@ export const navItems: NavItemType[] = [
   {
     label: 'Mantenimiento',
     icon: Wrench,
-    anyPermission: ['mant.clientes', 'config.productos', 'mant.productos_virt', 'mant.roles', 'mant.cuentas'],
+    anyPermission: ['mant.clientes', 'config.productos', 'mant.productos_virt', 'mant.promociones', 'mant.roles', 'mant.cuentas'],
     items: [
         { href: '/dashboard/mantenimiento/clientes', label: 'Clientes', icon: Contact, permission: 'mant.clientes', feature: 'mantClientes' },
         { href: '/dashboard/mantenimiento/productos', label: 'Productos', icon: Package, permission: 'config.productos', feature: 'mantProductos' },
         { href: '/dashboard/mantenimiento/productos-virtuales', label: 'Prod. Virtuales', icon: Ghost, permission: 'mant.productos_virt', feature: 'mantProductosVirt' },
+        { href: '/dashboard/mantenimiento/promociones', label: 'Promociones', icon: Percent, permission: 'mant.promociones' },
         { href: '/dashboard/mantenimiento/roles', label: 'Roles', icon: ShieldCheck, permission: 'mant.roles', feature: 'mantRoles' },
         { href: '/dashboard/mantenimiento/cuentas', label: 'Cuentas', icon: BookUser, permission: 'mant.cuentas', feature: 'adminCuentas' },
     ]
@@ -105,24 +106,6 @@ export const navItems: NavItemType[] = [
       { href: '/dashboard/configuraciones/mesas', label: 'Mesas', icon: LayoutGrid, permission: 'config.mesas', feature: 'configMesas' },
       { href: '/dashboard/configuraciones/tragamonedas', label: 'Tragamonedas', icon: Dices, permission: 'config.tragamonedas', feature: 'configTragamonedas' },
       { href: '/dashboard/configuraciones/acerca-de', label: 'Acerca del Sistema', icon: Info, permission: 'dashboard.ver' },
-    ]
-  },
-  {
-    label: 'Pruebas',
-    icon: FlaskConical,
-    permission: 'pruebas.ver',
-    items: [
-      { href: '/dashboard/pruebas/controles-estandar', label: 'Controles Estándar', icon: Sliders },
-      { href: '/dashboard/pruebas/disenos-mensajes', label: 'Diseños de Mensajes', icon: MessageSquare },
-      { href: '/dashboard/pruebas/monitoreo-integral', label: 'Monitoreo Integral', icon: MonitorCheck },
-      { href: '/dashboard/pruebas/solucion-pago-unificado', label: 'Pago Unificado', icon: TableProperties },
-      { href: '/dashboard/pruebas/diseno-botones', label: 'Diseño Botones', icon: Palette },
-      { href: '/dashboard/pruebas/modelo-de-modal', label: 'Modelo Modal', icon: Layers },
-      { href: '/dashboard/pruebas/modelos-dialogo-pos', label: 'Modelos Diálogo POS', icon: Layout },
-      { href: '/dashboard/pruebas/modelo-historial-ventas', label: 'Modelo Historial', icon: FileClock },
-      { href: '/dashboard/pruebas/modelos-mesas', label: 'Modelos Mesas', icon: LayoutGrid },
-      { href: '/dashboard/pruebas/modo-oscuro', label: 'Modo Oscuro', icon: Moon },
-      { href: '/dashboard/pruebas/notificaciones', label: 'Notificaciones', icon: Bell },
     ]
   },
 ];
@@ -453,19 +436,20 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                 </button>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <div className="mt-1 rounded-xl bg-sidebar-accent/40 border border-sidebar-border/60 p-1.5 space-y-1 max-h-56 overflow-y-auto">
-                  <p className="text-[10px] font-bold text-muted-foreground px-2 py-1 tracking-wider">
+                <div className="mt-1.5 rounded-2xl bg-[#252526] border border-[#383838] shadow-2xl p-2 space-y-1 max-h-56 overflow-y-auto">
+                  <p className="text-[11px] font-semibold text-slate-400 px-2 py-1">
                     Cambiar de sucursal
                   </p>
+                  <div className="h-px bg-[#2e2e2e] my-1" />
                   {(sucursalesVisibles || []).map((s) => (
                     <button
                       key={s.id}
                       type="button"
                       className={cn(
-                        "w-full px-2.5 py-2 rounded-lg cursor-pointer font-bold flex items-center gap-3 transition-colors text-left",
+                        "w-full px-2.5 py-2 rounded-xl cursor-pointer font-semibold flex items-center gap-3 transition-colors text-left border",
                         s.id === sucursalId
-                          ? "bg-primary/15 text-primary"
-                          : "hover:bg-muted/70 text-foreground"
+                          ? "bg-sky-600/20 text-sky-400 border-sky-500/30"
+                          : "border-transparent hover:bg-[#313131] text-slate-200"
                       )}
                       onClick={() => {
                         setIsMobileBranchOpen(false);
@@ -473,13 +457,13 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                         setOpenMobile(false);
                       }}
                     >
-                      <Building2 className="h-4 w-4 shrink-0 opacity-70" />
+                      <Building2 className="h-4 w-4 shrink-0 opacity-80" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs">{s.nombre}</p>
-                        <p className="text-[9px] opacity-60 font-medium">ID #{s.idSucursal}</p>
+                        <p className="text-[10px] text-slate-400 font-medium">ID #{s.idSucursal}</p>
                       </div>
                       {s.id === sucursalId && (
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-primary/20 text-primary shrink-0">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0">
                           Activa
                         </span>
                       )}
@@ -510,32 +494,46 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                   ) : branchDisplay}
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side={isCollapsed ? "right" : "top"} align={isCollapsed ? "start" : "center"} className="w-64 font-body rounded-2xl shadow-2xl border-none">
-                <DropdownMenuLabel className="text-[10px] font-bold text-muted-foreground tracking-wider px-3 py-2">
-                  Cambiar de Sucursal
+              <DropdownMenuContent
+                side="right"
+                align="end"
+                sideOffset={10}
+                className="w-64 font-body rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.85)] bg-[#252526] border border-[#3c3c3c] text-slate-100 p-1.5"
+              >
+                <DropdownMenuLabel className="text-[11px] font-semibold text-slate-400 px-2.5 py-1.5">
+                  Cambiar de sucursal
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <ScrollArea className="h-64">
-                  {(sucursalesVisibles || []).map(s => (
-                    <DropdownMenuItem 
-                      key={s.id} 
-                      className={cn(
-                        "px-3 py-2.5 rounded-xl cursor-pointer font-bold flex items-center gap-3",
-                        s.id === sucursalId ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                      )}
-                      onClick={() => {
-                        setIsBranchDropdownOpen(false);
-                        setIsLocked(false);
-                        handleSwitchBranch(s.id);
-                      }}
-                    >
-                      <Building2 className="h-4 w-4 shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs">{s.nombre}</p>
-                        <p className="text-[9px] opacity-60 font-medium">ID #{s.idSucursal}</p>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
+                <DropdownMenuSeparator className="bg-[#2e2e2e] my-1" />
+                <ScrollArea className="h-64 pr-1">
+                  <div className="space-y-1">
+                    {(sucursalesVisibles || []).map(s => (
+                      <DropdownMenuItem 
+                        key={s.id} 
+                        className={cn(
+                          "px-2.5 py-2 rounded-xl cursor-pointer font-semibold flex items-center gap-3 border transition-colors",
+                          s.id === sucursalId
+                            ? "bg-sky-600/20 text-sky-400 border-sky-500/30 focus:bg-sky-600/25 focus:text-sky-300"
+                            : "border-transparent text-slate-200 hover:bg-[#313131] focus:bg-[#313131] focus:text-slate-100"
+                        )}
+                        onClick={() => {
+                          setIsBranchDropdownOpen(false);
+                          setIsLocked(false);
+                          handleSwitchBranch(s.id);
+                        }}
+                      >
+                        <Building2 className="h-4 w-4 shrink-0 opacity-80" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-xs">{s.nombre}</p>
+                          <p className="text-[10px] text-slate-400 font-medium">ID #{s.idSucursal}</p>
+                        </div>
+                        {s.id === sucursalId && (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0">
+                            Activa
+                          </span>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
                 </ScrollArea>
               </DropdownMenuContent>
             </DropdownMenu>

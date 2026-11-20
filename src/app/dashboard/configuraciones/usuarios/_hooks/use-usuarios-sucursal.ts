@@ -24,6 +24,7 @@ export function useUsuariosSucursal() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [sortOrder, setSortOrder] = useState("name-asc")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
@@ -86,12 +87,27 @@ export function useUsuariosSucursal() {
 
   const filteredUsuarios = useMemo(() => {
     const term = searchTerm.toLowerCase()
-    return usuariosConDocId.filter(u =>
+    const filtered = usuariosConDocId.filter(u =>
       (u.nombre || '').toLowerCase().includes(term) ||
       (u.email || '').toLowerCase().includes(term) ||
       (u.rol || '').toLowerCase().includes(term)
     )
-  }, [usuariosConDocId, searchTerm])
+    return filtered.sort((a, b) => {
+      switch (sortOrder) {
+        case 'name-desc':
+          return (b.nombre || '').localeCompare(a.nombre || '')
+        case 'rol-asc':
+          return (a.rol || '').localeCompare(b.rol || '') || (a.nombre || '').localeCompare(b.nombre || '')
+        case 'name-asc':
+        default:
+          return (a.nombre || '').localeCompare(b.nombre || '')
+      }
+    })
+  }, [usuariosConDocId, searchTerm, sortOrder])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, sortOrder])
 
   const paginatedUsuarios = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage
@@ -240,6 +256,9 @@ export function useUsuariosSucursal() {
     errorPermisos,
     searchTerm,
     setSearchTerm,
+    sortOrder,
+    setSortOrder,
+    totalItems: filteredUsuarios.length,
     currentPage,
     setCurrentPage,
     itemsPerPage,

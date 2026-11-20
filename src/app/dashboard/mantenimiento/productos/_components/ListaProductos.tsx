@@ -1,13 +1,11 @@
 'use client';
 
-import { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { SurfaceCard, PillTabs, Paginacion } from "@/components/comunes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowUpDown, Loader2, Edit, Trash2, ChevronLeft, ChevronRight, Info, Utensils, MapPin } from "lucide-react";
+import { ArrowDownAZ, ArrowUpZA, ArrowDown01, ArrowUp01, Loader2, Edit, Trash2, Utensils, MapPin, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Producto } from "@/lib/tipos";
 
@@ -15,6 +13,7 @@ type ProductoConDocId = Producto & { docId: string };
 
 interface ListaProductosProps {
   productos: ProductoConDocId[];
+  totalItems: number;
   cargando: boolean;
   terminoBusqueda: string;
   onSearchChange: (val: string) => void;
@@ -36,6 +35,7 @@ interface ListaProductosProps {
 
 export function ListaProductos({
   productos,
+  totalItems,
   cargando,
   terminoBusqueda,
   onSearchChange,
@@ -48,215 +48,205 @@ export function ListaProductos({
   onEliminar,
   paginacion
 }: ListaProductosProps) {
-  return (
-    <Card className="border rounded-lg transition-all bg-card-foreground/5 shadow-sm font-body overflow-hidden">
-      <CardHeader className="p-4">
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="relative flex-grow w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por nombre..."
-              className="pl-9 rounded-full h-10 border-muted-foreground/20"
-              value={terminoBusqueda}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Select value={ubicacionFiltro} onValueChange={onUbicacionFiltroChange}>
-              <SelectTrigger className="w-full sm:w-[170px] rounded-full h-10 border-muted-foreground/20">
-                <MapPin className="mr-2 h-4 w-4 text-primary" />
-                <SelectValue placeholder="Ubicación..." />
-              </SelectTrigger>
-              <SelectContent className="font-body">
-                <SelectItem value="todas">Todas las ubicaciones</SelectItem>
-                {ubicacionesDisponibles.map((u) => (
-                  <SelectItem key={u} value={u}>{u}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={orden} onValueChange={onSortOrderChange}>
-              <SelectTrigger className="w-full sm:w-[180px] rounded-full h-10 border-muted-foreground/20">
-                <ArrowUpDown className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Ordenar por..." />
-              </SelectTrigger>
-              <SelectContent className="font-body">
-                <SelectItem value="name-asc">Nombre (A-Z)</SelectItem>
-                <SelectItem value="name-desc">Nombre (Z-A)</SelectItem>
-                <SelectItem value="stock-asc">Stock (Menor a Mayor)</SelectItem>
-                <SelectItem value="stock-desc">Stock (Mayor a Menor)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+  const ubicacionSelect = (className?: string) => (
+    <Select value={ubicacionFiltro} onValueChange={onUbicacionFiltroChange}>
+      <SelectTrigger className={cn("rounded-full h-10 sm:h-11 border-[#2e2e2e] bg-[#252526] hover:bg-[#313131] text-xs shrink-0", className)}>
+        <div className="flex items-center gap-2 truncate">
+          <MapPin className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+          <SelectValue placeholder="Ubicación..." />
         </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        {cargando ? (
-          <div className="flex items-center justify-center h-64 text-muted-foreground">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          </div>
-        ) : productos.length > 0 ? (
-          <Accordion type="single" collapsible className="w-full space-y-2 mt-2">
-            {productos.map((producto) => {
-              const stockMinimo = producto.existenciaMinima || 0;
-              const stockBajo = producto.existencia <= stockMinimo;
-              const numPrep = producto.preparaciones?.length || 0;
+      </SelectTrigger>
+      <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 font-body">
+        <SelectItem value="todas" className="text-xs">Todas las ubicaciones</SelectItem>
+        {ubicacionesDisponibles.map((u) => (
+          <SelectItem key={u} value={u} className="text-xs">{u}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
 
-              return (
-                <AccordionItem 
-                  value={producto.docId} 
-                  key={producto.docId} 
-                  className={cn(
-                    "border-b-0 rounded-lg border transition-all overflow-hidden mb-2",
-                    stockBajo 
-                      ? "bg-amber-50/50 border-amber-200 dark:bg-orange-900/10 dark:border-orange-800" 
-                      : "bg-card-foreground/5 hover:bg-muted/50"
-                  )}
-                >
-                  <AccordionTrigger className="px-4 py-4 hover:no-underline font-body">
-                    <div className="flex flex-1 items-center justify-between pr-2">
-                      <div className="flex flex-col items-start min-w-[100px] text-left">
-                        <span className="font-bold text-base truncate w-full text-foreground">{producto.nombre}</span>
-                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                          {producto.ubicacion && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-[9px] font-bold text-primary rounded-full leading-none">
-                              <MapPin className="h-2.5 w-2.5" />
-                              {producto.ubicacion}
-                            </span>
-                          )}
-                          {numPrep > 0 && (
-                            <div className="px-2 py-0.5 bg-muted text-[9px] font-bold text-muted-foreground rounded-full leading-none">
-                              {numPrep} prep.
-                            </div>
-                          )}
-                        </div>
-                      </div>
+  return (
+    <SurfaceCard variant="panel" className="p-4 sm:p-5 space-y-4 font-body">
+      {/* Barra superior unificada: PillTabs con buscador + Opciones en móvil (incluye ubicación) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+        <div className="flex-1 min-w-0">
+          <PillTabs
+            value={orden}
+            onValueChange={onSortOrderChange}
+            searchValue={terminoBusqueda}
+            onSearchChange={onSearchChange}
+            searchPlaceholder="Buscar producto por nombre..."
+            collapsibleMobileTabs
+            hasActiveExtraFilter={ubicacionFiltro !== 'todas'}
+            mobileExtraContent={ubicacionSelect("w-full")}
+            tabs={[
+              { id: 'name-asc', label: 'A-Z', icon: ArrowDownAZ },
+              { id: 'name-desc', label: 'Z-A', icon: ArrowUpZA },
+              { id: 'stock-asc', label: 'Menor stock', icon: ArrowUp01 },
+              { id: 'stock-desc', label: 'Mayor stock', icon: ArrowDown01 },
+            ]}
+          />
+        </div>
 
-                      <div className="flex flex-col items-center text-center">
-                        <div className="text-sm font-bold leading-tight tabular-nums">
-                          <span className="text-lg">{producto.existencia}</span>
-                          <span className="text-muted-foreground font-normal mx-0.5">/</span>
-                          <span className="text-muted-foreground font-normal">{stockMinimo}</span>
-                        </div>
-                        <span className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter opacity-70">Stock / Mín.</span>
-                      </div>
+        <div className="hidden sm:block shrink-0">
+          {ubicacionSelect("w-[200px]")}
+        </div>
+      </div>
 
-                      <div className="hidden sm:block">
-                        <Badge className={cn(
-                          "rounded-full px-3 h-5 text-[10px] font-bold border-none",
-                          stockBajo ? "bg-orange-500 text-white" : "bg-emerald-500 text-white"
-                        )}>
-                          {stockBajo ? 'Bajo' : 'En stock'}
-                        </Badge>
-                      </div>
+      {cargando ? (
+        <div className="flex flex-col items-center justify-center h-64 space-y-3 text-slate-400">
+          <Loader2 className="h-10 w-10 animate-spin text-sky-400" />
+          <span className="text-xs">Cargando productos...</span>
+        </div>
+      ) : productos.length > 0 ? (
+        <Accordion type="single" collapsible className="w-full space-y-2.5">
+          {productos.map((producto) => {
+            const stockMinimo = producto.existenciaMinima || 0;
+            const stockBajo = producto.existencia <= stockMinimo;
+            const numPrep = producto.preparaciones?.length || 0;
 
-                      <div className="text-right shrink-0">
-                        <span className="text-sm sm:text-xl font-bold text-primary tabular-nums">Q{producto.precioVenta.toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    <div className="border-t pt-4 mt-2 space-y-6">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-3">
-                          <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                            <Info className="h-3.5 w-3.5" /> Detalles del producto
-                          </h4>
-                          <div className="grid grid-cols-3 gap-3 bg-muted/20 p-4 rounded-xl border border-muted/40">
-                            <div>
-                              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">Precio compra</p>
-                              <p className="font-bold text-sm">Q{producto.precioCompra.toFixed(2)}</p>
-                            </div>
-                            <div>
-                              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">Cód. búsqueda</p>
-                              <p className="font-bold text-sm truncate">{producto.codigoBusqueda || 'N/A'}</p>
-                            </div>
-                            <div>
-                              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">Ubicación</p>
-                              <p className="font-bold text-sm truncate text-primary">{producto.ubicacion || 'Sin asignar'}</p>
-                            </div>
-                          </div>
-                        </div>
-
+            return (
+              <AccordionItem
+                value={producto.docId}
+                key={producto.docId}
+                className={cn(
+                  "rounded-xl border bg-[#252526] transition-all overflow-hidden shadow-sm",
+                  stockBajo
+                    ? "border-amber-500/40 hover:border-amber-500/60"
+                    : "border-[#2e2e2e] hover:border-[#383838]"
+                )}
+              >
+                <AccordionTrigger className="px-3.5 py-3 sm:px-4 sm:py-3.5 hover:no-underline hover:bg-[#2e2e2e]/30 transition-colors data-[state=open]:border-b data-[state=open]:border-[#2e2e2e]">
+                  <div className="flex-1 grid grid-cols-[1fr_auto] gap-3 items-center text-sm text-left pr-1.5 sm:pr-2.5">
+                    <div className="flex flex-col items-start gap-1 min-w-0">
+                      <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
+                        {producto.nombre}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-slate-400 font-medium">
+                        <span className={cn("tabular-nums", stockBajo ? "text-amber-300 font-semibold" : "")}>
+                          Stock: {producto.existencia} / Mín: {stockMinimo}
+                        </span>
+                        {producto.ubicacion && (
+                          <span className="inline-flex items-center gap-1 text-sky-400">
+                            <MapPin className="h-3 w-3 shrink-0" />
+                            {producto.ubicacion}
+                          </span>
+                        )}
                         {numPrep > 0 && (
-                          <div className="space-y-3">
-                            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                              <Utensils className="h-3.5 w-3.5" /> Preparaciones
-                            </h4>
-                            <div className="space-y-2">
-                              {producto.preparaciones?.map((prep, idx) => (
-                                <div key={idx} className="flex justify-between items-center text-xs p-2 bg-muted/30 rounded-lg">
-                                  <span className="font-bold">{prep.nombre}</span>
-                                  <span className="font-bold text-primary">Q{prep.precioVenta.toFixed(2)}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                          <span className="inline-flex items-center gap-1 text-slate-300">
+                            <Utensils className="h-3 w-3 shrink-0" />
+                            {numPrep} {numPrep === 1 ? 'prep.' : 'preps.'}
+                          </span>
                         )}
                       </div>
+                    </div>
 
-                      <div className="flex justify-end gap-2 pt-4 border-t border-dashed border-muted-foreground/20">
-                        <Button 
-                          size="sm" 
-                          className="rounded-full h-9 px-5 font-bold text-xs bg-sky-600 hover:bg-sky-700 text-white shadow-sm"
-                          onClick={() => onEditar(producto)}
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          Editar <span className="hidden sm:inline">Producto</span>
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
-                          className="rounded-full h-9 px-5 font-bold text-xs shadow-sm"
-                          onClick={() => onEliminar(producto)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Eliminar
-                        </Button>
+                    <div className="flex flex-col items-end gap-1 shrink-0 text-right">
+                      <p className="font-bold text-base sm:text-lg text-emerald-400 leading-none tabular-nums">
+                        Q{producto.precioVenta.toFixed(2)}
+                      </p>
+                      <Badge
+                        className={cn(
+                          "rounded-full text-[10px] font-semibold px-2 py-0.5",
+                          stockBajo
+                            ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                            : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                        )}
+                      >
+                        {stockBajo ? 'Stock bajo' : 'En stock'}
+                      </Badge>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+
+                <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e]">
+                  <div className="space-y-3.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5">
+                        <p className="text-[11px] text-slate-400 font-medium">Precio de compra</p>
+                        <p className="text-sm font-bold text-slate-100 tabular-nums mt-0.5">
+                          Q{producto.precioCompra.toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
+                        <p className="text-[11px] text-slate-400 font-medium">Código de búsqueda</p>
+                        <p className="text-sm font-bold text-slate-100 truncate mt-0.5">
+                          {producto.codigoBusqueda || 'N/A'}
+                        </p>
+                      </div>
+                      <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
+                        <p className="text-[11px] text-slate-400 font-medium">Ubicación</p>
+                        <p className="text-sm font-bold text-sky-400 truncate mt-0.5">
+                          {producto.ubicacion || 'Sin asignar'}
+                        </p>
                       </div>
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
-        ) : (
-          <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-64 border-2 border-dashed rounded-lg bg-muted/5 m-2">
-            <Info className="h-12 w-12 mb-4 text-primary/30" />
-            <p className="font-semibold text-lg">{terminoBusqueda ? "Sin resultados" : "No hay productos registrados"}</p>
-            <p className="text-xs mt-1">Añade tu primer artículo al catálogo.</p>
-          </div>
-        )}
-      </CardContent>
-      {paginacion.totalPaginas > 1 && (
-        <CardFooter className="flex flex-col items-center gap-4 p-4 sm:flex-row sm:justify-between bg-muted/5">
-          <div className="flex items-center space-x-2">
-            <p className="text-xs font-medium text-muted-foreground">Filas por página</p>
-            <Select value={`${paginacion.itemsPorPagina}`} onValueChange={(v) => paginacion.onItemsPorPaginaChange(Number(v))}>
-              <SelectTrigger className="h-8 w-[70px] rounded-full text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[10, 20, 50, 100].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>{pageSize}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex w-full items-center justify-center space-x-2 sm:w-auto">
-            <Button variant="outline" size="sm" onClick={() => paginacion.onPaginaChange(paginacion.paginaActual - 1)} disabled={paginacion.paginaActual === 1} className="px-3 rounded-full h-8">
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              <span className="text-xs">Anterior</span>
-            </Button>
-            <div className="flex-shrink-0 text-xs font-bold text-muted-foreground px-2">
-              Pág. {paginacion.paginaActual} de {paginacion.totalPaginas}
-            </div>
-            <Button variant="outline" size="sm" onClick={() => paginacion.onPaginaChange(paginacion.paginaActual + 1)} disabled={paginacion.paginaActual === paginacion.totalPaginas} className="px-3 rounded-full h-8">
-              <span className="text-xs">Siguiente</span>
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </div>
-        </CardFooter>
+
+                    {numPrep > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                          <Utensils className="h-3.5 w-3.5 text-sky-400" />
+                          <span>Preparaciones ({numPrep})</span>
+                        </h4>
+                        <div className="rounded-xl border border-[#2e2e2e] bg-[#252526] divide-y divide-[#2e2e2e] overflow-hidden">
+                          {producto.preparaciones?.map((prep, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs px-3 py-2">
+                              <span className="font-semibold text-slate-100 truncate pr-2">{prep.nombre}</span>
+                              <span className="font-bold text-sky-400 tabular-nums shrink-0">
+                                Q{prep.precioVenta.toFixed(2)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex justify-end gap-2 pt-2.5 border-t border-[#2e2e2e]">
+                      <Button
+                        size="sm"
+                        className="rounded-full h-8 px-4 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-sm flex items-center gap-1.5"
+                        onClick={() => onEditar(producto)}
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                        <span>Editar</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full h-8 px-4 text-xs font-semibold bg-rose-500/15 text-rose-400 hover:bg-rose-600 hover:text-white border border-rose-500/25 flex items-center gap-1.5"
+                        onClick={() => onEliminar(producto)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Eliminar</span>
+                      </Button>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      ) : (
+        <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 border border-dashed border-[#2e2e2e] rounded-xl bg-[#252526] p-4">
+          <Package className="h-10 w-10 mb-3 text-slate-500 opacity-50" />
+          <p className="font-bold text-sm text-white">
+            {terminoBusqueda ? "Sin resultados" : "No hay productos registrados"}
+          </p>
+          <p className="text-xs max-w-xs mx-auto mt-1 text-slate-400">
+            {terminoBusqueda ? "Prueba con otros términos de búsqueda." : "Tus productos aparecerán aquí."}
+          </p>
+        </div>
       )}
-    </Card>
+
+      <Paginacion
+        currentPage={paginacion.paginaActual}
+        totalPages={paginacion.totalPaginas}
+        totalItems={totalItems}
+        itemsPerPage={paginacion.itemsPorPagina}
+        itemLabel="productos"
+        onPageChange={paginacion.onPaginaChange}
+        onItemsPerPageChange={paginacion.onItemsPorPaginaChange}
+      />
+    </SurfaceCard>
   );
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { collection, query, orderBy } from 'firebase/firestore'
 import { useFirebase, useCollection, useMemoFirebase } from '@/firebase'
 import { useSucursal } from '@/hooks/use-sucursal'
@@ -16,57 +16,51 @@ export function useHistorialCuadreMensual() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [openAccordionId, setOpenAccordionId] = useState<string | null>(null)
 
-  const cuadresQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null
-    return query(collection(firestore, `sucursales/${sucursalId}/cuadre_mensual`), orderBy('fecha', 'desc'))
-  }, [firestore, sucursalId])
+  const cuadresQuery = useMemoFirebase(
+    () => (firestore && sucursalId)
+      ? query(collection(firestore, `sucursales/${sucursalId}/cuadre_mensual`), orderBy('fecha', 'desc'))
+      : null,
+    [firestore, sucursalId]
+  )
 
   const { data: cuadres, isLoading, error } = useCollection<CuadreMensual>(cuadresQuery)
 
-  const cuadresConId = useMemo((): CuadreMensualConId[] => {
-    return (cuadres || []).map(c => ({ ...c, id: c.id }))
-  }, [cuadres])
-
   const cuadresFiltrados = useMemo(() => {
-    if (!filtro) return cuadresConId
-    const filtroLower = filtro.toLowerCase()
-    return cuadresConId.filter(
-      c => String(c.idCuadreMensual).includes(filtroLower) || c.observaciones.toLowerCase().includes(filtroLower)
+    const lista = (cuadres || []) as CuadreMensualConId[]
+    const q = filtro.trim().toLowerCase()
+    if (!q) return lista
+    return lista.filter(
+      c => String(c.idCuadreMensual).includes(q) || c.observaciones?.toLowerCase().includes(q)
     )
-  }, [cuadresConId, filtro])
+  }, [cuadres, filtro])
 
-  const totalPages = Math.ceil(cuadresFiltrados.length / itemsPerPage) || 1
-
+  const totalPages = Math.max(1, Math.ceil(cuadresFiltrados.length / itemsPerPage))
   const cuadresPaginados = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return cuadresFiltrados.slice(startIndex, startIndex + itemsPerPage)
+    const start = (currentPage - 1) * itemsPerPage
+    return cuadresFiltrados.slice(start, start + itemsPerPage)
   }, [cuadresFiltrados, currentPage, itemsPerPage])
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
-  }
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
-  }
-
-  const cargando = isLoading || isLoadingSucursal
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filtro, itemsPerPage])
 
   return {
     firestore,
     sucursalId,
-    cargando,
+    cargando: isLoading || isLoadingSucursal,
     error,
     filtro,
     setFiltro,
-    currentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    totalPages,
+    totalItems: cuadresFiltrados.length,
     cuadresPaginados,
     openAccordionId,
     setOpenAccordionId,
-    handleNextPage,
-    handlePreviousPage,
+    pagination: {
+      currentPage,
+      itemsPerPage,
+      totalPages,
+      onPageChange: setCurrentPage,
+      onItemsPerPageChange: setItemsPerPage,
+    },
   }
 }

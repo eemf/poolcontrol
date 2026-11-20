@@ -3,12 +3,11 @@
 import { useState, useCallback, useMemo } from "react"
 import { useFirebase, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, query, orderBy, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ShieldCheck, Users } from "lucide-react"
+import { ShieldCheck, Users, Trash2 } from "lucide-react"
 import { useSucursal } from "@/hooks/use-sucursal"
 import { useToast } from "@/hooks/use-toast"
 import type { Rol, UsuarioSucursal } from "@/lib/tipos"
-import { Card } from "@/components/ui/card"
+import { SurfaceCard, PillTabs, ModalConfirmacion, BotonVolverArriba } from "@/components/comunes"
 
 // Componentes refactorizados
 import { EncabezadoPermisos } from "./_components/EncabezadoPermisos"
@@ -20,10 +19,11 @@ export default function PaginaGestionPermisos() {
   const { firestore } = useFirebase();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
   const { toast } = useToast();
-  
+
   const [activeTab, setActiveTab] = useState("roles");
   const [isRolModalOpen, setIsRolModalOpen] = useState(false);
   const [editingRol, setEditingRol] = useState<Rol | null>(null);
+  const [rolToDelete, setRolToDelete] = useState<Rol | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Estados Form Rol
@@ -32,11 +32,11 @@ export default function PaginaGestionPermisos() {
   const [rolPermisos, setRolPermisos] = useState<Set<string>>(new Set());
 
   // Consultas
-  const rolesQuery = useMemoFirebase(() => 
+  const rolesQuery = useMemoFirebase(() =>
     sucursalId ? query(collection(firestore, `sucursales/${sucursalId}/roles`), orderBy("nombre")) : null
   , [firestore, sucursalId]);
 
-  const usuariosQuery = useMemoFirebase(() => 
+  const usuariosQuery = useMemoFirebase(() =>
     sucursalId ? query(collection(firestore, `sucursales/${sucursalId}/usuarios`), orderBy("nombre")) : null
   , [firestore, sucursalId]);
 
@@ -98,21 +98,25 @@ export default function PaginaGestionPermisos() {
     setIsRolModalOpen(true);
   }, []);
 
-  const eliminarRol = useCallback(async (rolId: string) => {
-    if (!confirm("¿Deseas eliminar este rol?")) return;
+  const confirmarEliminarRol = useCallback(async () => {
+    if (!firestore || !sucursalId || !rolToDelete) return;
+    setLoading(true);
     try {
-      await deleteDoc(doc(firestore, `sucursales/${sucursalId}/roles`, rolId));
+      await deleteDoc(doc(firestore, `sucursales/${sucursalId}/roles`, (rolToDelete as any).id));
       toast({ title: "Éxito", description: "El rol ha sido eliminado." });
+      setRolToDelete(null);
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
-  }, [firestore, sucursalId, toast]);
+  }, [firestore, sucursalId, rolToDelete, toast]);
 
   const toggleRolAUsuario = useCallback(async (usuarioUid: string, rolId: string, currentRoles: string[]) => {
     if (!firestore || !sucursalId) return;
     const userRef = doc(firestore, `sucursales/${sucursalId}/usuarios`, usuarioUid);
     const hasRol = currentRoles?.includes(rolId);
-    
+
     try {
       await updateDoc(userRef, {
         roles: hasRol ? arrayRemove(rolId) : arrayUnion(rolId)
@@ -124,11 +128,11 @@ export default function PaginaGestionPermisos() {
   }, [firestore, sucursalId, toast]);
 
   const modalForm = useMemo(() => ({
-    nombre: rolNombre, 
+    nombre: rolNombre,
     setNombre: setRolNombre,
-    descripcion: rolDesc, 
+    descripcion: rolDesc,
     setDescripcion: setRolDesc,
-    permisos: rolPermisos, 
+    permisos: rolPermisos,
     onTogglePermiso: togglePermiso
   }), [rolNombre, rolDesc, rolPermisos, togglePermiso]);
 
@@ -138,59 +142,77 @@ export default function PaginaGestionPermisos() {
   }, [resetForm]);
 
   return (
-    <div className="space-y-6">
-      <EncabezadoPermisos 
-        onNuevoRol={() => { 
+    <div className="space-y-4 sm:space-y-6">
+      <EncabezadoPermisos
+        onNuevoRol={() => {
           resetForm();
-          setIsRolModalOpen(true); 
-        }} 
+          setIsRolModalOpen(true);
+        }}
       />
 
-      <Card className="border rounded-lg bg-card shadow-sm overflow-hidden p-4 sm:p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 rounded-full h-12 p-1 bg-muted/20 border-none mb-6 sm:mb-8">
-            <TabsTrigger value="roles" className="rounded-full gap-2 font-bold text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-white">
-              <ShieldCheck className="h-4 w-4 shrink-0" /> 
-              <span className="hidden xs:inline">Roles de Usuario</span>
-              <span className="xs:hidden">Roles</span>
-            </TabsTrigger>
-            <TabsTrigger value="usuarios" className="rounded-full gap-2 font-bold text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-white">
-              <Users className="h-4 w-4 shrink-0" /> 
-              <span className="hidden xs:inline">Personal de Sucursal</span>
-              <span className="xs:hidden">Personal</span>
-            </TabsTrigger>
-          </TabsList>
+      <SurfaceCard variant="panel" className="p-4 sm:p-5 space-y-4 font-body">
+        <PillTabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          tabs={[
+            {
+              id: "roles",
+              label: "Roles de Usuario",
+              icon: ShieldCheck,
+              count: roles?.length || 0,
+              badgeVariant: activeTab === "roles" ? "white" : "sky",
+            },
+            {
+              id: "usuarios",
+              label: "Personal de Sucursal",
+              icon: Users,
+              count: usuarios?.length || 0,
+              badgeVariant: activeTab === "usuarios" ? "white" : "slate",
+            },
+          ]}
+        />
 
-          <div className="mt-0">
-            <TabsContent value="roles" className="mt-0 outline-none">
-              <ListadoRoles 
-                roles={roles} 
-                cargando={isLoadingRoles || isLoadingSucursal} 
-                onEditar={abrirEditarRol}
-                onEliminar={eliminarRol}
-              />
-            </TabsContent>
+        {activeTab === "roles" ? (
+          <ListadoRoles
+            roles={roles}
+            cargando={isLoadingRoles || isLoadingSucursal}
+            onEditar={abrirEditarRol}
+            onEliminar={setRolToDelete}
+          />
+        ) : (
+          <SeccionPersonal
+            usuarios={usuarios}
+            roles={roles}
+            onToggleRol={toggleRolAUsuario}
+            cargando={isLoadingUsuarios || isLoadingSucursal}
+          />
+        )}
+      </SurfaceCard>
 
-            <TabsContent value="usuarios" className="mt-0 outline-none">
-              <SeccionPersonal 
-                usuarios={usuarios} 
-                roles={roles} 
-                onToggleRol={toggleRolAUsuario}
-                cargando={isLoadingUsuarios || isLoadingSucursal}
-              />
-            </TabsContent>
-          </div>
-        </Tabs>
-      </Card>
-
-      <ModalRol 
-        abierto={isRolModalOpen || !!editingRol} 
-        onClose={handleCloseModal} 
-        editando={!!editingRol} 
-        onSubmit={manejarGuardarRol} 
+      <ModalRol
+        abierto={isRolModalOpen || !!editingRol}
+        onClose={handleCloseModal}
+        editando={!!editingRol}
+        onSubmit={manejarGuardarRol}
         procesando={loading}
         form={modalForm}
       />
+
+      <ModalConfirmacion
+        open={!!rolToDelete}
+        onOpenChange={(o) => !o && setRolToDelete(null)}
+        tipo="destructivo"
+        swalTipo="error"
+        titulo="¿Eliminar rol?"
+        subtitulo={`Esta acción eliminará el rol "${rolToDelete?.nombre || ''}" y sus permisos asociados en esta sucursal.`}
+        textoCancelar="Cancelar"
+        textoConfirmar="Sí, eliminar"
+        iconoConfirmar={Trash2}
+        procesando={loading}
+        onConfirmar={confirmarEliminarRol}
+      />
+
+      <BotonVolverArriba threshold={150} />
     </div>
   )
 }

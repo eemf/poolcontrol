@@ -21,24 +21,26 @@ export function DialogoEliminarRol({
 }: DialogoEliminarRolProps) {
   return (
     <AlertDialog open={abierto} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="rounded-3xl font-body border-none shadow-2xl">
+      <AlertDialogContent className="rounded-2xl font-body bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 shadow-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle className="font-headline text-xl text-destructive flex items-center gap-2">
-            <Trash2 className="h-6 w-6" /> ¿Confirmas la eliminación?
+          <AlertDialogTitle className="font-headline text-lg sm:text-xl text-rose-400 flex items-center gap-2">
+            <Trash2 className="h-5 w-5" /> ¿Confirmas la eliminación?
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-sm">
+          <AlertDialogDescription className="text-xs sm:text-sm text-slate-400">
             Esta acción es definitiva. El rol
-            <span className="font-bold text-foreground"> "{rol?.nombre}"</span> será eliminado de los registros de la sucursal.
+            <span className="font-bold text-slate-100"> &quot;{rol?.nombre}&quot;</span> será eliminado de los registros de la sucursal.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-3 pt-4">
-          <AlertDialogCancel className="rounded-full h-11 px-8 font-semibold">Cancelar</AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={(e) => { e.preventDefault(); onConfirmar(); }} 
-            disabled={procesando} 
-            className="bg-destructive hover:bg-destructive/90 rounded-full h-11 px-10 font-bold"
+        <AlertDialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2.5 pt-4">
+          <AlertDialogCancel className="rounded-full h-9 px-6 text-xs font-semibold bg-[#252526] hover:bg-[#313131] text-slate-200 border border-[#2e2e2e]">
+            Cancelar
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => { e.preventDefault(); onConfirmar(); }}
+            disabled={procesando}
+            className="bg-rose-600 hover:bg-rose-500 text-white rounded-full h-9 px-6 text-xs font-semibold"
           >
-            {procesando ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Trash2 className="mr-2 h-4 w-4" />}
+            {procesando ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
             Sí, Eliminar
           </AlertDialogAction>
         </AlertDialogFooter>

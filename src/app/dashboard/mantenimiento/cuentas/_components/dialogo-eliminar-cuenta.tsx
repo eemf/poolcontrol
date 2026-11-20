@@ -29,7 +29,7 @@ export function DialogoEliminarCuenta({
 }: DialogoEliminarCuentaProps) {
   return (
     <AlertDialog open={!!cuentaToDelete} onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent className="bg-app-surface border-app-border text-slate-100 max-w-md">
+      <AlertDialogContent className="bg-[#1e1e1e] border border-[#2e2e2e] text-slate-100 max-w-md rounded-2xl font-body shadow-2xl">
         <AlertDialogHeader>
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
@@ -41,7 +41,7 @@ export function DialogoEliminarCuenta({
               </AlertDialogTitle>
               <AlertDialogDescription className="text-slate-400 text-xs mt-1">
                 Esta acción no se puede deshacer. Se eliminará permanentemente la cuenta{' '}
-                <strong className="text-slate-200">"{cuentaToDelete?.nombre}"</strong>.
+                <strong className="text-slate-200">&quot;{cuentaToDelete?.nombre}&quot;</strong>.
               </AlertDialogDescription>
             </div>
           </div>
@@ -50,14 +50,14 @@ export function DialogoEliminarCuenta({
           <AlertDialogCancel
             onClick={onClose}
             disabled={loading}
-            className="rounded-full bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800"
+            className="rounded-full h-9 px-5 text-xs font-medium bg-[#252526] hover:bg-[#313131] border-[#2e2e2e] text-slate-200"
           >
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={loading}
-            className="rounded-full bg-rose-600 hover:bg-rose-500 text-white font-semibold flex items-center gap-2"
+            className="rounded-full h-9 px-5 text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white flex items-center gap-2"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             Confirmar Eliminación

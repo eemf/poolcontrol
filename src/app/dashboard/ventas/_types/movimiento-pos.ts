@@ -24,6 +24,7 @@ export interface MovimientoRecientePOS {
   clienteNombre?: string;
   montoTotal?: number;
   metodoPago?: string;
+  promocionNombre?: string;
   fecha: Date;
   usuarioNombre?: string;
   items?: ItemMovimientoPOS[];

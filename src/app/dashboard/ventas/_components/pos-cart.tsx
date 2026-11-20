@@ -2,8 +2,9 @@
 
 import React, { useCallback } from 'react';
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { SurfaceCard } from "@/components/comunes";
-import { Trash2, ShoppingCart, ReceiptText, BadgeCheck, BadgeHelp, PieChart, Clock } from 'lucide-react';
+import { Trash2, ShoppingCart, ReceiptText, BadgeCheck, BadgeHelp, PieChart, Clock, Percent } from 'lucide-react';
 import { format } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
 import { DetalleVenta } from "@/lib/tipos";
@@ -47,12 +48,18 @@ export function POSCart({ carrito, clienteSeleccionadoId, manejarEliminarDelCarr
           {esItemManual ? <ReceiptText className="h-5 w-5 text-indigo-500 flex-shrink-0" /> : <Icono className={`h-5 w-5 ${color} flex-shrink-0`} />}
           <p className={`font-semibold leading-tight text-sm ${isPaid ? 'line-through text-muted-foreground' : ''}`}>{item.nombreProducto}</p>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-x-2 text-xs text-muted-foreground ml-7">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-x-2 gap-y-1 text-xs text-muted-foreground ml-7">
           <span className="text-xs">{item.cantidad} &times; Q{(item.precioUnitario ?? 0).toFixed(2)}</span>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {getFechaFormateada(item.fechaAgregado)}
           </div>
+          {item.promocionAplicada && (
+            <Badge className="w-fit rounded-full text-[10px] font-semibold px-2 py-0 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 gap-1">
+              <Percent className="h-2.5 w-2.5" />
+              {item.promocionAplicada.nombre}
+            </Badge>
+          )}
         </div>
       </div>
     );
@@ -80,8 +87,15 @@ export function POSCart({ carrito, clienteSeleccionadoId, manejarEliminarDelCarr
                   {renderizarItemVenta(item)}
                 </div>
                 <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
-                  <div className="font-medium text-sm text-slate-100 tabular-nums">
-                    Q{item.subtotal.toFixed(2)}
+                  <div className="text-right">
+                    {item.promocionAplicada && item.precioOriginal !== undefined && (
+                      <div className="text-[11px] text-slate-500 line-through tabular-nums leading-none mb-0.5">
+                        Q{(item.precioOriginal * item.cantidad).toFixed(2)}
+                      </div>
+                    )}
+                    <div className={`font-medium text-sm tabular-nums ${item.promocionAplicada ? 'text-emerald-400 font-semibold' : 'text-slate-100'}`}>
+                      Q{item.subtotal.toFixed(2)}
+                    </div>
                   </div>
                   <Button
                     type="button"

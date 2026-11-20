@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from "react"
-import { PageHeader } from "@/components/comunes/page-header"
-import { PillTabs } from "@/components/comunes/pill-tabs"
-import { SurfaceCard } from "@/components/comunes/surface-card"
+import { useMemo, useState } from "react"
+import { PageHeader, PillTabs, SurfaceCard, BotonVolverArriba } from "@/components/comunes"
 import { Button } from "@/components/ui/button"
 import { LayoutGrid, DollarSign, PlusCircle, Loader2 } from "lucide-react"
 import { useConfigMesas } from "./_hooks/use-config-mesas"
@@ -15,6 +13,7 @@ import { EliminarDialogs } from "./_components/eliminar-dialogs"
 
 export default function PaginaConfiguracionMesasUnificada() {
   const [tab, setTab] = useState<'mesas' | 'tarifas'>('mesas')
+  const [searchTerm, setSearchTerm] = useState('')
   const {
     isMounted,
     isGlobalLoading,
@@ -49,77 +48,104 @@ export default function PaginaConfiguracionMesasUnificada() {
     abrirEditarMesa,
   } = useConfigMesas()
 
+  const mesasFiltradas = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+    if (!term) return mesasConDocId
+    return mesasConDocId.filter((m) => {
+      const etiqueta = `${m.tipoDeMesa === 'Consola' ? 'Consola' : 'Mesa'} ${m.numeroMesa}`.toLowerCase()
+      return etiqueta.includes(term) || (m.tipoDeMesa || '').toLowerCase().includes(term) || (m.estado || '').toLowerCase().includes(term)
+    })
+  }, [mesasConDocId, searchTerm])
+
+  const tarifasFiltradas = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+    if (!term) return tarifasConDocId
+    return tarifasConDocId.filter((t) =>
+      (t.nombre || '').toLowerCase().includes(term) ||
+      (t.tipoDeMesa || '').toLowerCase().includes(term) ||
+      (t.tipoDeCalculo || '').toLowerCase().includes(term)
+    )
+  }, [tarifasConDocId, searchTerm])
+
   if (!isMounted) return null
 
   return (
-    <div className="space-y-6 pb-2">
+    <div className="space-y-4 sm:space-y-6 pb-2">
       <PageHeader
         title="Configuración de Estaciones"
         description="Administra las tarifas y el inventario de estaciones (Mesas de Billar y Consolas)."
         icon={LayoutGrid}
         action={
-          <div className="flex items-center gap-2">
-            {tab === 'mesas' ? (
-              <Button onClick={abrirNuevaMesa} size="sm" className="rounded-full bg-sky-600 hover:bg-sky-500 text-white font-bold h-9">
-                <PlusCircle className="mr-1.5 h-4 w-4" />
-                Nueva Estación
-              </Button>
-            ) : (
-              <Button onClick={abrirNuevaTarifa} size="sm" className="rounded-full bg-sky-600 hover:bg-sky-500 text-white font-bold h-9">
-                <PlusCircle className="mr-1.5 h-4 w-4" />
-                Nueva Tarifa
-              </Button>
-            )}
-          </div>
+          tab === 'mesas' ? (
+            <Button
+              onClick={abrirNuevaMesa}
+              className="w-full sm:w-auto rounded-full h-9 px-4 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md flex items-center justify-center gap-2"
+            >
+              <PlusCircle className="h-4 w-4" />
+              Nueva Estación
+            </Button>
+          ) : (
+            <Button
+              onClick={abrirNuevaTarifa}
+              className="w-full sm:w-auto rounded-full h-9 px-4 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md flex items-center justify-center gap-2"
+            >
+              <PlusCircle className="h-4 w-4" />
+              Nueva Tarifa
+            </Button>
+          )
         }
       />
 
-      {/* Pestañas de Navegación Oficiales */}
-      <PillTabs
-        value={tab}
-        onValueChange={(val) => setTab(val as 'mesas' | 'tarifas')}
-        tabs={[
-          {
-            id: 'mesas',
-            label: 'Estaciones',
-            icon: LayoutGrid,
-            count: mesasConDocId.length,
-            badgeVariant: 'sky',
-          },
-          {
-            id: 'tarifas',
-            label: 'Tarifas',
-            icon: DollarSign,
-            count: tarifasConDocId.length,
-            badgeVariant: 'amber',
-          },
-        ]}
-      />
+      <SurfaceCard variant="panel" className="p-4 sm:p-5 space-y-4 font-body">
+        <PillTabs
+          value={tab}
+          onValueChange={(val) => setTab(val as 'mesas' | 'tarifas')}
+          searchValue={searchTerm}
+          onSearchChange={setSearchTerm}
+          searchPlaceholder={tab === 'mesas' ? "Buscar estación por número o tipo..." : "Buscar tarifa por nombre o tipo..."}
+          tabs={[
+            {
+              id: 'mesas',
+              label: 'Estaciones',
+              icon: LayoutGrid,
+              count: mesasConDocId.length,
+              badgeVariant: tab === 'mesas' ? 'white' : 'sky',
+            },
+            {
+              id: 'tarifas',
+              label: 'Tarifas',
+              icon: DollarSign,
+              count: tarifasConDocId.length,
+              badgeVariant: tab === 'tarifas' ? 'white' : 'amber',
+            },
+          ]}
+        />
 
-      {isGlobalLoading ? (
-        <div className="flex items-center justify-center h-64 text-slate-400">
-          <Loader2 className="h-10 w-10 animate-spin text-sky-400" />
-        </div>
-      ) : tab === 'mesas' ? (
-        <SurfaceCard variant="panel" className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#2e2e2e]">
-            <div>
-              <h2 className="text-base font-bold text-white">Inventario de Estaciones</h2>
-              <p className="text-xs text-slate-400">Mesas de billar pool, carambola y consolas de videojuegos registradas.</p>
-            </div>
+        {isGlobalLoading ? (
+          <div className="flex flex-col items-center justify-center h-64 space-y-3 text-slate-400">
+            <Loader2 className="h-10 w-10 animate-spin text-sky-400" />
+            <span className="text-xs">Cargando configuración...</span>
           </div>
-
-          {mesasConDocId.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40">
-              <p className="text-slate-400 text-sm">No hay estaciones registradas aún.</p>
-              <Button onClick={abrirNuevaMesa} size="sm" className="rounded-full mt-3 bg-sky-600 hover:bg-sky-500 text-white">
-                <PlusCircle className="mr-1.5 h-4 w-4" />
-                Añadir Primera Estación
-              </Button>
+        ) : tab === 'mesas' ? (
+          mesasFiltradas.length === 0 ? (
+            <div className="flex flex-col items-center justify-center text-center py-12 border border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/50 px-4">
+              <LayoutGrid className="h-10 w-10 text-slate-500 mb-3" />
+              <p className="text-slate-200 font-semibold text-base">
+                {searchTerm ? 'Sin resultados' : 'No hay estaciones registradas aún'}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                {searchTerm ? 'Prueba con otro término de búsqueda.' : 'Agrega tu primera mesa o consola para comenzar.'}
+              </p>
+              {!searchTerm && (
+                <Button onClick={abrirNuevaMesa} className="rounded-full h-9 px-4 text-xs font-semibold mt-4 bg-sky-600 hover:bg-sky-500 text-white">
+                  <PlusCircle className="mr-1.5 h-4 w-4" />
+                  Añadir Primera Estación
+                </Button>
+              )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mesasConDocId.map((mesa) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {mesasFiltradas.map((mesa) => (
                 <MesaCard
                   key={mesa.docId}
                   mesa={mesa}
@@ -129,41 +155,37 @@ export default function PaginaConfiguracionMesasUnificada() {
                 />
               ))}
             </div>
-          )}
-        </SurfaceCard>
-      ) : (
-        <SurfaceCard variant="panel" className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#2e2e2e]">
-            <div>
-              <h2 className="text-base font-bold text-white">Tarifas de Cobro</h2>
-              <p className="text-xs text-slate-400">Reglas de facturación por minuto, intervalos y controles adicionales.</p>
-            </div>
-          </div>
-
-          {tarifasConDocId.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40">
-              <p className="text-slate-400 text-sm">No hay tarifas registradas aún.</p>
-              <Button onClick={abrirNuevaTarifa} size="sm" className="rounded-full mt-3 bg-sky-600 hover:bg-sky-500 text-white">
+          )
+        ) : tarifasFiltradas.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-center py-12 border border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/50 px-4">
+            <DollarSign className="h-10 w-10 text-slate-500 mb-3" />
+            <p className="text-slate-200 font-semibold text-base">
+              {searchTerm ? 'Sin resultados' : 'No hay tarifas registradas aún'}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              {searchTerm ? 'Prueba con otro término de búsqueda.' : 'Crea tu primera tarifa para asignar a las estaciones.'}
+            </p>
+            {!searchTerm && (
+              <Button onClick={abrirNuevaTarifa} className="rounded-full h-9 px-4 text-xs font-semibold mt-4 bg-sky-600 hover:bg-sky-500 text-white">
                 <PlusCircle className="mr-1.5 h-4 w-4" />
                 Añadir Primera Tarifa
               </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {tarifasConDocId.map((tarifa) => (
-                <TarifaCard
-                  key={tarifa.docId}
-                  tarifa={tarifa}
-                  onEdit={abrirEditarTarifa}
-                  onDelete={setTarifaToDelete}
-                />
-              ))}
-            </div>
-          )}
-        </SurfaceCard>
-      )}
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {tarifasFiltradas.map((tarifa) => (
+              <TarifaCard
+                key={tarifa.docId}
+                tarifa={tarifa}
+                onEdit={abrirEditarTarifa}
+                onDelete={setTarifaToDelete}
+              />
+            ))}
+          </div>
+        )}
+      </SurfaceCard>
 
-      {/* Modales y Diálogos */}
       <TarifaDialog
         isOpen={isTarifaModalOpen}
         onOpenChange={setIsTarifaModalOpen}
@@ -197,6 +219,8 @@ export default function PaginaConfiguracionMesasUnificada() {
         onCancelMesa={() => setMesaToDelete(null)}
         onConfirmMesa={handleDeleteMesa}
       />
+
+      <BotonVolverArriba threshold={150} />
     </div>
   )
 }

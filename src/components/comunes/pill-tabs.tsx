@@ -32,6 +32,12 @@ interface PillTabsProps {
   autoFocusSearch?: boolean;
   /** En móvil (< sm), oculta los interruptores bajo un botón de filtros junto al buscador */
   collapsibleMobileTabs?: boolean;
+  /** En móvil (< sm), mantiene las pestañas integradas dentro de la misma píldora del buscador */
+  inlineMobileTabs?: boolean;
+  /** Contenido adicional (ej. selectores) que se muestra/oculta dentro del panel colapsable en móvil */
+  mobileExtraContent?: React.ReactNode;
+  /** Indica si hay un filtro extra activo para resaltar el botón de opciones en móvil */
+  hasActiveExtraFilter?: boolean;
 }
 
 /**
@@ -52,6 +58,9 @@ export function PillTabs({
   searchInputRef,
   autoFocusSearch = false,
   collapsibleMobileTabs = false,
+  inlineMobileTabs = false,
+  mobileExtraContent,
+  hasActiveExtraFilter = false,
 }: PillTabsProps) {
   const hasSearch = typeof onSearchChange === 'function';
   const [showMobileTabs, setShowMobileTabs] = useState(false);
@@ -157,7 +166,8 @@ export function PillTabs({
   return (
     <div className={cn('w-full', className)}>
       {/* ================= VISTA MÓVIL (< sm): Buscador arriba y Pestañas abajo ================= */}
-      <div className="flex sm:hidden flex-col w-full">
+      {!inlineMobileTabs && (
+        <div className="flex sm:hidden flex-col w-full">
         {/* Fila 1 móvil: Buscador + botón opcional de filtros/interruptores */}
         <div className="flex items-center gap-2 w-full">
           <div className="flex-1 min-w-0 h-10 px-3 bg-[#252526] rounded-full border border-[#2e2e2e] focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500 flex items-center gap-2 transition-all">
@@ -199,13 +209,13 @@ export function PillTabs({
                 'h-10 w-10 rounded-full border flex items-center justify-center shrink-0 transition-colors relative',
                 showMobileTabs
                   ? 'bg-sky-600 border-sky-500 text-white shadow-sm'
-                  : tabs[0] && value !== tabs[0].id
+                  : (tabs[0] && value !== tabs[0].id) || hasActiveExtraFilter
                   ? 'bg-[#252526] border-sky-500/60 text-sky-400 hover:bg-[#313131]'
                   : 'bg-[#252526] border-[#2e2e2e] text-slate-300 hover:bg-[#313131]'
               )}
             >
               <SlidersHorizontal className="h-4 w-4" />
-              {!showMobileTabs && tabs[0] && value !== tabs[0].id && (
+              {!showMobileTabs && ((tabs[0] && value !== tabs[0].id) || hasActiveExtraFilter) && (
                 <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-sky-400" />
               )}
             </button>
@@ -221,7 +231,7 @@ export function PillTabs({
               : 'grid-rows-[0fr] opacity-0 mt-0 pointer-events-none'
           )}
         >
-          <div className="overflow-hidden">
+          <div className="overflow-hidden space-y-2">
             <Tabs
               value={value}
               onValueChange={(val) => {
@@ -277,14 +287,17 @@ export function PillTabs({
             })}
           </TabsList>
         </Tabs>
+            {mobileExtraContent}
           </div>
         </div>
       </div>
+      )}
 
-      {/* ================= VISTA ESCRITORIO (sm+): Buscador y Pestañas en la misma píldora ================= */}
+      {/* ================= VISTA ESCRITORIO (sm+ o inlineMobileTabs): Buscador y Pestañas en la misma píldora ================= */}
       <div
         className={cn(
-          'hidden sm:flex w-full h-11 p-1 bg-[#252526] rounded-full border border-[#2e2e2e] has-[input:focus]:border-sky-500 has-[input:focus]:ring-1 has-[input:focus]:ring-sky-500 items-center gap-1.5 transition-all',
+          inlineMobileTabs ? 'flex' : 'hidden sm:flex',
+          'w-full h-11 p-1 bg-[#252526] rounded-full border border-[#2e2e2e] has-[input:focus]:border-sky-500 has-[input:focus]:ring-1 has-[input:focus]:ring-sky-500 items-center gap-1.5 transition-all',
           listClassName
         )}
       >
@@ -348,10 +361,13 @@ export function PillTabs({
                       }, 20);
                     }
                   }}
-                  className="h-full rounded-full text-xs font-semibold data-[state=active]:bg-sky-600 data-[state=active]:text-white flex items-center justify-center gap-1.5 px-3 transition-all"
+                  className={cn(
+                    'h-full rounded-full text-xs font-semibold data-[state=active]:bg-sky-600 data-[state=active]:text-white flex items-center justify-center gap-1.5 transition-all',
+                    inlineMobileTabs ? 'px-2.5 sm:px-3' : 'px-3'
+                  )}
                 >
                   {Icon && <Icon className="h-3.5 w-3.5 shrink-0" />}
-                  <span className="truncate">{tab.label}</span>
+                  <span className={cn('truncate', inlineMobileTabs && 'hidden sm:inline')}>{tab.label}</span>
                   {hasCount && (
                     <CountBadge
                       count={tab.count!}

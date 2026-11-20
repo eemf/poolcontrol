@@ -65,6 +65,7 @@ export const PERMISSIONS_GROUPS: PermissionGroup[] = [
       { key: 'mant.clientes', label: 'Gestionar Clientes', description: 'Permite administrar el padrón de clientes y proveedores.' },
       { key: 'config.productos', label: 'Catálogo de Productos', description: 'Permite crear y editar productos físicos y recetas.' },
       { key: 'mant.productos_virt', label: 'Productos Virtuales', description: 'Permite gestionar servicios y monedas virtuales.' },
+      { key: 'mant.promociones', label: 'Gestión de Promociones', description: 'Permite crear, activar y administrar promociones y ofertas.' },
       { key: 'mant.roles', label: 'Gestionar Roles', description: 'Permite crear y editar los perfiles de acceso (Admin).' },
       { key: 'mant.cuentas', label: 'Cuentas Financieras', description: 'Permite administrar las cuentas de efectivo y bancos.' },
     ]
@@ -76,7 +77,6 @@ export const PERMISSIONS_GROUPS: PermissionGroup[] = [
       { key: 'config.permisos', label: 'Asignar Permisos', description: 'Permite otorgar privilegios a roles y usuarios.' },
       { key: 'config.mesas', label: 'Configurar Estaciones', description: 'Permite definir las mesas, consolas y sus tarifas.' },
       { key: 'config.tragamonedas', label: 'Configurar Máquinas', description: 'Permite dar de alta y configurar tragamonedas.' },
-      { key: 'pruebas.ver', label: 'Acceso a Pruebas', description: 'Permite ver los modelos y páginas de prueba de la aplicación.' },
     ]
   }
 ];

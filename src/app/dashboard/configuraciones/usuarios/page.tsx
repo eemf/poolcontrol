@@ -1,5 +1,6 @@
 'use client'
 
+import { BotonVolverArriba } from "@/components/comunes"
 import { EncabezadoUsuarios } from "./_components/EncabezadoUsuarios"
 import { ListaUsuarios } from "./_components/ListaUsuarios"
 import { ModalUsuario } from "./_components/ModalUsuario"
@@ -14,6 +15,9 @@ export default function PaginaUsuariosSucursal() {
     errorPermisos,
     searchTerm,
     setSearchTerm,
+    sortOrder,
+    setSortOrder,
+    totalItems,
     currentPage,
     setCurrentPage,
     itemsPerPage,
@@ -41,7 +45,7 @@ export default function PaginaUsuariosSucursal() {
   if (!isMounted) return null
 
   return (
-    <div className="space-y-6 pb-2">
+    <div className="space-y-4 sm:space-y-6 pb-2">
       <EncabezadoUsuarios
         onNuevoUsuario={() => { resetForm(); setIsModalOpen(true); }}
         deshabilitado={errorPermisos}
@@ -49,9 +53,12 @@ export default function PaginaUsuariosSucursal() {
 
       <ListaUsuarios
         usuarios={paginatedUsuarios}
+        totalItems={totalItems}
         cargando={cargando}
         terminoBusqueda={searchTerm}
         onSearchChange={setSearchTerm}
+        orden={sortOrder}
+        onSortOrderChange={setSortOrder}
         onEditar={setEditingUser}
         onEliminar={setUserToDelete}
         onCambiarPassword={(u) => {
@@ -91,6 +98,8 @@ export default function PaginaUsuariosSucursal() {
         onConfirmar={handleDelete}
         procesando={loading}
       />
+
+      <BotonVolverArriba threshold={150} />
     </div>
   )
 }

@@ -158,7 +158,7 @@ export function DialogoUltimosMovimientos({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl w-[94vw] max-w-xl bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 p-4 sm:p-5 rounded-2xl shadow-2xl font-body overflow-hidden flex flex-col max-h-[88vh]">
         {/* Cabecera del diálogo */}
-        <DialogHeader className="space-y-1.5 pb-2.5 border-b border-[#2e2e2e] text-left">
+        <DialogHeader className="text-left">
           <div className="flex items-center gap-2.5">
             <div className="h-9 w-9 rounded-full bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
               <History className="h-4.5 w-4.5" />
@@ -213,7 +213,7 @@ export function DialogoUltimosMovimientos({
         </div>
 
         {/* Listado de movimientos con scroll fluido sin paginación */}
-        <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-1 max-h-[62vh] pt-1">
+        <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-0 sm:pr-1 max-h-[62vh] pt-1">
           {movimientosFiltrados.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center text-slate-400 border border-dashed border-[#2e2e2e] rounded-xl bg-[#252526]/40 p-6">
               <Clock className="h-8 w-8 text-slate-500 mb-2" />
@@ -236,7 +236,7 @@ export function DialogoUltimosMovimientos({
               return (
                 <div
                   key={mov.id}
-                  className="rounded-xl bg-[#141414] border border-[#2e2e2e] px-3 py-2.5 space-y-1 hover:border-[#3c3c3c] transition-colors"
+                  className="rounded-xl bg-[#252526] border border-[#2e2e2e] px-3 py-2.5 space-y-1 hover:border-[#383838] transition-colors"
                 >
                   {/* Fila 1: Tipo + #Venta + Cliente | Monto Total a la derecha */}
                   <div className="flex items-center justify-between gap-2">
@@ -246,6 +246,12 @@ export function DialogoUltimosMovimientos({
                       {idVentaStr && (
                         <span className="text-[11px] font-bold tabular-nums text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20 shrink-0">
                           #{idVentaStr}
+                        </span>
+                      )}
+
+                      {mov.promocionNombre && (
+                        <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30 shrink-0">
+                          {mov.promocionNombre}
                         </span>
                       )}
 
@@ -311,15 +317,15 @@ export function DialogoUltimosMovimientos({
         </div>
 
         {/* Pie del modal */}
-        <div className="pt-2.5 border-t border-[#2e2e2e] flex items-center justify-between gap-3">
+        <div className="pt-1 flex items-center justify-between gap-3">
           <p className="text-[11px] text-slate-400 truncate">
             Mostrando <strong className="text-slate-200 font-bold">{movimientosFiltrados.length}</strong> operaciones del turno en tiempo real.
           </p>
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={() => onOpenChange(false)}
-            className="rounded-full h-8 px-4 text-xs font-semibold border-[#2e2e2e] bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 shrink-0"
+            className="rounded-full h-9 px-5 text-xs font-medium border border-[#2e2e2e] bg-[#252526] hover:bg-[#313131] text-slate-200 shrink-0"
           >
             Cerrar
           </Button>

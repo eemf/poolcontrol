@@ -134,12 +134,13 @@ export default function PaginaCierreCaja() {
           <Button
             variant="secondary"
             asChild
-            className="rounded-full h-9 w-9 sm:w-auto p-0 sm:px-3.5 text-xs font-semibold bg-[#252526] border border-[#2e2e2e] text-slate-200 hover:bg-[#313131] gap-1.5 inline-flex items-center justify-center shrink-0"
+            className="rounded-full h-9 px-3.5 text-xs font-semibold bg-[#252526] border border-[#2e2e2e] text-slate-200 hover:bg-[#313131] gap-1.5 inline-flex items-center justify-center shrink-0"
             title="Historial de Cierres"
             aria-label="Historial de Cierres"
           >
             <Link href="/dashboard/cierre-caja/historial">
               <History className="h-4 w-4 text-sky-400 shrink-0" />
+              <span className="sm:hidden">Historial</span>
               <span className="hidden sm:inline">Historial de Cierres</span>
             </Link>
           </Button>

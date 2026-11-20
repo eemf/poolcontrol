@@ -1,139 +1,150 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Edit, Trash2, CheckCircle, Key, FileText } from "lucide-react";
+import { Loader2, Edit, Trash2, CheckCircle2, Key, FileText, ShieldCheck } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import type { Rol } from "@/lib/tipos";
-import { cn } from "@/lib/utils";
 
 interface ListadoRolesProps {
   roles: Rol[] | null;
   cargando: boolean;
   onEditar: (rol: Rol) => void;
-  onEliminar: (rolId: string) => void;
+  onEliminar: (rol: Rol) => void;
 }
 
 export function ListadoRoles({ roles, cargando, onEditar, onEliminar }: ListadoRolesProps) {
   if (cargando) {
-    return <div className="flex justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-3 text-slate-400">
+        <Loader2 className="h-10 w-10 animate-spin text-sky-400" />
+        <span className="text-xs">Cargando roles y permisos...</span>
+      </div>
+    );
   }
 
   if (!roles || roles.length === 0) {
     return (
-      <div className="py-20 text-center border-2 border-dashed rounded-lg text-muted-foreground bg-muted/5 font-body">
-        <p>No hay roles definidos para esta sucursal.</p>
+      <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 rounded-xl border border-dashed border-[#2e2e2e] bg-[#252526]/50 p-6 font-body">
+        <ShieldCheck className="h-10 w-10 mb-3 text-slate-500" />
+        <p className="font-semibold text-base text-slate-200">No hay roles definidos</p>
+        <p className="text-xs text-slate-400 mt-1">Crea tu primer rol para configurar sus capacidades.</p>
       </div>
     );
   }
 
   return (
-    <Card className="border-none shadow-none bg-transparent font-body overflow-hidden">
-      <CardContent className="p-0">
-        <Accordion type="single" collapsible className="w-full space-y-3">
-          {roles.map(rol => {
-            // Lógica de agrupación de permisos por categoría
-            const groupedPermissions = (rol.permisos || []).reduce((acc, p) => {
-              const [cat, action] = p.split('.');
-              const category = cat.charAt(0).toUpperCase() + cat.slice(1);
-              const label = action ? action.charAt(0).toUpperCase() + action.slice(1) : category;
-              
-              if (!acc[category]) acc[category] = [];
-              acc[category].push(label);
-              return acc;
-            }, {} as Record<string, string[]>);
+    <Accordion type="single" collapsible className="w-full space-y-2.5 font-body">
+      {roles.map((rol) => {
+        const groupedPermissions = (rol.permisos || []).reduce((acc, p) => {
+          const [cat, action] = p.split('.');
+          const category = cat.charAt(0).toUpperCase() + cat.slice(1);
+          const label = action ? action.charAt(0).toUpperCase() + action.slice(1) : category;
 
-            return (
-              <AccordionItem 
-                value={(rol as any).id} 
-                key={(rol as any).id} 
-                className="border rounded-lg bg-card-foreground/5 hover:bg-card-foreground/[0.08] transition-all overflow-hidden shadow-sm"
-              >
-                <AccordionTrigger className="px-4 py-4 hover:no-underline font-body">
-                  <div className="flex flex-1 items-center justify-between pr-4 text-left gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-base text-foreground truncate">{rol.nombre}</p>
-                      <p className="text-[10px] font-medium text-muted-foreground tracking-tight mt-0.5">
-                        {(rol.permisos?.length || 0)} Capacidades configuradas
-                      </p>
-                    </div>
-                    <Badge className="bg-primary text-white border-none rounded-full font-bold px-3 h-6 text-[10px] shrink-0">
-                      Activo
-                    </Badge>
+          if (!acc[category]) acc[category] = [];
+          acc[category].push(label);
+          return acc;
+        }, {} as Record<string, string[]>);
+
+        const numPermisos = rol.permisos?.length || 0;
+
+        return (
+          <AccordionItem
+            value={(rol as any).id}
+            key={(rol as any).id}
+            className="rounded-xl border border-[#2e2e2e] hover:border-[#383838] bg-[#252526] transition-all overflow-hidden shadow-sm"
+          >
+            <AccordionTrigger className="px-3.5 py-3 sm:px-4 sm:py-3.5 hover:no-underline hover:bg-[#2e2e2e]/30 transition-colors data-[state=open]:border-b data-[state=open]:border-[#2e2e2e]">
+              <div className="flex-1 flex items-center justify-between gap-3 text-left pr-1.5 sm:pr-2.5 min-w-0">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-9 w-9 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+                    <ShieldCheck className="h-4 w-4" />
                   </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-4 pb-4">
-                  <div className="border-t border-muted-foreground/10 pt-4 mt-2 space-y-6">
-                    {/* Sección Descripción */}
-                    <div className="space-y-2">
-                      <h4 className="text-[10px] font-black text-muted-foreground tracking-widest uppercase flex items-center gap-2">
-                        <FileText className="h-3 w-3" /> Perfil de Responsabilidades
-                      </h4>
-                      <p className="text-sm font-medium text-foreground/80 pl-1">
-                        {rol.descripcion || "Sin descripción detallada disponible."}
-                      </p>
-                    </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-sm sm:text-base text-slate-100 truncate">{rol.nombre}</p>
+                    <p className="text-[11px] text-slate-400 font-medium mt-0.5 tabular-nums">
+                      {numPermisos} {numPermisos === 1 ? 'capacidad configurada' : 'capacidades configuradas'}
+                    </p>
+                  </div>
+                </div>
+                <Badge className="rounded-full text-[10px] font-semibold px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
+                  Activo
+                </Badge>
+              </div>
+            </AccordionTrigger>
 
-                    {/* Sección Permisos Estructurada */}
-                    <div className="space-y-4">
-                      <h4 className="text-[10px] font-black text-muted-foreground tracking-widest uppercase flex items-center gap-2">
-                        <Key className="h-3 w-3 text-primary" /> Matriz de Permisos Detallada
-                      </h4>
-                      
-                      {rol.permisos && rol.permisos.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {Object.entries(groupedPermissions).map(([category, perms]) => (
-                            <div key={category} className="bg-background/50 rounded-xl border border-muted-foreground/10 p-3 shadow-sm">
-                              <p className="text-[9px] font-black text-primary uppercase tracking-tighter mb-2 border-b border-primary/10 pb-1">
-                                {category}
-                              </p>
-                              <div className="flex flex-wrap gap-1.5">
-                                {perms.map(p => (
-                                  <div 
-                                    key={p} 
-                                    className="flex items-center gap-1.5 bg-muted/50 text-foreground/80 px-2 py-1 rounded-md text-[10px] font-bold border border-muted-foreground/10 transition-colors hover:bg-muted"
-                                  >
-                                    <CheckCircle className="h-3 w-3 text-emerald-500" />
-                                    {p}
-                                  </div>
-                                ))}
+            <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e]">
+              <div className="space-y-4">
+                <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3.5 py-3 space-y-1">
+                  <h4 className="text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5 text-sky-400" />
+                    Perfil de responsabilidades
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-200">
+                    {rol.descripcion || "Sin descripción detallada disponible."}
+                  </p>
+                </div>
+
+                <div className="space-y-2.5">
+                  <h4 className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                    <Key className="h-3.5 w-3.5 text-sky-400" />
+                    Matriz de permisos detallada
+                  </h4>
+
+                  {numPermisos > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {Object.entries(groupedPermissions).map(([category, perms]) => (
+                        <div key={category} className="bg-[#252526] rounded-xl border border-[#2e2e2e] p-3 space-y-2">
+                          <p className="text-xs font-bold text-sky-400 border-b border-[#2e2e2e] pb-1.5">
+                            {category}
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {perms.map((p) => (
+                              <div
+                                key={p}
+                                className="flex items-center gap-1.5 bg-[#1e1e1e] text-slate-200 px-2.5 py-1 rounded-full text-[11px] font-medium border border-[#2e2e2e]"
+                              >
+                                <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
+                                {p}
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      ) : (
-                        <div className="bg-background/50 rounded-xl border border-dashed border-muted-foreground/20 p-6 text-center">
-                          <span className="text-xs text-muted-foreground italic">Este rol no cuenta con privilegios asignados todavía.</span>
-                        </div>
-                      )}
+                      ))}
                     </div>
+                  ) : (
+                    <div className="bg-[#252526]/50 rounded-xl border border-dashed border-[#2e2e2e] p-6 text-center">
+                      <span className="text-xs text-slate-400 italic">
+                        Este rol no cuenta con privilegios asignados todavía.
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-                    {/* Acciones del Registro */}
-                    <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t border-dashed border-muted-foreground/20">
-                      <button 
-                        className="rounded-full h-11 sm:h-9 px-5 font-bold text-xs bg-sky-600 hover:bg-sky-700 text-white shadow-sm flex items-center justify-center gap-2 transition-transform active:scale-95 w-full sm:w-auto"
-                        onClick={() => onEditar(rol)}
-                      >
-                        <Edit className="h-4 w-4" />
-                        Editar Rol
-                      </button>
-                      <button 
-                        className="rounded-full h-11 sm:h-9 px-5 font-bold text-xs bg-destructive hover:bg-destructive/90 text-white shadow-sm flex items-center justify-center gap-2 transition-transform active:scale-95 w-full sm:w-auto"
-                        onClick={() => onEliminar((rol as any).id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            );
-          })}
-        </Accordion>
-      </CardContent>
-    </Card>
+                <div className="flex justify-end gap-2 pt-3 border-t border-[#2e2e2e]">
+                  <Button
+                    size="sm"
+                    className="rounded-full h-8 px-4 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-sm"
+                    onClick={() => onEditar(rol)}
+                  >
+                    <Edit className="mr-1.5 h-3.5 w-3.5" />
+                    Editar Rol
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="rounded-full h-8 px-4 text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 shadow-sm"
+                    onClick={() => onEliminar(rol)}
+                  >
+                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                    Eliminar
+                  </Button>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        );
+      })}
+    </Accordion>
   );
 }

@@ -12,13 +12,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, KeyRound, Loader2, Mail, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, Loader2, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useFirebase, useUser } from '@/firebase';
-import {
-  cambiarPasswordUsuario,
-  enviarCorreoRestablecimiento,
-} from '@/lib/firebase/servicios/usuarios-auth';
+import { cambiarPasswordUsuario } from '@/lib/firebase/servicios/usuarios-auth';
 
 interface UsuarioParaPassword {
   authUid: string;
@@ -47,7 +44,6 @@ export function DialogoCambiarPassword({
   const [confirmarPassword, setConfirmarPassword] = useState('');
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [cargandoDirecto, setCargandoDirecto] = useState(false);
-  const [cargandoEmail, setCargandoEmail] = useState(false);
   const [errorLocal, setErrorLocal] = useState<string | null>(null);
 
   const resetFormulario = () => {
@@ -102,7 +98,7 @@ export function DialogoCambiarPassword({
       } else {
         if (resultado.code === 'ADMIN_CREDENTIALS_NEEDED') {
           setErrorLocal(
-            'Para cambio directo se requieren credenciales de servicio en local. Puedes usar el botón de abajo para enviarle un enlace de restablecimiento al correo.'
+            'Para cambio directo se requieren credenciales de servicio configuradas en el servidor.'
           );
         } else {
           setErrorLocal(resultado.message);
@@ -118,66 +114,37 @@ export function DialogoCambiarPassword({
     }
   };
 
-  const handleEnviarEmail = async () => {
-    if (!usuario?.email) return;
-
-    setCargandoEmail(true);
-    setErrorLocal(null);
-
-    try {
-      const resultado = await enviarCorreoRestablecimiento(auth, usuario.email);
-      if (resultado.ok) {
-        toast({
-          title: 'Enlace enviado',
-          description: resultado.message,
-        });
-        resetFormulario();
-        onOpenChange(false);
-        onSuccess?.();
-      } else {
-        setErrorLocal(resultado.message);
-        toast({
-          variant: 'destructive',
-          title: 'Error al enviar enlace',
-          description: resultado.message,
-        });
-      }
-    } finally {
-      setCargandoEmail(false);
-    }
-  };
-
   if (!usuario) return null;
 
   return (
     <Dialog open={abierto} onOpenChange={handleCerrar}>
-      <DialogContent className="sm:max-w-md rounded-3xl font-body border-none shadow-2xl p-6">
-        <DialogHeader className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-              <KeyRound className="h-5 w-5" />
+      <DialogContent className="sm:max-w-md bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-2xl p-5 sm:p-6 shadow-2xl font-body flex flex-col max-h-[90vh]">
+        <DialogHeader className="shrink-0">
+          <div className="flex items-center gap-3 pr-6">
+            <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+              <KeyRound className="w-5 h-5" />
             </div>
-            <div>
-              <DialogTitle className="font-headline text-lg font-bold">
+            <div className="text-left min-w-0">
+              <DialogTitle className="font-headline text-lg font-bold text-slate-100 leading-tight truncate">
                 Modificar contraseña
               </DialogTitle>
-              <DialogDescription className="text-xs font-body text-muted-foreground">
-                Usuario: <span className="font-semibold text-foreground">{usuario.nombre}</span> ({usuario.email})
+              <DialogDescription className="text-xs text-slate-400 mt-0.5 truncate">
+                Usuario: <span className="font-semibold text-slate-200">{usuario.nombre}</span> ({usuario.email})
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <form onSubmit={handleActualizarPassword} className="space-y-4 pt-2">
+        <form onSubmit={handleActualizarPassword} className="space-y-3.5 pt-2">
           {errorLocal && (
-            <div className="p-3 bg-destructive/10 text-destructive text-xs rounded-2xl border border-destructive/20 flex items-start gap-2 animate-in fade-in">
-              <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="p-3 bg-rose-500/15 text-rose-300 text-xs rounded-xl border border-rose-500/30 flex items-start gap-2 animate-in fade-in">
+              <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
               <span>{errorLocal}</span>
             </div>
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="nueva-password" className="text-xs font-semibold ml-1">
+            <Label htmlFor="nueva-password" className="text-xs font-medium ml-1 text-slate-200 block">
               Nueva contraseña
             </Label>
             <div className="relative">
@@ -187,8 +154,8 @@ export function DialogoCambiarPassword({
                 placeholder="Mínimo 6 caracteres"
                 value={nuevaPassword}
                 onChange={(e) => setNuevaPassword(e.target.value)}
-                className="rounded-full h-11 pr-10 border-muted-foreground/20"
-                disabled={cargandoDirecto || cargandoEmail}
+                className="rounded-full h-10 pr-10 bg-[#252526] border-[#2e2e2e] text-sm text-slate-100 placeholder:text-slate-500"
+                disabled={cargandoDirecto}
                 required
                 autoComplete="new-password"
               />
@@ -196,7 +163,7 @@ export function DialogoCambiarPassword({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full text-muted-foreground hover:bg-transparent"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full text-slate-400 hover:text-slate-200 hover:bg-[#313131]"
                 onClick={() => setMostrarPassword(!mostrarPassword)}
                 tabIndex={-1}
               >
@@ -206,7 +173,7 @@ export function DialogoCambiarPassword({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="confirmar-password" className="text-xs font-semibold ml-1">
+            <Label htmlFor="confirmar-password" className="text-xs font-medium ml-1 text-slate-200 block">
               Confirmar contraseña
             </Label>
             <div className="relative">
@@ -216,77 +183,43 @@ export function DialogoCambiarPassword({
                 placeholder="Repite la contraseña"
                 value={confirmarPassword}
                 onChange={(e) => setConfirmarPassword(e.target.value)}
-                className="rounded-full h-11 pr-10 border-muted-foreground/20"
-                disabled={cargandoDirecto || cargandoEmail}
+                className="rounded-full h-10 pr-10 bg-[#252526] border-[#2e2e2e] text-sm text-slate-100 placeholder:text-slate-500"
+                disabled={cargandoDirecto}
                 required
                 autoComplete="new-password"
               />
             </div>
           </div>
 
-          <div className="pt-2">
+          <DialogFooter className="pt-2 shrink-0 flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => handleCerrar(false)}
+              disabled={cargandoDirecto}
+              className="rounded-full h-9 px-5 text-xs font-medium bg-[#252526] hover:bg-[#313131] text-slate-200 border border-[#2e2e2e]"
+            >
+              Cerrar
+            </Button>
             <Button
               type="submit"
-              disabled={cargandoDirecto || cargandoEmail || !nuevaPassword}
-              className="w-full rounded-full h-11 font-bold shadow-md shadow-primary/20 gap-2"
+              disabled={cargandoDirecto || !nuevaPassword}
+              className="rounded-full h-9 px-6 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md gap-2"
             >
               {cargandoDirecto ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Actualizando contraseña...
+                  Actualizando...
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="h-4 w-4" />
-                  Guardar nueva contraseña
+                  Guardar
                 </>
               )}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-
-        <div className="relative my-2">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-dashed border-muted-foreground/20" />
-          </div>
-          <div className="relative flex justify-center text-[10px] uppercase tracking-wider font-semibold">
-            <span className="bg-background px-2 text-muted-foreground">O envía un enlace</span>
-          </div>
-        </div>
-
-        <div>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={cargandoDirecto || cargandoEmail}
-            onClick={handleEnviarEmail}
-            className="w-full rounded-full h-10 text-xs font-medium gap-2 border-muted-foreground/20 hover:bg-primary/5"
-          >
-            {cargandoEmail ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                Enviando correo...
-              </>
-            ) : (
-              <>
-                <Mail className="h-3.5 w-3.5 text-primary" />
-                Enviar enlace de restablecimiento al correo
-              </>
-            )}
-          </Button>
-        </div>
-
-        <DialogFooter className="pt-2">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => handleCerrar(false)}
-            disabled={cargandoDirecto || cargandoEmail}
-            className="w-full rounded-full text-xs text-muted-foreground"
-          >
-            Cerrar
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

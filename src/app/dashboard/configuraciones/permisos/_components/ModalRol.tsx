@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
@@ -32,69 +31,107 @@ export function ModalRol({
 }: ModalRolProps) {
   return (
     <Dialog open={abierto} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent className="sm:max-w-2xl rounded-3xl p-0 overflow-hidden text-foreground border-none shadow-2xl flex flex-col max-h-[90vh] gap-0">
-        <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0">
-          <DialogHeader className="p-6 pb-4 shrink-0 bg-background">
-            <DialogTitle className="font-headline text-xl">{editando ? "Editar Rol" : "Nuevo Rol"}</DialogTitle>
-            <DialogDescription className="text-xs font-body">Define las capacidades de acceso para este rol.</DialogDescription>
+      <DialogContent className="sm:max-w-2xl bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-2xl p-5 sm:p-6 shadow-2xl font-body flex flex-col max-h-[90vh]">
+        <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 gap-4">
+          <DialogHeader className="shrink-0">
+            <div className="flex items-center gap-3 pr-6">
+              <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="text-left min-w-0">
+                <DialogTitle className="font-headline text-lg font-bold text-slate-100 leading-tight truncate">
+                  {editando ? "Editar Rol" : "Nuevo Rol"}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-400 mt-0.5 truncate">
+                  Define las capacidades de acceso para este rol.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          
-          <div className="flex-1 overflow-y-auto bg-muted/5">
-            <div className="space-y-8 p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-bold tracking-widest text-muted-foreground ml-1">Nombre del Rol*</Label>
-                  <Input value={form.nombre} onChange={e => form.setNombre(e.target.value)} required placeholder="Ej: Cajero Principal" className="rounded-full h-11 border-muted-foreground/20 focus:ring-primary" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-bold tracking-widest text-muted-foreground ml-1">Descripción</Label>
-                  <Input value={form.descripcion} onChange={e => form.setDescripcion(e.target.value)} placeholder="Ej: Encargado de ventas y caja" className="rounded-full h-11 border-muted-foreground/20 focus:ring-primary" />
-                </div>
-              </div>
 
-              <div className="space-y-6">
-                <h3 className="font-bold text-xs border-b pb-2 text-primary tracking-widest flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4" /> Matriz de Privilegios
-                </h3>
-                {PERMISSIONS_GROUPS.map(group => (
-                  <div key={group.groupName} className="space-y-4 p-5 rounded-2xl bg-muted/20 border border-muted/40 shadow-sm">
-                    <h4 className="text-[10px] font-black text-muted-foreground tracking-widest border-l-2 border-primary/40 pl-2">{group.groupName}</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {group.permissions.map(perm => (
-                        <div 
-                          key={perm.key} 
-                          className="flex items-start space-x-3 bg-background p-4 rounded-xl border border-muted/40 shadow-sm transition-all hover:border-primary/30 group relative" 
-                        >
-                          <Checkbox 
-                            id={`perm-${perm.key}`} 
-                            checked={form.permisos.has(perm.key)} 
-                            onCheckedChange={() => form.onTogglePermiso(perm.key)}
-                            className="mt-0.5"
-                          />
-                          <Label 
-                            htmlFor={`perm-${perm.key}`} 
-                            className="flex-1 space-y-1 text-left cursor-pointer"
-                          >
-                            <span className="text-sm font-bold leading-none group-hover:text-primary transition-colors block">{perm.label}</span>
-                            <p className="text-[10px] text-muted-foreground font-body leading-tight opacity-80 font-normal">{perm.description}</p>
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+          <div className="flex-1 overflow-y-auto min-h-0 space-y-5 p-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium ml-1 text-slate-200 block">Nombre del rol*</Label>
+                <Input
+                  value={form.nombre}
+                  onChange={e => form.setNombre(e.target.value)}
+                  onClick={e => e.currentTarget.select()}
+                  required
+                  placeholder="Ej: Cajero Principal"
+                  className="rounded-full h-10 bg-[#252526] border-[#2e2e2e] text-sm text-slate-100 placeholder:text-slate-500"
+                />
               </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium ml-1 text-slate-200 block">Descripción</Label>
+                <Input
+                  value={form.descripcion}
+                  onChange={e => form.setDescripcion(e.target.value)}
+                  onClick={e => e.currentTarget.select()}
+                  placeholder="Ej: Encargado de ventas y caja"
+                  className="rounded-full h-10 bg-[#252526] border-[#2e2e2e] text-sm text-slate-100 placeholder:text-slate-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3.5">
+              <h3 className="font-semibold text-xs border-b border-[#2e2e2e] pb-2 text-sky-400 flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" /> Matriz de privilegios
+              </h3>
+              {PERMISSIONS_GROUPS.map(group => (
+                <div key={group.groupName} className="space-y-3 p-4 rounded-xl bg-[#252526] border border-[#2e2e2e]">
+                  <h4 className="text-xs font-bold text-slate-200 border-l-2 border-sky-500 pl-2">
+                    {group.groupName}
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {group.permissions.map(perm => (
+                      <div
+                        key={perm.key}
+                        className="flex items-start space-x-3 bg-[#1e1e1e] p-3 rounded-xl border border-[#2e2e2e] transition-colors hover:border-sky-500/40 group"
+                      >
+                        <Checkbox
+                          id={`perm-${perm.key}`}
+                          checked={form.permisos.has(perm.key)}
+                          onCheckedChange={() => form.onTogglePermiso(perm.key)}
+                          className="mt-0.5 border-slate-500 data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                        />
+                        <Label
+                          htmlFor={`perm-${perm.key}`}
+                          className="flex-1 space-y-1 text-left cursor-pointer"
+                        >
+                          <span className="text-xs sm:text-sm font-semibold leading-none text-slate-100 group-hover:text-sky-400 transition-colors block">
+                            {perm.label}
+                          </span>
+                          <p className="text-[11px] text-slate-400 font-body leading-tight font-normal">
+                            {perm.description}
+                          </p>
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          <DialogFooter className="p-6 bg-background shrink-0 sm:justify-between flex flex-col-reverse sm:flex-row gap-3">
+          <DialogFooter className="pt-2 shrink-0 flex-row items-center justify-between sm:justify-between gap-2 sm:space-x-0">
             <DialogClose asChild>
-              <button type="button" className="rounded-full border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8 font-bold w-full sm:w-auto">Cancelar</button>
+              <Button
+                type="button"
+                variant="secondary"
+                className="rounded-full h-9 px-5 text-xs font-medium bg-[#252526] hover:bg-[#313131] text-slate-200 border border-[#2e2e2e]"
+              >
+                Cancelar
+              </Button>
             </DialogClose>
-            <button type="submit" disabled={procesando} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-12 font-bold w-full sm:w-auto shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+            <Button
+              type="submit"
+              disabled={procesando}
+              className="rounded-full h-9 px-6 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-md flex items-center gap-2"
+            >
               {procesando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {editando ? "Actualizar Rol" : "Guardar Rol"}
-            </button>
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

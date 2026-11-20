@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast"
 import type { ProductoVirtual } from "@/lib/tipos"
 
 // Componentes Refactorizados
+import { BotonVolverArriba } from "@/components/comunes"
 import { EncabezadoProductosVirtuales } from "./_components/EncabezadoProductosVirtuales"
 import { ListaProductosVirtuales } from "./_components/ListaProductosVirtuales"
 import { ModalProductoVirtual } from "./_components/ModalProductoVirtual"
@@ -26,6 +27,7 @@ export default function PaginaProductosVirtuales() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("name-asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -85,11 +87,28 @@ export default function PaginaProductosVirtuales() {
 
   const filteredProducts = useMemo(() => {
     const term = searchTerm.toLowerCase();
-    return productosConDocId.filter(p => 
+    const filtered = productosConDocId.filter(p => 
       (p.nombre || '').toLowerCase().includes(term) ||
       (p.categoria || '').toLowerCase().includes(term)
     );
-  }, [productosConDocId, searchTerm]);
+    return filtered.sort((a, b) => {
+      switch (sortOrder) {
+        case 'name-desc':
+          return (b.nombre || '').localeCompare(a.nombre || '');
+        case 'price-asc':
+          return (a.precioVenta || 0) - (b.precioVenta || 0);
+        case 'price-desc':
+          return (b.precioVenta || 0) - (a.precioVenta || 0);
+        case 'name-asc':
+        default:
+          return (a.nombre || '').localeCompare(b.nombre || '');
+      }
+    });
+  }, [productosConDocId, searchTerm, sortOrder]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortOrder]);
 
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -154,14 +173,17 @@ export default function PaginaProductosVirtuales() {
   if (!isMounted) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <EncabezadoProductosVirtuales onNuevoProducto={() => { setEditingProduct(null); setIsModalOpen(true); }} />
       
       <ListaProductosVirtuales 
         productos={paginatedProducts}
+        totalItems={filteredProducts.length}
         cargando={isLoadingProductos || isLoadingSucursal}
         terminoBusqueda={searchTerm}
         onSearchChange={setSearchTerm}
+        orden={sortOrder}
+        onSortOrderChange={setSortOrder}
         onEditar={setEditingProduct}
         onEliminar={setProductToDelete}
         paginacion={{
@@ -197,6 +219,8 @@ export default function PaginaProductosVirtuales() {
         onConfirmar={handleDelete}
         procesando={loading}
       />
+
+      <BotonVolverArriba threshold={150} />
     </div>
   );
 }

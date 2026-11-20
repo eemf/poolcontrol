@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback, FormEvent } from "react"
-import { useFirebase, useUser, useCollection, useMemoFirebase } from "@/firebase"
+import { useFirebase, useUser, useCollection, useDoc, useMemoFirebase } from "@/firebase"
 import { collection, doc, setDoc, deleteDoc, query, runTransaction, orderBy } from "firebase/firestore"
 import { useSucursal } from "@/hooks/use-sucursal"
 import { useToast } from "@/hooks/use-toast"
@@ -58,6 +58,12 @@ export function useCatalogoProductos() {
 
   const { data: rawProductos, isLoading: isLoadingProductos } = useCollection<Producto>(productosQuery)
 
+  const generalesRef = useMemoFirebase(
+    () => (firestore && sucursalId) ? doc(firestore, `sucursales/${sucursalId}/generales/actual`) : null,
+    [firestore, sucursalId]
+  )
+  const { data: generalesData } = useDoc<{ ubicacionesProducto?: string[] }>(generalesRef)
+
   useEffect(() => {
     setIsMounted(true)
   }, [])
@@ -81,12 +87,38 @@ export function useCatalogoProductos() {
   }, [rawProductos])
 
   const ubicacionesDisponibles = useMemo(() => {
+    if (Array.isArray(generalesData?.ubicacionesProducto)) {
+      return generalesData.ubicacionesProducto
+    }
     const defaultSet = new Set(['Estantes', 'Refris', 'Congeladores', 'Mostrador', 'Bodega'])
     ;(rawProductos || []).forEach(p => {
       if (p.ubicacion && p.ubicacion.trim()) defaultSet.add(p.ubicacion.trim())
     })
     return Array.from(defaultSet)
-  }, [rawProductos])
+  }, [generalesData, rawProductos])
+
+  const agregarUbicacion = useCallback(async (nuevaUbicacion: string) => {
+    const limpia = nuevaUbicacion.trim()
+    if (!limpia || !firestore || !sucursalId) return
+    const yaExiste = ubicacionesDisponibles.some(u => u.toLowerCase() === limpia.toLowerCase())
+    if (yaExiste) {
+      const existente = ubicacionesDisponibles.find(u => u.toLowerCase() === limpia.toLowerCase())!
+      setUbicacion(existente)
+      return
+    }
+    const nuevaLista = [...ubicacionesDisponibles, limpia]
+    await setDoc(doc(firestore, `sucursales/${sucursalId}/generales/actual`), { ubicacionesProducto: nuevaLista }, { merge: true })
+    setUbicacion(limpia)
+    toast({ title: "Ubicación agregada", description: `"${limpia}" se añadió al listado.` })
+  }, [firestore, sucursalId, ubicacionesDisponibles, toast])
+
+  const eliminarUbicacion = useCallback(async (ubicacionAEliminar: string) => {
+    if (!ubicacionAEliminar || !firestore || !sucursalId) return
+    const nuevaLista = ubicacionesDisponibles.filter(u => u !== ubicacionAEliminar)
+    await setDoc(doc(firestore, `sucursales/${sucursalId}/generales/actual`), { ubicacionesProducto: nuevaLista }, { merge: true })
+    if (ubicacion === ubicacionAEliminar) setUbicacion('')
+    toast({ title: "Ubicación eliminada", description: `"${ubicacionAEliminar}" fue removida del listado.` })
+  }, [firestore, sucursalId, ubicacionesDisponibles, ubicacion, toast])
 
   const filteredProducts = useMemo(() => {
     let result = productosConDocId.filter(p => {
@@ -108,7 +140,7 @@ export function useCatalogoProductos() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, sortOrder, ubicacionFiltro])
+  }, [searchTerm, sortOrder, ubicacionFiltro, itemsPerPage])
 
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage
@@ -229,11 +261,14 @@ export function useCatalogoProductos() {
     ubicacionFiltro,
     setUbicacionFiltro,
     ubicacionesDisponibles,
+    agregarUbicacion,
+    eliminarUbicacion,
     currentPage,
     setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
     totalPages,
+    totalItems: filteredProducts.length,
     paginatedProducts,
     productosConDocId,
     isModalOpen,

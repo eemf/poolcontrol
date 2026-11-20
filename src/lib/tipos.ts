@@ -89,12 +89,46 @@ export interface Cliente {
   permiteCredito?: boolean;
 }
 
+export type TipoPromocion = 'nxm' | 'precio_especial' | 'combo' | 'porcentaje';
+
+export interface VigenciaPromocion {
+  fechaInicio?: Timestamp | string;
+  fechaFin?: Timestamp | string;
+  diasSemana?: number[]; // 0 (Dom) - 6 (Sáb)
+  horaInicio?: string;   // "HH:mm"
+  horaFin?: string;      // "HH:mm"
+}
+
+export interface Promocion {
+  id: string;
+  idPromocion: number;
+  sucursalId: string;
+  nombre: string;
+  descripcion?: string;
+  tipo: TipoPromocion;
+  activa: boolean;
+  // Reglas según tipo
+  cantidadLleva?: number;       // nxm (ej. 2)
+  cantidadPaga?: number;        // nxm (ej. 1)
+  combinable?: boolean;         // nxm: permite combinar distintos productos de la promo
+  precioPromocion?: number;     // precio_especial (ej. Q10.00 en lugar de Q12.00)
+  cantidadRequerida?: number;   // combo (ej. 2 unidades)
+  precioPaquete?: number;       // combo (ej. Q20.00)
+  porcentajeDescuento?: number; // porcentaje (ej. 15)
+  // Productos a los que aplica
+  productosIds: string[];
+  vigencia?: VigenciaPromocion;
+  fechaCreacion?: Timestamp;
+  fechaActualizacion?: Timestamp;
+}
+
 export interface DetalleVenta {
   idDetalle: number;
   idProducto: string;
   nombreProducto: string;
   cantidad: number;
   precioUnitario: number;
+  precioOriginal?: number;
   subtotal: number;
   saldo: number;
   pagadoEfectivo: number;
@@ -104,6 +138,12 @@ export interface DetalleVenta {
   fechaAgregado: string | Date | Timestamp;
   ingredientesConsumidos?: { productoId: string; cantidad: number }[];
   esVirtual?: boolean;
+  promocionAplicada?: {
+    id: string;
+    nombre: string;
+    tipo: TipoPromocion;
+    descuento: number;
+  };
   metadata?: {
     tipo?: 'alquiler' | 'ajuste' | 'consumo';
     modo?: 'libre' | 'definido';

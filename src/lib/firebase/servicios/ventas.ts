@@ -1,6 +1,7 @@
 'use client';
 import { doc, runTransaction, Timestamp, Firestore, collection, query, where, getDocs, increment, updateDoc, getDoc, DocumentSnapshot, limit } from 'firebase/firestore';
-import type { Venta, DetalleVenta, Pago, Producto, ProductoVirtual } from '@/lib/tipos';
+import type { Venta, DetalleVenta, Pago, Producto, ProductoVirtual, Promocion } from '@/lib/tipos';
+import { evaluarPromocionItem } from '@/lib/promociones/calcular-promociones';
 import { getFullGenerales, toDate, validarSucursal } from './utils';
 import { registrarMovimientoInventario } from './historial-inventario';
 import { registrarAuditoria } from './auditoria';
@@ -498,10 +499,19 @@ export async function procesarVentaRapidaConId(
   productoId: string,
   productoData: Producto | ProductoVirtual,
   esVirtual: boolean,
-  metodoPago: 'Efectivo' | 'Tarjeta' = 'Efectivo'
+  metodoPago: 'Efectivo' | 'Tarjeta' = 'Efectivo',
+  promociones?: Promocion[]
 ) {
     const sid = validarSucursal(sucursalId);
     const productoRef = doc(firestore, `sucursales/${sid}/${esVirtual ? 'productos_virtuales' : 'productos'}`, productoId);
+
+    let promosEvaluar = promociones;
+    if (!promosEvaluar) {
+        const promosSnap = await getDocs(
+            query(collection(firestore, `sucursales/${sid}/promociones`), where('activa', '==', true))
+        );
+        promosEvaluar = promosSnap.docs.map(d => ({ id: d.id, ...d.data() } as Promocion));
+    }
 
     return runTransaction(firestore, async (transaction) => {
         const [productoDoc, generalesDoc, corrVentaDoc, corrPagoDoc, corrDetalleDoc, corrHistorialDoc] = await Promise.all([
@@ -573,7 +583,20 @@ export async function procesarVentaRapidaConId(
             });
         }
         
-        const totalVenta = comando.cantidad * precioUnitario;
+        const evalPromo = evaluarPromocionItem(
+            {
+                id: productoId,
+                productoId,
+                nombre: nombreVenta,
+                precioVenta: precioUnitario,
+                cantidad: comando.cantidad,
+                omitirPromocion: comando.indicePreparacion !== undefined,
+            },
+            promosEvaluar || []
+        );
+
+        const totalVenta = evalPromo.subtotalFinal;
+        const precioUnitarioFinal = evalPromo.precioUnitarioEfectivo;
         const nuevoIdVenta = (corrVentaDoc.data()?.correlativo || 0) + 1;
         const nuevoIdPago = (corrPagoDoc.data()?.correlativo || 0) + 1;
         const nuevoIdDetalle = (corrDetalleDoc.data()?.correlativo || 0) + 1;
@@ -581,13 +604,19 @@ export async function procesarVentaRapidaConId(
 
         const detalle: DetalleVenta = {
             idDetalle: nuevoIdDetalle, idProducto: productoId, nombreProducto: nombreVenta,
-            cantidad: comando.cantidad, precioUnitario, subtotal: totalVenta, saldo: 0,
+            cantidad: comando.cantidad, precioUnitario: precioUnitarioFinal, subtotal: totalVenta, saldo: 0,
             pagadoEfectivo: metodoPago === 'Efectivo' ? totalVenta : 0, 
             pagadoTarjeta: metodoPago === 'Tarjeta' ? totalVenta : 0, 
             metodoPago: metodoPago,
             estado: 'Pagada', fechaAgregado: Timestamp.now(),
             esVirtual: esVirtual,
-            ingredientesConsumidos: ingredientesConsumidos
+            ingredientesConsumidos: ingredientesConsumidos,
+            ...(evalPromo.promocionAplicada
+                ? {
+                    precioOriginal: evalPromo.precioOriginal,
+                    promocionAplicada: evalPromo.promocionAplicada,
+                  }
+                : {}),
         };
         
         const ventaData: Omit<Venta, 'id'> = {
@@ -674,20 +703,22 @@ export async function procesarVentaRapidaConId(
             categoria: 'VENTAS',
             accion: 'VENTA_RAPIDA',
             titulo: `Venta Rápida #${nuevoIdVenta}`,
-            descripcion: `${comando.cantidad}x ${nombreVenta} - Q${totalVenta.toFixed(2)} (Efectivo)`,
+            descripcion: `${comando.cantidad}x ${nombreVenta}${evalPromo.promocionAplicada ? ` [${evalPromo.promocionAplicada.nombre}]` : ''} - Q${totalVenta.toFixed(2)} (Efectivo)`,
             detalles: {
                 idVenta: nuevoIdVenta,
                 idPago: nuevoIdPago,
                 producto: nombreVenta,
                 cantidad: comando.cantidad,
                 total: totalVenta,
-                esVirtual
+                esVirtual,
+                promocionNombre: evalPromo.promocionAplicada?.nombre || null,
             }
         }, transaction);
 
         return { 
             idVenta: nuevoIdVenta, 
             idPago: nuevoIdPago, 
+            promocionAplicada: evalPromo.promocionAplicada,
             nombreProducto: nombreVenta, 
             cantidad: comando.cantidad, 
             totalVenta, 

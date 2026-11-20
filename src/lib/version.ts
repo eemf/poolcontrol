@@ -12,9 +12,492 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
+    build: 212,
+    fecha: "2026-11-20",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b212",
+    descripcion: "Sincronización dinámica de appVersion con releaseHistory[0] y publicación en rama v2.0.",
+    cambios: [
+      "Versionado (`version.ts`): `appVersion.version`, `appVersion.build` y `appVersion.date` ahora leen dinámicamente de `releaseHistory[0]` para reflejar siempre el build actual (Build 212)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 211,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b211",
+    descripcion: "Indicador visual de promoción aplicada en toast, última acción, movimientos del turno y auditoría de Venta Rápida.",
+    cambios: [
+      "Venta Rápida (`quick-dispatch-input.tsx`, `servicios/ventas.ts`, `movimiento-pos.ts`, `use-ventas.ts`, `dialogo-ultimos-movimientos.tsx`): Mostrado el nombre de la promoción en el título del toast, en la descripción de `pos:accion-reciente`, en la bitácora de auditoría y como badge verde en `Últimos Movimientos del Turno`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 210,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b210",
+    descripcion: "Aplicación automática de promociones vigentes en Venta Rápida (F8 / barra superior).",
+    cambios: [
+      "Venta Rápida (`servicios/ventas.ts`, `quick-dispatch-input.tsx`): Evaluada automáticamente la mejor promoción vigente en `procesarVentaRapidaConId` (con carga en tiempo real desde `QuickDispatchInput` y respaldo en Firestore), descontando el stock real entregado (`comando.cantidad`) y cobrando el subtotal promocional."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 209,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b209",
+    descripcion: "Promociones Fase 4: Integración en Punto de Venta (POS).",
+    cambios: [
+      "Promociones Fase 4 (`ventas/_hooks/use-ventas.ts`, `ventas/_components/pos-cart.tsx`): Suscripción en tiempo real a `promociones`, badge de promoción en el selector de productos, evaluación automática al agregar/quitar ítems pendientes en el carrito sin alterar el descuento real de inventario ni los precios base del catálogo, y visualización del ahorro y etiqueta de promoción en el carrito."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 208,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b208",
+    descripcion: "Promociones Fase 3: Módulo completo de Gestión de Promociones.",
+    cambios: [
+      "Promociones Fase 3 (`/dashboard/mantenimiento/promociones`): Creado hook `use-promociones.ts`, `<EncabezadoPromociones>`, `<ListaPromociones>` (filtros por estado y tipo, buscador, acordeones con switch rápido, paginación), `<ModalPromocion>` (reglas NxM, precio especial, combo, porcentaje, selector múltiple de productos y vigencia opcional), `<ModalConfirmacion>` y `<BotonVolverArriba>`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 207,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b207",
+    descripcion: "Promociones Fase 2: Motor puro de cálculo de promociones.",
+    cambios: [
+      "Promociones Fase 2 (`src/lib/promociones/calcular-promociones.ts`): Implementado motor de evaluación de vigencia (`esPromocionVigente`), cálculo individual (`evaluarPromocionItem`) y carrito con soporte NxM combinable (`calcularPromocionesCarrito`) para reglas 2x1/NxM, precio especial, combos y porcentaje."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 206,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b206",
+    descripcion: "Promociones Fase 1: Tipos base, permiso y enlace en navegación.",
+    cambios: [
+      "Promociones Fase 1 (`tipos.ts`, `permisos.ts`, `client-dashboard-nav.tsx`): Definidos `TipoPromocion`, `VigenciaPromocion`, `Promocion` y campos opcionales `precioOriginal` / `promocionAplicada` en `DetalleVenta`; añadido permiso `mant.promociones` y enlace `Promociones` en el menú de Mantenimiento."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 205,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b205",
+    descripcion: "Apertura lateral derecha y mayor elevación para el selector de sucursales en escritorio.",
+    cambios: [
+      "Navegación (`client-dashboard-nav.tsx`): Configurado el `DropdownMenuContent` de escritorio con `side=\"right\" align=\"end\" sideOffset={10}`, borde `border-[#3c3c3c]` y sombra profunda para desplegarse fuera de la barra lateral sin superponerse al menú principal."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 204,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b204",
+    descripcion: "Contraste y diferenciación visual del menú selector de sucursales en la barra lateral.",
+    cambios: [
+      "Navegación (`client-dashboard-nav.tsx`): Estilizado el menú desplegable y colapsable de `Cambiar de sucursal` con superficie elevada `bg-[#252526]`, borde visible `border-[#383838]`, separador `#2e2e2e`, elemento activo resaltado en `sky-600/20` con badge `Activa` y hover `#313131`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 203,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b203",
+    descripcion: "Texto visible 'Historial' en el botón de historial en vista móvil de Cierre de Caja.",
+    cambios: [
+      "Cierre de Caja (`cierre-caja/page.tsx`): Mostrado el texto `Historial` junto al icono en el botón de encabezado para vista móvil (`sm:hidden`) manteniendo `Historial de Cierres` en escritorio."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 202,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b202",
+    descripcion: "Eliminación efectiva de la barra de scroll visual en vista móvil incluyendo .custom-scrollbar.",
+    cambios: [
+      "Global (`globals.css`): Añadido `.custom-scrollbar` y `!important` dentro de `@media (max-width: 767px)` para suprimir por completo la barra de scroll en modales y páginas en vista móvil sin afectar el desplazamiento."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 201,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b201",
+    descripcion: "Corrección de colores, líneas y espaciado de scroll en DialogoUltimosMovimientos.",
+    cambios: [
+      "Ventas (`dialogo-ultimos-movimientos.tsx`): Eliminadas las líneas divisorias en encabezado y pie, reemplazado `bg-[#141414]` por `bg-[#252526]` en las tarjetas de movimientos, botón `Cerrar` homologado (`h-9 hover:bg-[#313131]`) y restaurado `sm:pr-1` en el listado para mantener el ancho original en escritorio."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 200,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b200",
+    descripcion: "Ocultamiento de scrollbars visuales en vista móvil y margen en escritorio.",
+    cambios: [
+      "Global (`globals.css`, `dialogo-ultimos-movimientos.tsx`): Ocultada la barra de scroll visual en pantallas móviles (`max-width: 767px`) manteniendo el desplazamiento táctil/rueda fluido, y ajustado `sm:pr-2` en el listado del modal de últimos movimientos en escritorio."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 199,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b199",
+    descripcion: "Eliminadas las líneas divisorias del encabezado y pie en los modales de Base y Extracción.",
+    cambios: [
+      "Gestión Tragamonedas (`modal-operacion-maquina.tsx`): Removidos `border-b border-[#2e2e2e]` de `<DialogHeader>` y `border-t border-[#2e2e2e]` de `<DialogFooter>` para coincidir con el diseño estándar aprobado."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 198,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b198",
+    descripcion: "Eliminación de las páginas y sección de navegación de Pruebas.",
+    cambios: [
+      "Pruebas (`src/app/dashboard/pruebas`, `client-dashboard-nav.tsx`, `permisos.ts`): Eliminado el directorio completo de páginas de pruebas, la sección `Pruebas` del menú lateral y el permiso `pruebas.ver`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 197,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b197",
+    descripcion: "Estandarización completa de Configuración de Tragamonedas y sus modales.",
+    cambios: [
+      "Tragamonedas (`page.tsx`, `tragamonedas-card.tsx`, `tragamonedas-dialog.tsx`, `eliminar-maquina-dialog.tsx`): Integrado `<PillTabs>` con buscador, filtros por estado (`Todas`, `Activas`, `Mant.`, `Inactivas`) y `Opciones` en móvil dentro de `<SurfaceCard variant=\"panel\">`, compactadas las tarjetas en `#252526` sin caja vacía ni franja oscura, añadido `<BotonVolverArriba>` y homologados los botones del modal (`bg-sky-600`, `h-9`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 196,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b196",
+    descripcion: "Alineación de etiquetas en el modal de Estación.",
+    cambios: [
+      "MesaDialog (`mesa-dialog.tsx`): Unificada la clase del `<Label>` de `Tarifa asignada*` (`text-xs font-medium ml-1 text-slate-200 block`) con `Tipo de estación` para alinear ambos selectores a la misma altura."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 195,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b195",
+    descripcion: "Uso de InputNumero sin flechas de incremento en modales de Estaciones y Tarifas.",
+    cambios: [
+      "Mesas (`mesa-dialog.tsx`, `tarifa-dialog.tsx`): Reemplazado `<Input type=\"number\">` por `<InputNumero>` en el número de estación y campos numéricos de tarifas para ocultar los controles de subir/bajar y evitar cambios accidentales con scroll o flechas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 194,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b194",
+    descripcion: "Reestructuración de contenedores y modales estándar en Estaciones y Tarifas.",
+    cambios: [
+      "Mesas (`page.tsx`, `mesa-card.tsx`, `tarifa-card.tsx`, `mesa-dialog.tsx`, `tarifa-dialog.tsx`): Integrado `<PillTabs>` con buscador dentro de `<SurfaceCard variant=\"panel\">`, corregido contraste de badges (`white` en pestaña activa), eliminada la franja oscura del pie en tarjetas, agregado `<BotonVolverArriba>` y homologados ambos modales (`flex-col max-h-[90vh]`, selects en `#1e1e1e`, prefijo `Q` y botones `h-9`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 193,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b193",
+    descripcion: "Estandarización visual y de controles en Permisos, Mesas y Tragamonedas.",
+    cambios: [
+      "Permisos (`page.tsx`, `EncabezadoPermisos.tsx`, `ListadoRoles.tsx`, `SeccionPersonal.tsx`, `ModalRol.tsx`): Aplicado `<PageHeader>`, `<SurfaceCard variant=\"panel\">`, `<PillTabs>` con `<CountBadge>`, acordeones en `#252526`/`#1e1e1e`, `<ModalConfirmacion>`, `<BotonVolverArriba>` y modal con paleta oficial y encabezado circular.",
+      "Mesas & Tragamonedas (`mesa-card.tsx`, `tarifa-card.tsx`, `mesa-dialog.tsx`, `tarifa-dialog.tsx`, `tragamonedas-card.tsx`): Homologadas tarjetas (`#252526`/`#1e1e1e`, botones píldora `Editar` y `Eliminar` `h-8`) y modales (`MesaDialog`, `TarifaDialog`) con encabezado de icono circular y pie en una sola fila (`h-9`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 192,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b192",
+    descripcion: "Botón de contraseña compacto solo con icono en vista móvil dentro de acordeones de Usuarios.",
+    cambios: [
+      "ListaUsuarios (`ListaUsuarios.tsx`): Ocultado el texto `Contraseña` en móvil (`hidden sm:inline`), dejando solo el icono `KeyRound` circular (`h-8 w-8`) y `flex-nowrap` para mantener los 3 botones de acción en una sola línea."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 191,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b191",
+    descripcion: "Simplificación de DialogoCambiarPassword sin envío de enlace y con pie en una sola fila.",
+    cambios: [
+      "Usuarios (`DialogoCambiarPassword.tsx`): Eliminada la opción de enviar enlace de restablecimiento por correo y alineados los botones `Cerrar` (izquierda) y `Guardar` (derecha) en una sola fila dentro del pie del modal."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 190,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b190",
+    descripcion: "Estandarización visual y de controles en DialogoCambiarPassword.",
+    cambios: [
+      "Usuarios (`DialogoCambiarPassword.tsx`): Aplicado fondo oficial `#1e1e1e`, borde `#2e2e2e`, icono circular `KeyRound` (`sky-400`), inputs en `#252526`, alerta de error en `rose-500/15`, botones píldora `h-9` y separador sin `bg-background` ni mayúsculas sostenidas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 189,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b189",
+    descripcion: "Estandarización visual y de controles en Gestión de Usuarios.",
+    cambios: [
+      "Usuarios (`page.tsx`, `use-usuarios-sucursal.ts`, `EncabezadoUsuarios.tsx`, `ListaUsuarios.tsx`, `ModalUsuario.tsx`): Aplicado `<SurfaceCard variant=\"panel\">`, `<PillTabs>` con buscador, ordenamiento (`A-Z`, `Z-A`, `Por rol`) y `Opciones` en móvil, acordeones con paleta `#1e1e1e`/`#252526`/`#2e2e2e`, `<Paginacion>`, `<BotonVolverArriba>` y modal con encabezado circular y controles estándar."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 188,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b188",
+    descripcion: "Estandarización visual y de controles en Gestión de Roles y Cuentas Financieras.",
+    cambios: [
+      "Roles (`page.tsx`, `EncabezadoRoles.tsx`, `ListaRoles.tsx`, `ModalRol.tsx`, `DialogoEliminarRol.tsx`): Aplicado `<PageHeader>`, `<SurfaceCard variant=\"panel\">`, `<PillTabs>` con buscador, ordenamiento y botón `Opciones` en móvil, `<Paginacion>`, `<BotonVolverArriba>` y modales con paleta `#1e1e1e`/`#252526`/`#2e2e2e`.",
+      "Cuentas (`page.tsx`, `cuenta-card.tsx`, `modal-cuenta.tsx`, `dialogo-eliminar-cuenta.tsx`): Integrado `<SurfaceCard variant=\"panel\">` con `<PillTabs>` (filtro por tipo `Todas`/`Efectivo`/`Bancaria` + buscador y `Opciones` en móvil), `<BotonVolverArriba>`, tarjetas con bordes `#2e2e2e` y modal con encabezado circular y prefijo `Q`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 187,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b187",
+    descripcion: "Controles estándar y paleta oficial en Modal de Producto Virtual.",
+    cambios: [
+      "ModalProductoVirtual (`ModalProductoVirtual.tsx`): Encabezado con icono circular translúcido (`Ghost`), prefijo `Q` en precio de venta, selección automática al hacer clic en inputs, `<Switch>` con colores oficiales (`sky-600` / `#313131`) y footer unificado con `ModalProducto`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 186,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b186",
+    descripcion: "Estandarización visual y de controles (escritorio y móvil) en Productos Virtuales.",
+    cambios: [
+      "Productos Virtuales (`page.tsx`, `EncabezadoProductosVirtuales.tsx`, `ListaProductosVirtuales.tsx`, `ModalProductoVirtual.tsx`, `DialogoEliminarProductoVirtual.tsx`): Aplicado `<PageHeader>`, `<SurfaceCard variant=\"panel\">`, `<PillTabs>` con buscador, ordenamiento (`A-Z`, `Z-A`, `Menor precio`, `Mayor precio`) y botón `Opciones` en móvil, acordeones con paleta oficial `#1e1e1e`/`#252526`/`#2e2e2e`, `<Paginacion>` y `<BotonVolverArriba>`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 185,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b185",
+    descripcion: "Selector de ubicaciones con agregar y eliminar persistentes en Modal de Producto.",
+    cambios: [
+      "Productos (`use-catalogo-productos.ts`, `page.tsx`, `ModalProducto.tsx`): Reemplazado el campo de texto de ubicación por un `<Select>` persistente en `generales/actual` (`ubicacionesProducto`), con botón `Agregar` en línea para crear nuevas ubicaciones y botón `Eliminar` para remover la ubicación seleccionada del listado."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 184,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b184",
+    descripcion: "Selector de ubicaciones integrado dentro del panel colapsable Opciones en móvil en Productos.",
+    cambios: [
+      "PillTabs & Productos (`pill-tabs.tsx`, `ListaProductos.tsx`): Agregadas las propiedades `mobileExtraContent` y `hasActiveExtraFilter` en `<PillTabs>` para incluir el selector de ubicaciones dentro del panel desplegable de `Opciones` junto al ordenamiento en vista móvil."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 183,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b183",
+    descripcion: "Rediseño de Gestión de Productos con paleta oficial, controles estándar y vista móvil.",
+    cambios: [
+      "Productos (`page.tsx`, `use-catalogo-productos.ts`, `EncabezadoProductos.tsx`, `ListaProductos.tsx`, `ModalProducto.tsx`): Integrado `<SurfaceCard variant='panel'>`, `<PillTabs>` con buscador y ordenamiento colapsable en móvil (`Opciones`), selector de ubicación en `#252526`, acordeones de 2 columnas sin `uppercase` con detalle en `#1e1e1e`/`#252526`, `<Paginacion>` estándar, `<BotonVolverArriba />` y modal actualizado con prefijos `Q` y selección al clic."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 182,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b182",
+    descripcion: "Portada y contenido del acordeón optimizados y más legibles en Clientes.",
+    cambios: [
+      "Clientes (`lista-clientes.tsx`): Portada con formato `#{id}. {nombre}` + teléfono abajo a la izquierda y tipo + estado de crédito apilados a la derecha; contenido interno en 3 tarjetas compactas (`Teléfono`, `Línea de Crédito`, `Consumo Interno`) sin switches deshabilitados pequeños."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 181,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b181",
+    descripcion: "Ordenamiento integrado al buscador mediante PillTabs y botón Opciones en móvil en Clientes.",
+    cambios: [
+      "Clientes (`lista-clientes.tsx`): Reemplazado el `Select` externo por `<PillTabs>` con las 4 opciones de orden (`ID Desc`, `ID Asc`, `A-Z`, `Z-A`) integradas al buscador en escritorio y colapsadas bajo el botón `Opciones` junto al buscador en vista móvil (`collapsibleMobileTabs`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 180,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b180",
+    descripcion: "Rediseño de Gestión de Clientes con paleta oficial, controles estándar y vista móvil responsiva.",
+    cambios: [
+      "Clientes (`page.tsx`, `encabezado-clientes.tsx`, `lista-clientes.tsx`, `modal-cliente.tsx`): Migrado a `<PageHeader>`, `<SurfaceCard variant='panel'>`, buscador en píldora con botón `X` de limpieza, selector de ordenamiento en `#252526`, acordeones con paleta `#1e1e1e`/`#252526`/`#2e2e2e`, badges `rounded-full` sin mayúsculas sostenidas, `<Paginacion>` estándar, `<BotonVolverArriba />` y modal limpio sin `bg-background`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 179,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b179",
+    descripcion: "Desglose del cálculo colapsable en el resumen de Cuadre Mensual.",
+    cambios: [
+      "Cuadre Mensual (`cuadre-mensual-resumen.tsx`): Ocultado por defecto el desglose de ingresos/compras/gastos dentro de un `<Accordion>` colapsable (`Ver detalle del cálculo`), dejando visible únicamente `Balance Neto Calculado`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 178,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b178",
+    descripcion: "Cuadre Mensual e Historial estandarizados con el mismo diseño que Cuadre Semanal.",
+    cambios: [
+      "Cuadre Mensual (`page.tsx`, `cuadre-mensual-lista.tsx`, `cuadre-mensual-resumen.tsx`): Unificado con el diseño de Cuadre Semanal (`#1e1e1e`/`#252526`/`#2e2e2e`, botón `Historial` con icono `emerald-400`, tarjetas con badge `Pendiente` en ámbar, panel lateral con icono circular, tarjetas `Total Ingresos`/`Total Egresos`, input `Balance a Liquidar` con prefijo `Q` y `<BotonVolverArriba />`).",
+      "Historial de Cuadres Mensuales (`historial/page.tsx`, `use-historial-cuadre-mensual.ts`, `cuadre-mensual-item-acordeon.tsx`, `detalle-cuadres-semanales.tsx`): Integrado `<PageHeader>` con `backHref`, buscador en píldora con botón `X`, `<Accordion value={openAccordionId ?? ''}>`, detalle compacto por filas, `<Paginacion>` estándar y `<BotonVolverArriba />`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 177,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b177",
+    descripcion: "Corregido el toggle de apertura/cierre en un solo clic en Historial de Cuadres Semanales.",
+    cambios: [
+      "Historial de Cuadres Semanales (`historial/page.tsx`): Cambiado `value={openAccordionId || undefined}` a `value={openAccordionId ?? ''}` en `<Accordion>` para mantener el componente controlado y evitar que se quede entreabierto en dos clics."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 176,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b176",
+    descripcion: "Detalle compacto y preciso dentro del acordeón de Historial de Cuadres Semanales.",
+    cambios: [
+      "Historial de Cuadres Semanales (`cuadre-item-acordeon.tsx`, `detalle-registros-procesados.tsx`): Unificados los KPIs superiores en 4 tarjetas compactas (`Ingresos`, `Egresos`, `Balance Neto`, `Liquidado`) más barra compacta de `Origen → Destino`; listas de registros procesados agrupadas por categoría en filas compactas con monto exacto (corregido `pagosTarjeta` en cierres con tarjeta) para ahorrar espacio en escritorio y móvil."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 175,
+    fecha: "2026-11-19",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b175",
+    descripcion: "Título simplificado en el contenedor de ingresos físicos de Cuadre Semanal.",
+    cambios: [
+      "Cuadre Semanal (`ingresos-fisicos.tsx`): Cambiado el título de `Ingresos del Período (Efectivo y Monedas)` a `Ingresos (Efectivo y Monedas)`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 174,
+    fecha: "2026-11-18",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b174",
+    descripcion: "Pestañas integradas dentro de la misma píldora del buscador en móvil para POS Ventas.",
+    cambios: [
+      "PillTabs & POS Ventas (`pill-tabs.tsx`, `pos-accounts.tsx`): Agregada la opción `inlineMobileTabs` en `<PillTabs>` y aplicada en `pos-accounts.tsx` para mantener el buscador y las pestañas `Pendientes` / `Crédito` integrados en la misma píldora también en móvil (sin separarlas en un botón aparte)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 173,
+    fecha: "2026-11-18",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b173",
+    descripcion: "Pestañas integradas al buscador en vista móvil en POS Ventas.",
+    cambios: [
+      "POS Ventas (`pos-accounts.tsx`): Activado `collapsibleMobileTabs` en `<PillTabs>` para integrar las pestañas `Pendientes` / `Crédito` bajo el botón `Opciones` junto al input de búsqueda en la vista móvil."
+    ]
+  },
+  {
+    version: "2.0.0",
     build: 172,
     fecha: "2026-11-17",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b172",
     descripcion: "Controles estándar, PillTabs, acordeones y Paginacion en Historial de Cuadres Semanales.",
@@ -4193,10 +4676,10 @@ export const releaseHistory: ReleaseItem[] = [
 ];
 
 export const appVersion = {
-  version: "2.0.0",
-  build: 14,
-  date: "2026-11-08",
-  publicadaActual: releaseHistory[0], // Build 14 (v2.0.0)
-  publicadaAnterior: releaseHistory[1], // Build 13 (v2.0.0)
+  version: releaseHistory[0].version,
+  build: releaseHistory[0].build,
+  date: releaseHistory[0].fecha,
+  publicadaActual: releaseHistory[0],
+  publicadaAnterior: releaseHistory[1],
   historial: releaseHistory
 };

@@ -29,7 +29,7 @@ export function MesaCard({ mesa, tarifas, onEdit, onDelete }: MesaCardProps) {
   }
 
   return (
-    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-white shadow-sm hover:border-slate-500 transition-colors">
+    <Card className="flex flex-col bg-[#252526] border-[#2e2e2e] text-slate-100 shadow-sm hover:border-[#383838] transition-colors rounded-xl overflow-hidden">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ export function MesaCard({ mesa, tarifas, onEdit, onDelete }: MesaCardProps) {
               {isConsola ? <Gamepad2 className="h-5 w-5" /> : <LayoutGrid className="h-5 w-5" />}
             </div>
             <div>
-              <CardTitle className="text-base font-bold text-white">
+              <CardTitle className="text-base font-bold text-slate-100">
                 {isConsola ? 'Consola' : 'Mesa'} {mesa.numeroMesa}
               </CardTitle>
               <CardDescription className="text-xs text-slate-400">{mesa.tipoDeMesa}</CardDescription>
@@ -47,29 +47,31 @@ export function MesaCard({ mesa, tarifas, onEdit, onDelete }: MesaCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-grow space-y-1.5">
-        <p className="text-xs font-medium text-slate-400">Tarifa Asignada</p>
-        <p className="text-sm font-semibold text-white bg-[#1e1e1e] p-2 rounded-lg border border-[#2e2e2e]">
-          {tarifa?.nombre || 'No asignada'}
-        </p>
+      <CardContent className="flex-grow pt-0 pb-3">
+        <div className="flex items-center justify-between gap-2 bg-[#1e1e1e] px-3 py-2 rounded-xl border border-[#2e2e2e]">
+          <span className="text-[11px] font-medium text-slate-400">Tarifa asignada</span>
+          <span className="text-xs font-semibold text-slate-100 truncate">
+            {tarifa?.nombre || 'No asignada'}
+          </span>
+        </div>
       </CardContent>
 
-      <CardFooter className="justify-end gap-2 border-t border-[#2e2e2e] bg-[#1e1e1e]/50 p-2.5">
+      <CardFooter className="justify-end gap-2 border-t border-[#2e2e2e] px-4 py-2.5">
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full text-slate-300 hover:text-white hover:bg-slate-700/50"
+          size="sm"
+          className="h-8 px-3.5 rounded-full text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-sm"
           onClick={() => onEdit(mesa)}
         >
-          <Edit className="h-4 w-4" />
+          <Edit className="mr-1.5 h-3.5 w-3.5" />
+          Editar
         </Button>
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-full"
+          size="sm"
+          className="h-8 px-3.5 rounded-full text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 shadow-sm"
           onClick={() => onDelete(mesa)}
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+          Eliminar
         </Button>
       </CardFooter>
     </Card>

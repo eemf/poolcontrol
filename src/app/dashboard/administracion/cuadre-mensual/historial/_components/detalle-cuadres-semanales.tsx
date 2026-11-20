@@ -28,19 +28,16 @@ export function DetalleCuadresSemanales({ ids, firestore, sucursalId }: DetalleC
     const fetchDetalles = async () => {
       setIsLoading(true)
       try {
-        const detallesPromises = ids.map(id => {
-          const docRef = doc(firestore, `sucursales/${sucursalId}/cuadre_semanal`, id)
-          return getDoc(docRef)
-        })
-
-        const docsSnapshots = await Promise.all(detallesPromises)
-        const fetchedDetalles = docsSnapshots
-          .filter(docSnap => docSnap.exists())
-          .map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as CuadreSemanalConId))
-
-        setDetalles(fetchedDetalles)
+        const docsSnapshots = await Promise.all(
+          ids.map(id => getDoc(doc(firestore, `sucursales/${sucursalId}/cuadre_semanal`, id)))
+        )
+        setDetalles(
+          docsSnapshots
+            .filter(docSnap => docSnap.exists())
+            .map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as CuadreSemanalConId))
+        )
       } catch (err) {
-        console.error("Error al cargar cuadres semanales:", err)
+        console.error('Error al cargar cuadres semanales:', err)
       } finally {
         setIsLoading(false)
       }
@@ -52,32 +49,31 @@ export function DetalleCuadresSemanales({ ids, firestore, sucursalId }: DetalleC
   if (!ids || ids.length === 0) return null
 
   return (
-    <div>
-      <h4 className="font-semibold mb-2 text-xs text-slate-300">
-        Cuadres Semanales Incluidos ({ids.length})
-      </h4>
+    <div className="rounded-xl border border-[#2e2e2e] bg-[#1e1e1e] overflow-hidden">
+      <div className="px-2.5 py-1.5 bg-[#1e1e1e] border-b border-[#2e2e2e] flex items-center justify-between text-[11px] font-semibold text-slate-300">
+        <span>Cuadres Semanales Incluidos</span>
+        <span className="text-slate-400 tabular-nums">{ids.length}</span>
+      </div>
+
       {isLoading ? (
-        <div className="flex justify-center p-2">
+        <div className="flex justify-center p-2.5">
           <Loader2 className="h-4 w-4 animate-spin text-sky-400" />
         </div>
       ) : (
-        <div className="space-y-1.5">
+        <div className="divide-y divide-[#2e2e2e]">
           {detalles.map(item => (
-            <div
-              key={item.id}
-              className="flex justify-between items-center text-xs p-2.5 bg-[#1e1e1e] rounded-lg border border-[#2e2e2e]"
-            >
-              <div>
-                <p className="font-semibold text-white truncate max-w-44">
+            <div key={item.id} className="px-2.5 py-1.5 flex items-center justify-between gap-2 text-xs hover:bg-[#313131]/50 transition-colors">
+              <div className="min-w-0 flex-1 flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                <span className="font-medium text-slate-100 truncate">
                   Cuadre Semanal #{item.idCuadreSemanal}
-                </p>
-                <p className="text-slate-400 text-[11px]">
-                  {format(item.fecha.toDate(), "dd/MM/yy hh:mm a", { locale: es })}
-                </p>
+                </span>
+                <span className="text-[10px] text-slate-400 shrink-0 tabular-nums">
+                  {format(item.fecha.toDate(), 'dd/MM hh:mm a', { locale: es })}
+                </span>
               </div>
-              <p className="font-bold text-sky-400">
+              <span className="font-bold text-sky-400 tabular-nums shrink-0">
                 Q{(item.resumen.balanceLiquidado ?? 0).toFixed(2)}
-              </p>
+              </span>
             </div>
           ))}
         </div>

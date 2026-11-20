@@ -1,5 +1,6 @@
 'use client'
 
+import { BotonVolverArriba } from "@/components/comunes"
 import { EncabezadoProductos } from "./_components/EncabezadoProductos"
 import { ListaProductos } from "./_components/ListaProductos"
 import { ModalProducto } from "./_components/ModalProducto"
@@ -17,11 +18,14 @@ export default function PaginaCatalogoProductos() {
     ubicacionFiltro,
     setUbicacionFiltro,
     ubicacionesDisponibles,
+    agregarUbicacion,
+    eliminarUbicacion,
     currentPage,
     setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
     totalPages,
+    totalItems,
     paginatedProducts,
     productosConDocId,
     isModalOpen,
@@ -40,11 +44,12 @@ export default function PaginaCatalogoProductos() {
   if (!isMounted) return null
 
   return (
-    <div className="space-y-6 pb-2">
+    <div className="space-y-4 font-body pb-10">
       <EncabezadoProductos onNuevoProducto={() => { resetForm(); setIsModalOpen(true); }} />
 
       <ListaProductos
         productos={paginatedProducts}
+        totalItems={totalItems}
         cargando={cargando}
         terminoBusqueda={searchTerm}
         onSearchChange={setSearchTerm}
@@ -71,6 +76,9 @@ export default function PaginaCatalogoProductos() {
         onSubmit={handleSubmit}
         procesando={loading}
         productosParaIngredientes={productosConDocId}
+        ubicacionesDisponibles={ubicacionesDisponibles}
+        onAgregarUbicacion={agregarUbicacion}
+        onEliminarUbicacion={eliminarUbicacion}
         form={form}
       />
 
@@ -81,6 +89,8 @@ export default function PaginaCatalogoProductos() {
         onConfirmar={handleDelete}
         procesando={loading}
       />
+
+      <BotonVolverArriba />
     </div>
   )
 }

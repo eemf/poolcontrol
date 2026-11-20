@@ -1,20 +1,20 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search, Loader2, Edit, Trash2, ChevronLeft, ChevronRight, ShieldCheck, FileText } from "lucide-react";
+import { SurfaceCard, PillTabs, Paginacion } from "@/components/comunes";
+import { ArrowDownAZ, ArrowUpZA, ArrowDown01, ArrowUp01, Loader2, Edit, Trash2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import type { Rol } from "@/lib/tipos";
 
 type RolConDocId = Rol & { docId: string };
 
 interface ListaRolesProps {
   roles: RolConDocId[];
+  totalItems: number;
   cargando: boolean;
   terminoBusqueda: string;
   onSearchChange: (val: string) => void;
+  orden: string;
+  onSortOrderChange: (val: string) => void;
   onEditar: (rol: RolConDocId) => void;
   onEliminar: (rol: RolConDocId) => void;
   paginacion: {
@@ -28,102 +28,105 @@ interface ListaRolesProps {
 
 export function ListaRoles({
   roles,
+  totalItems,
   cargando,
   terminoBusqueda,
   onSearchChange,
+  orden,
+  onSortOrderChange,
   onEditar,
   onEliminar,
   paginacion
 }: ListaRolesProps) {
   return (
-    <Card className="border rounded-lg transition-all bg-card-foreground/5 shadow-sm font-body overflow-hidden">
-      <CardHeader className="p-4 pb-2">
-        <div className="relative flex-grow w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nombre o descripción..."
-            className="pl-9 rounded-full h-10 border-muted-foreground/20"
-            value={terminoBusqueda}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
+    <SurfaceCard variant="panel" className="p-4 sm:p-5 space-y-4 font-body">
+      <PillTabs
+        value={orden}
+        onValueChange={onSortOrderChange}
+        searchValue={terminoBusqueda}
+        onSearchChange={onSearchChange}
+        searchPlaceholder="Buscar por nombre o descripción..."
+        collapsibleMobileTabs
+        tabs={[
+          { id: 'id-asc', label: 'Más antiguo', icon: ArrowUp01 },
+          { id: 'id-desc', label: 'Más reciente', icon: ArrowDown01 },
+          { id: 'name-asc', label: 'A-Z', icon: ArrowDownAZ },
+          { id: 'name-desc', label: 'Z-A', icon: ArrowUpZA },
+        ]}
+      />
+
+      {cargando ? (
+        <div className="flex flex-col items-center justify-center h-64 space-y-3 text-slate-400">
+          <Loader2 className="h-10 w-10 animate-spin text-sky-400" />
+          <span className="text-xs">Cargando roles...</span>
         </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        {cargando ? (
-          <div className="flex items-center justify-center h-64 text-muted-foreground">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          </div>
-        ) : roles.length > 0 ? (
-          <div className="space-y-2 mt-2">
-            {roles.map((rol) => (
-              <div 
-                key={rol.docId} 
-                className="flex flex-col sm:flex-row items-start sm:items-center p-4 border rounded-lg bg-card-foreground/5 hover:bg-muted/50 transition-all shadow-sm"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-foreground text-base truncate">{rol.nombre}</p>
-                  <p className="text-xs text-muted-foreground font-body">{rol.descripcion || 'Sin descripción'}</p>
+      ) : roles.length > 0 ? (
+        <div className="space-y-2.5">
+          {roles.map((rol) => (
+            <div
+              key={rol.docId}
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl border border-[#2e2e2e] hover:border-[#383838] bg-[#252526] transition-all shadow-sm"
+            >
+              <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                <div className="h-9 w-9 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0 mt-0.5 sm:mt-0">
+                  <ShieldCheck className="h-4 w-4" />
                 </div>
-                <div className="flex items-center gap-2 shrink-0 pt-4 sm:pt-0 sm:ml-auto">
-                  <Button 
-                    size="sm" 
-                    className="rounded-full h-9 px-5 font-bold text-xs bg-sky-600 hover:bg-sky-700 text-white shadow-sm"
-                    onClick={() => onEditar(rol)}
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
-                    Editar
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm" 
-                    className="rounded-full h-9 px-5 font-bold text-xs shadow-sm"
-                    onClick={() => onEliminar(rol)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Eliminar
-                  </Button>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-sm sm:text-base text-slate-100 truncate">{rol.nombre}</p>
+                    <span className="text-[11px] font-medium text-slate-400 tabular-nums shrink-0">
+                      #{rol.idRol}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5 line-clamp-2 sm:truncate">
+                    {rol.descripcion || 'Sin descripción'}
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-64 border-2 border-dashed rounded-lg bg-muted/5 m-2">
-            <ShieldCheck className="h-12 w-12 mb-4 text-primary/30" />
-            <p className="font-semibold text-lg">{terminoBusqueda ? "Sin resultados" : "No hay roles registrados"}</p>
-            <p className="text-xs mt-1">Crea tu primer rol para asignar permisos.</p>
-          </div>
-        )}
-      </CardContent>
-      {paginacion.totalPaginas > 1 && (
-        <CardFooter className="flex flex-col items-center gap-4 p-4 sm:flex-row sm:justify-between bg-muted/5">
-          <div className="flex items-center space-x-2">
-            <p className="text-xs font-medium text-muted-foreground">Filas por página</p>
-            <Select value={`${paginacion.itemsPorPagina}`} onValueChange={(v) => paginacion.onItemsPorPaginaChange(Number(v))}>
-              <SelectTrigger className="h-8 w-[70px] rounded-full text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[10, 20, 50, 100].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>{pageSize}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex w-full items-center justify-center space-x-2 sm:w-auto">
-            <Button variant="outline" size="sm" onClick={() => paginacion.onPaginaChange(paginacion.paginaActual - 1)} disabled={paginacion.paginaActual === 1} className="px-3 rounded-full h-8">
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              <span className="text-xs">Anterior</span>
-            </Button>
-            <div className="flex-shrink-0 text-xs font-bold text-muted-foreground px-2">
-              Pág. {paginacion.paginaActual} de {paginacion.totalPaginas}
+
+              <div className="flex items-center justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#2e2e2e]">
+                <Button
+                  size="sm"
+                  className="rounded-full h-8 px-4 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-sm"
+                  onClick={() => onEditar(rol)}
+                >
+                  <Edit className="mr-1.5 h-3.5 w-3.5" />
+                  Editar
+                </Button>
+                <Button
+                  size="sm"
+                  className="rounded-full h-8 px-4 text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 shadow-sm"
+                  onClick={() => onEliminar(rol)}
+                >
+                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                  Eliminar
+                </Button>
+              </div>
             </div>
-            <Button variant="outline" size="sm" onClick={() => paginacion.onPaginaChange(paginacion.paginaActual + 1)} disabled={paginacion.paginaActual === paginacion.totalPaginas} className="px-3 rounded-full h-8">
-              <span className="text-xs">Siguiente</span>
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </div>
-        </CardFooter>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center text-center text-slate-400 h-64 rounded-xl border border-dashed border-[#2e2e2e] bg-[#252526]/50 p-6">
+          <ShieldCheck className="h-10 w-10 mb-3 text-slate-500" />
+          <p className="font-semibold text-base text-slate-200">
+            {terminoBusqueda ? "Sin resultados" : "No hay roles registrados"}
+          </p>
+          <p className="text-xs text-slate-400 mt-1">
+            {terminoBusqueda ? "Prueba ajustando el término de búsqueda." : "Crea tu primer rol para asignar permisos."}
+          </p>
+        </div>
       )}
-    </Card>
+
+      {totalItems > 0 && (
+        <Paginacion
+          currentPage={paginacion.paginaActual}
+          totalPages={paginacion.totalPaginas}
+          totalItems={totalItems}
+          itemsPerPage={paginacion.itemsPorPagina}
+          onPageChange={paginacion.onPaginaChange}
+          onItemsPerPageChange={paginacion.onItemsPorPaginaChange}
+        />
+      )}
+    </SurfaceCard>
   );
 }
