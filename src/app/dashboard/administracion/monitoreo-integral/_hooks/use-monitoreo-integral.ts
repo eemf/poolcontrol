@@ -17,6 +17,10 @@ export const toDate = (fecha: any): Date => {
   return new Date(0);
 };
 
+/**
+ * Hook de monitoreo integral de turno (Flujo de Gaveta, Flujo de Monedas y Kardex de Inventario).
+ * Suscribe únicamente las colecciones requeridas por la pestaña activa para optimizar lecturas en Firestore.
+ */
 export function useMonitoreoIntegral() {
   const { firestore } = useFirebase();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
@@ -74,9 +78,10 @@ export function useMonitoreoIntegral() {
     };
   }, [periodoId, turnoActual, cierres]);
 
-  // 4. Consultas de movimientos filtradas por el período
+  // 4. Consultas condicionales por pestaña activa y rango del período
   const pagosQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId || !configPeriodo) return null;
+    if (tabActiva !== 'gaveta' && tabActiva !== 'monedas') return null;
     const baseRef = collection(firestore, `sucursales/${sucursalId}/pagos`);
     if (configPeriodo.fin) {
       return query(
@@ -87,11 +92,11 @@ export function useMonitoreoIntegral() {
       );
     }
     return query(baseRef, where('fecha', '>=', configPeriodo.inicio), orderBy('fecha', 'asc'));
-  }, [firestore, sucursalId, configPeriodo]);
+  }, [firestore, sucursalId, configPeriodo, tabActiva]);
   const { data: pagos, isLoading: isLoadingPagos } = useCollection<Pago>(pagosQuery);
 
   const inventarioQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId || !configPeriodo) return null;
+    if (!firestore || !sucursalId || !configPeriodo || tabActiva !== 'inventario') return null;
     const baseRef = collection(firestore, `sucursales/${sucursalId}/historial_inventario`);
     if (configPeriodo.fin) {
       return query(
@@ -102,17 +107,17 @@ export function useMonitoreoIntegral() {
       );
     }
     return query(baseRef, where('fecha', '>=', configPeriodo.inicio), orderBy('fecha', 'asc'));
-  }, [firestore, sucursalId, configPeriodo]);
+  }, [firestore, sucursalId, configPeriodo, tabActiva]);
   const { data: inventario, isLoading: isLoadingInventario } = useCollection<HistorialInventario>(inventarioQuery);
 
   const productosQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId) return null;
+    if (!firestore || !sucursalId || tabActiva !== 'inventario') return null;
     return collection(firestore, `sucursales/${sucursalId}/productos`);
-  }, [firestore, sucursalId]);
+  }, [firestore, sucursalId, tabActiva]);
   const { data: productos } = useCollection<Producto>(productosQuery);
 
   const tragamonedasQuery = useMemoFirebase(() => {
-    if (!firestore || !sucursalId || !configPeriodo) return null;
+    if (!firestore || !sucursalId || !configPeriodo || tabActiva !== 'monedas') return null;
     const baseRef = collectionGroup(firestore, 'historial');
     if (configPeriodo.fin) {
       return query(
@@ -124,7 +129,7 @@ export function useMonitoreoIntegral() {
       );
     }
     return query(baseRef, where('sucursalId', '==', sucursalId), where('fecha', '>=', configPeriodo.inicio), orderBy('fecha', 'asc'));
-  }, [firestore, sucursalId, configPeriodo]);
+  }, [firestore, sucursalId, configPeriodo, tabActiva]);
   const { data: movTraga, isLoading: isLoadingTraga } = useCollection<HistorialTragamonedas>(tragamonedasQuery);
 
   // Cálculos financieros

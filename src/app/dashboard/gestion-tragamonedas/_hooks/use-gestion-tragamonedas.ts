@@ -26,6 +26,9 @@ export interface Tragamonedas {
   estado: EstadoTragamonedas;
 }
 
+/**
+ * Hook de operación diaria de máquinas tragamonedas (bases, extracciones, préstamos y anulaciones).
+ */
 export interface TragamonedasConDocId extends Tragamonedas {
   docId: string;
 }

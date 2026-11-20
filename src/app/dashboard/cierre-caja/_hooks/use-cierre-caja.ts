@@ -18,6 +18,10 @@ export interface Cuenta {
   idCuenta: number;
 }
 
+/**
+ * Hook de arqueo y cierre de caja del turno actual.
+ * Consolida ventas pendientes, mesas activas y efectivo declarado para ejecutar el cierre atómico.
+ */
 export function useCierreCaja() {
   const { toast } = useToast();
   const { firestore, user, profile } = useFirebase();

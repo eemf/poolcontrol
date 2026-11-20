@@ -25,6 +25,10 @@ export interface ProductoElegiblePromo {
   esVirtual?: boolean
 }
 
+/**
+ * Hook de gestión CRUD para promociones de la sucursal (combos, paquetes y descuentos).
+ * Sincroniza productos físicos y virtuales elegibles para armar promociones en POS.
+ */
 export interface FormPromocionState {
   nombre: string
   descripcion: string

@@ -26,6 +26,10 @@ import { toDate } from '@/lib/firebase/servicios/utils';
 import { useSucursal } from '@/hooks/use-sucursal';
 import type { Mesa, Tarifa, Producto } from '@/lib/tipos';
 
+/**
+ * Hook principal de Sala de Juegos (mesas de billar y consolas).
+ * Gestiona cronómetros en tiempo real, tarifas, consumos ligados a inventario, traslados y cobros.
+ */
 export function useMesas() {
   const { toast } = useToast();
   const { firestore } = useFirebase();

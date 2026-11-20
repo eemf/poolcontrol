@@ -220,10 +220,10 @@ export function Header() {
               <TooltipTrigger asChild>
                 <Link
                   href="/dashboard/configuraciones/acerca-de"
-                  className="flex items-center justify-center rounded-xl p-1 hover:bg-sky-500/10 transition-colors shrink-0"
+                  className="flex items-center justify-center transition-transform hover:scale-105 shrink-0"
                   aria-label={`Versión v${appVersion.version} (Build ${appVersion.build})`}
                 >
-                  <BolaBillarIcon className="h-7 w-7 text-sky-400 shrink-0" />
+                  <BolaBillarIcon className="h-10 w-10 shrink-0" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent

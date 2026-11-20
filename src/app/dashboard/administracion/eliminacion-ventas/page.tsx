@@ -1,12 +1,16 @@
 'use client'
 
-import { PageHeader } from '@/components/comunes/page-header'
+import { BotonVolverArriba, PageHeader, SurfaceCard } from '@/components/comunes'
 import { Eraser, Loader2, ShieldAlert } from 'lucide-react'
 import { useEliminacionVentas } from './_hooks/use-eliminacion-ventas'
 import { PanelConfiguracionRango } from './_components/panel-configuracion-rango'
 import { PanelAdvertenciasVentas } from './_components/panel-advertencias-ventas'
 import { DialogoConfirmarPurga } from './_components/dialogo-confirmar-purga'
 
+/**
+ * Página de mantenimiento y depuración de registros de ventas por rango de identificación.
+ * Requiere permiso explícito (`reportes.eliminar_rango` o `ventas.eliminar_rango`).
+ */
 export default function PaginaMantenimientoVentas() {
   const {
     cargandoPermisos,
@@ -56,29 +60,31 @@ export default function PaginaMantenimientoVentas() {
         icon={Eraser}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-        <div className="md:col-span-2">
-          <PanelConfiguracionRango
-            desdeId={desdeId}
-            setDesdeId={setDesdeId}
-            hastaId={hastaId}
-            setHastaId={setHastaId}
-            excluirCredito={excluirCredito}
-            setExcluirCredito={setExcluirCredito}
-            excluirPendientes={excluirPendientes}
-            setExcluirPendientes={setExcluirPendientes}
-            procesando={procesando}
-            progreso={progreso}
-            puedeEjecutar={puedeEjecutar}
-            onEjecutarClick={() => setConfirmacionAbierta(true)}
-            resultado={resultado}
-          />
-        </div>
+      <SurfaceCard variant="panel" className="p-4 sm:p-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div className="md:col-span-2">
+            <PanelConfiguracionRango
+              desdeId={desdeId}
+              setDesdeId={setDesdeId}
+              hastaId={hastaId}
+              setHastaId={setHastaId}
+              excluirCredito={excluirCredito}
+              setExcluirCredito={setExcluirCredito}
+              excluirPendientes={excluirPendientes}
+              setExcluirPendientes={setExcluirPendientes}
+              procesando={procesando}
+              progreso={progreso}
+              puedeEjecutar={puedeEjecutar}
+              onEjecutarClick={() => setConfirmacionAbierta(true)}
+              resultado={resultado}
+            />
+          </div>
 
-        <div className="md:col-span-1">
-          <PanelAdvertenciasVentas />
+          <div className="md:col-span-1">
+            <PanelAdvertenciasVentas />
+          </div>
         </div>
-      </div>
+      </SurfaceCard>
 
       <DialogoConfirmarPurga
         open={confirmacionAbierta}
@@ -88,6 +94,8 @@ export default function PaginaMantenimientoVentas() {
         procesando={procesando}
         onConfirm={manejarEliminacion}
       />
+
+      <BotonVolverArriba threshold={150} />
     </div>
   )
 }

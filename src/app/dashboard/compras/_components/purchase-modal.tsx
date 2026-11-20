@@ -196,7 +196,7 @@ export function PurchaseModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl bg-[#1e1e1e] border-[#2e2e2e] text-slate-100 rounded-2xl overflow-visible p-5 sm:p-6 shadow-2xl font-body flex flex-col max-h-[90vh]">
-        <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-visible gap-4">
+        <form onSubmit={onSubmit} className="flex flex-col max-md:flex-none flex-1 min-h-0 overflow-visible gap-4">
           <DialogHeader className="shrink-0">
             <div className="flex items-center gap-3 pr-6">
               <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
@@ -213,7 +213,7 @@ export function PurchaseModal({
             </div>
           </DialogHeader>
 
-          <div className="flex flex-col flex-1 min-h-0 space-y-3.5">
+          <div className="flex flex-col max-md:flex-none flex-1 min-h-0 space-y-3.5">
             {/* Sección Proveedor y Monto Total en la misma fila */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
               <div className="flex-1 min-w-0 sm:max-w-lg">

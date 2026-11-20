@@ -12,9 +12,261 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
-    build: 221,
+    build: 241,
     fecha: "2026-11-20",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b241",
+    descripcion: "Corrección global de modales con teclado virtual en móvil evitando solapamiento de botones.",
+    cambios: [
+      "Manejador de Teclado y Diálogos (`mobile-keyboard-handler.tsx`, `dialog.tsx`): Sincronización dinámica de `--app-vv-height` y `--app-vv-offset-top` con `visualViewport` para ajustar y desplazar todos los modales por encima del teclado móvil sin amontonar botones.",
+      "Modal de Compras (`purchase-modal.tsx`): Corregido flujo flex en móvil (`max-md:flex-none`) para que el pie (`Cancelar` / `Finalizar Registro`) nunca se superponga sobre los campos del formulario."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 240,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b240",
+    descripcion: "Eliminada la sección temporal de Pruebas tras aplicar el icono oficial.",
+    cambios: [
+      "Menú Principal y Rutas (`client-dashboard-nav.tsx`, `src/app/dashboard/pruebas`): Removido el grupo `Pruebas` del menú y eliminada la carpeta temporal `pruebas/estilo-icono-app`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 239,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b239",
+    descripcion: "Aplicado el nuevo icono oficial Bola 8 Minimalista (40px sin fondo) en la aplicación, barra del cliente y Dashboard Maestro.",
+    cambios: [
+      "Icono Oficial (`bola-billar-icon.tsx`, `src/app/icon.svg`): Actualizado al diseño `Bola 8 Minimalista` con halo celeste para pestaña del navegador e icono global.",
+      "Barras Superiores (`header.tsx`, `admin-header.tsx`): Actualizado el tamaño a `40px` (`h-10 w-10`) sin caja de fondo tanto en Pool Control como en Admin Panel."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 238,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b238",
+    descripcion: "Aumentado tamaño de los iconos de prueba sin caja de fondo en Estilo de Icono de Aplicación.",
+    cambios: [
+      "Pruebas (`pruebas/estilo-icono-app/page.tsx`): Eliminada la caja de fondo del icono en la vista previa y tarjetas, aumentando el tamaño a `40px` en barra superior, `20px` en pestaña y `56px` en tarjetas."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 237,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b237",
+    descripcion: "Añadidos 2 diseños vectoriales basados en el emblema oficial de Billares M&M en Pruebas.",
+    cambios: [
+      "Pruebas (`pruebas/estilo-icono-app`): Añadidas las propuestas `6. Emblema Rey M&M (Original)` en rojo/negro/blanco y `7. Emblema Rey M&M (Tema 2.0)` adaptado a los tonos celestes del tema."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 236,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b236",
+    descripcion: "Nuevo grupo de menú Pruebas con galería comparativa de 5 estilos de icono de billar.",
+    cambios: [
+      "Menú Principal (`client-dashboard-nav.tsx`): Añadido grupo `Pruebas` con la opción `Estilo de Icono de Aplicación`.",
+      "Pruebas (`pruebas/estilo-icono-app/page.tsx`, `_components/IconosBillarGaleria.tsx`): Creada página comparativa con 5 iconos SVG de billar (Bola 8 Minimalista, Triángulo Rack, Tacos Cruzados, Mesa Vista Cenital y Bola 9 Moderna) y vista previa en vivo en barra superior y pestaña."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 235,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b235",
+    descripcion: "Fase 5 de optimización del Dashboard Cliente: unificación de listeners en Núcleo Operativo y límite en historial de ajustes.",
+    cambios: [
+      "Dashboard (`use-dashboard.ts`): Unificadas las consultas de ventas semanal y mensual en un solo listener `ventasRangoQuery` (reduciendo a la mitad las lecturas de `ventas`) y añadido `limit(12)` en `cuadre_mensual`.",
+      "Historial de Inventario (`use-historial-ajustes.ts`): Añadido `limit(50)` incremental para evitar descargas completas.",
+      "Cierre de Caja, Tragamonedas, Mesas y Ventas (`_hooks/*`): Añadida documentación JSDoc de arquitectura y flujos transaccionales."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 234,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b234",
+    descripcion: "Fase 4 de optimización del Dashboard Cliente: carga condicional por pestaña en Reportes y estandarización de Depuración.",
+    cambios: [
+      "Monitoreo Integral (`use-monitoreo-integral.ts`): Suscripción condicional a `pagos`, `historial_inventario`, `productos` y `historial` según la pestaña activa, evitando lecturas innecesarias al abrir el módulo.",
+      "Auditoría (`use-auditoria.ts`) y Eliminación de Ventas (`eliminacion-ventas/page.tsx`, `use-eliminacion-ventas.ts`): Añadido `<SurfaceCard variant=\"panel\">`, `<BotonVolverArriba />` y documentación JSDoc."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 233,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b233",
+    descripcion: "Fase 3 de optimización del Dashboard Cliente: modularización y documentación completa de Mantenimiento.",
+    cambios: [
+      "Clientes, Productos Virtuales y Roles (`clientes/_hooks/use-clientes.ts`, `productos-virtuales/_hooks/use-productos-virtuales.ts`, `roles/_hooks/use-roles.ts`): Extraída toda la lógica de Firestore, formularios y paginación a hooks dedicados.",
+      "Promociones y Cuentas (`promociones`, `cuentas`): Añadida documentación JSDoc en páginas y hooks."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 232,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b232",
+    descripcion: "Fase 2 de optimización del Dashboard Cliente: historiales acotados y modularización en Administración.",
+    cambios: [
+      "Compras (`compras/_hooks/use-compras.ts`) y Gastos (`gastos/page.tsx`, `_hooks/use-gastos.ts`): Extraído hook dedicado en Gastos y optimizadas consultas Firestore para cargar solo pendientes por defecto o últimos 50 registros históricos.",
+      "Traslados (`traslados/_hooks/use-traslados.ts`, `detalle-traslado-dialog.tsx`): Acotadas consultas de traslados (`limit(100)`) y compras recientes (`limit(50)`), y reemplazada tabla HTML por tarjetas responsivas.",
+      "Cuadre Tragamonedas y Mensual (`cuadre-tragamonedas/page.tsx`, `historial/_hooks/*`, `cuadre-mensual/_hooks/use-cuadre-mensual.ts`): Añadido `limit(50)` incremental en historiales, filtro `estadoMensual == 'pendiente'` en Firestore, `<SurfaceCard variant=\"panel\">` y documentación JSDoc."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 231,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b231",
+    descripcion: "Fase 1 de optimización del Dashboard Cliente: correcciones visuales críticas, historiales con límite y refactorización de Configuraciones.",
+    cambios: [
+      "Mesas (`mesas-dialogs.tsx`): Reemplazado `#141414` por `#1e1e1e` cumpliendo la paleta oficial de 3 capas.",
+      "Cuadre Semanal (`cuadre-semanal/_components/*`, `historial/_hooks/use-historial-cuadre-semanal.ts`): Migrados badges claros y clases `uppercase` a paleta oscura oficial, añadido `limit(50)` con carga incremental en historial y documentación completa.",
+      "Acerca del Sistema (`configuraciones/acerca-de/page.tsx`): Estandarizado con `<PageHeader>`, `<SurfaceCard>`, tarjetas `#252526`, `<Paginacion>` para historial de versiones y `<BotonVolverArriba>`.",
+      "Permisos (`configuraciones/permisos/page.tsx`, `_hooks/use-permisos-config.ts`) y Tragamonedas (`configuraciones/tragamonedas`): Extraída lógica a hook dedicado y añadida documentación JSDoc en español."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 230,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b230",
+    descripcion: "Métricas principales integradas en la barra superior del Admin Panel.",
+    cambios: [
+      "Admin Header (`src/app/components/admin-header.tsx`): Añadidas píldoras de métricas en tiempo real en la barra superior (Sucursales, Suscripciones activas, MRR, Comandos de voz y alertas Por atender) adaptadas a escritorio y móvil."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 229,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b229",
+    descripcion: "Implementación de métricas globales en tiempo real en el Dashboard Maestro.",
+    cambios: [
+      "Dashboard Maestro (`admin-success/page.tsx`, `_hooks/use-dashboard-maestro.ts`, `_components/MetricasMaestro.tsx`): Añadidas tarjetas KPI en tiempo real (sucursales registradas, suscripciones activas, ingreso mensual activo/proyectado MRR y usuarios globales), tabla de estado por sucursal y distribución de planes."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 228,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b228",
+    descripcion: "Unificación de colores del menú lateral e icono de Admin Panel.",
+    cambios: [
+      "Admin Nav y Header (`admin-dashboard-nav.tsx`, `admin-header.tsx`): Aplicados colores temáticos e iconos de color en el menú lateral (`variant=\"default\"` activo y `hover:bg-primary/10`), reemplazado icono de escudo por `BolaBillarIcon` en Admin Panel y adaptado el centro de notificaciones a la paleta oscura oficial."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 227,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b227",
+    descripcion: "Estandarización visual del Dashboard Maestro con el Design System oficial.",
+    cambios: [
+      "Dashboard Maestro (`admin-success/page.tsx`): Aplicado `<PageHeader>`, `<SurfaceCard variant=\"panel\">`, tarjetas en `#252526` con iconos circulares translúcidos, botones en píldora `h-9`, módulo de Suscripciones integrado y `<BotonVolverArriba>`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 226,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b226",
+    descripcion: "Refactorización y estandarización visual completa de Gestión de Suscripciones.",
+    cambios: [
+      "Suscripciones (`admin-success/suscripciones/page.tsx`, `_hooks/use-suscripciones-admin.ts`, `_components/ListaSuscripciones.tsx`, `_components/ModalesSuscripcion.tsx`): Extraída lógica a hook dedicado, aplicado `<PageHeader>`, `<SurfaceCard variant=\"panel\">`, `<PillTabs>` con buscador y filtro de estado (`Todas`, `Activas`, `Por atender`), tarjetas en `#252526`/`#1e1e1e` con barra de acciones en píldora, modales oscuros estándar, `<ModalConfirmacion>` y `<BotonVolverArriba>`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 225,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b225",
+    descripcion: "Refactorización y estandarización visual completa de Gestión de Usuarios (Maestro).",
+    cambios: [
+      "Usuarios Maestro (`admin-success/usuarios/page.tsx`, `_hooks/use-usuarios-maestro.ts`, `_components/ListaUsuariosMaestro.tsx`, `_components/ModalUsuarioMaestro.tsx`): Extraída lógica a hook dedicado, aplicado `<PageHeader>`, `<SurfaceCard variant=\"panel\">`, `<PillTabs>` con buscador, filtro por alcance (`Todos`, `Multi-sucursal`, `Solo base`) y selector de sucursal integrado en `Opciones` en móvil, acordeones en `#252526`/`#1e1e1e`, modal estándar, `<ModalConfirmacion>` y `<BotonVolverArriba>`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 224,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b224",
+    descripcion: "Rediseño ejecutivo y modular de las tarjetas de sucursal en Gestión de Sucursales.",
+    cambios: [
+      "SucursalCard (`admin-success/sucursales/_components/SucursalCard.tsx`, `page.tsx`): Extraída tarjeta dedicada con badge de ID `#X`, fila de conteo de módulos habilitados (`activos / total`), fila de comandos de voz con estado y `<Switch>`, y barra inferior equilibrada con `Editar`, `Eliminar` e `Ingresar`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 223,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b223",
+    descripcion: "Refactorización y estandarización visual completa de Gestión de Sucursales (Admin).",
+    cambios: [
+      "Sucursales Admin (`admin-success/sucursales/page.tsx`, `_hooks/use-sucursales-admin.ts`, `_components/ModalSucursal.tsx`): Extraída lógica a hook dedicado, aplicado `<PageHeader>`, `<SurfaceCard variant=\"panel\">`, `<PillTabs>` con buscador y filtros por voz (`Todas`, `Con voz`, `Sin voz`) con `Opciones` en móvil, tarjetas en `#252526`/`#1e1e1e`, `<ModalSucursal>` con paleta oficial y agregado switch de `Gestión de Promociones`, `<ModalConfirmacion>` y `<BotonVolverArriba>`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 222,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b222",
+    descripcion: "Estandarización visual y de controles en Dashboard Maestro.",
+    cambios: [
+      "Dashboard Maestro (`admin-success/page.tsx`, `dashboard/configuraciones/master/page.tsx`): Aplicado `<PageHeader>`, `<SurfaceCard variant=\"panel\">`, tarjetas en `#252526` con bordes `#2e2e2e`, iconos circulares translúcidos y botones píldora `bg-sky-600 hover:bg-sky-500 h-9`."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 221,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b221",
     descripcion: "Actualización del título de la aplicación a Pool Control 2.0 y nuevo favicon SVG de bola 8.",

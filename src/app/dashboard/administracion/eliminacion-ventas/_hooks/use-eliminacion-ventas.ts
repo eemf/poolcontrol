@@ -7,6 +7,10 @@ import { usePermissions } from '@/hooks/use-permissions'
 import { useToast } from '@/hooks/use-toast'
 import { eliminarVentasPorRango } from '@/lib/firebase/servicios/ventas-mantenimiento'
 
+/**
+ * Hook de control para la purga masiva de ventas por rango de ID con reglas de exclusión
+ * (créditos y ventas pendientes de pago) y reporte de progreso en tiempo real.
+ */
 export function useEliminacionVentas() {
   const { firestore } = useFirebase()
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal()

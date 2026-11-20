@@ -23,6 +23,10 @@ export const initialFormState: Omit<Tragamonedas, 'idTragamonedas'> = {
   estado: 'activo',
 }
 
+/**
+ * Hook de gestión CRUD para las máquinas tragamonedas de la sucursal activa.
+ * Maneja correlativos atómicos en altas y sincronización en tiempo real con Firestore.
+ */
 export function useConfigTragamonedas() {
   const [isMounted, setIsMounted] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -36,6 +40,7 @@ export function useConfigTragamonedas() {
   const { user, isUserLoading } = useUser()
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal()
 
+  // Consulta en tiempo real ordenada por identificador numérico de máquina
   const tragamonedasQuery = useMemoFirebase(() => {
     if (!firestore || !user || !sucursalId) return null
     return query(collection(firestore, `sucursales/${sucursalId}/tragamonedas`), orderBy("idTragamonedas", "asc"))
@@ -78,6 +83,7 @@ export function useConfigTragamonedas() {
     setFormState(prev => ({ ...prev, [field]: value }))
   }
 
+  /** Guarda una máquina nueva (asignando correlativo por transacción) o actualiza una existente. */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!firestore || !user || !sucursalId || !formState.nombre) {

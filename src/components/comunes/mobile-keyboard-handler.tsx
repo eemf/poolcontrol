@@ -16,6 +16,23 @@ export function MobileKeyboardHandler() {
     let activeInput: HTMLElement | null = null;
     let resizeCleanup: (() => void) | null = null;
 
+    const syncVisualViewportVars = () => {
+      const root = document.documentElement;
+      const vv = window.visualViewport;
+      if (!vv || window.innerWidth >= 768) {
+        root.style.removeProperty('--app-vv-height');
+        root.style.removeProperty('--app-vv-offset-top');
+        return;
+      }
+      root.style.setProperty('--app-vv-height', `${Math.round(vv.height)}px`);
+      root.style.setProperty('--app-vv-offset-top', `${Math.round(vv.offsetTop)}px`);
+    };
+
+    syncVisualViewportVars();
+    window.visualViewport?.addEventListener('resize', syncVisualViewportVars);
+    window.visualViewport?.addEventListener('scroll', syncVisualViewportVars);
+    window.addEventListener('resize', syncVisualViewportVars);
+
     const isMobile = () => {
       return (
         window.innerWidth < 768 ||
@@ -102,6 +119,11 @@ export function MobileKeyboardHandler() {
     return () => {
       window.removeEventListener('focusin', handleFocusIn);
       window.removeEventListener('focusout', handleFocusOut);
+      window.visualViewport?.removeEventListener('resize', syncVisualViewportVars);
+      window.visualViewport?.removeEventListener('scroll', syncVisualViewportVars);
+      window.removeEventListener('resize', syncVisualViewportVars);
+      document.documentElement.style.removeProperty('--app-vv-height');
+      document.documentElement.style.removeProperty('--app-vv-offset-top');
       resizeCleanup?.();
     };
   }, []);

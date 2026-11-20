@@ -240,7 +240,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
         procesando={procesandoEliminacionConsumo}
         onConfirmar={handleConfirmarEliminarConsumoPersistido}
       >
-        <div className="rounded-xl bg-[#141414] border border-[#2e2e2e] p-3.5 space-y-2 text-left">
+        <div className="rounded-xl bg-[#1e1e1e] border border-[#2e2e2e] p-3.5 space-y-2 text-left">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="text-xs font-bold text-slate-100 truncate">

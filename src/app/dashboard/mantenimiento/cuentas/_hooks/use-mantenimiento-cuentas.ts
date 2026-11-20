@@ -10,6 +10,9 @@ import type { Cuenta } from '@/lib/tipos'
 
 export type CuentaConId = Cuenta & { id: string }
 
+/**
+ * Hook de gestión CRUD para las cuentas financieras (Efectivo / Bancaria) de la sucursal.
+ */
 export function useMantenimientoCuentas() {
   const { firestore } = useFirebase()
   const { user } = useUser()

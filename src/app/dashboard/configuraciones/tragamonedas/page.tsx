@@ -9,6 +9,10 @@ import { TragamonedasCard } from "./_components/tragamonedas-card"
 import { TragamonedasDialog } from "./_components/tragamonedas-dialog"
 import { EliminarMaquinaDialog } from "./_components/eliminar-maquina-dialog"
 
+/**
+ * Página de configuración de máquinas tragamonedas de la sucursal.
+ * Permite filtrar por estado, buscar por nombre o modelo y administrar altas, ediciones y bajas.
+ */
 export default function PaginaConfiguracionTragamonedas() {
   const {
     isMounted,
@@ -32,6 +36,7 @@ export default function PaginaConfiguracionTragamonedas() {
   const [estadoFiltro, setEstadoFiltro] = useState<'todas' | 'activo' | 'mantenimiento' | 'inactivo'>('todas')
   const [searchTerm, setSearchTerm] = useState('')
 
+  // Filtrado combinado por estado operativo y término de búsqueda
   const maquinasFiltradas = useMemo(() => {
     const term = searchTerm.trim().toLowerCase()
     return maquinasConDocId.filter((m) => {

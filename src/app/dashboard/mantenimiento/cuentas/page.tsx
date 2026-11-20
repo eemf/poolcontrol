@@ -9,6 +9,9 @@ import { CuentaCard } from './_components/cuenta-card'
 import { ModalCuenta } from './_components/modal-cuenta'
 import { DialogoEliminarCuenta } from './_components/dialogo-eliminar-cuenta'
 
+/**
+ * Página de mantenimiento de cuentas de efectivo y bancarias de la sucursal.
+ */
 export default function CuentasPage() {
   const {
     filteredCuentas,

@@ -11,6 +11,10 @@ import {
   type ItemAuditoriaVisual 
 } from '../_utils/auditoria-helpers';
 
+/**
+ * Hook de consulta y filtrado para el registro de auditoría del turno actual o cierres previos.
+ * Incluye recuperación diferida de artículos en ventas antiguas cuando no están embebidos en el log.
+ */
 export function useAuditoria() {
   const { firestore } = useFirebase();
   const { user: currentUser, profile: currentProfile } = useUser();

@@ -4,6 +4,7 @@ import {
   query,
   where,
   orderBy,
+  limit,
 } from 'firebase/firestore';
 import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
@@ -36,12 +37,13 @@ export function useTraslados() {
     setCurrentPage(1);
   }, [activeTab, busqueda, itemsPerPage]);
 
-  // 1. Consultar todos los traslados donde participa esta sucursal (origen o destino)
+  // 1. Consultar los traslados recientes donde participa esta sucursal (origen o destino)
   const trasladosQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
     return query(
       collection(firestore, 'traslados'),
-      where('sucursalesIds', 'array-contains', sucursalId)
+      where('sucursalesIds', 'array-contains', sucursalId),
+      limit(100)
     );
   }, [firestore, sucursalId]);
 
@@ -77,10 +79,14 @@ export function useTraslados() {
   const { data: productosData } = useCollection<Producto>(productosQuery);
   const productosOrigen = useMemo(() => productosData || [], [productosData]);
 
-  // 4. Consultar compras de la sucursal para obtener historial de precios de compra de los productos
+  // 4. Consultar las últimas 50 compras de la sucursal para obtener precios de referencia recientes
   const comprasQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
-    return query(collection(firestore, `sucursales/${sucursalId}/compras`), orderBy('fecha', 'desc'));
+    return query(
+      collection(firestore, `sucursales/${sucursalId}/compras`),
+      orderBy('fecha', 'desc'),
+      limit(50)
+    );
   }, [firestore, sucursalId]);
   const { data: comprasData } = useCollection<Compra>(comprasQuery);
   const comprasOrigen = useMemo(() => comprasData || [], [comprasData]);

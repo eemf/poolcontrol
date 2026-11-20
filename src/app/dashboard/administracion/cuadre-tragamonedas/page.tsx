@@ -1,19 +1,18 @@
 'use client'
 
-import dynamic from "next/dynamic"
-import { PageHeader, BotonVolverArriba } from "@/components/comunes"
+import { PageHeader, SurfaceCard, BotonVolverArriba } from "@/components/comunes"
 import { Button } from "@/components/ui/button"
 import { PiggyBank, History, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useCuadreTragamonedasCierre } from "./_hooks/use-cuadre-tragamonedas-cierre"
 import { MaquinaCuadreCard } from "./_components/maquina-cuadre-card"
 import { CuadreTragamonedasResumen } from "./_components/cuadre-tragamonedas-resumen"
+import { CuadreConfirmacionDialog } from "./_components/cuadre-confirmacion-dialog"
 
-const CuadreConfirmacionDialog = dynamic(
-  () => import("./_components/cuadre-confirmacion-dialog").then(m => m.CuadreConfirmacionDialog),
-  { ssr: false }
-)
-
+/**
+ * Página de cuadre y liquidación periódica de máquinas tragamonedas.
+ * Presenta el conteo de monedas, existencia física y resumen financiero de cierre.
+ */
 export default function PaginaCuadreTragamonedas() {
   const {
     isLoading,
@@ -68,41 +67,43 @@ export default function PaginaCuadreTragamonedas() {
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Listado de Máquinas */}
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {maquinasConGenerales.map(maquina => (
-            <MaquinaCuadreCard
-              key={maquina.id}
-              maquina={maquina}
-              montoManual={montosManuales[maquina.id] ?? ''}
-              onMontoManualChange={handleMontoManualChange}
-            />
-          ))}
-        </div>
+      <SurfaceCard variant="panel" className="p-4 sm:p-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          {/* Listado de Máquinas */}
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {maquinasConGenerales.map(maquina => (
+              <MaquinaCuadreCard
+                key={maquina.id}
+                maquina={maquina}
+                montoManual={montosManuales[maquina.id] ?? ''}
+                onMontoManualChange={handleMontoManualChange}
+              />
+            ))}
+          </div>
 
-        {/* Panel Lateral de Resumen y Cierre */}
-        <div className="lg:col-span-1">
-          <CuadreTragamonedasResumen
-            resumen={resumen}
-            porcentajeGanancia={porcentajeGanancia}
-            gananciaEstimada={gananciaEstimada}
-            existenciaSiguiente={existenciaSiguiente}
-            setExistenciaSiguiente={setExistenciaSiguiente}
-            efectivoSiguientePeriodo={efectivoSiguientePeriodo}
-            setEfectivoSiguientePeriodo={setEfectivoSiguientePeriodo}
-            gananciaATrasladar={gananciaATrasladar}
-            setGananciaATrasladar={setGananciaATrasladar}
-            cuentaDestinoId={cuentaDestinoId}
-            setCuentaDestinoId={setCuentaDestinoId}
-            cuentas={cuentas}
-            observaciones={observaciones}
-            setObservaciones={setObservaciones}
-            onFinalizarClick={() => setAlertaAbierta(true)}
-            procesando={procesando}
-          />
+          {/* Panel Lateral de Resumen y Cierre */}
+          <div className="lg:col-span-1">
+            <CuadreTragamonedasResumen
+              resumen={resumen}
+              porcentajeGanancia={porcentajeGanancia}
+              gananciaEstimada={gananciaEstimada}
+              existenciaSiguiente={existenciaSiguiente}
+              setExistenciaSiguiente={setExistenciaSiguiente}
+              efectivoSiguientePeriodo={efectivoSiguientePeriodo}
+              setEfectivoSiguientePeriodo={setEfectivoSiguientePeriodo}
+              gananciaATrasladar={gananciaATrasladar}
+              setGananciaATrasladar={setGananciaATrasladar}
+              cuentaDestinoId={cuentaDestinoId}
+              setCuentaDestinoId={setCuentaDestinoId}
+              cuentas={cuentas}
+              observaciones={observaciones}
+              setObservaciones={setObservaciones}
+              onFinalizarClick={() => setAlertaAbierta(true)}
+              procesando={procesando}
+            />
+          </div>
         </div>
-      </div>
+      </SurfaceCard>
 
       {/* Modal de Confirmación */}
       <CuadreConfirmacionDialog

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { collection, query, where, orderBy, Timestamp, doc } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, Timestamp, doc } from 'firebase/firestore';
 import { useFirebase, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { useSucursal } from '@/hooks/use-sucursal';
 import { usePermissions } from '@/hooks/use-permissions';
@@ -19,6 +19,10 @@ const toDate = (fecha: any): Date => {
   return new Date(0);
 };
 
+/**
+ * Hook principal de métricas del Dashboard operativo de la sucursal.
+ * Unifica la consulta de ventas (semana + mes) en un solo listener para reducir lecturas en Firestore.
+ */
 export function useDashboard() {
   const { firestore } = useFirebase();
   const { sucursalId, isLoading: isLoadingSucursal } = useSucursal();
@@ -27,6 +31,11 @@ export function useDashboard() {
   const hace7Dias = useMemo(() => startOfDay(subDays(new Date(), 6)), []);
   const hace7Meses = useMemo(() => startOfMonth(subMonths(new Date(), 6)), []);
   const inicioMes = useMemo(() => startOfMonth(new Date()), []);
+  // Toma la fecha más antigua entre los últimos 7 días y el inicio de mes para consultar ventas una sola vez
+  const fechaInicioVentas = useMemo(
+    () => (hace7Dias < inicioMes ? hace7Dias : inicioMes),
+    [hace7Dias, inicioMes]
+  );
 
   // Consultas
   const mesasQuery = useMemoFirebase(() => 
@@ -34,23 +43,24 @@ export function useDashboard() {
   , [firestore, sucursalId]);
   const { data: mesas } = useCollection<Mesa>(mesasQuery);
 
-  const ventasSemanaQuery = useMemoFirebase(() => 
+  // Listener unificado de ventas para evitar suscripción duplicada entre semana y mes
+  const ventasRangoQuery = useMemoFirebase(() => 
     (firestore && sucursalId) ? query(
       collection(firestore, `sucursales/${sucursalId}/ventas`),
-      where('fecha', '>=', Timestamp.fromDate(hace7Dias)),
+      where('fecha', '>=', Timestamp.fromDate(fechaInicioVentas)),
       orderBy('fecha', 'desc')
     ) : null
-  , [firestore, sucursalId, hace7Dias]);
-  const { data: ventasSemana } = useCollection<Venta>(ventasSemanaQuery);
+  , [firestore, sucursalId, fechaInicioVentas]);
+  const { data: ventasRango } = useCollection<Venta>(ventasRangoQuery);
 
-  const ventasMesQuery = useMemoFirebase(() => 
-    (firestore && sucursalId) ? query(
-      collection(firestore, `sucursales/${sucursalId}/ventas`),
-      where('fecha', '>=', Timestamp.fromDate(inicioMes)),
-      orderBy('fecha', 'desc')
-    ) : null
-  , [firestore, sucursalId, inicioMes]);
-  const { data: ventasMes } = useCollection<Venta>(ventasMesQuery);
+  const ventasSemana = useMemo(
+    () => (ventasRango || []).filter((v) => toDate(v.fecha) >= hace7Dias),
+    [ventasRango, hace7Dias]
+  );
+  const ventasMes = useMemo(
+    () => (ventasRango || []).filter((v) => toDate(v.fecha) >= inicioMes),
+    [ventasRango, inicioMes]
+  );
 
   const productosQuery = useMemoFirebase(() => 
     (firestore && sucursalId) ? collection(firestore, `sucursales/${sucursalId}/productos`) : null
@@ -70,7 +80,8 @@ export function useDashboard() {
     (firestore && sucursalId) ? query(
       collection(firestore, `sucursales/${sucursalId}/cuadre_mensual`),
       where('fecha', '>=', Timestamp.fromDate(hace7Meses)),
-      orderBy('fecha', 'asc')
+      orderBy('fecha', 'asc'),
+      limit(12)
     ) : null
   , [firestore, sucursalId, hace7Meses]);
   const { data: cierresMensuales } = useCollection<CuadreMensual>(cierresMensualesQuery);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { collection, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, query, where, Timestamp } from 'firebase/firestore';
 import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
 import type { CuadreSemanal, Cuenta } from '@/lib/tipos';
 import { useSucursal } from '@/hooks/use-sucursal';
@@ -11,6 +11,10 @@ import { format, subMonths, startOfMonth } from 'date-fns';
 
 export type CuadreSemanalConId = CuadreSemanal & { id: string };
 
+/**
+ * Hook de consolidación y cierre mensual a partir de cuadres semanales pendientes.
+ * Filtra directamente en Firestore por `estadoMensual == 'pendiente'` para evitar leer todo el histórico.
+ */
 export function useCuadreMensual() {
   const { firestore } = useFirebase();
   const { user } = useUser();
@@ -25,11 +29,12 @@ export function useCuadreMensual() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
+  // Consulta únicamente cuadres semanales pendientes de cierre mensual (sin orderBy compuesto para no requerir índice adicional)
   const cuadresQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
     return query(
       collection(firestore, `sucursales/${sucursalId}/cuadre_semanal`),
-      orderBy('fecha', 'desc')
+      where('estadoMensual', '==', 'pendiente')
     );
   }, [firestore, sucursalId]);
 
@@ -41,9 +46,14 @@ export function useCuadreMensual() {
   const { data: todosLosCuadres, isLoading, error } = useCollection<CuadreSemanalConId>(cuadresQuery);
   const { data: cuentas, isLoading: isLoadingCuentas } = useCollection<Cuenta>(cuentasQuery);
   
+  // Ordena cronológicamente descendente en memoria los pocos registros pendientes
   const cuadresSemanales = useMemo(() => {
     if (!todosLosCuadres) return null;
-    return todosLosCuadres.filter(c => c.estadoMensual === 'pendiente');
+    return [...todosLosCuadres].sort((a, b) => {
+      const fa = a.fecha instanceof Timestamp ? a.fecha.toMillis() : 0;
+      const fb = b.fecha instanceof Timestamp ? b.fecha.toMillis() : 0;
+      return fb - fa;
+    });
   }, [todosLosCuadres]);
 
   const handleSelectCuadre = (id: string, isSelected: boolean) => {

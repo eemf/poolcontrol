@@ -10,10 +10,10 @@ import { SidebarContent, SidebarMenu, SidebarMenuItem, useSidebar } from "@/comp
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 export const adminNavItems = [
-  { href: '/admin-success', label: 'Dashboard', icon: LayoutGrid  },
-  { href: '/admin-success/sucursales', label: 'Sucursales', icon: Building },
-  { href: '/admin-success/usuarios', label: 'Usuarios', icon: Users },
-  { href: '/admin-success/suscripciones', label: 'Suscripciones', icon: CalendarClock },
+  { href: '/admin-success', label: 'Dashboard', icon: LayoutGrid, iconColor: 'text-sky-400' },
+  { href: '/admin-success/sucursales', label: 'Sucursales', icon: Building, iconColor: 'text-emerald-400' },
+  { href: '/admin-success/usuarios', label: 'Usuarios', icon: Users, iconColor: 'text-cyan-400' },
+  { href: '/admin-success/suscripciones', label: 'Suscripciones', icon: CalendarClock, iconColor: 'text-amber-400' },
 ];
 
 export default function AdminDashboardNav() {
@@ -31,21 +31,24 @@ export default function AdminDashboardNav() {
     <>
       <SidebarContent>
         <SidebarMenu>
-          {adminNavItems.map((item) => (
+          {adminNavItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
             <SidebarMenuItem key={item.label}>
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       asChild
-                      variant={pathname === item.href ? "secondary" : "ghost"}
+                      variant={isActive ? "default" : "ghost"}
                       className={cn(
-                        "w-full rounded-full transition-all duration-300 h-10",
-                        isCollapsed ? "justify-center px-0 gap-0" : "justify-start px-3 gap-3"
+                        "w-full rounded-full transition-colors duration-150 h-10",
+                        isCollapsed ? "justify-center px-0 gap-0" : "justify-start px-3 gap-3",
+                        !isActive && "hover:bg-primary/10 hover:text-primary"
                       )}
                     >
                       <Link href={item.href} onClick={handleNavigate}>
-                        <item.icon className="h-5 w-5 shrink-0" />
+                        <item.icon className={cn("h-5 w-5 shrink-0", !isActive && item.iconColor)} />
                         <span className={cn(
                           "whitespace-nowrap transition-all duration-300 ease-in-out",
                           isCollapsed ? "opacity-0 w-0 ml-0 overflow-hidden" : "opacity-100 ml-3 w-auto"
@@ -59,7 +62,8 @@ export default function AdminDashboardNav() {
                 </Tooltip>
               </TooltipProvider>
             </SidebarMenuItem>
-          ))}
+            );
+          })}
         </SidebarMenu>
       </SidebarContent>
     </>

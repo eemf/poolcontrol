@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   FileText,
   Building2,
@@ -142,37 +141,31 @@ export function DetalleTrasladoDialog({
             </div>
           </div>
 
-          {/* Tabla de Productos */}
-          <div className="space-y-1.5">
+          {/* Listado Responsivo de Productos Trasladados */}
+          <div className="space-y-2">
             <span className="text-xs font-semibold text-slate-300 px-1">Productos Trasladados</span>
-            <div className="rounded-xl border border-[#2e2e2e] overflow-hidden bg-[#252526]">
-              <Table>
-                <TableHeader className="bg-[#1e1e1e]">
-                  <TableRow className="border-[#2e2e2e] hover:bg-transparent">
-                    <TableHead className="text-slate-300 text-xs py-2">Producto</TableHead>
-                    <TableHead className="text-slate-300 text-xs text-center py-2">Cantidad</TableHead>
-                    <TableHead className="text-slate-300 text-xs text-right py-2">Costo U.</TableHead>
-                    <TableHead className="text-slate-300 text-xs text-right py-2">Subtotal</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {traslado.items.map((it, idx) => (
-                    <TableRow key={idx} className="border-[#2e2e2e] hover:bg-[#313131]">
-                      <TableCell className="py-2 text-xs font-medium text-white">
-                        <div>{it.nombreProducto}</div>
-                        {it.nombreProductoDestino && it.nombreProductoDestino.trim().toLowerCase() !== it.nombreProducto.trim().toLowerCase() && (
-                          <div className="text-[10px] text-sky-400 font-normal mt-0.5">
-                            Recibido en destino como: {it.nombreProductoDestino}
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell className="py-2 text-xs text-center font-bold text-amber-300">{it.cantidad}</TableCell>
-                      <TableCell className="py-2 text-xs text-right text-slate-300">Q{it.costoUnitario.toFixed(2)}</TableCell>
-                      <TableCell className="py-2 text-xs text-right font-bold text-emerald-400">Q{it.costoTotal.toFixed(2)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="space-y-2">
+              {traslado.items.map((it, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-xl border border-[#2e2e2e] bg-[#252526] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold text-white truncate">{it.nombreProducto}</p>
+                    {it.nombreProductoDestino &&
+                      it.nombreProductoDestino.trim().toLowerCase() !== it.nombreProducto.trim().toLowerCase() && (
+                        <p className="text-[11px] text-sky-400 mt-0.5">
+                          Recibido en destino como: {it.nombreProductoDestino}
+                        </p>
+                      )}
+                  </div>
+                  <div className="flex items-center justify-between sm:justify-end gap-4 text-xs tabular-nums shrink-0 pt-1.5 sm:pt-0 border-t border-[#2e2e2e] sm:border-t-0">
+                    <span className="font-bold text-amber-300">Cant: {it.cantidad}</span>
+                    <span className="text-slate-400">C/U: Q{it.costoUnitario.toFixed(2)}</span>
+                    <span className="font-bold text-emerald-400">Q{it.costoTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

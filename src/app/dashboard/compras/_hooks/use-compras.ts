@@ -6,6 +6,8 @@ import {
   runTransaction,
   query,
   orderBy,
+  where,
+  limit,
   Timestamp,
 } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +23,13 @@ export type ProductoConDocId = Producto & { docId: string };
 export type ClienteConDocId = Cliente & { docId: string };
 export type CompraConDocId = Compra & { docId: string };
 
+const LIMITE_INICIAL_COMPRAS = 50;
+
+/**
+ * Hook de gestión de compras e ingreso automático a inventario.
+ * Optimiza las lecturas de Firestore consultando solo pendientes por defecto
+ * o los últimos 50 registros históricos cuando se activa "Mostrar todas".
+ */
 export function useCompras() {
   const { firestore } = useFirebase();
   const { user } = useUser();
@@ -31,6 +40,7 @@ export function useCompras() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mostrarTodas, setMostrarTodas] = useState(false);
+  const [limiteCompras, setLimiteCompras] = useState(LIMITE_INICIAL_COMPRAS);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Paginación
@@ -43,11 +53,14 @@ export function useCompras() {
   const [proveedorSeleccionadoId, setProveedorSeleccionadoId] = useState('');
   const [itemsEnCompra, setItemsEnCompra] = useState<ItemCompra[]>([]);
 
-  // Consultas Firestore
+  // Consulta condicional: pendientes activas o historial acotado por fecha descendente
   const comprasQuery = useMemoFirebase(() => {
     if (!firestore || !sucursalId) return null;
-    return query(collection(firestore, `sucursales/${sucursalId}/compras`), orderBy("fecha", "desc"));
-  }, [firestore, sucursalId]);
+    const baseRef = collection(firestore, `sucursales/${sucursalId}/compras`);
+    return mostrarTodas
+      ? query(baseRef, orderBy("fecha", "desc"), limit(limiteCompras))
+      : query(baseRef, where("estado", "==", "Pendiente"));
+  }, [firestore, sucursalId, mostrarTodas, limiteCompras]);
 
   const { data: rawCompras, isLoading: isLoadingCompras } = useCollection<Compra>(comprasQuery);
 
@@ -63,8 +76,16 @@ export function useCompras() {
   }, [firestore, sucursalId]);
   const { data: todosLosClientes, isLoading: isLoadingProveedores } = useCollection<Cliente>(proveedoresQuery);
 
-  // Memoización de Datos
-  const comprasConDocId = useMemo((): CompraConDocId[] => (rawCompras || []).map(c => ({ ...c, docId: c.id })), [rawCompras]);
+  // Memoización de Datos (orden descendente garantizado incluso en consulta filtrada por estado)
+  const comprasConDocId = useMemo((): CompraConDocId[] => {
+    return [...(rawCompras || [])]
+      .sort((a, b) => {
+        const fa = a.fecha instanceof Timestamp ? a.fecha.toMillis() : 0;
+        const fb = b.fecha instanceof Timestamp ? b.fecha.toMillis() : 0;
+        return fb - fa;
+      })
+      .map(c => ({ ...c, docId: c.id }));
+  }, [rawCompras]);
   const productosConDocId = useMemo((): ProductoConDocId[] => (productosData || []).map(p => ({ ...p, docId: p.id })), [productosData]);
   const proveedores = useMemo((): ClienteConDocId[] => (todosLosClientes || []).filter(c => c.tipoCliente === 'Proveedor' || c.tipoCliente === 'Ambos').map(c => ({ ...c, docId: c.id })), [todosLosClientes]);
 

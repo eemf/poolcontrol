@@ -73,6 +73,7 @@ const DialogContent = React.forwardRef<
           "swal2-modal-anim data-[state=open]:animate-none data-[state=closed]:animate-none left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] sm:w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-[#2e2e2e] bg-[#1e1e1e] p-5 sm:p-6 shadow-2xl",
           "max-h-[90vh] flex flex-col",
           className,
+          "max-md:!max-h-[calc(var(--app-vv-height,100dvh)-1.5rem)] max-md:!top-[calc(var(--app-vv-offset-top,0px)+var(--app-vv-height,100dvh)/2)] max-md:!overflow-y-auto max-md:!overflow-x-hidden",
           "fixed rounded-2xl sm:rounded-2xl"
         )}
         {...props}

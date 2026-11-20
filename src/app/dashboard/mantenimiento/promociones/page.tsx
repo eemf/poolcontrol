@@ -7,6 +7,9 @@ import { EncabezadoPromociones } from './_components/EncabezadoPromociones'
 import { ListaPromociones } from './_components/ListaPromociones'
 import { ModalPromocion } from './_components/ModalPromocion'
 
+/**
+ * Página de mantenimiento de promociones, combos y descuentos por volumen de la sucursal.
+ */
 export default function PaginaPromociones() {
   const {
     isMounted,

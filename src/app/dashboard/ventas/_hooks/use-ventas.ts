@@ -29,6 +29,10 @@ import {
   type ItemATrasladar,
 } from '@/lib/firebase/servicios';
 import { useIsMobile } from '@/hooks/use-mobile';
+/**
+ * Hook principal del Punto de Venta (POS).
+ * Coordina catálogo físico/virtual, promociones vigentes, cuentas pendientes/crédito y cobros transaccionales.
+ */
 import { useSucursal } from '@/hooks/use-sucursal';
 
 const toDate = (fecha: any): Date => {
