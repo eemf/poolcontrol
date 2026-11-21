@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
 import { ThemeProvider } from '@/context/theme-provider';
-import { MobileKeyboardHandler } from '@/components/comunes';
+import { MobileKeyboardHandler, UserFontScaleSync } from '@/components/comunes';
 
 export const metadata: Metadata = {
   title: 'Pool Control 2.0',
@@ -39,6 +39,7 @@ export default function RootLayout({
           <FirebaseClientProvider>
             {children}
             <MobileKeyboardHandler />
+            <UserFontScaleSync />
           </FirebaseClientProvider>
           <Toaster />
         </ThemeProvider>

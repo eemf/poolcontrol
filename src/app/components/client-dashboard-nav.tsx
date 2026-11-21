@@ -9,7 +9,7 @@ import {
   TableProperties,
   Truck, Scale, History, HandCoins, Landmark, BookUser, CalendarDays, 
   Calendar, FlaskConical, PiggyBank, FileClock, MonitorCheck, Ghost, Layers, Moon, Wrench, Bell, Eraser, Layout, ChevronUp, Building2, Info,
-  BarChart3, ArrowLeftRight, Sliders, MessageSquare, Percent
+  BarChart3, ArrowLeftRight, Sliders, MessageSquare, Percent, Type
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -111,6 +111,7 @@ export const navItems: NavItemType[] = [
       { href: '/dashboard/configuraciones/permisos', label: 'Permisos', icon: ShieldCheck, iconColor: 'text-indigo-400', permission: 'config.permisos' },
       { href: '/dashboard/configuraciones/mesas', label: 'Mesas', icon: LayoutGrid, iconColor: 'text-emerald-400', permission: 'config.mesas', feature: 'configMesas' },
       { href: '/dashboard/configuraciones/tragamonedas', label: 'Tragamonedas', icon: Dices, iconColor: 'text-amber-400', permission: 'config.tragamonedas', feature: 'configTragamonedas' },
+      { href: '/dashboard/configuraciones/apariencia', label: 'Tamaño de Fuente', icon: Type, iconColor: 'text-sky-400', permission: 'dashboard.ver' },
       { href: '/dashboard/configuraciones/acerca-de', label: 'Acerca del Sistema', icon: Info, iconColor: 'text-cyan-400', permission: 'dashboard.ver' },
     ]
   },

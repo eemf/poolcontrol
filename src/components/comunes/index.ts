@@ -8,3 +8,4 @@ export * from './boton-volver-arriba';
 export * from './swal-icono';
 export * from './modal-confirmacion';
 export * from './bola-billar-icon';
+export * from './user-font-scale-sync';

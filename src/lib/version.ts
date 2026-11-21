@@ -12,9 +12,22 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
-    build: 241,
+    build: 242,
     fecha: "2026-11-20",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b242",
+    descripcion: "Nueva página configurable de Tamaño de Fuente por usuario en Configuraciones.",
+    cambios: [
+      "Configuraciones (`configuraciones/apariencia/page.tsx`, `_hooks/use-preferencia-fuente.ts`, `client-dashboard-nav.tsx`): Añadida página `Tamaño de Fuente` con 4 tamaños predefinidos, ajuste fino de 90% a 130%, vista previa en vivo y persistencia por usuario.",
+      "Sincronización Global (`user-font-scale-sync.tsx`, `src/app/layout.tsx`): Aplica la escala de fuente del usuario en toda la aplicación desde caché local y Firestore (`preferencias.escalaFuente`)."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 241,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b241",
     descripcion: "Corrección global de modales con teclado virtual en móvil evitando solapamiento de botones.",
