@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import type { Mesa } from '@/lib/tipos';
+import type { TipoPagoAnticipadoMesa } from '@/lib/firebase/servicios/mesas';
 import type { AutocompleteOption } from '@/components/ui/autocomplete-input';
 import {
   Dialog,
@@ -25,7 +26,9 @@ import {
   Users,
   Zap,
   AlertTriangle,
+  Clock,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface BillingDialogProps {
   isOpen: boolean;
@@ -43,6 +46,7 @@ interface BillingDialogProps {
   processingCharge: boolean;
   onFinalizarSinCosto: () => void;
   onProcederConPago: (metodo: 'Efectivo' | 'Tarjeta') => void;
+  onPagoAnticipado: (tipoPago: TipoPagoAnticipadoMesa, metodo: 'Efectivo' | 'Tarjeta') => void;
   onPasarACuenta: (clienteId: string) => void;
   clientesOptions: AutocompleteOption[];
   clienteInputRef: React.RefObject<HTMLInputElement>;
@@ -75,6 +79,7 @@ export function BillingDialog({
   processingCharge,
   onFinalizarSinCosto,
   onProcederConPago,
+  onPagoAnticipado,
   onPasarACuenta,
   clientesOptions,
   clienteInputRef,
@@ -91,11 +96,36 @@ export function BillingDialog({
   setTableToCharge,
 }: BillingDialogProps) {
   const isConsola = tableToCharge?.tipoDeMesa === 'Consola';
-  const [confirmarTarjetaModo, setConfirmarTarjetaModo] = useState<'rapido' | 'dividir' | null>(
-    null
-  );
+  const esTiempoDefinido = tableToCharge?.modoJuego === 'definido';
+  const costoTiempoPendiente = esTiempoDefinido ? Math.max(0, Number(editableCost) || 0) : 0;
+  const hayTiempoAnticipable = esTiempoDefinido && costoTiempoPendiente > 0;
+  const hayConsumosAnticipables = consumoFijoModal > 0;
+  const puedePagarAnticipado = hayTiempoAnticipable || hayConsumosAnticipables;
+
+  const [confirmarTarjetaModo, setConfirmarTarjetaModo] = useState<
+    'rapido' | 'dividir' | 'anticipado' | null
+  >(null);
+  const [tipoPagoAnticipado, setTipoPagoAnticipado] = useState<TipoPagoAnticipadoMesa>('ambos');
   const [confirmarCancelarDivision, setConfirmarCancelarDivision] = useState(false);
   const [submittingCuenta, setSubmittingCuenta] = useState(false);
+
+  // Ajustar opción válida de pago anticipado según lo que tenga saldo pendiente
+  useEffect(() => {
+    if (hayTiempoAnticipable && hayConsumosAnticipables) {
+      setTipoPagoAnticipado('ambos');
+    } else if (hayTiempoAnticipable) {
+      setTipoPagoAnticipado('tiempo');
+    } else if (hayConsumosAnticipables) {
+      setTipoPagoAnticipado('consumos');
+    }
+  }, [isOpen, hayTiempoAnticipable, hayConsumosAnticipables]);
+
+  const montoAnticipado =
+    tipoPagoAnticipado === 'ambos'
+      ? costoTiempoPendiente + consumoFijoModal
+      : tipoPagoAnticipado === 'tiempo'
+        ? costoTiempoPendiente
+        : consumoFijoModal;
 
   // Limpiar estados locales al cerrar el modal o cambiar estados de carga
   useEffect(() => {
@@ -133,6 +163,8 @@ export function BillingDialog({
     if (!confirmarTarjetaModo) return;
     if (confirmarTarjetaModo === 'rapido') {
       await onProcederConPago('Tarjeta');
+    } else if (confirmarTarjetaModo === 'anticipado') {
+      await onPagoAnticipado(tipoPagoAnticipado, 'Tarjeta');
     } else {
       await onPagoDivision('Tarjeta');
     }
@@ -310,8 +342,107 @@ export function BillingDialog({
                   { id: 'rapido', label: 'Rápido', icon: Zap },
                   { id: 'cuenta', label: 'Cuenta', icon: User },
                   { id: 'dividir', label: 'Dividir', icon: Users },
+                  ...(puedePagarAnticipado
+                    ? [{ id: 'anticipado', label: 'Anticipado', icon: Clock }]
+                    : []),
                 ]}
               />
+
+              {/* Contenido de Pestaña: Pago Anticipado (sin liberar estación) */}
+              {activeTab === 'anticipado' && puedePagarAnticipado && (
+                <div className="pt-1 space-y-3.5">
+                  <div className="rounded-xl bg-[#252526] border border-[#2e2e2e] p-3.5 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium text-slate-300">
+                        Cobrar sin liberar {isConsola ? 'la consola' : 'la mesa'}
+                      </span>
+                      <span className="text-sm font-bold text-sky-400 tabular-nums">
+                        Q{montoAnticipado.toFixed(2)}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {hayTiempoAnticipable && hayConsumosAnticipables && (
+                        <button
+                          type="button"
+                          onClick={() => setTipoPagoAnticipado('ambos')}
+                          className={cn(
+                            'rounded-full h-8 px-3.5 text-xs font-semibold border transition-colors',
+                            tipoPagoAnticipado === 'ambos'
+                              ? 'bg-sky-600 border-sky-500 text-white'
+                              : 'bg-[#1e1e1e] border-[#2e2e2e] text-slate-300 hover:bg-[#313131]'
+                          )}
+                        >
+                          Todo (Q{(costoTiempoPendiente + consumoFijoModal).toFixed(2)})
+                        </button>
+                      )}
+                      {hayTiempoAnticipable && (
+                        <button
+                          type="button"
+                          onClick={() => setTipoPagoAnticipado('tiempo')}
+                          className={cn(
+                            'rounded-full h-8 px-3.5 text-xs font-semibold border transition-colors',
+                            tipoPagoAnticipado === 'tiempo'
+                              ? 'bg-sky-600 border-sky-500 text-white'
+                              : 'bg-[#1e1e1e] border-[#2e2e2e] text-slate-300 hover:bg-[#313131]'
+                          )}
+                        >
+                          Solo Tiempo (Q{costoTiempoPendiente.toFixed(2)})
+                        </button>
+                      )}
+                      {hayConsumosAnticipables && (
+                        <button
+                          type="button"
+                          onClick={() => setTipoPagoAnticipado('consumos')}
+                          className={cn(
+                            'rounded-full h-8 px-3.5 text-xs font-semibold border transition-colors',
+                            tipoPagoAnticipado === 'consumos'
+                              ? 'bg-sky-600 border-sky-500 text-white'
+                              : 'bg-[#1e1e1e] border-[#2e2e2e] text-slate-300 hover:bg-[#313131]'
+                          )}
+                        >
+                          Solo Consumos (Q{consumoFijoModal.toFixed(2)})
+                        </button>
+                      )}
+                    </div>
+
+                    <p className="text-[11px] text-slate-400 leading-snug">
+                      El reloj seguirá corriendo y la estación permanecerá ocupada hasta que finalice la sesión.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col-reverse sm:flex-row items-center gap-2.5">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="w-full sm:w-auto rounded-full px-5 font-medium h-10 bg-[#252526] hover:bg-[#2e2e2e] text-slate-200 border border-[#2e2e2e]"
+                      onClick={() => onOpenChange(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <div className="flex w-full flex-1 gap-2.5">
+                      <Button
+                        type="button"
+                        onClick={() => setConfirmarTarjetaModo('anticipado')}
+                        disabled={processingCharge || montoAnticipado <= 0}
+                        variant="secondary"
+                        className="flex-1 rounded-full h-10 font-semibold bg-[#252526] hover:bg-[#2e2e2e] text-slate-100 border border-[#2e2e2e]"
+                      >
+                        <CreditCard className="mr-1.5 h-4 w-4 text-sky-400" /> Tarjeta
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={() => onPagoAnticipado(tipoPagoAnticipado, 'Efectivo')}
+                        disabled={processingCharge || montoAnticipado <= 0}
+                        className="flex-1 rounded-full h-10 font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md"
+                      >
+                        {processingCharge && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                        <Coins className="mr-1.5 h-4 w-4" /> Efectivo
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Contenido de Pestaña: Pago Rápido */}
               {activeTab === 'rapido' && (
@@ -550,7 +681,9 @@ export function BillingDialog({
                     Q
                     {(confirmarTarjetaModo === 'dividir'
                       ? montoPorParte
-                      : totalAPagarModal
+                      : confirmarTarjetaModo === 'anticipado'
+                        ? montoAnticipado
+                        : totalAPagarModal
                     ).toFixed(2)}
                   </span>
                 </div>

@@ -467,13 +467,24 @@ export async function procesarVentaTiempoDeMesa(firestore: Firestore, sucursalId
                     metadata: { tipo: 'consumo' }
                 } as DetalleVenta));
 
+                const yaTieneAlquiler = detallesActualizados.some(d => d.idProducto === `mesa-${mesa.id}`);
+                const itemAlquilerPendiente: DetalleVenta[] = (!yaTieneAlquiler && costoAlquiler > 0) ? [{
+                    idDetalle: idD++, idProducto: `mesa-${mesa.id}`, nombreProducto: nombreProductoTiempo,
+                    cantidad: 1, precioUnitario: costoAlquiler, subtotal: costoAlquiler, saldo: 0,
+                    pagadoEfectivo: metodoDePago === 'Efectivo' ? costoAlquiler : 0,
+                    pagadoTarjeta: metodoDePago === 'Tarjeta' ? costoAlquiler : 0,
+                    metodoPago: metodoDePago, estado: 'Pagada', fechaAgregado: Timestamp.now(), esVirtual: false,
+                    metadata: { tipo: 'alquiler', modo: mesa.modoJuego || 'libre', pagadoContado: false, horaInicio: mesa.horaInicio, horaFin: Timestamp.now() }
+                }] : [];
+
+                const nuevosDetallesPago = [...itemAlquilerPendiente, ...consumosItems];
                 const totalConsumo = consumosItems.reduce((s, i) => s + i.subtotal, 0);
                 const nuevoTotalVenta = ventaData.total + totalConsumo + costoAlquiler;
 
                 const montoExtra = totalConsumo + costoAlquiler;
                 if (montoExtra > 0) {
                     const idP = (corrPagoSnap.data()?.correlativo || 0) + 1;
-                    const itemsSaldados = consumosItems.map(d => ({ 
+                    const itemsSaldados = nuevosDetallesPago.map(d => ({ 
                         idDetalle: d.idDetalle, nombreProducto: d.nombreProducto, 
                         montoAplicado: d.subtotal, subtotalItem: d.subtotal, 
                         esVirtual: !!d.esVirtual, cantidad: d.cantidad 
@@ -510,7 +521,7 @@ export async function procesarVentaTiempoDeMesa(firestore: Firestore, sucursalId
                 }
 
                 transaction.update(ventaRef, {
-                    detalles: [...detallesActualizados, ...consumosItems],
+                    detalles: [...detallesActualizados, ...nuevosDetallesPago],
                     total: nuevoTotalVenta,
                     saldo: 0,
                     metodoPago: (ventaData.metodoPago === metodoDePago || !ventaData.metodoPago) ? metodoDePago : 'Mixto'
@@ -617,6 +628,247 @@ export async function procesarVentaTiempoDeMesa(firestore: Firestore, sucursalId
                 total,
                 metodoDePago
             }
+        }, transaction);
+    });
+}
+
+export type TipoPagoAnticipadoMesa = 'tiempo' | 'consumos' | 'ambos';
+
+/**
+ * Registra el pago anticipado de tiempo definido, consumos o ambos en una mesa/consola
+ * SIN detener el temporizador ni liberar la estación (`estado` permanece `ocupado`).
+ */
+export async function procesarPagoAnticipadoMesa({
+    firestore,
+    sucursalId,
+    mesa,
+    usuarioId,
+    tipoPago,
+    costoAlquiler,
+    metodoDePago,
+}: {
+    firestore: Firestore;
+    sucursalId: string;
+    mesa: Mesa;
+    usuarioId: string;
+    tipoPago: TipoPagoAnticipadoMesa;
+    costoAlquiler: number;
+    metodoDePago: 'Efectivo' | 'Tarjeta';
+}) {
+    const sid = validarSucursal(sucursalId);
+    const mesaRef = doc(firestore, `sucursales/${sid}/mesas_de_billar`, mesa.id);
+
+    return runTransaction(firestore, async (transaction) => {
+        const mesaDoc = await transaction.get(mesaRef);
+        const mesaData = mesaDoc.data() as Mesa | undefined;
+        if (!mesaDoc.exists() || mesaData?.estado !== 'ocupado') {
+            throw new Error("La sesión ya no está activa.");
+        }
+
+        const incluirTiempo = tipoPago === 'tiempo' || tipoPago === 'ambos';
+        const incluirConsumos = tipoPago === 'consumos' || tipoPago === 'ambos';
+
+        const montoTiempo = incluirTiempo ? Math.max(0, Number(costoAlquiler) || 0) : 0;
+        const consumosAPagar = incluirConsumos ? (mesaData.consumos || []) : [];
+        const totalConsumo = consumosAPagar.reduce((s: number, it: any) => s + Number(it.total || 0), 0);
+        const montoTotalPagado = montoTiempo + totalConsumo;
+
+        if (montoTotalPagado <= 0) {
+            throw new Error("No hay saldo pendiente seleccionado para cobrar.");
+        }
+
+        const generalesRef = doc(firestore, `sucursales/${sid}/generales`, 'actual');
+        const corrPagoRef = doc(firestore, `sucursales/${sid}/correlativos`, 'pagos');
+        const corrDetalleRef = doc(firestore, `sucursales/${sid}/correlativos`, 'ventas_detalles');
+        const corrVentaRef = doc(firestore, `sucursales/${sid}/correlativos`, 'ventas');
+
+        const ventaExistenteRef = mesaData.idVentaPrepagada
+            ? doc(firestore, `sucursales/${sid}/ventas`, mesaData.idVentaPrepagada)
+            : null;
+
+        const [corrPagoSnap, corrDetalleSnap, corrVentaSnap, ventaExistenteSnap] = await Promise.all([
+            transaction.get(corrPagoRef),
+            transaction.get(corrDetalleRef),
+            transaction.get(corrVentaRef),
+            ventaExistenteRef ? transaction.get(ventaExistenteRef) : Promise.resolve(null),
+        ]);
+
+        let idD = (corrDetalleSnap.data()?.correlativo || 0) + 1;
+        const idP = (corrPagoSnap.data()?.correlativo || 0) + 1;
+        const labelEstacion = mesaData.tipoDeMesa === 'Consola' ? 'Consola' : 'Mesa';
+
+        const nuevosDetalles: DetalleVenta[] = [];
+
+        if (montoTiempo > 0) {
+            const minutosTotales = Math.round((mesaData.tiempoDefinido || 0) / 60);
+            nuevosDetalles.push({
+                idDetalle: idD++,
+                idProducto: `mesa-${mesa.id}`,
+                nombreProducto: `Alquiler anticipado ${labelEstacion} #${mesaData.numeroMesa}${minutosTotales > 0 ? ` (${minutosTotales} min)` : ''}`,
+                cantidad: 1,
+                precioUnitario: montoTiempo,
+                subtotal: montoTiempo,
+                saldo: 0,
+                pagadoEfectivo: metodoDePago === 'Efectivo' ? montoTiempo : 0,
+                pagadoTarjeta: metodoDePago === 'Tarjeta' ? montoTiempo : 0,
+                metodoPago: metodoDePago,
+                estado: 'Pagada',
+                fechaAgregado: Timestamp.now(),
+                esVirtual: false,
+                metadata: {
+                    tipo: 'alquiler',
+                    modo: mesaData.modoJuego || 'definido',
+                    pagadoContado: true,
+                    horaInicio: mesaData.horaInicio,
+                },
+            });
+        }
+
+        consumosAPagar.forEach((it: any) => {
+            const sub = Number(it.total || 0);
+            nuevosDetalles.push({
+                idDetalle: idD++,
+                idProducto: it.idProducto,
+                nombreProducto: it.nombreProducto,
+                cantidad: it.cantidad,
+                precioUnitario: it.precioUnitario,
+                subtotal: sub,
+                saldo: 0,
+                pagadoEfectivo: metodoDePago === 'Efectivo' ? sub : 0,
+                pagadoTarjeta: metodoDePago === 'Tarjeta' ? sub : 0,
+                metodoPago: metodoDePago,
+                estado: 'Pagada',
+                fechaAgregado: Timestamp.now(),
+                esVirtual: !!it.esVirtual,
+                metadata: { tipo: 'consumo' },
+            });
+        });
+
+        let ventaDocIdFinal: string;
+        let idVentaFinal: number;
+        let ventaTotalFinal: number;
+
+        if (ventaExistenteSnap && ventaExistenteSnap.exists() && ventaExistenteRef) {
+            const ventaData = ventaExistenteSnap.data() as Venta;
+            ventaDocIdFinal = ventaExistenteRef.id;
+            idVentaFinal = ventaData.idVenta;
+            ventaTotalFinal = (ventaData.total || 0) + montoTotalPagado;
+
+            transaction.update(ventaExistenteRef, {
+                detalles: [...(ventaData.detalles || []), ...nuevosDetalles],
+                total: ventaTotalFinal,
+                saldo: 0,
+                metodoPago:
+                    ventaData.metodoPago === metodoDePago || !ventaData.metodoPago
+                        ? metodoDePago
+                        : 'Mixto',
+            });
+        } else {
+            idVentaFinal = (corrVentaSnap.data()?.correlativo || 0) + 1;
+            ventaDocIdFinal = idVentaFinal.toString();
+            ventaTotalFinal = montoTotalPagado;
+
+            transaction.set(doc(firestore, `sucursales/${sid}/ventas`, ventaDocIdFinal), {
+                idVenta: idVentaFinal,
+                sucursalId: sid,
+                fecha: serverTimestamp(),
+                clienteId: '0',
+                nombreCliente: `${labelEstacion} ${mesaData.numeroMesa}`,
+                total: ventaTotalFinal,
+                saldo: 0,
+                tipoVenta: 'POS',
+                metodoPago: metodoDePago,
+                estado: 'Pagada',
+                detalles: nuevosDetalles,
+            });
+            transaction.set(corrVentaRef, { correlativo: idVentaFinal }, { merge: true });
+        }
+
+        const itemsSaldados = nuevosDetalles.map((d) => ({
+            idDetalle: d.idDetalle,
+            nombreProducto: d.nombreProducto,
+            montoAplicado: d.subtotal,
+            subtotalItem: d.subtotal,
+            esVirtual: !!d.esVirtual,
+            cantidad: d.cantidad,
+        }));
+
+        const pagoData: Omit<Pago, 'id'> = {
+            idPago: idP,
+            sucursalId: sid,
+            fecha: serverTimestamp(),
+            idVenta: idVentaFinal,
+            ventaDocId: ventaDocIdFinal,
+            clienteNombre: `${labelEstacion} ${mesaData.numeroMesa}`,
+            montoTotalPagado,
+            ventaTotal: ventaTotalFinal,
+            metodoPago: metodoDePago,
+            usuarioId,
+            itemsSaldados,
+        };
+
+        transaction.set(doc(firestore, `sucursales/${sid}/pagos`, idP.toString()), pagoData);
+        transaction.set(corrPagoRef, { correlativo: idP }, { merge: true });
+        transaction.set(corrDetalleRef, { correlativo: idD - 1 }, { merge: true });
+
+        if (metodoDePago === 'Efectivo') {
+            const updatesGenerales: Record<string, any> = {};
+            if (montoTiempo > 0) updatesGenerales.totalMesas = increment(montoTiempo);
+            if (totalConsumo > 0) updatesGenerales.totalEfectivo = increment(totalConsumo);
+            if (Object.keys(updatesGenerales).length > 0) {
+                transaction.update(generalesRef, updatesGenerales);
+            }
+        } else {
+            const monedasCard = itemsSaldados
+                .filter((i) => i.esVirtual)
+                .reduce((acc, i) => acc + i.montoAplicado, 0);
+            const otrosCard = montoTotalPagado - monedasCard;
+            if (otrosCard > 0) transaction.update(generalesRef, { totalVentasTarjeta: increment(otrosCard) });
+            if (monedasCard > 0) {
+                transaction.update(generalesRef, {
+                    totalMonedasTarjeta: increment(monedasCard),
+                    acumuladoMonedasTarjeta: increment(monedasCard),
+                });
+            }
+        }
+
+        // Actualizar mesa manteniendo la sesión activa sin liberar
+        const mesaUpdates: Record<string, any> = {
+            idVentaPrepagada: ventaDocIdFinal,
+        };
+
+        if (montoTiempo > 0) {
+            mesaUpdates.alquilerPagado = true;
+            mesaUpdates.montoACobrar = 0;
+            if (Array.isArray(mesaData.ajustesDeTiempo) && mesaData.ajustesDeTiempo.length > 0) {
+                mesaUpdates.ajustesDeTiempo = mesaData.ajustesDeTiempo.map((a: any) => ({
+                    ...a,
+                    pagado: true,
+                }));
+            }
+        }
+
+        if (consumosAPagar.length > 0) {
+            mesaUpdates.consumos = [];
+        }
+
+        transaction.update(mesaRef, mesaUpdates);
+
+        registrarAuditoria(firestore, sid, {
+            usuarioId,
+            categoria: 'MESAS',
+            accion: 'MESA_COBRAR',
+            titulo: `Pago anticipado ${labelEstacion} #${mesaData.numeroMesa}`,
+            descripcion: `Concepto: ${tipoPago} • Monto: Q${montoTotalPagado.toFixed(2)} (${metodoDePago}) • Estación sigue activa`,
+            detalles: {
+                mesaId: mesa.id,
+                numeroMesa: mesaData.numeroMesa,
+                tipoPago,
+                montoTiempo,
+                totalConsumo,
+                montoTotalPagado,
+                metodoDePago,
+            },
         }, transaction);
     });
 }

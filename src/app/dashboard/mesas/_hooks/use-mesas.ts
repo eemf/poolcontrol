@@ -11,7 +11,9 @@ import {
   trasladarMesa, 
   ajustarTiempoDefinido, 
   procesarPagoDivision, 
-  eliminarConsumoMesa 
+  eliminarConsumoMesa,
+  procesarPagoAnticipadoMesa,
+  type TipoPagoAnticipadoMesa,
 } from '@/lib/firebase/servicios/mesas';
 import { 
   descontarStockTemporal, 
@@ -491,6 +493,35 @@ export function useMesas() {
     }
   }, [tableToCharge, firestore, user, sucursalId, editableCost, serverOffset, toast, processingCharge]);
 
+  /** Cobra tiempo, consumos o ambos por adelantado sin detener el reloj ni liberar la mesa/consola. */
+  const handlePagoAnticipado = useCallback(async (tipoPago: TipoPagoAnticipadoMesa, metodo: 'Efectivo' | 'Tarjeta') => {
+    if (!tableToCharge || !firestore || !user || !sucursalId || processingCharge) return;
+    setProcessingCharge(true);
+    try {
+      await procesarPagoAnticipadoMesa({
+        firestore,
+        sucursalId,
+        mesa: tableToCharge,
+        usuarioId: user.uid,
+        tipoPago,
+        costoAlquiler: Number(editableCost) || 0,
+        metodoDePago: metodo,
+      });
+      toast({
+        title: 'Pago anticipado registrado',
+        description: 'El cobro se guardó y la estación sigue activa.',
+      });
+      setIsCobroModalOpen(false);
+      setTableToCharge(null);
+      setNumeroDePartes(null);
+      setCurrentDivisionStep(null);
+    } catch (e: any) {
+      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+    } finally {
+      setProcessingCharge(false);
+    }
+  }, [tableToCharge, firestore, user, sucursalId, editableCost, toast, processingCharge]);
+
   const handlePasarACuenta = useCallback(async (clienteId: string) => {
     if (!tableToCharge || !firestore || !user || !sucursalId || processingCharge) return;
     setProcessingCharge(true);
@@ -908,6 +939,7 @@ export function useMesas() {
     handleStartTime,
     handleFinalizarSinCosto,
     handleProcederConPago,
+    handlePagoAnticipado,
     handlePasarACuenta,
     handleAddConsumo,
     handleRemoveFromTempCart,

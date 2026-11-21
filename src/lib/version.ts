@@ -12,9 +12,34 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
-    build: 243,
+    build: 245,
     fecha: "2026-11-20",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b245",
+    descripcion: "Pago anticipado en Sala de Juegos para cobrar tiempo o consumos sin liberar la mesa o consola.",
+    cambios: [
+      "Servicios de Mesas (`servicios/mesas.ts`): Añadida transacción `procesarPagoAnticipadoMesa` que liquida tiempo definido, consumos o ambos manteniendo el estado `ocupado` y el reloj en marcha, y ajustado `procesarVentaTiempoDeMesa` para cierres posteriores.",
+      "Cobro de Mesa (`billing-dialog.tsx`, `use-mesas.ts`, `mesas-dialogs.tsx`): Añadida pestaña `Anticipado` con selección de concepto (`Ambos`, `Solo Tiempo`, `Solo Consumos`) y pago en Efectivo o Tarjeta sin liberar la estación."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 244,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b244",
+    descripcion: "Corregido cierre automático del modal de Cliente con Deuda Activa al confirmar venta en POS.",
+    cambios: [
+      "Punto de Venta (`use-ventas.ts`): Añadido `setAlertaClienteConCreditoAbierta(false)` en el bloque `finally` de `procederAGuardarVenta` para cerrar el modal tras confirmar continuar la venta."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 243,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b243",
     descripcion: "Habilitada la opción Tamaño de Fuente para todos los perfiles sin restricciones de permisos.",

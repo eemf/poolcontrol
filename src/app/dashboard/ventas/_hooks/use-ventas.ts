@@ -319,7 +319,10 @@ export function useVentas() {
       });
       clienteInputRef.current?.focus();
     } catch (e: any) { toast({ title: "Error al Guardar Venta", description: e.message, variant: "destructive" }); }
-    finally { setProcesandoGuardado(false); }
+    finally {
+      setProcesandoGuardado(false);
+      setAlertaClienteConCreditoAbierta(false);
+    }
   }, [firestore, user, sucursalId, clienteSeleccionadoId, idVentaActiva, carrito, clientes, toast, procesandoGuardado, profile]);
 
   const manejarGuardarVenta = useCallback(() => {

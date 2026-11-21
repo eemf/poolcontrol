@@ -36,6 +36,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
     processingCharge,
     handleFinalizarSinCosto,
     handleProcederConPago,
+    handlePagoAnticipado,
     handlePasarACuenta,
     clientesOptions,
     clienteInputRef,
@@ -133,6 +134,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
         processingCharge={processingCharge}
         onFinalizarSinCosto={handleFinalizarSinCosto}
         onProcederConPago={handleProcederConPago}
+        onPagoAnticipado={handlePagoAnticipado}
         onPasarACuenta={handlePasarACuenta}
         clientesOptions={clientesOptions}
         clienteInputRef={clienteInputRef as any}
