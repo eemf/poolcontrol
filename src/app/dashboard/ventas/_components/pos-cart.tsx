@@ -55,7 +55,7 @@ export function POSCart({ carrito, clienteSeleccionadoId, manejarEliminarDelCarr
             {getFechaFormateada(item.fechaAgregado)}
           </div>
           {item.promocionAplicada && (
-            <Badge className="w-fit rounded-full text-[10px] font-semibold px-2 py-0 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 gap-1">
+            <Badge className="w-fit rounded-full text-[0.625rem] font-semibold px-2 py-0 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 gap-1">
               <Percent className="h-2.5 w-2.5" />
               {item.promocionAplicada.nombre}
             </Badge>
@@ -89,7 +89,7 @@ export function POSCart({ carrito, clienteSeleccionadoId, manejarEliminarDelCarr
                 <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
                   <div className="text-right">
                     {item.promocionAplicada && item.precioOriginal !== undefined && (
-                      <div className="text-[11px] text-slate-500 line-through tabular-nums leading-none mb-0.5">
+                      <div className="text-[0.6875rem] text-slate-500 line-through tabular-nums leading-none mb-0.5">
                         Q{(item.precioOriginal * item.cantidad).toFixed(2)}
                       </div>
                     )}

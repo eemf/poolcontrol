@@ -49,13 +49,13 @@ export function ListaGastos({
   const renderBadgeEstado = (estado: string) => {
     if (estado === 'pendiente') {
       return (
-        <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-[11px] font-semibold px-2.5 py-0.5">
+        <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-[0.6875rem] font-semibold px-2.5 py-0.5">
           Pendiente
         </Badge>
       );
     }
     return (
-      <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[11px] font-semibold px-2.5 py-0.5">
+      <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[0.6875rem] font-semibold px-2.5 py-0.5">
         Procesado
       </Badge>
     );
@@ -117,7 +117,7 @@ export function ListaGastos({
                     <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
                       #{gasto.idGasto}. {gasto.descripcion}
                     </p>
-                    <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+                    <span className="inline-flex items-center gap-1 text-[0.6875rem] text-slate-400 font-medium">
                       <Clock className="h-3 w-3 text-slate-500 shrink-0" />
                       {format(gasto.fecha.toDate(), "dd/MM/yyyy • hh:mm a", { locale: es })}
                     </span>

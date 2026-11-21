@@ -328,7 +328,7 @@ export function ConsumptionDialog({
                     </Button>
                   </div>
                 </div>
-                <p className="text-[10px] text-slate-400 text-center">
+                <p className="text-[0.625rem] text-slate-400 text-center">
                   Presiona F6 para salir del modo manual
                 </p>
               </>
@@ -411,7 +411,7 @@ export function ConsumptionDialog({
                     </Button>
                   </div>
                 </div>
-                <p className="text-[10px] text-slate-400 text-center">
+                <p className="text-[0.625rem] text-slate-400 text-center">
                   Presiona F6 para agregar un ítem manual
                 </p>
               </>
@@ -582,7 +582,7 @@ export function ConsumptionDialog({
                   <h3 className="font-headline text-base font-bold text-slate-100 leading-tight">
                     ¿Eliminar Producto?
                   </h3>
-                  <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                  <p className="text-[0.6875rem] text-slate-400 mt-0.5 truncate">
                     {isConsola ? 'Consola' : 'Mesa'} #{mesaParaConsumo?.numeroMesa} • Confirma la eliminación
                   </p>
                 </div>
@@ -594,7 +594,7 @@ export function ConsumptionDialog({
                     <p className="text-xs font-bold text-slate-100 truncate">
                       {itemAEliminar.nombreProducto}
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                    <p className="text-[0.6875rem] text-slate-400 mt-0.5 flex items-center gap-1.5">
                       <span>
                         {itemAEliminar.cantidad} &times; Q
                         {Number(itemAEliminar.precioUnitario ?? 0).toFixed(2)} c/u
@@ -611,7 +611,7 @@ export function ConsumptionDialog({
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
+                <div className="pt-2 border-t border-[#2e2e2e] text-[0.6875rem] text-slate-300 leading-snug">
                   {itemAEliminar.idProducto !== 'item-manual' ? (
                     <span>
                       Se devolverá{' '}

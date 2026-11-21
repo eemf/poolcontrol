@@ -52,7 +52,7 @@ export function ListaGastos({ items, selected, onSelect, onSelectAll }: ListaGas
                     <DollarSign className="hidden sm:block h-5 w-5 text-rose-400 shrink-0" />
                     <div className="flex flex-col min-w-0 flex-1">
                       <span className="font-bold text-xs sm:text-sm text-foreground truncate">{gasto.descripcion} #{gasto.idGasto}</span>
-                      <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">
+                      <span className="text-[0.625rem] sm:text-xs text-muted-foreground font-medium truncate">
                         {gasto.categoria} • {format(gasto.fecha.toDate(), "dd MMM, yyyy", { locale: es })}
                       </span>
                     </div>
@@ -61,7 +61,7 @@ export function ListaGastos({ items, selected, onSelect, onSelectAll }: ListaGas
                     <p className="font-bold text-xs sm:text-sm text-rose-400 whitespace-nowrap tabular-nums leading-tight">
                       - Q{gasto.monto.toFixed(2)}
                     </p>
-                    <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
+                    <Badge className="rounded-full text-[0.625rem] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                       Pendiente
                     </Badge>
                   </div>

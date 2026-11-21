@@ -164,7 +164,7 @@ export function ListaUsuariosMaestro({
                       <p className="font-bold text-sm sm:text-base text-slate-100 truncate">
                         {usuario.nombre}
                       </p>
-                      <p className="text-[11px] text-slate-400 truncate flex items-center gap-1">
+                      <p className="text-[0.6875rem] text-slate-400 truncate flex items-center gap-1">
                         <Mail className="h-3 w-3 shrink-0" />
                         <span className="truncate">{usuario.email}</span>
                       </p>
@@ -172,11 +172,11 @@ export function ListaUsuariosMaestro({
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <Badge className={cn('rounded-full font-semibold px-2.5 py-0.5 text-[10px]', getRolBadge(usuario.rol))}>
+                    <Badge className={cn('rounded-full font-semibold px-2.5 py-0.5 text-[0.625rem]', getRolBadge(usuario.rol))}>
                       {usuario.rol}
                     </Badge>
                     {usuario.accesoGlobal && (
-                      <Badge className="hidden sm:inline-flex rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold px-2.5 py-0.5 gap-1">
+                      <Badge className="hidden sm:inline-flex rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[0.625rem] font-semibold px-2.5 py-0.5 gap-1">
                         <ArrowLeftRight className="h-2.5 w-2.5" />
                         Multi-sucursal
                       </Badge>
@@ -198,7 +198,7 @@ export function ListaUsuariosMaestro({
                         if (!usuario.accesoGlobal) {
                           const sucBase = sucursales.find(s => s.id === usuario.sucursalId)
                           return (
-                            <Badge className="rounded-full bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e] text-[11px] font-medium">
+                            <Badge className="rounded-full bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e] text-[0.6875rem] font-medium">
                               Únicamente sucursal base ({sucBase?.nombre || selectedSucursalNombre})
                             </Badge>
                           )
@@ -210,11 +210,11 @@ export function ListaUsuariosMaestro({
                         if (esTodas) {
                           return (
                             <>
-                              <Badge className="rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[11px] font-semibold">
+                              <Badge className="rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[0.6875rem] font-semibold">
                                 Todas las sucursales ({sucursales.length})
                               </Badge>
                               {sucursales.map(s => (
-                                <Badge key={s.id} className="rounded-full bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e] text-[10px] font-medium">
+                                <Badge key={s.id} className="rounded-full bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e] text-[0.625rem] font-medium">
                                   {s.nombre}
                                 </Badge>
                               ))}
@@ -229,14 +229,14 @@ export function ListaUsuariosMaestro({
                             <Badge
                               key={sId}
                               className={cn(
-                                "rounded-full text-[11px] font-medium flex items-center gap-1.5",
+                                "rounded-full text-[0.6875rem] font-medium flex items-center gap-1.5",
                                 esBase
                                   ? "bg-sky-500/15 text-sky-300 border border-sky-500/30 font-semibold"
                                   : "bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e]"
                               )}
                             >
                               <span>{suc?.nombre || `Sucursal ${sId}`}</span>
-                              {esBase && <span className="text-[9px] bg-sky-600 text-white px-1.5 py-0 rounded-full">Base</span>}
+                              {esBase && <span className="text-[0.5625rem] bg-sky-600 text-white px-1.5 py-0 rounded-full">Base</span>}
                             </Badge>
                           )
                         })

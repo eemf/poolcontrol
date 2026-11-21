@@ -61,7 +61,7 @@ function VersionResumenCard({
           </span>
           <Badge
             className={cn(
-              'rounded-full text-[11px] font-semibold px-2.5 py-0.5 border',
+              'rounded-full text-[0.6875rem] font-semibold px-2.5 py-0.5 border',
               esActual
                 ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
                 : 'bg-sky-500/15 text-sky-400 border-sky-500/30'
@@ -216,28 +216,28 @@ export default function AcercaDePage() {
                     </span>
                     <Badge
                       variant="outline"
-                      className="text-[11px] font-semibold h-5 rounded-full px-2.5 bg-[#1e1e1e] border-[#2e2e2e] text-slate-300"
+                      className="text-[0.6875rem] font-semibold h-5 rounded-full px-2.5 bg-[#1e1e1e] border-[#2e2e2e] text-slate-300"
                     >
                       Build {item.build}
                     </Badge>
                     <Badge
                       variant="outline"
-                      className="text-[11px] font-medium h-5 rounded-full px-2.5 bg-[#1e1e1e] border-[#2e2e2e] text-slate-400"
+                      className="text-[0.6875rem] font-medium h-5 rounded-full px-2.5 bg-[#1e1e1e] border-[#2e2e2e] text-slate-400"
                     >
                       {item.tipo}
                     </Badge>
                     {isActual && (
-                      <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full text-[11px] font-semibold h-5 px-2.5">
+                      <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full text-[0.6875rem] font-semibold h-5 px-2.5">
                         Publicada Actual
                       </Badge>
                     )}
                     {isAnterior && (
-                      <Badge className="bg-sky-500/15 text-sky-400 border border-sky-500/30 rounded-full text-[11px] font-semibold h-5 px-2.5">
+                      <Badge className="bg-sky-500/15 text-sky-400 border border-sky-500/30 rounded-full text-[0.6875rem] font-semibold h-5 px-2.5">
                         Publicada Anterior
                       </Badge>
                     )}
                     {!isActual && !isAnterior && (
-                      <Badge className="bg-[#1e1e1e] text-slate-400 border border-[#2e2e2e] rounded-full text-[11px] font-medium h-5 px-2.5">
+                      <Badge className="bg-[#1e1e1e] text-slate-400 border border-[#2e2e2e] rounded-full text-[0.6875rem] font-medium h-5 px-2.5">
                         Archivada
                       </Badge>
                     )}
@@ -251,7 +251,7 @@ export default function AcercaDePage() {
                     <span>{item.fecha}</span>
                   </div>
                   {item.tagGit && (
-                    <span className="text-[11px] font-mono text-sky-400 flex items-center gap-1 bg-[#1e1e1e] border border-[#2e2e2e] px-2 py-0.5 rounded-full">
+                    <span className="text-[0.6875rem] font-mono text-sky-400 flex items-center gap-1 bg-[#1e1e1e] border border-[#2e2e2e] px-2 py-0.5 rounded-full">
                       <GitBranch className="h-3 w-3" />
                       {item.tagGit}
                     </span>

@@ -423,7 +423,7 @@ export function NuevoTrasladoDialog({
                       Producto
                     </Label>
                     {productoSeleccionado && (
-                      <span className="text-[11px] font-semibold text-sky-400">
+                      <span className="text-[0.6875rem] font-semibold text-sky-400">
                         Stock: {productoSeleccionado.existencia ?? 0} uds
                       </span>
                     )}
@@ -506,7 +506,7 @@ export function NuevoTrasladoDialog({
                 <SurfaceCard variant="surface" className="p-2.5 flex flex-wrap items-center gap-1.5 animate-in fade-in duration-200">
                   <div className="flex items-center gap-1.5 text-slate-400 shrink-0">
                     <History className="h-3.5 w-3.5 text-sky-400 shrink-0" />
-                    <span className="text-[11px] font-semibold text-slate-200">
+                    <span className="text-[0.6875rem] font-semibold text-slate-200">
                       Historial de precios:
                     </span>
                   </div>
@@ -534,13 +534,13 @@ export function NuevoTrasladoDialog({
                             <span className={cn('text-xs font-bold tabular-nums', isSelected ? 'text-white' : 'text-sky-400')}>
                               Q{item.costoUnitario.toFixed(2)}
                             </span>
-                            <span className={cn('text-[10px]', isSelected ? 'text-white/90' : 'text-slate-400')}>
+                            <span className={cn('text-[0.625rem]', isSelected ? 'text-white/90' : 'text-slate-400')}>
                               {item.idCompra > 0 ? format(item.fecha, 'dd/MM/yy') : 'Catálogo'}
                             </span>
                             {idx === 0 && (
                               <span
                                 className={cn(
-                                  'text-[9px] font-bold px-1.5 py-0.5 rounded-full',
+                                  'text-[0.5625rem] font-bold px-1.5 py-0.5 rounded-full',
                                   isSelected ? 'bg-white/25 text-white' : 'bg-sky-500/15 text-sky-400'
                                 )}
                               >
@@ -552,7 +552,7 @@ export function NuevoTrasladoDialog({
                       })}
                     </div>
                   ) : (
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                    <span className="text-[0.6875rem] text-slate-400 flex items-center gap-1">
                       <Tag className="h-3 w-3 opacity-60" />
                       Sin historial registrado. Se utilizará el costo actual del producto.
                     </span>

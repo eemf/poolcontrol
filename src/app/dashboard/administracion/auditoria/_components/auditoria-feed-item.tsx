@@ -119,26 +119,26 @@ export function AuditoriaFeedItem({
                 <span className="font-bold text-xs sm:text-sm text-slate-100 truncate min-w-0 sm:max-w-[280px]">
                   {registro.titulo}
                 </span>
-                <Badge variant="outline" className={cn("text-[9.5px] px-2 py-0 h-4.5 font-medium rounded-full shrink-0", catConfig.badgeClass)}>
+                <Badge variant="outline" className={cn("text-[0.59375rem] px-2 py-0 h-4.5 font-medium rounded-full shrink-0", catConfig.badgeClass)}>
                   {catConfig.label}
                 </Badge>
-                <span className="hidden sm:inline text-[11px] text-muted-foreground shrink-0">
+                <span className="hidden sm:inline text-[0.6875rem] text-muted-foreground shrink-0">
                   • {horaRelativa}
                 </span>
               </div>
 
               {/* Fila 2: Resumen legible */}
-              <p className="text-[11px] sm:text-xs text-slate-300 sm:text-muted-foreground line-clamp-1">
+              <p className="text-[0.6875rem] sm:text-xs text-slate-300 sm:text-muted-foreground line-clamp-1">
                 {registro.descripcion}
               </p>
 
               {/* Fila 3 (solo móvil): Operador y tiempo relativo limpio sin puntos huérfanos ni rol redundante */}
-              <div className="flex sm:hidden items-center justify-between gap-2 text-[11px] text-slate-400 pt-0.5">
+              <div className="flex sm:hidden items-center justify-between gap-2 text-[0.6875rem] text-slate-400 pt-0.5">
                 <span className="inline-flex items-center gap-1 text-slate-300 font-medium truncate min-w-0">
                   <User className="h-3 w-3 text-sky-400 shrink-0" />
                   <span className="truncate">{userInfo.nombre}</span>
                 </span>
-                <span className="text-[10.5px] text-slate-400 shrink-0">
+                <span className="text-[0.65625rem] text-slate-400 shrink-0">
                   {horaRelativa}
                 </span>
               </div>
@@ -154,25 +154,25 @@ export function AuditoriaFeedItem({
                 {userInfo.nombre}
               </span>
               {userInfo.rol && (
-                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-3.5 text-muted-foreground border-app-border rounded-full">
+                <Badge variant="outline" className="text-[0.5625rem] px-1.5 py-0 h-3.5 text-muted-foreground border-app-border rounded-full">
                   {userInfo.rol}
                 </Badge>
               )}
             </div>
 
             {/* Dispositivo / Terminal */}
-            <div className="flex items-center justify-end gap-1 text-[11px] text-muted-foreground">
+            <div className="flex items-center justify-end gap-1 text-[0.6875rem] text-muted-foreground">
               <span className="inline-flex items-center gap-1 bg-[#1e1e1e] border border-app-border px-2 py-0.5 rounded-full text-slate-200">
                 <DeviceIcon className={cn("h-3 w-3 shrink-0", deviceMeta.color)} />
                 <span>{equipoNombre}</span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-[0.625rem] text-muted-foreground">
                   ({deviceMeta.label})
                 </span>
               </span>
             </div>
 
             {/* Fecha y Hora exacta */}
-            <div className="flex items-center justify-end gap-1 text-[10.5px] text-muted-foreground tabular-nums">
+            <div className="flex items-center justify-end gap-1 text-[0.65625rem] text-muted-foreground tabular-nums">
               <Clock className="h-2.5 w-2.5 text-muted-foreground/70" />
               <span>{fechaHora}</span>
             </div>
@@ -193,7 +193,7 @@ export function AuditoriaFeedItem({
                 Detalle de la Operación
               </span>
               {idVentaRef && (
-                <Badge variant="outline" className="text-[10px] rounded-full border-sky-500/30 text-sky-400 bg-sky-500/10 font-medium">
+                <Badge variant="outline" className="text-[0.625rem] rounded-full border-sky-500/30 text-sky-400 bg-sky-500/10 font-medium">
                   Venta #{idVentaRef}
                 </Badge>
               )}
@@ -231,12 +231,12 @@ export function AuditoriaFeedItem({
                           {it.nombre}
                         </span>
                         {it.tipo === 'eliminado' && (
-                          <Badge variant="outline" className="text-[8.5px] px-1.5 py-0 h-4 border-rose-500/50 text-rose-400 bg-rose-500/10 font-bold rounded-full">
+                          <Badge variant="outline" className="text-[0.53125rem] px-1.5 py-0 h-4 border-rose-500/50 text-rose-400 bg-rose-500/10 font-bold rounded-full">
                             Eliminado
                           </Badge>
                         )}
                         {it.tipo === 'devuelto' && (
-                          <Badge variant="outline" className="text-[8.5px] px-1.5 py-0 h-4 border-amber-400 text-amber-400 rounded-full">
+                          <Badge variant="outline" className="text-[0.53125rem] px-1.5 py-0 h-4 border-amber-400 text-amber-400 rounded-full">
                             Devuelto
                           </Badge>
                         )}
@@ -259,7 +259,7 @@ export function AuditoriaFeedItem({
                   <div className="flex items-center justify-between pt-2 border-t border-app-border/40 text-xs">
                     <div className="flex items-center gap-1.5">
                       {metodoPagoDetectado && (
-                        <Badge variant="outline" className="rounded-full text-[10px] bg-app-surface border-app-border text-slate-300">
+                        <Badge variant="outline" className="rounded-full text-[0.625rem] bg-app-surface border-app-border text-slate-300">
                           Método: <strong className="text-sky-400 ml-1">{metodoPagoDetectado}</strong>
                         </Badge>
                       )}
@@ -280,7 +280,7 @@ export function AuditoriaFeedItem({
             {/* Observación o Motivo Real (solo si no duplica la lista de artículos) */}
             {mostrarDescripcion && (
               <div className="pt-1">
-                <span className="text-[11px] text-muted-foreground block mb-1 font-medium">
+                <span className="text-[0.6875rem] text-muted-foreground block mb-1 font-medium">
                   Observación / Motivo:
                 </span>
                 <p className="p-2.5 rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] text-slate-200 leading-relaxed text-xs">
@@ -297,7 +297,7 @@ export function AuditoriaFeedItem({
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
                 Trazabilidad y Seguridad
               </span>
-              <span className="text-[10px] text-muted-foreground tabular-nums">
+              <span className="text-[0.625rem] text-muted-foreground tabular-nums">
                 ID Evento: {registro.id?.slice(0, 8)}...
               </span>
             </div>
@@ -306,14 +306,14 @@ export function AuditoriaFeedItem({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {/* Responsable */}
               <div className="p-2.5 rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] space-y-1">
-                <span className="text-[10.5px] font-medium text-muted-foreground flex items-center gap-1">
+                <span className="text-[0.65625rem] font-medium text-muted-foreground flex items-center gap-1">
                   <User className="h-3 w-3 text-sky-400" /> Operador Responsable
                 </span>
                 <div className="flex items-center justify-between gap-1 pt-0.5">
                   <span className="font-bold text-slate-100 truncate text-xs">
                     {userInfo.nombre}
                   </span>
-                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-3.5 rounded-full border-[#2e2e2e] text-muted-foreground shrink-0">
+                  <Badge variant="outline" className="text-[0.5625rem] px-1.5 py-0 h-3.5 rounded-full border-[#2e2e2e] text-muted-foreground shrink-0">
                     {userInfo.rol || 'Operador'}
                   </Badge>
                 </div>
@@ -321,14 +321,14 @@ export function AuditoriaFeedItem({
 
               {/* Terminal / Dispositivo */}
               <div className="p-2.5 rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] space-y-1">
-                <span className="text-[10.5px] font-medium text-muted-foreground flex items-center gap-1">
+                <span className="text-[0.65625rem] font-medium text-muted-foreground flex items-center gap-1">
                   <DeviceIcon className={cn("h-3 w-3 shrink-0", deviceMeta.color)} /> Terminal / Equipo
                 </span>
                 <div className="flex items-center justify-between gap-1 pt-0.5">
                   <span className="font-bold text-slate-100 truncate text-xs">
                     {equipoNombre}
                   </span>
-                  <Badge variant="outline" className={cn("text-[9px] px-1.5 py-0 h-3.5 rounded-full shrink-0", deviceMeta.badgeClass)}>
+                  <Badge variant="outline" className={cn("text-[0.5625rem] px-1.5 py-0 h-3.5 rounded-full shrink-0", deviceMeta.badgeClass)}>
                     {deviceMeta.label}
                   </Badge>
                 </div>
@@ -337,7 +337,7 @@ export function AuditoriaFeedItem({
 
             {/* Marca de tiempo exacta y Entorno */}
             <div className="p-2.5 rounded-lg bg-[#1e1e1e] border border-[#2e2e2e] flex items-center justify-between flex-wrap gap-2 text-xs">
-              <span className="text-muted-foreground flex items-center gap-1.5 text-[11px]">
+              <span className="text-muted-foreground flex items-center gap-1.5 text-[0.6875rem]">
                 <Clock className="h-3.5 w-3.5 text-amber-400" /> Registro exacto
               </span>
               <span className="font-bold tabular-nums text-slate-200 text-xs">
@@ -348,14 +348,14 @@ export function AuditoriaFeedItem({
             {/* Parámetros específicos relevantes (filtrando volcados JSON crudos) */}
             {metadatosRelevantes.length > 0 && (
               <div className="pt-1 border-t border-[#2e2e2e]">
-                <span className="text-[10.5px] text-muted-foreground block mb-1.5 font-medium">
+                <span className="text-[0.65625rem] text-muted-foreground block mb-1.5 font-medium">
                   Parámetros adicionales:
                 </span>
                 <div className="flex flex-wrap items-center gap-1.5">
                   {metadatosRelevantes.map(([clave, valor]) => (
                     <span
                       key={clave}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#1e1e1e] border border-[#2e2e2e] text-[10.5px]"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#1e1e1e] border border-[#2e2e2e] text-[0.65625rem]"
                     >
                       <span className="text-muted-foreground capitalize">{clave}:</span>
                       <strong className="text-slate-200 tabular-nums">

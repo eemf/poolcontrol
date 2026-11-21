@@ -91,22 +91,22 @@ export function ListaClientes({
                     <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
                       #{cliente.idcliente}. {cliente.nombre}
                     </p>
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-slate-400 font-medium truncate max-w-full">
+                    <span className="inline-flex items-center gap-1.5 text-[0.6875rem] text-slate-400 font-medium truncate max-w-full">
                       <Phone className="h-3 w-3 text-slate-500 shrink-0" />
                       <span className="truncate">{cliente.telefono || 'Sin teléfono'}</span>
                     </span>
                   </div>
 
                   <div className="flex flex-col items-end gap-1 shrink-0 text-right">
-                    <Badge className={cn('rounded-full text-[11px] font-semibold px-2.5 py-0.5', getBadgeClasses(cliente.tipoCliente))}>
+                    <Badge className={cn('rounded-full text-[0.6875rem] font-semibold px-2.5 py-0.5', getBadgeClasses(cliente.tipoCliente))}>
                       {cliente.tipoCliente}
                     </Badge>
                     {cliente.permiteCredito !== false ? (
-                      <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[10px] font-semibold px-2 py-0.5">
+                      <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[0.625rem] font-semibold px-2 py-0.5">
                         Crédito activo
                       </Badge>
                     ) : (
-                      <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full text-[10px] font-semibold px-2 py-0.5">
+                      <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full text-[0.625rem] font-semibold px-2 py-0.5">
                         Sin crédito
                       </Badge>
                     )}
@@ -118,7 +118,7 @@ export function ListaClientes({
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
-                      <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
+                      <p className="text-[0.6875rem] text-slate-400 font-medium flex items-center gap-1.5">
                         <Phone className="h-3 w-3 text-sky-400 shrink-0" /> Teléfono
                       </p>
                       <p className="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5 truncate">
@@ -127,7 +127,7 @@ export function ListaClientes({
                     </div>
 
                     <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
-                      <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
+                      <p className="text-[0.6875rem] text-slate-400 font-medium flex items-center gap-1.5">
                         <CreditCard className="h-3 w-3 text-sky-400 shrink-0" /> Línea de Crédito
                       </p>
                       <p className={cn(
@@ -139,7 +139,7 @@ export function ListaClientes({
                     </div>
 
                     <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
-                      <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
+                      <p className="text-[0.6875rem] text-slate-400 font-medium flex items-center gap-1.5">
                         <ShieldCheck className="h-3 w-3 text-sky-400 shrink-0" /> Consumo Interno
                       </p>
                       <p className={cn(

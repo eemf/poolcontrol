@@ -152,22 +152,22 @@ export default function VoiceAssistantDialog({
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             {isListening ? (
-              <Badge variant="outline" className="bg-red-500/15 text-red-400 border-red-500/30 text-[11px] whitespace-nowrap px-2 py-0.5 animate-pulse">
+              <Badge variant="outline" className="bg-red-500/15 text-red-400 border-red-500/30 text-[0.6875rem] whitespace-nowrap px-2 py-0.5 animate-pulse">
                 Escuchando
               </Badge>
             ) : isSpeaking ? (
-              <Badge variant="outline" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-[11px] whitespace-nowrap px-2 py-0.5">
+              <Badge variant="outline" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-[0.6875rem] whitespace-nowrap px-2 py-0.5">
                 Hablando
               </Badge>
             ) : isProcessing ? (
-              <Badge variant="outline" className="bg-blue-500/15 text-blue-400 border-blue-500/30 text-[11px] whitespace-nowrap px-2 py-0.5">
+              <Badge variant="outline" className="bg-blue-500/15 text-blue-400 border-blue-500/30 text-[0.6875rem] whitespace-nowrap px-2 py-0.5">
                 Pensando
               </Badge>
             ) : lastResult?.motorUtilizado ? (
               <Badge
                 variant="outline"
                 className={cn(
-                  'text-[10px] px-2 py-0.5 border flex items-center gap-1 font-medium whitespace-nowrap',
+                  'text-[0.625rem] px-2 py-0.5 border flex items-center gap-1 font-medium whitespace-nowrap',
                   lastResult.motorUtilizado === 'api_groq'
                     ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
                     : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
@@ -191,7 +191,7 @@ export default function VoiceAssistantDialog({
 
         {/* Aviso de HTTPS para móviles si se conecta por IP local */}
         {!isSecureContext && isMobile && (
-          <div className="mx-4 mt-3 p-2.5 rounded-lg bg-amber-950/40 border border-amber-500/40 text-amber-200 text-[11px] flex items-start gap-2">
+          <div className="mx-4 mt-3 p-2.5 rounded-lg bg-amber-950/40 border border-amber-500/40 text-amber-200 text-[0.6875rem] flex items-start gap-2">
             <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <div>
               <span className="font-semibold block">Conexión local sin SSL detectada:</span>
@@ -262,7 +262,7 @@ export default function VoiceAssistantDialog({
                   style={{ width: `${Math.max(0, audioLevel)}%` }}
                 />
               </div>
-              <span className={cn("text-[10px] transition-colors duration-200", audioLevel > 15 ? "text-emerald-400 font-medium" : "text-slate-400")}>
+              <span className={cn("text-[0.625rem] transition-colors duration-200", audioLevel > 15 ? "text-emerald-400 font-medium" : "text-slate-400")}>
                 {audioLevel > 15 ? 'Voz detectada' : 'Esperando tu voz...'}
               </span>
             </div>
@@ -281,7 +281,7 @@ export default function VoiceAssistantDialog({
           {/* Visualización de Transcripción */}
           {(transcript || interimTranscript) && (
             <div className="w-full bg-[#252526] border border-[#2e2e2e] rounded-lg p-2.5 text-xs">
-              <span className="text-slate-400 text-[10px] block mb-0.5 font-medium">
+              <span className="text-slate-400 text-[0.625rem] block mb-0.5 font-medium">
                 Texto reconocido:
               </span>
               <p className="text-slate-100 font-medium italic">
@@ -306,7 +306,7 @@ export default function VoiceAssistantDialog({
                   <p className="text-slate-200 text-xs leading-relaxed">
                     El cliente <span className="font-bold text-amber-300 underline underline-offset-2">"{pendingConfirmation.nombreCliente}"</span> no existe en la base de datos.
                   </p>
-                  <p className="text-[11px] text-amber-200/90 font-medium">
+                  <p className="text-[0.6875rem] text-amber-200/90 font-medium">
                     {pendingConfirmation.detalles}
                   </p>
                 </div>
@@ -336,7 +336,7 @@ export default function VoiceAssistantDialog({
                 </Button>
               </div>
 
-              <div className="text-[10px] text-center text-slate-400 bg-[#1f293d] rounded py-1 px-2 border border-slate-700/60">
+              <div className="text-[0.625rem] text-center text-slate-400 bg-[#1f293d] rounded py-1 px-2 border border-slate-700/60">
                 O responde por voz diciendo <span className="text-emerald-400 font-bold">"Sí"</span> o <span className="text-red-400 font-bold">"No"</span>.
               </div>
             </div>
@@ -365,7 +365,7 @@ export default function VoiceAssistantDialog({
                   <Badge
                     variant="outline"
                     className={cn(
-                      'text-[10px] px-1.5 py-0 font-medium tracking-wide flex items-center gap-1',
+                      'text-[0.625rem] px-1.5 py-0 font-medium tracking-wide flex items-center gap-1',
                       lastResult.motorUtilizado === 'api_groq'
                         ? 'bg-cyan-500/15 text-cyan-300 border-cyan-400/40'
                         : 'bg-amber-500/15 text-amber-300 border-amber-400/40'
@@ -408,7 +408,7 @@ export default function VoiceAssistantDialog({
                 <HelpCircle className="w-3.5 h-3.5 text-blue-400" />
                 <span>Comandos sugeridos por módulo</span>
               </div>
-              <div className="flex items-center gap-1 text-[11px] text-slate-400">
+              <div className="flex items-center gap-1 text-[0.6875rem] text-slate-400">
                 <span>{mostrarComandos ? 'Ocultar' : 'Mostrar'}</span>
                 {mostrarComandos ? (
                   <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
@@ -431,7 +431,7 @@ export default function VoiceAssistantDialog({
                         type="button"
                         onClick={() => setCategoriaActiva(cat.id as any)}
                         className={cn(
-                          'flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer',
+                          'flex items-center gap-1 px-2.5 py-1 rounded-md text-[0.6875rem] font-medium transition-all cursor-pointer',
                           isActive
                             ? 'bg-blue-600 text-white shadow-sm shadow-blue-900/30'
                             : 'bg-[#252526] text-slate-400 hover:text-slate-200 hover:bg-[#2e2e2e]'
@@ -452,7 +452,7 @@ export default function VoiceAssistantDialog({
                       type="button"
                       onClick={() => handleExampleClick(ejemplo)}
                       disabled={isProcessing}
-                      className="text-[11px] bg-[#252526] hover:bg-[#2e2e2e] text-slate-300 border border-[#2e2e2e] rounded-md px-2.5 py-1 text-left transition-colors cursor-pointer active:scale-95"
+                      className="text-[0.6875rem] bg-[#252526] hover:bg-[#2e2e2e] text-slate-300 border border-[#2e2e2e] rounded-md px-2.5 py-1 text-left transition-colors cursor-pointer active:scale-95"
                     >
                       "{ejemplo}"
                     </button>

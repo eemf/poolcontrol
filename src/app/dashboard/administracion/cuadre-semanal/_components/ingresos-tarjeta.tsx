@@ -32,7 +32,7 @@ const DetalleVentasTarjeta = ({ firestore, sucursalId, inicio, fin }: { firestor
     const { data: pagos, isLoading } = useCollection<Pago>(q);
 
     if (isLoading) return <div className="flex justify-center p-2"><Loader2 className="h-4 w-4 animate-spin text-primary" /></div>;
-    if (!pagos || pagos.length === 0) return <p className="text-[10px] text-muted-foreground italic text-center p-2">Sin detalles de ventas con tarjeta.</p>;
+    if (!pagos || pagos.length === 0) return <p className="text-[0.625rem] text-muted-foreground italic text-center p-2">Sin detalles de ventas con tarjeta.</p>;
 
     return (
         <div className="space-y-2">
@@ -41,7 +41,7 @@ const DetalleVentasTarjeta = ({ firestore, sucursalId, inicio, fin }: { firestor
                     <CreditCard className="h-3.5 w-3.5 text-sky-400" />
                     <span>Desglose de ventas con tarjeta</span>
                 </h4>
-                <span className="text-[11px] font-medium text-slate-400 tabular-nums">
+                <span className="text-[0.6875rem] font-medium text-slate-400 tabular-nums">
                     {pagos.length} {pagos.length === 1 ? 'pago' : 'pagos'}
                 </span>
             </div>
@@ -50,7 +50,7 @@ const DetalleVentasTarjeta = ({ firestore, sucursalId, inicio, fin }: { firestor
                     <div key={pago.id} className="flex justify-between items-center bg-[#252526] border border-[#2e2e2e] p-2.5 rounded-xl text-xs">
                         <div className="min-w-0 pr-2">
                             <p className="font-semibold text-slate-100 truncate">Venta #{pago.idVenta} — {pago.clienteNombre}</p>
-                            <p className="text-[10px] text-slate-400">{format(toDate(pago.fecha), 'hh:mm a')}</p>
+                            <p className="text-[0.625rem] text-slate-400">{format(toDate(pago.fecha), 'hh:mm a')}</p>
                         </div>
                         <p className="font-bold text-sky-400 tabular-nums shrink-0">Q{pago.montoTotalPagado.toFixed(2)}</p>
                     </div>
@@ -125,7 +125,7 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
                         </span>
                         <div className="flex items-center gap-1 mt-0.5">
                           <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">
+                          <span className="text-[0.625rem] sm:text-xs text-muted-foreground font-medium truncate">
                             {format(cierre.fecha.toDate(), "dd MMM, yyyy", { locale: es })}
                           </span>
                         </div>
@@ -135,7 +135,7 @@ export function IngresosTarjeta({ items, selected, onSelect, onSelectAll, firest
                       <p className="font-bold text-xs sm:text-sm text-blue-400 whitespace-nowrap tabular-nums leading-tight">
                         Q{cierre.pagosTarjeta.toFixed(2)}
                       </p>
-                      <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
+                      <Badge className="rounded-full text-[0.625rem] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                         Pendiente
                       </Badge>
                     </div>

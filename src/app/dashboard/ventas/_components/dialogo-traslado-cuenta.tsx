@@ -254,7 +254,7 @@ export function DialogoTrasladoCuenta({
             className="p-3 flex items-center justify-between gap-3"
           >
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-slate-400 block">
+              <span className="text-[0.6875rem] font-semibold text-slate-400 block">
                 Cuenta de Origen
               </span>
               <div className="flex items-center gap-1.5 mt-0.5">
@@ -262,13 +262,13 @@ export function DialogoTrasladoCuenta({
                 <span className="text-sm font-bold text-slate-100 truncate">
                   {ventaOrigen.nombreCliente}
                 </span>
-                <span className="text-[11px] font-mono text-slate-400">
+                <span className="text-[0.6875rem] font-mono text-slate-400">
                   (#{ventaOrigen.idVenta})
                 </span>
               </div>
             </div>
             <div className="text-right shrink-0">
-              <span className="text-[11px] text-slate-400 block">Saldo Actual</span>
+              <span className="text-[0.6875rem] text-slate-400 block">Saldo Actual</span>
               <span className="text-sm font-black text-amber-400 tabular-nums">
                 Q{saldoOrigenActual.toFixed(2)}
               </span>
@@ -371,7 +371,7 @@ export function DialogoTrasladoCuenta({
               <label className="text-xs font-bold text-slate-200">
                 2. ¿Qué se va a trasladar?
               </label>
-              <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+              <div className="flex items-center gap-1.5 text-[0.6875rem] text-slate-400 font-medium">
                 <span>Productos a trasladar:</span>
                 <CountBadge count={itemsFinalesATrasladar.length} variant="sky" showZero />
               </div>
@@ -434,7 +434,7 @@ export function DialogoTrasladoCuenta({
                             {modoTraslado === 'todo' ? `${det.cantidad}x ` : ''}
                             {det.nombreProducto}
                           </p>
-                          <p className="text-[11px] text-slate-400">
+                          <p className="text-[0.6875rem] text-slate-400">
                             Q{det.precioUnitario.toFixed(2)} c/u • Máx: {det.cantidad}
                           </p>
                         </div>
@@ -498,7 +498,7 @@ export function DialogoTrasladoCuenta({
               </span>
             </div>
 
-            <div className="pt-2 border-t border-[#2e2e2e] space-y-1.5 text-[11px]">
+            <div className="pt-2 border-t border-[#2e2e2e] space-y-1.5 text-[0.6875rem]">
               {/* Impacto en Cuenta de Origen */}
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">
@@ -513,7 +513,7 @@ export function DialogoTrasladoCuenta({
               </div>
 
               {seEliminaOrigen && (
-                <div className="flex items-center gap-1.5 text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1.5 rounded-lg">
+                <div className="flex items-center gap-1.5 text-[0.6875rem] text-amber-300 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1.5 rounded-lg">
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-400" />
                   <span>
                     La cuenta de <strong>{ventaOrigen.nombreCliente}</strong> quedará en Q0.00 y se{' '}

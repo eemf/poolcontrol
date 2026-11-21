@@ -69,7 +69,7 @@ export function DetalleRegistrosProcesados({
 
   return (
     <div className="rounded-xl border border-[#2e2e2e] bg-[#1e1e1e] overflow-hidden">
-      <div className="px-2.5 py-1.5 bg-[#1e1e1e] border-b border-[#2e2e2e] flex items-center justify-between text-[11px] font-semibold text-slate-300">
+      <div className="px-2.5 py-1.5 bg-[#1e1e1e] border-b border-[#2e2e2e] flex items-center justify-between text-[0.6875rem] font-semibold text-slate-300">
         <span>{titulo}</span>
         <span className="text-slate-400 tabular-nums">{ids.length}</span>
       </div>
@@ -97,7 +97,7 @@ export function DetalleRegistrosProcesados({
               <div key={item.id} className="px-2.5 py-1.5 flex items-center justify-between gap-2 text-xs hover:bg-[#313131]/50 transition-colors">
                 <div className="min-w-0 flex-1 flex flex-col sm:flex-row sm:items-center sm:gap-2">
                   <span className="font-medium text-slate-100 truncate">{nombre}</span>
-                  <span className="text-[10px] text-slate-400 shrink-0 tabular-nums">{fechaStr}</span>
+                  <span className="text-[0.625rem] text-slate-400 shrink-0 tabular-nums">{fechaStr}</span>
                 </div>
                 <span className="font-bold text-slate-100 tabular-nums shrink-0">
                   Q{Number(monto).toFixed(2)}

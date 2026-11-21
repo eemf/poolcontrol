@@ -119,7 +119,7 @@ export function ControlPagosFiltros({
           <SlidersHorizontal className="h-4 w-4 shrink-0" />
           <span className="hidden sm:inline">{mostrarFiltros ? 'Ocultar' : 'Opciones'}</span>
           {filtrosActivosCount > 0 && (
-            <span className="min-w-[18px] h-[18px] rounded-full bg-amber-400 text-slate-950 font-black text-[10px] inline-flex items-center justify-center px-1">
+            <span className="min-w-[18px] h-[18px] rounded-full bg-amber-400 text-slate-950 font-black text-[0.625rem] inline-flex items-center justify-center px-1">
               {filtrosActivosCount}
             </span>
           )}
@@ -148,7 +148,7 @@ export function ControlPagosFiltros({
                 <SelectItem value="personalizado">Rango personalizado</SelectItem>
                 {cierres && cierres.length > 0 && (
                   <>
-                    <div className="px-2 py-1 text-[10px] font-bold text-slate-400 border-t border-[#2e2e2e] mt-1">
+                    <div className="px-2 py-1 text-[0.625rem] font-bold text-slate-400 border-t border-[#2e2e2e] mt-1">
                       Turnos Anteriores
                     </div>
                     {cierres.slice(0, 10).map((c) => (

@@ -52,7 +52,7 @@ export function TransferDialog({
       onConfirmar={onConfirm}
     >
       <div className="space-y-1.5 text-left">
-        <Label htmlFor="mesa-destino" className="text-[11px] font-semibold text-slate-300 ml-1">
+        <Label htmlFor="mesa-destino" className="text-[0.6875rem] font-semibold text-slate-300 ml-1">
           Estación de Destino
         </Label>
         <Select value={mesaDestinoId} onValueChange={setMesaDestinoId}>

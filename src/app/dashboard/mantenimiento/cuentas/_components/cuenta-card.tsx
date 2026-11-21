@@ -29,7 +29,7 @@ export function CuentaCard({ cuenta, onEdit, onDelete }: CuentaCardProps) {
               <CardTitle className="text-base font-bold text-slate-100 truncate">{cuenta.nombre}</CardTitle>
               <Badge
                 variant="secondary"
-                className="rounded-full text-[10px] font-semibold mt-0.5 bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e]"
+                className="rounded-full text-[0.625rem] font-semibold mt-0.5 bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e]"
               >
                 {cuenta.tipo}
               </Badge>

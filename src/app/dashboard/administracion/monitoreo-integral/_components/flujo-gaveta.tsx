@@ -233,12 +233,12 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
               <div className="min-w-0">
                 <div className="font-bold text-sm sm:text-base text-white flex items-center gap-2 flex-wrap">
                   <span>Fondo inicial de caja (gaveta)</span>
-                  <Badge className="text-[10px] bg-sky-500/20 text-sky-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
+                  <Badge className="text-[0.625rem] bg-sky-500/20 text-sky-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
                     <Banknote className="h-2.5 w-2.5 sm:hidden" />
                     <span>Apertura</span>
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
+                <p className="text-[0.6875rem] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
                   <Clock className="h-3 w-3 text-slate-500" /> {format(inicioPeriodo, "dd/MM/yyyy hh:mm a", { locale: es })}
                 </p>
               </div>
@@ -247,7 +247,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
               <span className="text-sm sm:text-base font-bold text-sky-400 tabular-nums">
                 Q{resumen.inicial.toFixed(2)}
               </span>
-              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Saldo inicial</p>
+              <p className="text-[0.625rem] text-slate-400 font-medium mt-0.5">Saldo inicial</p>
             </div>
           </SurfaceCard>
         )}
@@ -290,16 +290,16 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
                       <span className="font-bold text-sm sm:text-base text-white truncate max-w-[160px] sm:max-w-[280px]">
                         {pago.clienteNombre || 'Consumidor final'}
                       </span>
-                      <span className="text-[10px] font-semibold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20 tabular-nums">
+                      <span className="text-[0.625rem] font-semibold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20 tabular-nums">
                         Pago #{pago.idPago}
                       </span>
                       {pago.idVenta && (
-                        <span className="text-[10px] text-slate-400 font-medium hidden sm:inline tabular-nums">
+                        <span className="text-[0.625rem] text-slate-400 font-medium hidden sm:inline tabular-nums">
                           Venta #{pago.idVenta}
                         </span>
                       )}
                       <Badge className={cn(
-                        "text-[10px] font-semibold rounded-full px-2 py-0.5 border-none flex items-center gap-1",
+                        "text-[0.625rem] font-semibold rounded-full px-2 py-0.5 border-none flex items-center gap-1",
                         tieneAlquiler ? "bg-indigo-500/20 text-indigo-300" : "bg-emerald-500/20 text-emerald-400"
                       )}>
                         <span className="sm:hidden">
@@ -309,7 +309,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
                       </Badge>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
+                    <div className="flex items-center gap-2 text-[0.6875rem] text-slate-400 mt-1 font-medium">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3 text-slate-500" />
                         {format(toDate(pago.fecha), "hh:mm:ss a")}
@@ -327,7 +327,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
                   <p className="text-sm sm:text-base font-bold text-emerald-400 tabular-nums">
                     +Q{pago.montoConsumo.toFixed(2)}
                   </p>
-                  <p className="text-[10px] text-slate-400 tabular-nums font-medium mt-0.5">
+                  <p className="text-[0.625rem] text-slate-400 tabular-nums font-medium mt-0.5">
                     Fondo: Q{pago.saldoAcumulado.toFixed(2)}
                   </p>
                 </div>
@@ -349,12 +349,12 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
               <div className="min-w-0">
                 <div className="font-bold text-sm sm:text-base text-white flex items-center gap-2 flex-wrap">
                   <span>Fondo inicial de caja (gaveta)</span>
-                  <Badge className="text-[10px] bg-sky-500/20 text-sky-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
+                  <Badge className="text-[0.625rem] bg-sky-500/20 text-sky-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
                     <Banknote className="h-2.5 w-2.5 sm:hidden" />
                     <span>Apertura</span>
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
+                <p className="text-[0.6875rem] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
                   <Clock className="h-3 w-3 text-slate-500" /> {format(inicioPeriodo, "dd/MM/yyyy hh:mm a", { locale: es })}
                 </p>
               </div>
@@ -363,7 +363,7 @@ export function FlujoGaveta({ resumen, flujo, inicioPeriodo }: FlujoGavetaProps)
               <span className="text-sm sm:text-base font-bold text-sky-400 tabular-nums">
                 Q{resumen.inicial.toFixed(2)}
               </span>
-              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Saldo inicial</p>
+              <p className="text-[0.625rem] text-slate-400 font-medium mt-0.5">Saldo inicial</p>
             </div>
           </SurfaceCard>
         )}

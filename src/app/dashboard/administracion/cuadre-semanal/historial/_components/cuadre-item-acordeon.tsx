@@ -50,7 +50,7 @@ export const CuadreItemAcordeon = memo(function CuadreItemAcordeon({
             <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
               #{cuadre.idCuadreSemanal}. {format(fecha, "dd 'de' MMMM, yyyy", { locale: es })}
             </p>
-            <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+            <span className="inline-flex items-center gap-1 text-[0.6875rem] text-slate-400 font-medium">
               <Clock className="h-3 w-3 text-slate-500 shrink-0" />
               {format(fecha, 'dd/MM/yyyy • hh:mm a', { locale: es })}
             </span>
@@ -62,8 +62,8 @@ export const CuadreItemAcordeon = memo(function CuadreItemAcordeon({
             <Badge
               className={
                 cuadre.estadoMensual === 'procesado'
-                  ? 'rounded-full border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-semibold bg-emerald-500/20 text-emerald-300'
-                  : 'rounded-full border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-semibold bg-amber-500/20 text-amber-300'
+                  ? 'rounded-full border border-emerald-500/30 px-2.5 py-0.5 text-[0.6875rem] font-semibold bg-emerald-500/20 text-emerald-300'
+                  : 'rounded-full border border-amber-500/30 px-2.5 py-0.5 text-[0.6875rem] font-semibold bg-amber-500/20 text-amber-300'
               }
             >
               {cuadre.estadoMensual === 'procesado' ? 'Procesado' : 'Pendiente'}
@@ -78,7 +78,7 @@ export const CuadreItemAcordeon = memo(function CuadreItemAcordeon({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {kpis.map(({ label, value, valueClass }) => (
               <div key={label} className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2 min-w-0">
-                <p className="text-[11px] text-slate-400 font-medium truncate">{label}</p>
+                <p className="text-[0.6875rem] text-slate-400 font-medium truncate">{label}</p>
                 <p className={`text-sm font-bold tabular-nums mt-0.5 truncate ${valueClass}`}>{value}</p>
               </div>
             ))}
@@ -87,12 +87,12 @@ export const CuadreItemAcordeon = memo(function CuadreItemAcordeon({
           {/* Ruta de cuentas compacta */}
           <div className="flex items-center justify-between gap-2 px-3 py-2 border border-[#2e2e2e] rounded-xl bg-[#252526] text-xs">
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] text-slate-400 mr-1.5">Origen:</span>
+              <span className="text-[0.625rem] text-slate-400 mr-1.5">Origen:</span>
               <span className="font-semibold text-slate-100 truncate">{cuadre.cuentas.origenNombre}</span>
             </div>
             <ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
             <div className="min-w-0 flex-1 text-right">
-              <span className="text-[10px] text-slate-400 mr-1.5">Destino:</span>
+              <span className="text-[0.625rem] text-slate-400 mr-1.5">Destino:</span>
               <span className="font-semibold text-slate-100 truncate">{cuadre.cuentas.destinoNombre}</span>
             </div>
           </div>

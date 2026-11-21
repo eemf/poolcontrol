@@ -80,7 +80,7 @@ export default function PaginaMonitoreoIntegral() {
                 {cierres && cierres.length > 0 && (
                   <>
                     <Separator className="my-1.5 bg-[#2e2e2e]" />
-                    <p className="px-2 py-1 text-[10px] font-semibold text-slate-400">Turnos anteriores</p>
+                    <p className="px-2 py-1 text-[0.625rem] font-semibold text-slate-400">Turnos anteriores</p>
                     {cierres.map((c) => (
                       <SelectItem key={c.id} value={c.id} className="text-xs">
                         Turno #{c.idCuadre} — {format(toDate(c.fecha), 'dd/MM/yyyy HH:mm', { locale: es })}

@@ -72,7 +72,7 @@ export function ExpensesList({ items, selected, onSelect, onSelectAll }: Expense
                     <p className="font-bold text-base sm:text-lg text-rose-400 whitespace-nowrap tabular-nums">
                       - Q{gasto.monto.toFixed(2)}
                     </p>
-                    <Badge className="h-5 rounded-full text-[10px] font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 capitalize">
+                    <Badge className="h-5 rounded-full text-[0.625rem] font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 capitalize">
                       {gasto.estado}
                     </Badge>
                   </div>

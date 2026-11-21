@@ -152,7 +152,7 @@ export default function LoginPage() {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-[10px] ml-1" />
+                    <FormMessage className="text-[0.625rem] ml-1" />
                   </FormItem>
                 )}
               />
@@ -185,7 +185,7 @@ export default function LoginPage() {
                         </Button>
                       </div>
                     </FormControl>
-                    <FormMessage className="text-[10px] ml-1" />
+                    <FormMessage className="text-[0.625rem] ml-1" />
                   </FormItem>
                 )}
               />

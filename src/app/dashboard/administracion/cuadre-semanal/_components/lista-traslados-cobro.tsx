@@ -80,7 +80,7 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                           </span>
                           <div className="flex items-center gap-1 mt-0.5">
                             <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
-                            <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">
+                            <span className="text-[0.625rem] sm:text-xs text-muted-foreground font-medium truncate">
                               {fechaEnvio}
                             </span>
                           </div>
@@ -94,8 +94,8 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                         <Badge
                           className={
                             esProcesado
-                              ? 'rounded-full text-[10px] font-semibold border border-emerald-500/30 bg-emerald-500/20 text-emerald-300 px-2 py-0.5'
-                              : 'rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5'
+                              ? 'rounded-full text-[0.625rem] font-semibold border border-emerald-500/30 bg-emerald-500/20 text-emerald-300 px-2 py-0.5'
+                              : 'rounded-full text-[0.625rem] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5'
                           }
                         >
                           {esProcesado ? 'Procesado' : 'Pendiente'}
@@ -112,7 +112,7 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                           <PackageCheck className="h-3.5 w-3.5 text-emerald-400" />
                           <span>Detalle de mercancía despachada</span>
                         </h4>
-                        <span className="text-[11px] font-medium text-slate-400 tabular-nums">
+                        <span className="text-[0.6875rem] font-medium text-slate-400 tabular-nums">
                           {traslado.items?.length || 0} {(traslado.items?.length || 0) === 1 ? 'artículo' : 'artículos'}
                         </span>
                       </div>
@@ -125,7 +125,7 @@ export function ListaTrasladosCobro({ items, selected, onSelect, onSelectAll }: 
                           >
                             <div className="min-w-0 pr-2">
                               <p className="font-semibold text-slate-100 truncate">{item.nombreProducto}</p>
-                              <p className="text-[10px] text-slate-400 tabular-nums">
+                              <p className="text-[0.625rem] text-slate-400 tabular-nums">
                                 {item.cantidad} unidades &times; Q{item.costoUnitario.toFixed(2)}
                               </p>
                             </div>

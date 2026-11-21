@@ -19,7 +19,7 @@ export function TarifaCard({ tarifa, onEdit, onDelete }: TarifaCardProps) {
             <CardTitle className="text-base font-bold text-slate-100">{tarifa.nombre}</CardTitle>
             <CardDescription className="text-xs text-slate-400">{tarifa.tipoDeMesa}</CardDescription>
           </div>
-          <Badge variant="secondary" className="rounded-full text-[11px] font-medium bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]">
+          <Badge variant="secondary" className="rounded-full text-[0.6875rem] font-medium bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]">
             {tarifa.tipoDeCalculo}
           </Badge>
         </div>

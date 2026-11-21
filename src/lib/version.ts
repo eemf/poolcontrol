@@ -12,9 +12,34 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
+    build: 247,
+    fecha: "2026-11-21",
+    estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b247",
+    descripcion: "Conversión global de tamaños de texto fijos (px) a rem para escalado uniforme por usuario.",
+    cambios: [
+      "Tipografía Global (`src/**` — 105 archivos): Convertidas las 514 clases `text-[8px..13px]` a unidades `rem` equivalentes (`text-[0.5rem]..text-[0.8125rem]`) para que botones, badges, pestañas y etiquetas respondan al ajuste de Tamaño de Fuente."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 246,
+    fecha: "2026-11-21",
+    estado: "publicada_anterior",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b246",
+    descripcion: "Corrección global de nitidez y subpíxeles en todos los modales y escalado de fuente.",
+    cambios: [
+      "Animaciones y Modales (`globals.css`, `dialog.tsx`, `alert-dialog.tsx`): Eliminados `will-change: transform`, `forwards` en apertura y centrado por `translate3d(-50%, -50%, 0)`, reemplazándolos por `inset-0 m-auto h-fit` para renderizado nativo 1:1 sin desenfoque.",
+      "Escala de Fuente (`user-font-scale-sync.tsx`): Redondeo a píxeles enteros en la raíz `<html>` para evitar desenfoque subpíxel en textos y bordes."
+    ]
+  },
+  {
+    version: "2.0.0",
     build: 245,
     fecha: "2026-11-20",
-    estado: "publicada_actual",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b245",
     descripcion: "Pago anticipado en Sala de Juegos para cobrar tiempo o consumos sin liberar la mesa o consola.",

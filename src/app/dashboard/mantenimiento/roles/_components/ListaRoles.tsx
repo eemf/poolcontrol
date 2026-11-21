@@ -74,7 +74,7 @@ export function ListaRoles({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-bold text-sm sm:text-base text-slate-100 truncate">{rol.nombre}</p>
-                    <span className="text-[11px] font-medium text-slate-400 tabular-nums shrink-0">
+                    <span className="text-[0.6875rem] font-medium text-slate-400 tabular-nums shrink-0">
                       #{rol.idRol}
                     </span>
                   </div>

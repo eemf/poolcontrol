@@ -274,7 +274,7 @@ export function PurchaseModal({
                       Modo
                     </Label>
                     <div className="flex items-center gap-2 pl-3 pr-1.5 h-10 rounded-full bg-[#252526] border border-[#2e2e2e]">
-                      <span className="text-[11px] font-medium text-slate-300 select-none">
+                      <span className="text-[0.6875rem] font-medium text-slate-300 select-none">
                         {isGastoManualMode ? 'Gasto' : 'Normal'}
                       </span>
                       <Switch
@@ -380,7 +380,7 @@ export function PurchaseModal({
                   </Button>
                 </div>
               </div>
-              <p className="hidden lg:block text-[10px] text-slate-400 text-center">
+              <p className="hidden lg:block text-[0.625rem] text-slate-400 text-center">
                 Presiona F6 para alternar entre producto y gasto directo
               </p>
 
@@ -389,7 +389,7 @@ export function PurchaseModal({
                 <SurfaceCard variant="surface" className="p-2.5 flex flex-wrap items-center gap-1.5 animate-in fade-in duration-200">
                   <div className="flex items-center gap-1.5 text-slate-400 shrink-0">
                     <History className="h-3.5 w-3.5 text-sky-400 shrink-0" />
-                    <span className="text-[11px] font-semibold text-slate-200">
+                    <span className="text-[0.6875rem] font-semibold text-slate-200">
                       Historial del proveedor:
                     </span>
                   </div>
@@ -417,12 +417,12 @@ export function PurchaseModal({
                             <span className={cn("text-xs font-bold tabular-nums", isSelected ? "text-white" : "text-sky-400")}>
                               Q{item.costoUnitario.toFixed(2)}
                             </span>
-                            <span className={cn("text-[10px]", isSelected ? "text-white/90" : "text-slate-400")}>
+                            <span className={cn("text-[0.625rem]", isSelected ? "text-white/90" : "text-slate-400")}>
                               {format(item.fecha, "dd/MM/yy")}
                             </span>
                             {idx === 0 && (
                               <span className={cn(
-                                "text-[9px] font-bold px-1.5 py-0.5 rounded-full",
+                                "text-[0.5625rem] font-bold px-1.5 py-0.5 rounded-full",
                                 isSelected ? "bg-white/25 text-white" : "bg-sky-500/15 text-sky-400"
                               )}>
                                 Última
@@ -433,7 +433,7 @@ export function PurchaseModal({
                       })}
                     </div>
                   ) : (
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                    <span className="text-[0.6875rem] text-slate-400 flex items-center gap-1">
                       <Tag className="h-3 w-3 opacity-60" />
                       {proveedorSeleccionadoId
                         ? "Sin compras previas de este producto con este proveedor."
@@ -457,7 +457,7 @@ export function PurchaseModal({
                             {item.cantidad} unidades &times; Q{item.costoUnitario.toFixed(2)}
                           </p>
                         ) : (
-                          <Badge className="bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-semibold text-[10px] h-5 rounded-full">
+                          <Badge className="bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-semibold text-[0.625rem] h-5 rounded-full">
                             Gasto directo
                           </Badge>
                         )}

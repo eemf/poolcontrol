@@ -55,7 +55,7 @@ export const CuadreMensualItemAcordeon = memo(function CuadreMensualItemAcordeon
             <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
               #{cuadre.idCuadreMensual}. {format(fecha, "dd 'de' MMMM, yyyy", { locale: es })}
             </p>
-            <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+            <span className="inline-flex items-center gap-1 text-[0.6875rem] text-slate-400 font-medium">
               <Clock className="h-3 w-3 text-slate-500 shrink-0" />
               {format(fecha, 'dd/MM/yyyy • hh:mm a', { locale: es })}
             </span>
@@ -64,7 +64,7 @@ export const CuadreMensualItemAcordeon = memo(function CuadreMensualItemAcordeon
             <p className="font-bold text-base sm:text-lg text-emerald-400 leading-none tabular-nums">
               Q{cuadre.resumen.balanceLiquidado.toFixed(2)}
             </p>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30 capitalize">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.625rem] font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30 capitalize">
               {getPeriodoTexto()}
             </span>
           </div>
@@ -75,13 +75,13 @@ export const CuadreMensualItemAcordeon = memo(function CuadreMensualItemAcordeon
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2 min-w-0">
-              <p className="text-[11px] text-slate-400 font-medium truncate">Balance Neto</p>
+              <p className="text-[0.6875rem] text-slate-400 font-medium truncate">Balance Neto</p>
               <p className="text-sm font-bold text-white tabular-nums mt-0.5 truncate">
                 Q{cuadre.resumen.balanceNetoCalculado.toFixed(2)}
               </p>
             </div>
             <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2 min-w-0">
-              <p className="text-[11px] text-sky-400 font-medium truncate">Balance Liquidado</p>
+              <p className="text-[0.6875rem] text-sky-400 font-medium truncate">Balance Liquidado</p>
               <p className="text-sm font-bold text-sky-400 tabular-nums mt-0.5 truncate">
                 Q{cuadre.resumen.balanceLiquidado.toFixed(2)}
               </p>
@@ -90,12 +90,12 @@ export const CuadreMensualItemAcordeon = memo(function CuadreMensualItemAcordeon
 
           <div className="flex items-center justify-between gap-2 px-3 py-2 border border-[#2e2e2e] rounded-xl bg-[#252526] text-xs">
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] text-slate-400 mr-1.5">Origen:</span>
+              <span className="text-[0.625rem] text-slate-400 mr-1.5">Origen:</span>
               <span className="font-semibold text-slate-100 truncate">{cuadre.cuentas.origenNombre}</span>
             </div>
             <ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
             <div className="min-w-0 flex-1 text-right">
-              <span className="text-[10px] text-slate-400 mr-1.5">Destino:</span>
+              <span className="text-[0.625rem] text-slate-400 mr-1.5">Destino:</span>
               <span className="font-semibold text-slate-100 truncate">{cuadre.cuentas.destinoNombre}</span>
             </div>
           </div>

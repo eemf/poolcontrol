@@ -118,7 +118,7 @@ export function IncomePhysical({
                     >
                       Q{monto.toFixed(2)}
                     </p>
-                    <Badge className="h-5 rounded-full text-[10px] font-semibold bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e]">
+                    <Badge className="h-5 rounded-full text-[0.625rem] font-semibold bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e]">
                       Pendiente
                     </Badge>
                   </div>

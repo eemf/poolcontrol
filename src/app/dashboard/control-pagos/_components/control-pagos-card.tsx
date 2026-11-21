@@ -91,19 +91,19 @@ export function ControlPagosCard({
                 </span>
 
                 {pago.esMultiventa ? (
-                  <Badge className="bg-indigo-600 hover:bg-indigo-500 text-white border-none text-[10px] font-medium rounded-full flex items-center gap-1">
+                  <Badge className="bg-indigo-600 hover:bg-indigo-500 text-white border-none text-[0.625rem] font-medium rounded-full flex items-center gap-1">
                     <Split className="h-3 w-3" />
                     Cubrió {pago.ventas.length} ventas ({pago.ventas.map(v => `#${v.idVenta}`).join(', ')})
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="text-[10px] font-medium border-app-border text-muted-foreground bg-[#1e1e1e] rounded-full hidden sm:inline-flex">
+                  <Badge variant="outline" className="text-[0.625rem] font-medium border-app-border text-muted-foreground bg-[#1e1e1e] rounded-full hidden sm:inline-flex">
                     Venta #{pago.ventas[0]?.idVenta}
                   </Badge>
                 )}
               </div>
 
               {/* Fecha, hora y operador */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-[11px] text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-[0.6875rem] text-muted-foreground">
                 <span className="flex items-center gap-1 text-slate-300">
                   <Clock className="h-3 w-3 text-sky-400 shrink-0" />
                   {format(pago.fecha, 'dd/MM/yyyy hh:mm:ss a')}
@@ -127,7 +127,7 @@ export function ControlPagosCard({
               Q{pago.montoTotalPagado.toFixed(2)}
             </span>
             <div className="flex items-center gap-1.5 mt-1">
-              <Badge className={cn("h-5 text-[9.5px] font-medium rounded-full px-2", getBadgeStyle(pago.metodoPago))}>
+              <Badge className={cn("h-5 text-[0.59375rem] font-medium rounded-full px-2", getBadgeStyle(pago.metodoPago))}>
                 {pago.metodoPago}
               </Badge>
             </div>
@@ -147,14 +147,14 @@ export function ControlPagosCard({
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white">Pago unificado de Q{pago.montoTotalPagado.toFixed(2)}</p>
-                  <p className="text-[11px] text-indigo-300/80">
+                  <p className="text-[0.6875rem] text-indigo-300/80">
                     Este pago único se distribuyó entre {pago.ventas.length} ventas a crédito pendientes del cliente.
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {pago.ventas.map(v => (
-                  <Badge key={v.idVenta} variant="outline" className="border-indigo-400/40 bg-indigo-900/30 text-white font-bold tabular-nums text-[10px] rounded-full">
+                  <Badge key={v.idVenta} variant="outline" className="border-indigo-400/40 bg-indigo-900/30 text-white font-bold tabular-nums text-[0.625rem] rounded-full">
                     Venta #{v.idVenta}: Q{v.montoPagadoVenta.toFixed(2)}
                   </Badge>
                 ))}
@@ -182,7 +182,7 @@ export function ControlPagosCard({
                         <span className="font-bold tabular-nums text-xs text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-full border border-sky-500/20">
                           Venta #{v.idVenta}
                         </span>
-                        <Badge className={cn("text-[10px] font-semibold rounded-full px-2 h-5", esVentaLiquidadaTotal ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-amber-500/15 text-amber-400 border border-amber-500/30")}>
+                        <Badge className={cn("text-[0.625rem] font-semibold rounded-full px-2 h-5", esVentaLiquidadaTotal ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-amber-500/15 text-amber-400 border border-amber-500/30")}>
                           {esVentaLiquidadaTotal ? 'Liquidada al 100%' : 'Abono'}
                         </Badge>
                       </div>
@@ -191,7 +191,7 @@ export function ControlPagosCard({
                         variant="ghost"
                         size="sm"
                         asChild
-                        className="sm:hidden h-7 text-[11px] font-medium text-sky-400 hover:text-white hover:bg-[#252526] px-2 rounded-full shrink-0"
+                        className="sm:hidden h-7 text-[0.6875rem] font-medium text-sky-400 hover:text-white hover:bg-[#252526] px-2 rounded-full shrink-0"
                       >
                         <Link href={`/dashboard/historial-ventas?ventaId=${v.ventaDocId}`}>
                           <ExternalLink className="h-3 w-3 mr-1" />
@@ -205,7 +205,7 @@ export function ControlPagosCard({
                         Cubierto: <span className="text-emerald-400 font-bold tabular-nums">Q{v.montoPagadoVenta.toFixed(2)}</span>
                       </span>
                       {v.ventaTotal && (
-                        <span className="text-[11px] text-slate-400 tabular-nums">
+                        <span className="text-[0.6875rem] text-slate-400 tabular-nums">
                           (Total: Q{v.ventaTotal.toFixed(2)})
                         </span>
                       )}
@@ -213,7 +213,7 @@ export function ControlPagosCard({
                         variant="ghost"
                         size="sm"
                         asChild
-                        className="hidden sm:inline-flex h-7 text-[11px] font-medium text-sky-400 hover:text-white hover:bg-[#252526] px-2.5 rounded-full"
+                        className="hidden sm:inline-flex h-7 text-[0.6875rem] font-medium text-sky-400 hover:text-white hover:bg-[#252526] px-2.5 rounded-full"
                       >
                         <Link href={`/dashboard/historial-ventas?ventaId=${v.ventaDocId}`}>
                           <ExternalLink className="h-3 w-3 mr-1" />
@@ -240,20 +240,20 @@ export function ControlPagosCard({
                             )}
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <span className="font-bold text-slate-100 bg-[#1e1e1e] px-2 py-0.5 rounded-full text-[11px] border border-[#2e2e2e] tabular-nums shrink-0">
+                              <span className="font-bold text-slate-100 bg-[#1e1e1e] px-2 py-0.5 rounded-full text-[0.6875rem] border border-[#2e2e2e] tabular-nums shrink-0">
                                 {it.cantidad || 1}x
                               </span>
                               <div className="min-w-0">
                                 <div className="font-bold text-slate-100 truncate text-xs flex items-center gap-1.5">
                                   <span>{it.nombreProducto}</span>
                                   {it.esVirtual && (
-                                    <Badge variant="outline" className="text-[8px] px-1.5 py-0 h-3.5 border-purple-500/30 text-purple-400 bg-purple-500/10 rounded-full">
+                                    <Badge variant="outline" className="text-[0.5rem] px-1.5 py-0 h-3.5 border-purple-500/30 text-purple-400 bg-purple-500/10 rounded-full">
                                       Virtual
                                     </Badge>
                                   )}
                                 </div>
                                 {it.subtotalItem && (
-                                  <span className="text-[10px] text-slate-400 tabular-nums">
+                                  <span className="text-[0.625rem] text-slate-400 tabular-nums">
                                     Subtotal: Q{it.subtotalItem.toFixed(2)}
                                   </span>
                                 )}
@@ -264,7 +264,7 @@ export function ControlPagosCard({
                               <span className="font-bold text-emerald-400 tabular-nums text-xs">
                                 Q{(it.montoAplicado || 0).toFixed(2)}
                               </span>
-                              <span className="text-[10px] text-slate-400">
+                              <span className="text-[0.625rem] text-slate-400">
                                 Aplicado
                               </span>
                             </div>

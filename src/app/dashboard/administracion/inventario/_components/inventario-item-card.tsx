@@ -27,14 +27,14 @@ export function InventarioItemCard({ producto }: InventarioItemCardProps) {
         <div className="mt-1 flex flex-wrap items-center gap-1.5">
           <Badge
             className={cn(
-              'rounded-full px-2.5 py-0.5 text-[10px] font-bold border-none shadow-sm',
+              'rounded-full px-2.5 py-0.5 text-[0.625rem] font-bold border-none shadow-sm',
               esStockBajo ? 'bg-amber-400 text-slate-950' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
             )}
           >
             {esStockBajo ? 'Bajo' : 'En stock'}
           </Badge>
           {producto.ubicacion && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#1e1e1e] border border-[#2e2e2e] text-[10px] font-semibold text-slate-300 rounded-full">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#1e1e1e] border border-[#2e2e2e] text-[0.625rem] font-semibold text-slate-300 rounded-full">
               <MapPin className="h-2.5 w-2.5 text-primary" />
               {producto.ubicacion}
             </span>
@@ -53,7 +53,7 @@ export function InventarioItemCard({ producto }: InventarioItemCardProps) {
               {producto.existenciaMinima || 0}
             </span>
           </div>
-          <p className="text-[10px] font-medium text-slate-400 leading-none mt-0.5">
+          <p className="text-[0.625rem] font-medium text-slate-400 leading-none mt-0.5">
             Stock / Mín.
           </p>
         </div>

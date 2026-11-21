@@ -88,11 +88,11 @@ function SelectorProductoDestino({
           Aumentar inventario en el producto local:
         </span>
         {isNuevo ? (
-          <span className="text-[11px] text-amber-400 font-medium bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+          <span className="text-[0.6875rem] text-amber-400 font-medium bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
             Se creará como nuevo
           </span>
         ) : (
-          <span className="text-[11px] text-emerald-400 font-medium bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+          <span className="text-[0.6875rem] text-emerald-400 font-medium bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
             Stock: {productoSeleccionado?.existencia ?? 0} ➔ {(productoSeleccionado?.existencia ?? 0) + itemOriginal.cantidad} uds
           </span>
         )}
@@ -131,7 +131,7 @@ function SelectorProductoDestino({
             </SelectItem>
             <SelectSeparator className="bg-[#2e2e2e]" />
             <SelectGroup>
-              <SelectLabel className="text-[10px] text-slate-400 font-semibold px-2 py-1">
+              <SelectLabel className="text-[0.625rem] text-slate-400 font-semibold px-2 py-1">
                 Vincular a producto existente en esta sucursal:
               </SelectLabel>
               {productosFiltrados.length === 0 ? (
@@ -143,7 +143,7 @@ function SelectorProductoDestino({
                   <SelectItem key={prod.id} value={prod.id} className="py-2 text-xs cursor-pointer">
                     <div className="flex items-center justify-between w-full gap-4">
                       <span className="font-semibold text-white">{prod.nombre}</span>
-                      <span className="text-[11px] text-slate-400">
+                      <span className="text-[0.6875rem] text-slate-400">
                         (Stock actual: {prod.existencia ?? 0} | Costo: Q{(prod.precioCompra ?? 0).toFixed(2)})
                       </span>
                     </div>
@@ -156,11 +156,11 @@ function SelectorProductoDestino({
       </div>
 
       {!isNuevo && productoSeleccionado && (
-        <p className="text-[11px] text-emerald-400/90 pl-1 flex items-center gap-1.5">
+        <p className="text-[0.6875rem] text-emerald-400/90 pl-1 flex items-center gap-1.5">
           <Check className="h-3 w-3 text-emerald-400" />
           Se sumarán {itemOriginal.cantidad} unidades a &quot;{productoSeleccionado.nombre}&quot; (Stock: {productoSeleccionado.existencia ?? 0} ➔ {(productoSeleccionado.existencia ?? 0) + itemOriginal.cantidad} uds)
           {!esMismoNombre && (
-            <span className="text-primary font-normal text-[10px] bg-primary/10 border border-primary/20 px-1.5 py-0.2 rounded-md">
+            <span className="text-primary font-normal text-[0.625rem] bg-primary/10 border border-primary/20 px-1.5 py-0.2 rounded-md">
               (Origen: {itemOriginal.nombreProducto})
             </span>
           )}
@@ -322,7 +322,7 @@ export function RecibirTrasladoDialog({
                     {/* Fila superior: Información del producto enviado por el origen */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#2e2e2e]">
                       <div>
-                        <span className="text-[11px] text-slate-400 font-medium">Producto recibido:</span>
+                        <span className="text-[0.6875rem] text-slate-400 font-medium">Producto recibido:</span>
                         <h4 className="text-sm font-bold text-white flex items-center gap-2">
                           {it.nombreProducto}
                           <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">

@@ -111,7 +111,7 @@ export function ModalCliente({
                   <Label htmlFor="credito-switch" className="text-xs font-semibold text-slate-100 flex items-center gap-1.5">
                     <CreditCard className="h-3.5 w-3.5 text-sky-400" /> Permitir Crédito
                   </Label>
-                  <p className="text-[11px] text-slate-400">Habilitar paso a cuentas por cobrar</p>
+                  <p className="text-[0.6875rem] text-slate-400">Habilitar paso a cuentas por cobrar</p>
                 </div>
                 <Switch
                   id="credito-switch"
@@ -126,7 +126,7 @@ export function ModalCliente({
                   <Label htmlFor="consumo-interno-switch" className="text-xs font-semibold text-slate-100">
                     Consumo Interno
                   </Label>
-                  <p className="text-[11px] text-slate-400">Personal autorizado</p>
+                  <p className="text-[0.6875rem] text-slate-400">Personal autorizado</p>
                 </div>
                 <Switch
                   id="consumo-interno-switch"

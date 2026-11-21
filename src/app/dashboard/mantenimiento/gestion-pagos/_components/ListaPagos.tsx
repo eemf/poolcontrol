@@ -81,7 +81,7 @@ export function ListaPagos({
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Label htmlFor="periodo-select" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest hidden sm:block shrink-0">Período</Label>
+            <Label htmlFor="periodo-select" className="text-[0.625rem] font-black text-muted-foreground uppercase tracking-widest hidden sm:block shrink-0">Período</Label>
             <Select value={periodoFiltro} onValueChange={onPeriodoFiltroChange}>
               <SelectTrigger id="periodo-select" className="w-full sm:w-[250px] rounded-full h-10">
                 <div className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export function ListaPagos({
                 {cierres && cierres.length > 0 && (
                   <>
                     <Separator className="my-2" />
-                    <p className="px-2 py-1 text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Turnos Cerrados</p>
+                    <p className="px-2 py-1 text-[0.5625rem] font-bold text-muted-foreground uppercase tracking-widest">Turnos Cerrados</p>
                     {cierres.map(c => (
                       <SelectItem key={c.id} value={c.id} className="text-xs">
                         Turno #{c.idCuadre} — {format(toDate(c.fecha), 'dd/MM/yy HH:mm')}
@@ -131,11 +131,11 @@ export function ListaPagos({
                   <div className="flex flex-1 items-center justify-between w-full pr-2 sm:pr-4">
                     <div className="min-w-0 text-left">
                       <p className="font-bold text-base text-foreground truncate">{pago.clienteNombre}</p>
-                      <p className="text-[10px] font-semibold text-muted-foreground tracking-tight mt-0.5">ID Pago: {pago.idPago}</p>
+                      <p className="text-[0.625rem] font-semibold text-muted-foreground tracking-tight mt-0.5">ID Pago: {pago.idPago}</p>
                     </div>
                     <div className="text-right flex flex-col items-end shrink-0 ml-4">
                       <p className="font-bold text-primary tabular-nums text-lg leading-none">Q{pago.montoTotalPagado.toFixed(2)}</p>
-                      <Badge className={cn("h-5 text-[9px] font-black uppercase rounded-full mt-1.5", getBadgeStyle(pago.metodoPago))}>
+                      <Badge className={cn("h-5 text-[0.5625rem] font-black uppercase rounded-full mt-1.5", getBadgeStyle(pago.metodoPago))}>
                         {pago.metodoPago}
                       </Badge>
                     </div>
@@ -146,14 +146,14 @@ export function ListaPagos({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-4">
                         <div className="space-y-3">
-                          <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Información de la transacción</h4>
+                          <h4 className="text-[0.625rem] font-black text-muted-foreground uppercase tracking-widest">Información de la transacción</h4>
                           <p className="text-xs font-bold text-foreground/80 flex items-center gap-2">
                             <Clock className="h-3 w-3 text-primary" />
                             {format(toDate(pago.fecha), "dd 'de' MMMM, yyyy - hh:mm a", { locale: es })}
                           </p>
                         </div>
                         <div className="pt-1">
-                          <Button variant="outline" size="sm" asChild className="h-9 rounded-full text-[10px] font-bold px-4">
+                          <Button variant="outline" size="sm" asChild className="h-9 rounded-full text-[0.625rem] font-bold px-4">
                             <Link href={`/dashboard/historial-ventas?ventaId=${pago.ventaDocId}`}>
                               <ExternalLink className="mr-2 h-3.5 w-3.5" />
                               Ver detalle de Venta #{pago.idVenta}
@@ -163,7 +163,7 @@ export function ListaPagos({
                       </div>
                       
                       <div className="space-y-3">
-                        <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                        <h4 className="text-[0.625rem] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                           <ReceiptText className="h-3.5 w-3.5 text-primary" /> Artículos Saldados
                         </h4>
                         <div className="space-y-2">
@@ -175,11 +175,11 @@ export function ListaPagos({
                             return (
                               <div key={index} className="flex justify-between items-center bg-background/50 p-3 rounded-xl border border-muted/40 transition-colors hover:bg-background shadow-sm">
                                 <div className="flex flex-col gap-1 min-w-0">
-                                  <p className="font-bold text-[13px] text-foreground truncate">
+                                  <p className="font-bold text-[0.8125rem] text-foreground truncate">
                                     {item.cantidad ? `${item.cantidad}x ` : '1x '}{item.nombreProducto}
                                   </p>
                                   <Badge className={cn(
-                                    "h-4 px-1.5 text-[9px] font-black uppercase rounded-full w-fit border-none text-white",
+                                    "h-4 px-1.5 text-[0.5625rem] font-black uppercase rounded-full w-fit border-none text-white",
                                     esLiquidacionTotal ? "bg-emerald-600" : "bg-amber-500"
                                   )}>
                                     {esLiquidacionTotal ? 'Saldado' : 'Abono'}
@@ -190,7 +190,7 @@ export function ListaPagos({
                                     Q{esPagoConsumoInterno ? '0.00' : (item.montoAplicado || 0).toFixed(2)}
                                   </p>
                                   {item.subtotalItem !== undefined && !esPagoConsumoInterno && (
-                                    <p className="text-[10px] text-muted-foreground font-bold tracking-tighter mt-1">
+                                    <p className="text-[0.625rem] text-muted-foreground font-bold tracking-tighter mt-1">
                                       de Q{item.subtotalItem.toFixed(2)}
                                     </p>
                                   )}

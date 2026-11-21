@@ -307,7 +307,7 @@ export function ModalesSuscripcion({
                                             <div className="text-right shrink-0 space-y-1">
                                                 <Badge
                                                     variant="outline"
-                                                    className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-200 text-[11px] font-semibold px-2.5 py-0.5"
+                                                    className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-200 text-[0.6875rem] font-semibold px-2.5 py-0.5"
                                                 >
                                                     {pago.metodo}
                                                 </Badge>

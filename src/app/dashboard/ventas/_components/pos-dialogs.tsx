@@ -171,7 +171,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                 </div>
               </div>
               {state.incluirCreditoEnPago && (
-                <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-[10px] h-5 rounded-full px-2.5 shrink-0">
+                <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-[0.625rem] h-5 rounded-full px-2.5 shrink-0">
                   Incluye Deuda
                 </Badge>
               )}
@@ -242,7 +242,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                           {detalle.cantidad}x {detalle.nombreProducto}
                         </span>
                         {detalle.saldo < detalle.subtotal && (
-                          <span className="text-[10px] font-semibold text-amber-400">
+                          <span className="text-[0.625rem] font-semibold text-amber-400">
                             Saldo parcial: Q{detalle.saldo.toFixed(2)}
                           </span>
                         )}
@@ -278,7 +278,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                     >
                       Incluir Total Créditos
                     </p>
-                    <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                    <p className="text-[0.625rem] text-slate-400 flex items-center gap-1 mt-0.5">
                       <History className="h-3 w-3 text-amber-400" /> Cierres anteriores
                     </p>
                   </div>
@@ -362,7 +362,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                     <h3 className="font-headline text-base font-bold text-slate-100 leading-tight">
                       ¿Confirmar Pago con Tarjeta?
                     </h3>
-                    <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                    <p className="text-[0.6875rem] text-slate-400 mt-0.5 truncate">
                       {state.ventaParaPagar?.nombreCliente} • Verifica antes de procesar
                     </p>
                   </div>
@@ -377,7 +377,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                       Q{state.montoAPagarDialogo.toFixed(2)}
                     </span>
                   </div>
-                  <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-400 leading-snug">
+                  <div className="pt-2 border-t border-[#2e2e2e] text-[0.6875rem] text-slate-400 leading-snug">
                     El cobro se registrará como pago con tarjeta y no sumará al efectivo en caja.
                   </div>
                 </div>
@@ -442,7 +442,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                       <h3 className="font-headline text-base font-bold text-slate-100 leading-tight">
                         Registrar Abono
                       </h3>
-                      <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                      <p className="text-[0.6875rem] text-slate-400 mt-0.5 truncate">
                         Abono a la cuenta de {state.ventaParaPagar?.nombreCliente}
                       </p>
                     </div>
@@ -454,7 +454,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                       <>
                         <div className="grid grid-cols-2 divide-x divide-[#2e2e2e]">
                           <div className="p-2.5 text-center space-y-0.5">
-                            <div className="flex items-center justify-center gap-1 text-[11px] font-medium text-slate-400">
+                            <div className="flex items-center justify-center gap-1 text-[0.6875rem] font-medium text-slate-400">
                               <FileClock className="h-3 w-3 text-sky-400 shrink-0" />
                               <span>Cuenta Actual</span>
                             </div>
@@ -463,7 +463,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                             </p>
                           </div>
                           <div className="p-2.5 text-center space-y-0.5">
-                            <div className="flex items-center justify-center gap-1 text-[11px] font-medium text-slate-400">
+                            <div className="flex items-center justify-center gap-1 text-[0.6875rem] font-medium text-slate-400">
                               <CreditCard className="h-3 w-3 text-amber-400 shrink-0" />
                               <span>Crédito</span>
                             </div>
@@ -585,7 +585,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                   <h4 className="font-headline text-sm font-bold text-slate-100">
                     Procesando Pago...
                   </h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className="text-[0.6875rem] text-slate-400 mt-0.5">
                     Registrando transacción y actualizando caja
                   </p>
                 </div>
@@ -614,7 +614,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             <p className="text-xs font-bold text-slate-100 truncate">
               {state.ventaParaConsumo?.nombreCliente}
             </p>
-            <p className="text-[11px] text-slate-400">Monto en cortesía</p>
+            <p className="text-[0.6875rem] text-slate-400">Monto en cortesía</p>
           </div>
           <span className="text-sm font-black text-amber-400 tabular-nums shrink-0">
             Q{(state.ventaParaConsumo?.saldo ?? 0).toFixed(2)}
@@ -624,7 +624,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
         <div className="space-y-1.5 text-left">
           <Label
             htmlFor="pin-consumo"
-            className="text-center block text-[11px] font-semibold text-slate-300"
+            className="text-center block text-[0.6875rem] font-semibold text-slate-300"
           >
             PIN de Autorización
           </Label>
@@ -706,7 +706,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
             </span>
           </div>
           <div className="flex items-center gap-1.5 shrink-0 ml-2">
-            <span className="text-[11px] text-slate-400">Saldo:</span>
+            <span className="text-[0.6875rem] text-slate-400">Saldo:</span>
             <span className="text-sm font-black text-amber-400 tabular-nums">
               Q{(state.ventaParaPagar?.saldo ?? state.ventaParaPagar?.total ?? 0).toFixed(2)}
             </span>
@@ -752,7 +752,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
                 {state.itemParaEliminar?.item.nombreProducto}
               </p>
               {state.itemParaEliminar?.item.cantidad !== undefined && (
-                <p className="text-[11px] text-slate-400 mt-0.5 tabular-nums">
+                <p className="text-[0.6875rem] text-slate-400 mt-0.5 tabular-nums">
                   {state.itemParaEliminar.item.cantidad} &times; Q
                   {Number(state.itemParaEliminar.item.precioUnitario ?? 0).toFixed(2)} c/u
                 </p>
@@ -766,7 +766,7 @@ export function POSDialogs({ state, actions, refs }: POSDialogsProps) {
           </div>
 
           {state.itemParaEliminar?.item.idDetalle !== 0 && (
-            <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
+            <div className="pt-2 border-t border-[#2e2e2e] text-[0.6875rem] text-slate-300 leading-snug">
               {state.itemParaEliminar?.item.idProducto === 'item-manual' ||
               state.itemParaEliminar?.item.idProducto?.startsWith('mesa-') ||
               state.itemParaEliminar?.item.idProducto?.startsWith('division-mesa-')

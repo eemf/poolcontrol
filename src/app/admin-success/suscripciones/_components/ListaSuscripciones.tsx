@@ -152,7 +152,7 @@ export function ListaSuscripciones({
                                                 </p>
                                                 <Badge
                                                     variant="outline"
-                                                    className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-300 text-[11px] font-semibold px-2.5 py-0.5"
+                                                    className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-300 text-[0.6875rem] font-semibold px-2.5 py-0.5"
                                                 >
                                                     ID {s.idSucursal}
                                                 </Badge>
@@ -192,7 +192,7 @@ export function ListaSuscripciones({
                                                 <p className="text-sm font-bold text-slate-100 tabular-nums">
                                                     Q{(sub?.montoAcordado || 0).toFixed(2)}
                                                 </p>
-                                                <p className="text-[11px] text-slate-400">Mensual</p>
+                                                <p className="text-[0.6875rem] text-slate-400">Mensual</p>
                                             </div>
 
                                             {activa ? (

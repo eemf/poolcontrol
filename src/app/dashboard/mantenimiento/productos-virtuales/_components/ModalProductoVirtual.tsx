@@ -149,7 +149,7 @@ export function ModalProductoVirtual({
                   <Label htmlFor="pos-switch" className="text-xs sm:text-sm font-semibold text-slate-100 cursor-pointer">
                     Incluir en POS
                   </Label>
-                  <p className="text-[11px] text-slate-400">Habilitar en buscador de ventas</p>
+                  <p className="text-[0.6875rem] text-slate-400">Habilitar en buscador de ventas</p>
                 </div>
                 <Switch
                   id="pos-switch"
@@ -164,7 +164,7 @@ export function ModalProductoVirtual({
                   <Label htmlFor="compras-switch" className="text-xs sm:text-sm font-semibold text-slate-100 cursor-pointer">
                     Incluir en Compras
                   </Label>
-                  <p className="text-[11px] text-slate-400">Habilitar en registro de entradas</p>
+                  <p className="text-[0.6875rem] text-slate-400">Habilitar en registro de entradas</p>
                 </div>
                 <Switch
                   id="compras-switch"

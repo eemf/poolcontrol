@@ -63,12 +63,12 @@ export function ListadoRoles({ roles, cargando, onEditar, onEliminar }: ListadoR
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-sm sm:text-base text-slate-100 truncate">{rol.nombre}</p>
-                    <p className="text-[11px] text-slate-400 font-medium mt-0.5 tabular-nums">
+                    <p className="text-[0.6875rem] text-slate-400 font-medium mt-0.5 tabular-nums">
                       {numPermisos} {numPermisos === 1 ? 'capacidad configurada' : 'capacidades configuradas'}
                     </p>
                   </div>
                 </div>
-                <Badge className="rounded-full text-[10px] font-semibold px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
+                <Badge className="rounded-full text-[0.625rem] font-semibold px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
                   Activo
                 </Badge>
               </div>
@@ -77,7 +77,7 @@ export function ListadoRoles({ roles, cargando, onEditar, onEliminar }: ListadoR
             <AccordionContent className="p-3.5 sm:p-4 bg-[#1e1e1e]">
               <div className="space-y-4">
                 <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3.5 py-3 space-y-1">
-                  <h4 className="text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+                  <h4 className="text-[0.6875rem] font-medium text-slate-400 flex items-center gap-1.5">
                     <FileText className="h-3.5 w-3.5 text-sky-400" />
                     Perfil de responsabilidades
                   </h4>
@@ -103,7 +103,7 @@ export function ListadoRoles({ roles, cargando, onEditar, onEliminar }: ListadoR
                             {perms.map((p) => (
                               <div
                                 key={p}
-                                className="flex items-center gap-1.5 bg-[#1e1e1e] text-slate-200 px-2.5 py-1 rounded-full text-[11px] font-medium border border-[#2e2e2e]"
+                                className="flex items-center gap-1.5 bg-[#1e1e1e] text-slate-200 px-2.5 py-1 rounded-full text-[0.6875rem] font-medium border border-[#2e2e2e]"
                               >
                                 <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
                                 {p}

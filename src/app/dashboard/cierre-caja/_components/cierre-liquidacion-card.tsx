@@ -78,7 +78,7 @@ export function CierreLiquidacionCard({
             <p className="text-3xl font-black text-sky-400 tabular-nums tracking-tight">
               Q{retiro.toFixed(2)}
             </p>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[0.6875rem] text-slate-400">
               (Total Físico Contado − Efectivo Siguiente Período)
             </p>
           </SurfaceCard>

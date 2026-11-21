@@ -30,13 +30,13 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
   const getStatusBadge = (status?: 'procesado' | 'pendiente') => {
     if (status === 'procesado') {
       return (
-        <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold h-6 rounded-full px-2.5 text-[11px]">
+        <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold h-6 rounded-full px-2.5 text-[0.6875rem]">
           Procesado
         </Badge>
       )
     }
     return (
-      <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold h-6 rounded-full px-2.5 text-[11px]">
+      <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold h-6 rounded-full px-2.5 text-[0.6875rem]">
         Pendiente
       </Badge>
     )
@@ -65,13 +65,13 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
                 <p className="font-bold text-sm sm:text-base text-white leading-tight truncate">
                   {format(fechaFin, "dd 'de' LLLL, yyyy", { locale: es })}
                 </p>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#1e1e1e] text-sky-400 border border-[#2e2e2e] tabular-nums shrink-0">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[0.625rem] font-bold bg-[#1e1e1e] text-sky-400 border border-[#2e2e2e] tabular-nums shrink-0">
                   Cierre #{cierre.idCuadre}
                 </span>
               </div>
 
               {/* Fila 2: Rango horario del turno */}
-              <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 truncate">
+              <div className="flex items-center gap-1.5 text-[0.6875rem] font-medium text-slate-400 truncate">
                 <Clock className="h-3 w-3 text-slate-500 shrink-0" />
                 <span className="truncate">
                   {inicioValido
@@ -82,7 +82,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
 
               {/* Fila 3: Usuario / Cajero */}
               {cierre.usuarioNombre && (
-                <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-300 truncate">
+                <div className="flex items-center gap-1.5 text-[0.6875rem] font-medium text-slate-300 truncate">
                   <User className="h-3 w-3 text-sky-400/80 shrink-0" />
                   <span className="truncate">{cierre.usuarioNombre}</span>
                 </div>
@@ -112,11 +112,11 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
 
             <div className="mt-0.5">
               {tienePendiente ? (
-                <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold h-5 rounded-full px-2 text-[10px]">
+                <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold h-5 rounded-full px-2 text-[0.625rem]">
                   Pendiente
                 </Badge>
               ) : (
-                <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold h-5 rounded-full px-2 text-[10px]">
+                <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold h-5 rounded-full px-2 text-[0.625rem]">
                   Procesado
                 </Badge>
               )}
@@ -130,18 +130,18 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
           {/* Franja Superior: Resumen Rápido en 4 KPIs (oculta en móvil para ahorrar espacio) */}
           <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
             <div className="p-2.5 sm:p-3 rounded-xl bg-[#252526] border border-[#2e2e2e]">
-              <p className="text-[11px] font-medium text-slate-400 truncate">1. Efectivo Esperado</p>
+              <p className="text-[0.6875rem] font-medium text-slate-400 truncate">1. Efectivo Esperado</p>
               <p className="text-sm sm:text-lg font-black text-emerald-400 tabular-nums tracking-tight mt-0.5">
                 Q{cierre.efectivoEsperado.toFixed(2)}
               </p>
-              <p className="text-[10px] text-slate-500 mt-0.5 truncate">Calculado en sistema</p>
+              <p className="text-[0.625rem] text-slate-500 mt-0.5 truncate">Calculado en sistema</p>
             </div>
 
             <div className="p-2.5 sm:p-3 rounded-xl bg-[#252526] border border-[#2e2e2e]">
               <div className="flex items-center justify-between gap-1">
-                <p className="text-[11px] font-medium text-slate-400 truncate">2. Efectivo Contado</p>
+                <p className="text-[0.6875rem] font-medium text-slate-400 truncate">2. Efectivo Contado</p>
                 <span
-                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full tabular-nums shrink-0 ${
+                  className={`text-[0.625rem] font-bold px-1.5 py-0.5 rounded-full tabular-nums shrink-0 ${
                     cierre.diferencia === 0
                       ? 'bg-emerald-500/15 text-emerald-400'
                       : cierre.diferencia > 0
@@ -157,23 +157,23 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
               <p className="text-sm sm:text-lg font-black text-white tabular-nums tracking-tight mt-0.5">
                 Q{cierre.efectivoFinalContado.toFixed(2)}
               </p>
-              <p className="text-[10px] text-slate-500 mt-0.5 truncate">Arqueo físico en caja</p>
+              <p className="text-[0.625rem] text-slate-500 mt-0.5 truncate">Arqueo físico en caja</p>
             </div>
 
             <div className="p-2.5 sm:p-3 rounded-xl bg-[#252526] border border-[#2e2e2e]">
-              <p className="text-[11px] font-medium text-slate-400 truncate">3. Fondo Sig. Turno</p>
+              <p className="text-[0.6875rem] font-medium text-slate-400 truncate">3. Fondo Sig. Turno</p>
               <p className="text-sm sm:text-lg font-black text-slate-200 tabular-nums tracking-tight mt-0.5">
                 Q{cierre.cajaSiguienteTurno.toFixed(2)}
               </p>
-              <p className="text-[10px] text-slate-500 mt-0.5 truncate">Se quedó en caja</p>
+              <p className="text-[0.625rem] text-slate-500 mt-0.5 truncate">Se quedó en caja</p>
             </div>
 
             <div className="p-2.5 sm:p-3 rounded-xl bg-[#252526] border border-sky-500/30">
-              <p className="text-[11px] font-semibold text-sky-400 truncate">4. Efectivo Liquidado</p>
+              <p className="text-[0.6875rem] font-semibold text-sky-400 truncate">4. Efectivo Liquidado</p>
               <p className="text-sm sm:text-lg font-black text-sky-400 tabular-nums tracking-tight mt-0.5">
                 Q{(cierre.totalLiquidado ?? 0).toFixed(2)}
               </p>
-              <p className="text-[10px] text-slate-400 mt-0.5 truncate">Contado − Sig. Turno</p>
+              <p className="text-[0.625rem] text-slate-400 mt-0.5 truncate">Contado − Sig. Turno</p>
             </div>
           </div>
 
@@ -262,7 +262,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
                 <div className="flex items-center justify-between p-2 bg-[#1e1e1e] rounded-lg border border-[#2e2e2e]">
                   <div>
                     <p className="font-semibold text-slate-200">Entrega Efectivo</p>
-                    <p className="text-[11px] font-bold text-sky-400 tabular-nums">
+                    <p className="text-[0.6875rem] font-bold text-sky-400 tabular-nums">
                       Q{(cierre.totalLiquidado ?? 0).toFixed(2)}
                     </p>
                   </div>
@@ -273,7 +273,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
                   <div className="flex items-center justify-between p-2 bg-[#1e1e1e] rounded-lg border border-[#2e2e2e]">
                     <div>
                       <p className="font-semibold text-slate-200">Cobros con Tarjeta</p>
-                      <p className="text-[11px] font-bold text-sky-300 tabular-nums">
+                      <p className="text-[0.6875rem] font-bold text-sky-300 tabular-nums">
                         Q{cierre.pagosTarjeta.toFixed(2)}
                       </p>
                     </div>
@@ -282,7 +282,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
                 ) : (
                   <div className="flex items-center justify-between p-2 bg-[#1e1e1e] rounded-lg border border-[#2e2e2e]">
                     <span className="text-slate-400 font-medium">Cobros con Tarjeta</span>
-                    <span className="text-[11px] font-semibold text-slate-500 tabular-nums">Q0.00</span>
+                    <span className="text-[0.6875rem] font-semibold text-slate-500 tabular-nums">Q0.00</span>
                   </div>
                 )}
               </div>
@@ -325,7 +325,7 @@ export function CierreCajaItemAcordeon({ cierre }: CierreCajaItemAcordeonProps) 
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/20 text-[11px] text-slate-400 leading-relaxed">
+              <div className="p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/20 text-[0.6875rem] text-slate-400 leading-relaxed">
                 El efectivo de monedas se gestiona en su propio fondo acumulado hasta realizar el cuadre de tragamonedas.
               </div>
             </div>

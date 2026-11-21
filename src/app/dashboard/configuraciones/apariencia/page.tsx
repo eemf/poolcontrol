@@ -70,7 +70,7 @@ export default function PaginaTamanoFuente() {
                     <Badge
                       variant="outline"
                       className={cn(
-                        'rounded-full text-[11px] font-semibold px-2.5 py-0.5 tabular-nums',
+                        'rounded-full text-[0.6875rem] font-semibold px-2.5 py-0.5 tabular-nums',
                         activo
                           ? 'bg-sky-600 text-white border-sky-500'
                           : 'bg-[#1e1e1e] border-[#2e2e2e] text-slate-300'
@@ -136,7 +136,7 @@ export default function PaginaTamanoFuente() {
               className="w-full accent-sky-500 cursor-pointer"
               aria-label="Porcentaje de tamaño de fuente"
             />
-            <div className="flex justify-between text-[11px] text-slate-400 tabular-nums">
+            <div className="flex justify-between text-[0.6875rem] text-slate-400 tabular-nums">
               <span>{FONT_SCALE_MIN}% (Compacto)</span>
               <span>100% (Estándar)</span>
               <span>{FONT_SCALE_MAX}% (Máximo)</span>

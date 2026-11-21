@@ -42,27 +42,27 @@ export function TrasladoCard({
     switch (estado) {
       case 'en_transito':
         return (
-          <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] px-2.5 py-0.5">
+          <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full flex items-center gap-1 w-fit text-[0.6875rem] px-2.5 py-0.5">
             <Clock className="h-3 w-3" />
             <span>En Tránsito</span>
           </Badge>
         );
       case 'recibido':
         return (
-          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] px-2.5 py-0.5">
+          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1 w-fit text-[0.6875rem] px-2.5 py-0.5">
             <CheckCircle2 className="h-3 w-3" />
             <span>Recibido</span>
           </Badge>
         );
       case 'cancelado':
         return (
-          <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] px-2.5 py-0.5">
+          <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full flex items-center gap-1 w-fit text-[0.6875rem] px-2.5 py-0.5">
             <XCircle className="h-3 w-3" />
             <span>Cancelado</span>
           </Badge>
         );
       default:
-        return <Badge variant="outline" className="rounded-full text-[11px]">{estado}</Badge>;
+        return <Badge variant="outline" className="rounded-full text-[0.6875rem]">{estado}</Badge>;
     }
   };
 
@@ -76,7 +76,7 @@ export function TrasladoCard({
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-xs font-bold text-white shrink-0">#TR-{traslado.idTraslado}</span>
-            <span className="text-[11px] text-slate-400 font-medium truncate">({fechaStr})</span>
+            <span className="text-[0.6875rem] text-slate-400 font-medium truncate">({fechaStr})</span>
           </div>
           <div className="shrink-0">{renderBadgeEstado(traslado.estado)}</div>
         </div>
@@ -84,14 +84,14 @@ export function TrasladoCard({
         {/* Ruta de Envío: Origen -> Destino */}
         <SurfaceCard variant="subcard" className="p-2.5 flex items-center justify-between text-xs gap-2">
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] text-slate-400 block font-medium">Origen</span>
+            <span className="text-[0.625rem] text-slate-400 block font-medium">Origen</span>
             <span className={`font-semibold truncate block ${esOrigen ? 'text-sky-400' : 'text-slate-200'}`}>
               {traslado.sucursalOrigenNombre}
             </span>
           </div>
           <ArrowRight className="h-4 w-4 text-slate-400 shrink-0 mx-1" />
           <div className="flex-1 min-w-0 text-right">
-            <span className="text-[10px] text-slate-400 block font-medium">Destino</span>
+            <span className="text-[0.625rem] text-slate-400 block font-medium">Destino</span>
             <span className={`font-semibold truncate block ${esDestino ? 'text-emerald-400' : 'text-slate-200'}`}>
               {traslado.sucursalDestinoNombre}
             </span>
@@ -103,7 +103,7 @@ export function TrasladoCard({
           <div>
             <span className="text-slate-400">Productos: </span>
             <strong className="text-white">{traslado.cantidadTotalItems} uds</strong>
-            <span className="text-slate-400 text-[11px] ml-1">({traslado.items?.length || 0} ítems)</span>
+            <span className="text-slate-400 text-[0.6875rem] ml-1">({traslado.items?.length || 0} ítems)</span>
           </div>
           <div>
             <span className="text-slate-400">Total: </span>

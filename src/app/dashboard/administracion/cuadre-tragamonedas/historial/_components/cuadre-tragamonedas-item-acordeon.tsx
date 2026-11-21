@@ -32,7 +32,7 @@ export const CuadreTragamonedasItemAcordeon = memo(function CuadreTragamonedasIt
             <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
               #{cuadre.idCuadre}. {format(fecha, "dd 'de' MMMM, yyyy", { locale: es })}
             </p>
-            <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+            <span className="inline-flex items-center gap-1 text-[0.6875rem] text-slate-400 font-medium">
               <Clock className="h-3 w-3 text-slate-500 shrink-0" />
               {format(fecha, 'dd/MM/yyyy • hh:mm a', { locale: es })}
             </span>
@@ -44,8 +44,8 @@ export const CuadreTragamonedasItemAcordeon = memo(function CuadreTragamonedasIt
             <Badge
               className={
                 cuadre.estado === 'procesado'
-                  ? 'rounded-full border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-semibold bg-emerald-500/20 text-emerald-300'
-                  : 'rounded-full border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-semibold bg-amber-500/20 text-amber-300'
+                  ? 'rounded-full border border-emerald-500/30 px-2.5 py-0.5 text-[0.6875rem] font-semibold bg-emerald-500/20 text-emerald-300'
+                  : 'rounded-full border border-amber-500/30 px-2.5 py-0.5 text-[0.6875rem] font-semibold bg-amber-500/20 text-amber-300'
               }
             >
               {cuadre.estado === 'procesado' ? 'Procesado' : 'Pendiente'}
@@ -59,7 +59,7 @@ export const CuadreTragamonedasItemAcordeon = memo(function CuadreTragamonedasIt
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {kpis.map(({ label, valor, icon: Icon, labelClass, iconClass, valueClass }) => (
               <div key={label} className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
-                <p className={`text-[11px] font-medium flex items-center gap-1 ${labelClass}`}>
+                <p className={`text-[0.6875rem] font-medium flex items-center gap-1 ${labelClass}`}>
                   <Icon className={`h-3 w-3 shrink-0 ${iconClass}`} /> {label}
                 </p>
                 <p className={`text-sm font-bold tabular-nums mt-0.5 ${valueClass}`}>
@@ -83,7 +83,7 @@ export const CuadreTragamonedasItemAcordeon = memo(function CuadreTragamonedasIt
                   >
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-100 truncate">{m.nombre}</p>
-                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-slate-400 mt-0.5 tabular-nums">
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[0.6875rem] text-slate-400 mt-0.5 tabular-nums">
                         <span>Manual: Q{m.montoManual.toFixed(2)}</span>
                         <span className={m.deuda > 0 ? 'text-rose-400' : ''}>
                           Deuda: Q{m.deuda.toFixed(2)}

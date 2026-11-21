@@ -29,7 +29,7 @@ export function ControlPagosMetricas({ metricas }: ControlPagosMetricasProps) {
         <div className="text-xl sm:text-2xl font-black text-slate-100 font-mono">
           Q{metricas.totalRecaudado.toFixed(2)}
         </div>
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-[0.6875rem] text-muted-foreground">
           En {metricas.totalComprobantes} {metricas.totalComprobantes === 1 ? 'operación' : 'operaciones'}
         </p>
       </SurfaceCard>
@@ -45,7 +45,7 @@ export function ControlPagosMetricas({ metricas }: ControlPagosMetricasProps) {
         <div className="text-xl sm:text-2xl font-black text-slate-100 font-mono">
           Q{metricas.totalEfectivo.toFixed(2)}
         </div>
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-[0.6875rem] text-muted-foreground">
           {metricas.totalRecaudado > 0 
             ? `${((metricas.totalEfectivo / metricas.totalRecaudado) * 100).toFixed(0)}% del total` 
             : '0%'}
@@ -63,7 +63,7 @@ export function ControlPagosMetricas({ metricas }: ControlPagosMetricasProps) {
         <div className="text-xl sm:text-2xl font-black text-slate-100 font-mono">
           Q{metricas.totalTarjeta.toFixed(2)}
         </div>
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-[0.6875rem] text-muted-foreground">
           {metricas.totalRecaudado > 0 
             ? `${((metricas.totalTarjeta / metricas.totalRecaudado) * 100).toFixed(0)}% del total` 
             : '0%'}
@@ -81,7 +81,7 @@ export function ControlPagosMetricas({ metricas }: ControlPagosMetricasProps) {
         <div className="text-xl sm:text-2xl font-black text-slate-100 font-mono">
           {metricas.totalArticulosCubiertos}
         </div>
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-[0.6875rem] text-muted-foreground">
           Unidades saldadas en total
         </p>
       </SurfaceCard>

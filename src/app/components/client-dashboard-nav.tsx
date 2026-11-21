@@ -373,7 +373,7 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
             </Link>
             <div className="min-w-0 flex-1">
                 <h2 className="text-base font-headline font-semibold leading-tight text-slate-100">Pool Control</h2>
-                <p className="text-[11px] text-sky-400 font-medium truncate">
+                <p className="text-[0.6875rem] text-sky-400 font-medium truncate">
                   {sucursalData?.nombre || 'Sin sucursal'}
                 </p>
             </div>
@@ -429,7 +429,7 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
               </CollapsibleTrigger>
               <CollapsibleContent className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
                 <div className="mt-1.5 rounded-2xl bg-[#252526] border border-[#383838] shadow-2xl p-2 space-y-1 max-h-56 overflow-y-auto">
-                  <p className="text-[11px] font-semibold text-slate-400 px-2 py-1">
+                  <p className="text-[0.6875rem] font-semibold text-slate-400 px-2 py-1">
                     Cambiar de sucursal
                   </p>
                   <div className="h-px bg-[#2e2e2e] my-1" />
@@ -452,10 +452,10 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                       <Building2 className="h-4 w-4 shrink-0 opacity-80" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs">{s.nombre}</p>
-                        <p className="text-[10px] text-slate-400 font-medium">ID #{s.idSucursal}</p>
+                        <p className="text-[0.625rem] text-slate-400 font-medium">ID #{s.idSucursal}</p>
                       </div>
                       {s.id === sucursalId && (
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0">
+                        <span className="text-[0.625rem] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0">
                           Activa
                         </span>
                       )}
@@ -492,7 +492,7 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                 sideOffset={10}
                 className="w-64 font-body rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.85)] bg-[#252526] border border-[#3c3c3c] text-slate-100 p-1.5"
               >
-                <DropdownMenuLabel className="text-[11px] font-semibold text-slate-400 px-2.5 py-1.5">
+                <DropdownMenuLabel className="text-[0.6875rem] font-semibold text-slate-400 px-2.5 py-1.5">
                   Cambiar de sucursal
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-[#2e2e2e] my-1" />
@@ -516,10 +516,10 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
                         <Building2 className="h-4 w-4 shrink-0 opacity-80" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-xs">{s.nombre}</p>
-                          <p className="text-[10px] text-slate-400 font-medium">ID #{s.idSucursal}</p>
+                          <p className="text-[0.625rem] text-slate-400 font-medium">ID #{s.idSucursal}</p>
                         </div>
                         {s.id === sucursalId && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0">
+                          <span className="text-[0.625rem] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0">
                             Activa
                           </span>
                         )}
@@ -548,7 +548,7 @@ export default function ClientDashboardNav({ pathname }: { pathname: string }) {
         {(isSuperAdmin || puedeSaltar) && sucursalId && (
           <div className="w-full">
               <div className={cn(
-                  "text-center text-[10px] font-bold tracking-wider text-destructive-foreground bg-destructive rounded-lg transition-all duration-300 overflow-hidden",
+                  "text-center text-[0.625rem] font-bold tracking-wider text-destructive-foreground bg-destructive rounded-lg transition-all duration-300 overflow-hidden",
                   isCollapsed ? "p-2 opacity-50" : "p-1.5 opacity-100"
               )}>
                   {isCollapsed ? (

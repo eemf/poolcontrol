@@ -52,12 +52,12 @@ export function SeccionPersonal({ usuarios, roles, onToggleRol, cargando }: Secc
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-sm sm:text-base text-slate-100 truncate">{usuario.nombre}</p>
-                    <p className="text-[11px] text-slate-400 font-medium mt-0.5 truncate">
+                    <p className="text-[0.6875rem] text-slate-400 font-medium mt-0.5 truncate">
                       {usuario.email}
                     </p>
                   </div>
                 </div>
-                <Badge className="rounded-full text-[10px] font-semibold px-2.5 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0 tabular-nums">
+                <Badge className="rounded-full text-[0.625rem] font-semibold px-2.5 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0 tabular-nums">
                   {numRoles} {numRoles === 1 ? 'Rol' : 'Roles'}
                 </Badge>
               </div>
@@ -70,7 +70,7 @@ export function SeccionPersonal({ usuarios, roles, onToggleRol, cargando }: Secc
                     <User className="h-3.5 w-3.5 text-sky-400" />
                     Selección de roles asignados
                   </h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className="text-[0.6875rem] text-slate-400 mt-0.5">
                     Haz clic en un rol para activarlo o desactivarlo para este usuario.
                   </p>
                 </div>

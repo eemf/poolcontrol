@@ -111,7 +111,7 @@ export function DashboardKPIs({ metrics }: DashboardKPIsProps) {
               {metrics.productosBajoStock.map((p) => (
                 <div key={p.id} className="flex justify-between items-center text-xs bg-[#252526] p-1.5 rounded-lg border border-app-border">
                   <span className="font-medium text-slate-200 truncate max-w-[130px]">{p.nombre}</span>
-                  <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-bold border-amber-500/40 text-amber-400 bg-amber-500/10 rounded-full">
+                  <Badge variant="outline" className="h-5 px-1.5 text-[0.625rem] font-bold border-amber-500/40 text-amber-400 bg-amber-500/10 rounded-full">
                     {p.existencia} / {p.existenciaMinima || 0}
                   </Badge>
                 </div>

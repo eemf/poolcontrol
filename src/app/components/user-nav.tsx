@@ -69,7 +69,7 @@ export function UserNav() {
         <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 hover:bg-primary/5 transition-colors shrink-0">
                 <Avatar className="h-9 w-9 border border-primary/20 shadow-sm mx-auto">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-[10px] font-black">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-[0.625rem] font-black">
                     {getInitials(displayName, displayEmail)}
                     </AvatarFallback>
                 </Avatar>
@@ -83,7 +83,7 @@ export function UserNav() {
                 {displayEmail}
                 </p>
                 {profile?.rol && (
-                  <p className="text-[9px] leading-none text-primary mt-2 tracking-widest font-black opacity-80 bg-primary/5 w-fit px-2 py-1 rounded-full">
+                  <p className="text-[0.5625rem] leading-none text-primary mt-2 tracking-widest font-black opacity-80 bg-primary/5 w-fit px-2 py-1 rounded-full">
                     {profile.rol}
                   </p>
                 )}
@@ -91,7 +91,7 @@ export function UserNav() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="my-2" />
              <DropdownMenuGroup>
-                <p className="px-3 py-1.5 text-[9px] font-black text-muted-foreground tracking-widest">Apariencia</p>
+                <p className="px-3 py-1.5 text-[0.5625rem] font-black text-muted-foreground tracking-widest">Apariencia</p>
                 <DropdownMenuItem onClick={() => setTheme("light")} className="rounded-xl cursor-pointer">
                     <Sun className="mr-2 h-4 w-4" /> <span className="text-xs font-medium">Modo claro</span>
                 </DropdownMenuItem>

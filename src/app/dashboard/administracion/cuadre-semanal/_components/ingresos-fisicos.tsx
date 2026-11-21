@@ -71,7 +71,7 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
                     <Icon className={cn("hidden sm:block h-5 w-5 shrink-0", iconColor)} />
                     <div className="flex flex-col min-w-0 flex-1">
                       <span className="font-bold text-xs sm:text-sm text-foreground truncate">{label}</span>
-                      <span className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                      <span className="text-[0.625rem] sm:text-xs text-muted-foreground truncate">
                         {format(item.fecha.toDate(), "dd MMM, yyyy '•' hh:mm a", { locale: es })}
                       </span>
                     </div>
@@ -80,7 +80,7 @@ export function IngresosFisicos({ items, selectedEfectivo, selectedTragamonedas,
                     <p className={cn("font-bold text-sm sm:text-base whitespace-nowrap tabular-nums leading-tight", montoColor)}>
                       Q{monto.toFixed(2)}
                     </p>
-                    <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
+                    <Badge className="rounded-full text-[0.625rem] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                       Pendiente
                     </Badge>
                   </div>

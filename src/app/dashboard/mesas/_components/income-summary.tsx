@@ -191,7 +191,7 @@ export function IncomeSummary({
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-bold text-slate-100 leading-tight flex items-center gap-2">
                               {sesion.tiempo}
-                              <span className="text-[10px] text-slate-400 font-medium">
+                              <span className="text-[0.625rem] text-slate-400 font-medium">
                                 {format(sesion.fecha, 'dd/MM', { locale: es })}
                               </span>
                               {sesion.metodoPago === 'Tarjeta' && (
@@ -202,7 +202,7 @@ export function IncomeSummary({
                               <div className="flex flex-wrap items-center gap-1 mt-1">
                                 <Badge
                                   className={cn(
-                                    'text-[10px] h-4 px-1.5 rounded-full font-semibold border',
+                                    'text-[0.625rem] h-4 px-1.5 rounded-full font-semibold border',
                                     sesion.metadata.modo === 'definido'
                                       ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                                       : 'bg-sky-500/20 text-sky-300 border-sky-500/30'
@@ -211,16 +211,16 @@ export function IncomeSummary({
                                   {sesion.metadata.modo === 'definido' ? 'Definido' : 'Libre'}
                                 </Badge>
                                 {sesion.metadata.pagadoContado && (
-                                  <Badge className="text-[10px] h-4 px-1.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                                  <Badge className="text-[0.625rem] h-4 px-1.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
                                     Contado
                                   </Badge>
                                 )}
                                 {sesion.metadata.tipo === 'ajuste' && (
-                                  <Badge className="text-[10px] h-4 px-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                                  <Badge className="text-[0.625rem] h-4 px-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
                                     Ajuste
                                   </Badge>
                                 )}
-                                <div className="flex items-center gap-1 ml-1 text-[10px] font-medium text-slate-400">
+                                <div className="flex items-center gap-1 ml-1 text-[0.625rem] font-medium text-slate-400">
                                   <span>
                                     {sesion.metadata.horaInicio
                                       ? format(toDate(sesion.metadata.horaInicio), 'hh:mm a')

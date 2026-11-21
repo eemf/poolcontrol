@@ -50,7 +50,7 @@ export function DetalleCuadresSemanales({ ids, firestore, sucursalId }: DetalleC
 
   return (
     <div className="rounded-xl border border-[#2e2e2e] bg-[#1e1e1e] overflow-hidden">
-      <div className="px-2.5 py-1.5 bg-[#1e1e1e] border-b border-[#2e2e2e] flex items-center justify-between text-[11px] font-semibold text-slate-300">
+      <div className="px-2.5 py-1.5 bg-[#1e1e1e] border-b border-[#2e2e2e] flex items-center justify-between text-[0.6875rem] font-semibold text-slate-300">
         <span>Cuadres Semanales Incluidos</span>
         <span className="text-slate-400 tabular-nums">{ids.length}</span>
       </div>
@@ -67,7 +67,7 @@ export function DetalleCuadresSemanales({ ids, firestore, sucursalId }: DetalleC
                 <span className="font-medium text-slate-100 truncate">
                   Cuadre Semanal #{item.idCuadreSemanal}
                 </span>
-                <span className="text-[10px] text-slate-400 shrink-0 tabular-nums">
+                <span className="text-[0.625rem] text-slate-400 shrink-0 tabular-nums">
                   {format(item.fecha.toDate(), 'dd/MM hh:mm a', { locale: es })}
                 </span>
               </div>

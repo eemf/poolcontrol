@@ -39,7 +39,7 @@ export function InventarioRevisionItem({
         </span>
         <div className="flex items-center gap-2 mt-1">
           {producto.ubicacion && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-sky-400 truncate">
+            <span className="inline-flex items-center gap-1 text-[0.625rem] font-semibold text-sky-400 truncate">
               <MapPin className="h-2.5 w-2.5 shrink-0" />
               <span className="truncate">{producto.ubicacion}</span>
             </span>
@@ -47,7 +47,7 @@ export function InventarioRevisionItem({
           {tieneModificacion && (
             <span
               className={cn(
-                'inline-flex items-center h-5 px-2 rounded-full text-[10px] font-bold tabular-nums whitespace-nowrap shrink-0',
+                'inline-flex items-center h-5 px-2 rounded-full text-[0.625rem] font-bold tabular-nums whitespace-nowrap shrink-0',
                 producto.diferencia > 0
                   ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                   : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'

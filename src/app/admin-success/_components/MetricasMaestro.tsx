@@ -138,7 +138,7 @@ export function MetricasMaestro({
                                     <p className="text-2xl font-bold text-slate-100 tabular-nums tracking-tight">
                                         {kpi.value}
                                     </p>
-                                    <p className="text-[11px] text-slate-400 truncate">{kpi.sub}</p>
+                                    <p className="text-[0.6875rem] text-slate-400 truncate">{kpi.sub}</p>
                                 </div>
                                 <div
                                     className={cn(
@@ -166,7 +166,7 @@ export function MetricasMaestro({
                                 <h2 className="text-sm font-bold text-slate-100">
                                     Estado por sucursal
                                 </h2>
-                                <p className="text-[11px] text-slate-400">
+                                <p className="text-[0.6875rem] text-slate-400">
                                     Vigencia, usuarios asignados y cuota mensual
                                 </p>
                             </div>
@@ -222,12 +222,12 @@ export function MetricasMaestro({
                                                 </p>
                                                 <Badge
                                                     variant="outline"
-                                                    className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-300 text-[10px] font-semibold px-2 py-0"
+                                                    className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-300 text-[0.625rem] font-semibold px-2 py-0"
                                                 >
                                                     {sub?.plan || 'Sin plan'}
                                                 </Badge>
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-400 mt-0.5">
+                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[0.6875rem] text-slate-400 mt-0.5">
                                                 <span>
                                                     {userCount !== null
                                                         ? `${userCount} ${userCount === 1 ? 'usuario' : 'usuarios'}`
@@ -248,16 +248,16 @@ export function MetricasMaestro({
                                             </span>
                                             {activa ? (
                                                 porVencer ? (
-                                                    <Badge className="rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[11px] font-semibold px-2.5 py-0.5">
+                                                    <Badge className="rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[0.6875rem] font-semibold px-2.5 py-0.5">
                                                         Vence en {diasRestantes}d
                                                     </Badge>
                                                 ) : (
-                                                    <Badge className="rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold px-2.5 py-0.5">
+                                                    <Badge className="rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[0.6875rem] font-semibold px-2.5 py-0.5">
                                                         Activa
                                                     </Badge>
                                                 )
                                             ) : (
-                                                <Badge className="rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 text-[11px] font-semibold px-2.5 py-0.5">
+                                                <Badge className="rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 text-[0.6875rem] font-semibold px-2.5 py-0.5">
                                                     {suspendida ? 'Suspendida' : 'Vencida'}
                                                 </Badge>
                                             )}
@@ -279,7 +279,7 @@ export function MetricasMaestro({
                             <h2 className="text-sm font-bold text-slate-100">
                                 Distribución de planes
                             </h2>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-[0.6875rem] text-slate-400">
                                 Suscripciones por nivel de servicio
                             </p>
                         </div>
@@ -326,19 +326,19 @@ export function MetricasMaestro({
                                 <p className="text-base font-bold text-emerald-400 tabular-nums">
                                     {sucursalesActivas}
                                 </p>
-                                <p className="text-[11px] text-slate-400">Activas</p>
+                                <p className="text-[0.6875rem] text-slate-400">Activas</p>
                             </div>
                             <div className="rounded-xl bg-[#1e1e1e] border border-[#2e2e2e] p-2.5">
                                 <p className="text-base font-bold text-amber-400 tabular-nums">
                                     {proximasAVencer}
                                 </p>
-                                <p className="text-[11px] text-slate-400">Por vencer</p>
+                                <p className="text-[0.6875rem] text-slate-400">Por vencer</p>
                             </div>
                             <div className="rounded-xl bg-[#1e1e1e] border border-[#2e2e2e] p-2.5">
                                 <p className="text-base font-bold text-rose-400 tabular-nums">
                                     {sucursalesAtencion}
                                 </p>
-                                <p className="text-[11px] text-slate-400">Inactivas</p>
+                                <p className="text-[0.6875rem] text-slate-400">Inactivas</p>
                             </div>
                         </div>
                     </div>

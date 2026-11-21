@@ -75,13 +75,13 @@ export function CuadreMensualResumen({
         <div className="p-4 space-y-3.5">
           <div className="grid grid-cols-2 gap-2.5">
             <div className="p-3 rounded-xl bg-[#252526] border border-[#2e2e2e] text-center">
-              <p className="text-[11px] font-medium text-emerald-400">Total Ingresos</p>
+              <p className="text-[0.6875rem] font-medium text-emerald-400">Total Ingresos</p>
               <p className="text-lg font-bold text-emerald-400 tabular-nums mt-0.5">
                 Q{totalIngresos.toFixed(2)}
               </p>
             </div>
             <div className="p-3 rounded-xl bg-[#252526] border border-[#2e2e2e] text-center">
-              <p className="text-[11px] font-medium text-rose-400">Total Egresos</p>
+              <p className="text-[0.6875rem] font-medium text-rose-400">Total Egresos</p>
               <p className="text-lg font-bold text-rose-400 tabular-nums mt-0.5">
                 - Q{totalEgresos.toFixed(2)}
               </p>
@@ -94,7 +94,7 @@ export function CuadreMensualResumen({
                 <div className="flex-1 flex items-center justify-between gap-2 pr-2 text-left">
                   <div className="min-w-0">
                     <span className="text-xs font-medium text-slate-300 block">Balance Neto Calculado</span>
-                    <span className="text-[10px] text-slate-400">Ver detalle del cálculo</span>
+                    <span className="text-[0.625rem] text-slate-400">Ver detalle del cálculo</span>
                   </div>
                   <span className="font-bold text-base text-sky-400 tabular-nums shrink-0">
                     Q{resumen.balanceNeto.toFixed(2)}

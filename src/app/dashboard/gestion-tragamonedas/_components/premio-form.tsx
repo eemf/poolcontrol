@@ -147,7 +147,7 @@ export const PremioForm = React.memo(function PremioForm({
           </div>
           <div>
             <h3 className="text-sm font-bold text-slate-100 leading-tight">Registrar Premio</h3>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[0.6875rem] text-slate-400">
               Abono o liquidación de premios a jugadores
             </p>
           </div>
@@ -229,7 +229,7 @@ export const PremioForm = React.memo(function PremioForm({
           ) : (
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label htmlFor="premio-total" className="text-[11px] font-semibold text-slate-300">
+                <Label htmlFor="premio-total" className="text-[0.6875rem] font-semibold text-slate-300">
                   Total Premio (Q)
                 </Label>
                 <div className="relative">
@@ -251,7 +251,7 @@ export const PremioForm = React.memo(function PremioForm({
                 </div>
               </div>
               <div className="space-y-1">
-                <Label htmlFor="monto-pagado" className="text-[11px] font-semibold text-slate-300">
+                <Label htmlFor="monto-pagado" className="text-[0.6875rem] font-semibold text-slate-300">
                   Monto Pagado (Q)
                 </Label>
                 <div className="relative">

@@ -158,7 +158,7 @@ export function Paginacion({
                 value={String(itemsPerPage)}
                 onValueChange={(val) => onItemsPerPageChange(Number(val))}
               >
-                <SelectTrigger className="h-7 w-[82px] rounded-full border-[#2e2e2e] bg-[#252526] text-slate-200 text-[11px] font-semibold focus:ring-1 focus:ring-sky-500 px-2">
+                <SelectTrigger className="h-7 w-[82px] rounded-full border-[#2e2e2e] bg-[#252526] text-slate-200 text-[0.6875rem] font-semibold focus:ring-1 focus:ring-sky-500 px-2">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1e1e1e] border-[#2e2e2e] text-slate-200 rounded-xl shadow-xl">
@@ -186,7 +186,7 @@ export function Paginacion({
             size="sm"
             onClick={() => onPageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage <= 1}
-            className="h-8 px-2.5 rounded-full bg-[#252526] hover:bg-[#313131] text-slate-300 hover:text-white border border-[#2e2e2e] disabled:opacity-30 disabled:hover:bg-[#252526] disabled:hover:text-slate-300 shadow-xs transition-colors shrink-0 font-medium gap-1 text-[11px] cursor-pointer disabled:cursor-not-allowed"
+            className="h-8 px-2.5 rounded-full bg-[#252526] hover:bg-[#313131] text-slate-300 hover:text-white border border-[#2e2e2e] disabled:opacity-30 disabled:hover:bg-[#252526] disabled:hover:text-slate-300 shadow-xs transition-colors shrink-0 font-medium gap-1 text-[0.6875rem] cursor-pointer disabled:cursor-not-allowed"
             title="Página anterior"
             aria-label="Página anterior"
           >
@@ -206,7 +206,7 @@ export function Paginacion({
             size="sm"
             onClick={() => onPageChange(Math.min(safeTotalPages, currentPage + 1))}
             disabled={currentPage >= safeTotalPages}
-            className="h-8 px-2.5 rounded-full bg-[#252526] hover:bg-[#313131] text-slate-300 hover:text-white border border-[#2e2e2e] disabled:opacity-30 disabled:hover:bg-[#252526] disabled:hover:text-slate-300 shadow-xs transition-colors shrink-0 font-medium gap-1 text-[11px] cursor-pointer disabled:cursor-not-allowed"
+            className="h-8 px-2.5 rounded-full bg-[#252526] hover:bg-[#313131] text-slate-300 hover:text-white border border-[#2e2e2e] disabled:opacity-30 disabled:hover:bg-[#252526] disabled:hover:text-slate-300 shadow-xs transition-colors shrink-0 font-medium gap-1 text-[0.6875rem] cursor-pointer disabled:cursor-not-allowed"
             title="Página siguiente"
             aria-label="Página siguiente"
           >

@@ -57,7 +57,7 @@ const DetalleVentasTarjeta = ({
 
   return (
     <div className="space-y-1.5 p-2.5 bg-[#1e1e1e] border border-[#2e2e2e] rounded-xl mt-1">
-      <p className="text-[11px] font-semibold text-slate-400 mb-1 px-1">
+      <p className="text-[0.6875rem] font-semibold text-slate-400 mb-1 px-1">
         Desglose de ventas con tarjeta
       </p>
       {pagos.map((pago) => (
@@ -69,7 +69,7 @@ const DetalleVentasTarjeta = ({
             <span className="font-semibold text-slate-200 truncate">
               Venta #{pago.idVenta} — {pago.clienteNombre}
             </span>
-            <span className="text-[10px] text-slate-400">
+            <span className="text-[0.625rem] text-slate-400">
               {format(toDate(pago.fecha), 'hh:mm a')}
             </span>
           </div>
@@ -162,7 +162,7 @@ export function IncomeCards({
                         <p className="font-bold text-base sm:text-lg text-sky-400 whitespace-nowrap tabular-nums leading-none">
                           Q{cierre.pagosTarjeta.toFixed(2)}
                         </p>
-                        <Badge className="h-5 rounded-full text-[10px] font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30 mt-1">
+                        <Badge className="h-5 rounded-full text-[0.625rem] font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30 mt-1">
                           Pendiente
                         </Badge>
                       </div>

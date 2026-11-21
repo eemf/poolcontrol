@@ -406,7 +406,7 @@ export function BillingDialog({
                       )}
                     </div>
 
-                    <p className="text-[11px] text-slate-400 leading-snug">
+                    <p className="text-[0.6875rem] text-slate-400 leading-snug">
                       El reloj seguirá corriendo y la estación permanecerá ocupada hasta que finalice la sesión.
                     </p>
                   </div>
@@ -592,7 +592,7 @@ export function BillingDialog({
 
                       <div className="relative my-2 flex items-center justify-center">
                         <div className="w-full border-t border-[#2e2e2e]" />
-                        <span className="bg-[#1e1e1e] px-3 text-[11px] font-medium text-slate-400 shrink-0">
+                        <span className="bg-[#1e1e1e] px-3 text-[0.6875rem] font-medium text-slate-400 shrink-0">
                           O enviar a cuenta
                         </span>
                         <div className="w-full border-t border-[#2e2e2e]" />
@@ -664,7 +664,7 @@ export function BillingDialog({
                   <h3 className="font-headline text-base font-bold text-slate-100 leading-tight">
                     ¿Confirmar Pago con Tarjeta?
                   </h3>
-                  <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                  <p className="text-[0.6875rem] text-slate-400 mt-0.5 truncate">
                     {isConsola ? 'Consola' : 'Mesa'} #{tableToCharge?.numeroMesa} • Verifica antes de procesar
                   </p>
                 </div>
@@ -687,7 +687,7 @@ export function BillingDialog({
                     ).toFixed(2)}
                   </span>
                 </div>
-                <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-400 leading-snug">
+                <div className="pt-2 border-t border-[#2e2e2e] text-[0.6875rem] text-slate-400 leading-snug">
                   El cobro se registrará como pago con tarjeta y no sumará al efectivo en caja.
                 </div>
               </div>
@@ -743,7 +743,7 @@ export function BillingDialog({
                   <h3 className="font-headline text-base font-bold text-slate-100 leading-tight">
                     ¿Cancelar División?
                   </h3>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className="text-[0.6875rem] text-slate-400 mt-0.5">
                     Los pagos parciales procesados no se revertirán.
                   </p>
                 </div>

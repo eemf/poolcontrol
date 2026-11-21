@@ -31,7 +31,7 @@ export function DashboardTopStations({
         </div>
         <div>
           <h3 className="text-sm font-bold text-slate-100">Mejores Estaciones</h3>
-          <p className="text-[11px] text-muted-foreground">Mayor facturación acumulada</p>
+          <p className="text-[0.6875rem] text-muted-foreground">Mayor facturación acumulada</p>
         </div>
       </div>
 
@@ -41,7 +41,7 @@ export function DashboardTopStations({
             <TrendingUp className="h-4 w-4 text-sky-400" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-medium text-muted-foreground">En el Turno Actual</p>
+            <p className="text-[0.625rem] font-medium text-muted-foreground">En el Turno Actual</p>
             <p className="text-xs font-bold text-slate-100 truncate">{topTurno.name}</p>
             <p className="text-xs font-mono font-bold text-sky-400">Q{topTurno.total.toFixed(2)}</p>
           </div>
@@ -52,7 +52,7 @@ export function DashboardTopStations({
             <CalendarDays className="h-4 w-4 text-emerald-400" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-medium text-muted-foreground">Esta Semana</p>
+            <p className="text-[0.625rem] font-medium text-muted-foreground">Esta Semana</p>
             <p className="text-xs font-bold text-slate-100 truncate">{topSemana.name}</p>
             <p className="text-xs font-mono font-bold text-emerald-400">Q{topSemana.total.toFixed(2)}</p>
           </div>
@@ -63,7 +63,7 @@ export function DashboardTopStations({
             <Clock className="h-4 w-4 text-indigo-400" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-medium text-muted-foreground">Este Mes</p>
+            <p className="text-[0.625rem] font-medium text-muted-foreground">Este Mes</p>
             <p className="text-xs font-bold text-slate-100 truncate">{topMes.name}</p>
             <p className="text-xs font-mono font-bold text-indigo-400">Q{topMes.total.toFixed(2)}</p>
           </div>

@@ -65,7 +65,7 @@ export function AjusteInventarioAcordeon({ ajuste }: AjusteInventarioAcordeonPro
                   Ajuste #{ajuste.idAjuste}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-400 font-medium truncate">
+              <div className="flex items-center gap-1.5 text-[0.6875rem] sm:text-xs text-slate-400 font-medium truncate">
                 <Clock className="h-3 w-3 text-slate-500 shrink-0" />
                 <span className="sm:hidden truncate">
                   {format(fechaAjuste, 'dd/MM/yyyy • hh:mm a', { locale: es })}
@@ -81,7 +81,7 @@ export function AjusteInventarioAcordeon({ ajuste }: AjusteInventarioAcordeonPro
           <div className="flex flex-col items-end justify-center gap-1 shrink-0 text-right">
             <Badge className="font-bold rounded-full px-2.5 py-0.5 bg-sky-500/15 text-sky-400 border border-sky-500/30 inline-flex items-center gap-1 tabular-nums">
               <span className="text-xs">{detalles.length}</span>
-              <span className="text-[11px] whitespace-nowrap">
+              <span className="text-[0.6875rem] whitespace-nowrap">
                 <span className="sm:hidden">{detalles.length === 1 ? 'prod.' : 'prods.'}</span>
                 <span className="hidden sm:inline">
                   {detalles.length === 1 ? 'producto' : 'productos'}
@@ -89,11 +89,11 @@ export function AjusteInventarioAcordeon({ ajuste }: AjusteInventarioAcordeonPro
               </span>
             </Badge>
             {totalModificados > 0 ? (
-              <span className="text-[10px] font-semibold text-amber-400 tabular-nums">
+              <span className="text-[0.625rem] font-semibold text-amber-400 tabular-nums">
                 {totalModificados} {totalModificados === 1 ? 'modificado' : 'modificados'}
               </span>
             ) : (
-              <span className="text-[10px] font-medium text-emerald-400">
+              <span className="text-[0.625rem] font-medium text-emerald-400">
                 Sin diferencias
               </span>
             )}
@@ -132,7 +132,7 @@ export function AjusteInventarioAcordeon({ ajuste }: AjusteInventarioAcordeonPro
                       {detalle.nombreProducto}
                     </p>
                     <div className="flex items-center gap-1.5 shrink-0 text-right">
-                      <span className="text-[11px] font-medium text-slate-400">
+                      <span className="text-[0.6875rem] font-medium text-slate-400">
                         Existencia:
                       </span>
                       <span className="font-bold text-sm text-white tabular-nums">
@@ -158,7 +158,7 @@ export function AjusteInventarioAcordeon({ ajuste }: AjusteInventarioAcordeonPro
                     <p className="font-bold text-sm text-white truncate">
                       {detalle.nombreProducto}
                     </p>
-                    <div className="flex items-center gap-2 mt-1 text-[11px] font-medium text-slate-300">
+                    <div className="flex items-center gap-2 mt-1 text-[0.6875rem] font-medium text-slate-300">
                       <span>
                         Sistema:{' '}
                         <strong className="font-bold text-slate-200 tabular-nums">
@@ -176,7 +176,7 @@ export function AjusteInventarioAcordeon({ ajuste }: AjusteInventarioAcordeonPro
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="text-[10px] font-semibold text-slate-400 mb-1 text-center">
+                    <p className="text-[0.625rem] font-semibold text-slate-400 mb-1 text-center">
                       Diferencia
                     </p>
                     <div className="bg-[#1e1e1e] px-2.5 py-1 rounded-full border border-[#2e2e2e] min-w-[60px] text-center">

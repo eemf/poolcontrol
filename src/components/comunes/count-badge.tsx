@@ -32,7 +32,7 @@ export function CountBadge({
 
   return (
     <span
-      className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-black leading-none shadow-sm shrink-0 transition-transform ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[0.6875rem] font-black leading-none shadow-sm shrink-0 transition-transform ${variantStyles[variant]} ${className}`}
     >
       {count}
     </span>

@@ -96,7 +96,7 @@ export function HistorialVentaItem({
                   {nombreMostrado}
                 </span>
               </div>
-              <span className="font-mono bg-[#1e1e1e] px-2 py-0.5 rounded-full border border-[#2e2e2e] text-[10px] font-bold text-sky-400 shrink-0">
+              <span className="font-mono bg-[#1e1e1e] px-2 py-0.5 rounded-full border border-[#2e2e2e] text-[0.625rem] font-bold text-sky-400 shrink-0">
                 Venta {idVenta}
               </span>
             </div>
@@ -104,16 +104,16 @@ export function HistorialVentaItem({
             {/* Fila 2: Turno y cortesía */}
             <div className="flex items-center gap-1.5 flex-wrap">
               {ultimoTurnoLabel && ultimoTurnoLabel === 'Turno actual' ? (
-                <Badge className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[10px] font-medium h-5 rounded-full px-2 shrink-0">
+                <Badge className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[0.625rem] font-medium h-5 rounded-full px-2 shrink-0">
                   Turno Actual
                 </Badge>
               ) : (
-                <span className="text-[11px] text-slate-400 font-medium">
+                <span className="text-[0.6875rem] text-slate-400 font-medium">
                   {ultimoTurnoLabel || 'Turno anterior'}
                 </span>
               )}
               {esConsumoInterno && (
-                <Badge className="bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[10px] font-semibold h-5 rounded-full px-2 shrink-0 inline-flex items-center gap-1">
+                <Badge className="bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 shrink-0 inline-flex items-center gap-1">
                   <Gift className="h-2.5 w-2.5" />
                   Cortesía
                 </Badge>
@@ -122,7 +122,7 @@ export function HistorialVentaItem({
 
             {/* Fila 3: Fecha y hora */}
             {fechaUltimoPago && (
-              <span className="flex items-center gap-1 text-[11px] text-slate-400 truncate">
+              <span className="flex items-center gap-1 text-[0.6875rem] text-slate-400 truncate">
                 <CalendarDays className="h-3 w-3 text-slate-500 shrink-0" />
                 {format(toDate(fechaUltimoPago), 'dd/MM/yyyy • hh:mm a', { locale: es })}
               </span>
@@ -133,7 +133,7 @@ export function HistorialVentaItem({
           <div className="flex flex-col justify-between items-end gap-1.5 shrink-0 text-right">
             {/* Fila 1: Total */}
             <div className="flex items-baseline gap-1">
-              <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">Total:</span>
+              <span className="text-[0.625rem] text-slate-400 font-medium hidden sm:inline">Total:</span>
               <span
                 className={cn(
                   'font-bold text-sm sm:text-base tabular-nums',
@@ -147,11 +147,11 @@ export function HistorialVentaItem({
             {/* Fila 2: Pendiente */}
             <div className="text-xs">
               {!esVentaLiquidada ? (
-                <span className="text-amber-400 font-semibold tabular-nums text-[11px]">
+                <span className="text-amber-400 font-semibold tabular-nums text-[0.6875rem]">
                   Pendiente: Q{saldoActual.toFixed(2)}
                 </span>
               ) : (
-                <span className="text-slate-400 text-[11px] tabular-nums">
+                <span className="text-slate-400 text-[0.6875rem] tabular-nums">
                   Pendiente: Q0.00
                 </span>
               )}
@@ -160,12 +160,12 @@ export function HistorialVentaItem({
             {/* Fila 3: Estado */}
             <div>
               {esVentaLiquidada ? (
-                <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold h-5 rounded-full px-2 inline-flex items-center gap-1">
+                <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 inline-flex items-center gap-1">
                   <CheckCircle2 className="h-3 w-3" />
                   Pagada
                 </Badge>
               ) : (
-                <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-semibold h-5 rounded-full px-2 inline-flex items-center gap-1">
+                <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 inline-flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   {totalPagadoPeriodo > 0
                     ? `Abonado Q${totalPagadoPeriodo.toFixed(2)}`
@@ -188,7 +188,7 @@ export function HistorialVentaItem({
                   <ShoppingBag className="h-3.5 w-3.5 text-sky-400" />
                   Artículos Consumidos
                 </h4>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[0.6875rem] text-slate-400">
                   {articulosConsumidos ? articulosConsumidos.length : 1} producto(s)
                 </span>
               </div>
@@ -233,7 +233,7 @@ export function HistorialVentaItem({
                             {det.nombreProducto}
                           </span>
 
-                          <div className="flex items-center gap-1 text-[11px] mt-0.5 flex-wrap">
+                          <div className="flex items-center gap-1 text-[0.6875rem] mt-0.5 flex-wrap">
                             {estaSaldado ? (
                               <span className="text-emerald-400 font-semibold inline-flex items-center gap-1">
                                 <CheckCircle2 className="h-3 w-3 shrink-0" />
@@ -282,7 +282,7 @@ export function HistorialVentaItem({
                   <Receipt className="h-3.5 w-3.5 text-emerald-400" />
                   Historial de Pagos y Abonos
                 </h4>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[0.6875rem] text-slate-400">
                   {pagos.length} {pagos.length === 1 ? 'pago' : 'pagos'}
                 </span>
               </div>
@@ -305,7 +305,7 @@ export function HistorialVentaItem({
                           <Badge
                             variant="outline"
                             className={cn(
-                              'text-[10px] h-5 px-2 rounded-full font-medium border inline-flex items-center gap-1',
+                              'text-[0.625rem] h-5 px-2 rounded-full font-medium border inline-flex items-center gap-1',
                               esPagoCortesia
                                 ? 'border-purple-500/30 text-purple-300 bg-purple-500/15'
                                 : esEfectivo
@@ -324,13 +324,13 @@ export function HistorialVentaItem({
                           </Badge>
 
                           {esAbonoCompartido && (
-                            <span className="text-[10px] text-amber-300/90 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 font-medium">
+                            <span className="text-[0.625rem] text-amber-300/90 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 font-medium">
                               Parte de abono Q{(pago.totalOperacion || 0).toFixed(2)}
                             </span>
                           )}
                         </div>
 
-                        <span className="text-[11px] text-slate-400 mt-0.5">
+                        <span className="text-[0.6875rem] text-slate-400 mt-0.5">
                           {format(toDate(pago.fecha), 'dd/MM/yyyy hh:mm a', { locale: es })}
                         </span>
                       </div>
@@ -348,7 +348,7 @@ export function HistorialVentaItem({
                               size="sm"
                               onClick={() => onCambiarMetodo(pago, ventaDocId)}
                               className={cn(
-                                'h-6 rounded-full px-2.5 text-[10px] font-semibold border transition-colors',
+                                'h-6 rounded-full px-2.5 text-[0.625rem] font-semibold border transition-colors',
                                 esEfectivo
                                   ? 'bg-sky-500/15 hover:bg-sky-500 text-sky-300 hover:text-slate-950 border-sky-500/30'
                                   : 'bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border-amber-500/30'

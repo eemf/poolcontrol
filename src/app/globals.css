@@ -124,43 +124,34 @@
  * ============================================================================ */
 @keyframes swal2-show {
   0% {
-    transform: translate3d(-50%, -50%, 0) scale(0.7);
+    transform: scale(0.92);
     opacity: 0;
   }
-  45% {
-    transform: translate3d(-50%, -50%, 0) scale(1.05);
-    opacity: 1;
-  }
-  80% {
-    transform: translate3d(-50%, -50%, 0) scale(0.95);
-  }
   100% {
-    transform: translate3d(-50%, -50%, 0) scale(1);
+    transform: scale(1);
     opacity: 1;
   }
 }
 
 @keyframes swal2-hide {
   0% {
-    transform: translate3d(-50%, -50%, 0) scale(1);
+    transform: scale(1);
     opacity: 1;
   }
   100% {
-    transform: translate3d(-50%, -50%, 0) scale(0.5);
+    transform: scale(0.92);
     opacity: 0;
   }
 }
 
 .swal2-modal-anim[data-state='open'],
 .modal-pro-anim[data-state='open'] {
-  animation: swal2-show 0.3s forwards !important;
-  will-change: transform, opacity;
+  animation: swal2-show 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .swal2-modal-anim[data-state='closed'],
 .modal-pro-anim[data-state='closed'] {
-  animation: swal2-hide 0.15s forwards !important;
-  will-change: transform, opacity;
+  animation: swal2-hide 0.15s ease-in forwards;
 }
 
 .swal2-icon {

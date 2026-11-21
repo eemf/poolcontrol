@@ -215,7 +215,7 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
                   </Button>
                 </div>
               </div>
-              <p className="text-[10px] text-slate-400 text-center">
+              <p className="text-[0.625rem] text-slate-400 text-center">
                 Presiona F6 para salir del modo manual
               </p>
             </div>
@@ -290,7 +290,7 @@ export function POSForm({ refs, state, actions }: POSFormProps) {
                   </Button>
                 </div>
               </div>
-              <p className="text-[10px] text-slate-400 text-center">
+              <p className="text-[0.625rem] text-slate-400 text-center">
                 Presiona F6 para agregar un ítem manual
               </p>
             </div>

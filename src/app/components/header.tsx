@@ -232,13 +232,13 @@ export function Header() {
                 className="bg-[#252526] border border-[#383838] text-slate-100 text-xs font-body px-3 py-1.5 shadow-xl"
               >
                 <p className="font-semibold">v{appVersion.version} (Build {appVersion.build})</p>
-                <p className="text-[10px] text-slate-400">Clic para ver historial de versiones</p>
+                <p className="text-[0.625rem] text-slate-400">Clic para ver historial de versiones</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <div className="flex flex-col min-w-0">
             <h2 className="text-base font-headline font-bold leading-none text-slate-100">Pool Control</h2>
-            <p className="text-[11px] text-sky-400 font-medium mt-1 truncate max-w-[165px]">
+            <p className="text-[0.6875rem] text-sky-400 font-medium mt-1 truncate max-w-[165px]">
               {sucursalData?.nombre || 'Cargando sucursal...'}
             </p>
           </div>

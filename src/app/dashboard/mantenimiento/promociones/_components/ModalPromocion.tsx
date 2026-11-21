@@ -206,7 +206,7 @@ export function ModalPromocion({
                       <Label htmlFor="combinable-switch" className="text-xs font-semibold text-slate-200 cursor-pointer">
                         Combinable entre productos seleccionados
                       </Label>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[0.6875rem] text-slate-400">
                         Ej. llevar 1 cerveza + 1 cerveza distinta y aplicar 2x1.
                       </p>
                     </div>
@@ -323,7 +323,7 @@ export function ModalPromocion({
                 <Label className="text-xs font-medium ml-1 text-slate-200">
                   Productos aplicables*
                 </Label>
-                <Badge className="rounded-full text-[10px] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30 tabular-nums">
+                <Badge className="rounded-full text-[0.625rem] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30 tabular-nums">
                   {form.productosIds.length} seleccionados
                 </Badge>
               </div>
@@ -370,7 +370,7 @@ export function ModalPromocion({
                             />
                             <span className="font-medium truncate">{prod.nombre}</span>
                           </div>
-                          <span className="text-[11px] font-semibold text-emerald-400 tabular-nums shrink-0">
+                          <span className="text-[0.6875rem] font-semibold text-emerald-400 tabular-nums shrink-0">
                             Q{prod.precioVenta.toFixed(2)}
                           </span>
                         </label>
@@ -388,7 +388,7 @@ export function ModalPromocion({
                   <Label htmlFor="vigencia-switch" className="text-xs sm:text-sm font-semibold text-slate-100 cursor-pointer">
                     Limitar por días u horario
                   </Label>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[0.6875rem] text-slate-400">
                     Opcional: ideal para promociones de fin de semana o Happy Hour.
                   </p>
                 </div>
@@ -403,7 +403,7 @@ export function ModalPromocion({
               {form.usarVigencia && (
                 <div className="space-y-3 pt-2 border-t border-[#2e2e2e]">
                   <div className="space-y-1.5">
-                    <Label className="text-[11px] text-slate-300 ml-1 block">
+                    <Label className="text-[0.6875rem] text-slate-300 ml-1 block">
                       Días activos (vacío = todos los días)
                     </Label>
                     <div className="flex flex-wrap gap-1.5">
@@ -430,7 +430,7 @@ export function ModalPromocion({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <Label className="text-[11px] text-slate-300 ml-1 block">Hora inicio</Label>
+                      <Label className="text-[0.6875rem] text-slate-300 ml-1 block">Hora inicio</Label>
                       <Input
                         type="time"
                         value={form.horaInicio}
@@ -439,7 +439,7 @@ export function ModalPromocion({
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[11px] text-slate-300 ml-1 block">Hora fin</Label>
+                      <Label className="text-[0.6875rem] text-slate-300 ml-1 block">Hora fin</Label>
                       <Input
                         type="time"
                         value={form.horaFin}
@@ -457,7 +457,7 @@ export function ModalPromocion({
                 <Label htmlFor="activa-switch" className="text-xs sm:text-sm font-semibold text-slate-100 cursor-pointer">
                   Promoción activa
                 </Label>
-                <p className="text-[11px] text-slate-400">Habilitar inmediatamente en Punto de Venta</p>
+                <p className="text-[0.6875rem] text-slate-400">Habilitar inmediatamente en Punto de Venta</p>
               </div>
               <Switch
                 id="activa-switch"

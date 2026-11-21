@@ -355,7 +355,7 @@ export function KardexInventario({
                 : `Resultados para "${filtroTexto.trim()}"`}
             </span>
             {resumenVentasBusqueda.existenciaInicialUnica !== null && (
-              <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
+              <span className="text-[0.6875rem] text-slate-400 tabular-nums shrink-0">
                 • Inicial: <strong className="text-slate-200">{resumenVentasBusqueda.existenciaInicialUnica}</strong>
               </span>
             )}
@@ -404,16 +404,16 @@ export function KardexInventario({
                           <span className="font-bold text-sm sm:text-base text-white truncate max-w-[180px] sm:max-w-[280px]">
                             {apertura.nombreProducto}
                           </span>
-                          <Badge variant="outline" className="text-[10px] font-bold rounded-full px-2 py-0.5 border border-sky-500/40 text-sky-400 bg-sky-500/10 flex items-center gap-1">
+                          <Badge variant="outline" className="text-[0.625rem] font-bold rounded-full px-2 py-0.5 border border-sky-500/40 text-sky-400 bg-sky-500/10 flex items-center gap-1">
                             <PackageSearch className="h-2.5 w-2.5 sm:hidden" />
                             <span>Apertura</span>
                           </Badge>
-                          <span className="text-[10px] truncate hidden sm:inline font-medium text-slate-400">
+                          <span className="text-[0.625rem] truncate hidden sm:inline font-medium text-slate-400">
                             Inicio de turno
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
+                        <div className="flex items-center gap-2 text-[0.6875rem] text-slate-400 mt-1 font-medium">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3 text-slate-500" />
                             {format(toDate(apertura.fecha), "hh:mm:ss a")}
@@ -433,7 +433,7 @@ export function KardexInventario({
                       <p className="text-sm sm:text-base font-bold tabular-nums text-sky-400">
                         {apertura.existenciaInicial} uds
                       </p>
-                      <p className="text-[10px] text-slate-400 tabular-nums font-medium mt-0.5">
+                      <p className="text-[0.625rem] text-slate-400 tabular-nums font-medium mt-0.5">
                         Existencia al abrir
                       </p>
                     </div>
@@ -489,7 +489,7 @@ export function KardexInventario({
                         {mov.nombreProducto || 'Producto'}
                       </span>
                       <Badge variant="outline" className={cn(
-                        "text-[10px] font-semibold rounded-full px-2 py-0.5 border flex items-center gap-1",
+                        "text-[0.625rem] font-semibold rounded-full px-2 py-0.5 border flex items-center gap-1",
                         esEliminado
                           ? "border-rose-500/40 text-rose-400 bg-rose-500/10 font-bold"
                           : esEntrada 
@@ -509,7 +509,7 @@ export function KardexInventario({
                       </Badge>
                       {mov.referencia && (
                         <span className={cn(
-                          "text-[10px] truncate hidden sm:inline font-medium",
+                          "text-[0.625rem] truncate hidden sm:inline font-medium",
                           esEliminado ? "text-rose-300/80" : "text-slate-400"
                         )}>
                           Ref: {mov.referencia}
@@ -517,7 +517,7 @@ export function KardexInventario({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
+                    <div className="flex items-center gap-2 text-[0.6875rem] text-slate-400 mt-1 font-medium">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3 text-slate-500" />
                         {format(toDate(mov.fecha), "hh:mm:ss a")}
@@ -544,7 +544,7 @@ export function KardexInventario({
                   )}>
                     {esEntrada ? `+${cantidad}` : cantidad}
                   </p>
-                  <p className="text-[10px] text-slate-400 tabular-nums font-medium mt-0.5">
+                  <p className="text-[0.625rem] text-slate-400 tabular-nums font-medium mt-0.5">
                     Stock final: <span className="text-white font-bold">{mov.existenciaNueva ?? '--'}</span>
                     {mov.existenciaAnterior !== undefined && (
                       <span className="opacity-60 hidden sm:inline"> (Antes: {mov.existenciaAnterior})</span>
@@ -574,16 +574,16 @@ export function KardexInventario({
                         <span className="font-bold text-sm sm:text-base text-white truncate max-w-[180px] sm:max-w-[280px]">
                           {apertura.nombreProducto}
                         </span>
-                        <Badge variant="outline" className="text-[10px] font-bold rounded-full px-2 py-0.5 border border-sky-500/40 text-sky-400 bg-sky-500/10 flex items-center gap-1">
+                        <Badge variant="outline" className="text-[0.625rem] font-bold rounded-full px-2 py-0.5 border border-sky-500/40 text-sky-400 bg-sky-500/10 flex items-center gap-1">
                           <PackageSearch className="h-2.5 w-2.5 sm:hidden" />
                           <span>Apertura</span>
                         </Badge>
-                        <span className="text-[10px] truncate hidden sm:inline font-medium text-slate-400">
+                        <span className="text-[0.625rem] truncate hidden sm:inline font-medium text-slate-400">
                           Inicio de turno
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
+                      <div className="flex items-center gap-2 text-[0.6875rem] text-slate-400 mt-1 font-medium">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3 text-slate-500" />
                           {format(toDate(apertura.fecha), "hh:mm:ss a")}
@@ -603,7 +603,7 @@ export function KardexInventario({
                     <p className="text-sm sm:text-base font-bold tabular-nums text-sky-400">
                       {apertura.existenciaInicial} uds
                     </p>
-                    <p className="text-[10px] text-slate-400 tabular-nums font-medium mt-0.5">
+                    <p className="text-[0.625rem] text-slate-400 tabular-nums font-medium mt-0.5">
                       Existencia al abrir
                     </p>
                   </div>

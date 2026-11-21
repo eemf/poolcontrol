@@ -63,7 +63,7 @@ export function POSUltimaAccion({
             <p className="text-xs font-semibold text-slate-200 truncate">
               Punto de Venta Listo
             </p>
-            <p className="text-[11px] text-slate-400 truncate">
+            <p className="text-[0.6875rem] text-slate-400 truncate">
               Aquí verás la confirmación de cada venta, cobro o producto agregado.
             </p>
           </div>
@@ -198,7 +198,7 @@ export function POSUltimaAccion({
           <Icono className={`w-3.5 h-3.5 ${colorIcono}`} />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 text-[11px] leading-tight">
+          <div className="flex items-center gap-1.5 text-[0.6875rem] leading-tight">
             {idVentaValido && (
               <span className="font-bold tabular-nums text-sky-400 shrink-0">
                 #{idVentaValido}
@@ -217,7 +217,7 @@ export function POSUltimaAccion({
               {tiempoRelativo}
             </span>
           </div>
-          <p className="text-[10.5px] text-slate-400 truncate leading-tight mt-0.5">
+          <p className="text-[0.65625rem] text-slate-400 truncate leading-tight mt-0.5">
             {ultimaAccion.descripcion}
           </p>
         </div>
@@ -243,7 +243,7 @@ export function POSUltimaAccion({
           {/* Fila 1: Número de venta, tipo, cliente y tiempo */}
           <div className="flex items-center gap-1.5 text-xs leading-tight min-w-0">
             {idVentaValido && (
-              <span className="text-[11px] font-bold tabular-nums text-sky-400 shrink-0">
+              <span className="text-[0.6875rem] font-bold tabular-nums text-sky-400 shrink-0">
                 #{idVentaValido}
               </span>
             )}
@@ -256,13 +256,13 @@ export function POSUltimaAccion({
               </span>
             )}
             <span className="text-slate-600 shrink-0">•</span>
-            <span className="font-semibold text-sky-400 text-[11px] shrink-0">
+            <span className="font-semibold text-sky-400 text-[0.6875rem] shrink-0">
               {tiempoRelativo}
             </span>
           </div>
 
           {/* Fila 2: Descripción en una sola línea */}
-          <p className="text-[11px] text-slate-400 truncate leading-tight">
+          <p className="text-[0.6875rem] text-slate-400 truncate leading-tight">
             {ultimaAccion.descripcion}
           </p>
         </div>

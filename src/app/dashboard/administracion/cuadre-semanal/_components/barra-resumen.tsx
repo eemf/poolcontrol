@@ -67,13 +67,13 @@ export function BarraResumen({
         <div className="p-4 space-y-3.5">
           <div className="grid grid-cols-2 gap-2.5">
             <div className="p-3 rounded-xl bg-[#252526] border border-[#2e2e2e] text-center">
-              <p className="text-[11px] font-medium text-emerald-400">Total Ingresos</p>
+              <p className="text-[0.6875rem] font-medium text-emerald-400">Total Ingresos</p>
               <p className="text-lg font-bold text-emerald-400 tabular-nums mt-0.5">
                 Q{totals.ingresos.toFixed(2)}
               </p>
             </div>
             <div className="p-3 rounded-xl bg-[#252526] border border-[#2e2e2e] text-center">
-              <p className="text-[11px] font-medium text-rose-400">Total Egresos</p>
+              <p className="text-[0.6875rem] font-medium text-rose-400">Total Egresos</p>
               <p className="text-lg font-bold text-rose-400 tabular-nums mt-0.5">
                 - Q{totals.egresos.toFixed(2)}
               </p>

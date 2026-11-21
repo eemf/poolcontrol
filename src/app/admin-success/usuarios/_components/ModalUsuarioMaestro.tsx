@@ -163,7 +163,7 @@ export function ModalUsuarioMaestro({
                     <ShieldCheck className="h-4 w-4 text-sky-400 shrink-0" />
                     Acceso Multi-sucursal
                   </Label>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[0.6875rem] text-slate-400">
                     Permite al usuario visualizar y saltar entre distintas sucursales.
                   </p>
                 </div>
@@ -188,7 +188,7 @@ export function ModalUsuarioMaestro({
                         <Building2 className="h-3.5 w-3.5 text-sky-400" />
                         Sucursales permitidas
                       </Label>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[0.6875rem] text-slate-400">
                         Elige las sucursales disponibles para cambiar.
                       </p>
                     </div>
@@ -197,7 +197,7 @@ export function ModalUsuarioMaestro({
                         type="button"
                         variant="secondary"
                         size="sm"
-                        className="h-7 text-[11px] px-3 rounded-full bg-[#1e1e1e] hover:bg-[#313131] text-slate-200 border border-[#2e2e2e]"
+                        className="h-7 text-[0.6875rem] px-3 rounded-full bg-[#1e1e1e] hover:bg-[#313131] text-slate-200 border border-[#2e2e2e]"
                         onClick={() => form.setSucursalesPermitidas(sucursales.map(s => s.id))}
                       >
                         Todas
@@ -206,7 +206,7 @@ export function ModalUsuarioMaestro({
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="h-7 text-[11px] px-2.5 rounded-full text-slate-400 hover:text-slate-200 hover:bg-[#313131]"
+                        className="h-7 text-[0.6875rem] px-2.5 rounded-full text-slate-400 hover:text-slate-200 hover:bg-[#313131]"
                         onClick={() => form.setSucursalesPermitidas(selectedSucursalId ? [selectedSucursalId] : [])}
                       >
                         Solo base
@@ -242,7 +242,7 @@ export function ModalUsuarioMaestro({
                           </div>
                           <div className="min-w-0 flex-1 truncate">
                             <span className="truncate block">{s.nombre}</span>
-                            {isBase && <span className="text-[10px] text-sky-400 font-semibold block">Sucursal Base</span>}
+                            {isBase && <span className="text-[0.625rem] text-sky-400 font-semibold block">Sucursal Base</span>}
                           </div>
                         </button>
                       )

@@ -170,35 +170,35 @@ export function HistorialModal({
     switch (tipo) {
       case 'premio_total':
         return (
-          <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-semibold h-5 rounded-full px-2.5 gap-1 shrink-0">
+          <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2.5 gap-1 shrink-0">
             <Trophy className="h-3 w-3" />
             Premio Total
           </Badge>
         );
       case 'premio_parcial':
         return (
-          <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-semibold h-5 rounded-full px-2.5 gap-1 shrink-0">
+          <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2.5 gap-1 shrink-0">
             <Award className="h-3 w-3" />
             Premio Parcial
           </Badge>
         );
       case 'base':
         return (
-          <Badge className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[10px] font-semibold h-5 rounded-full px-2.5 gap-1 shrink-0">
+          <Badge className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2.5 gap-1 shrink-0">
             <Landmark className="h-3 w-3" />
             Carga de Base
           </Badge>
         );
       case 'extraccion':
         return (
-          <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold h-5 rounded-full px-2.5 gap-1 shrink-0">
+          <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2.5 gap-1 shrink-0">
             <MinusCircle className="h-3 w-3" />
             Extracción
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="text-[10px] font-semibold h-5 rounded-full px-2.5">
+          <Badge variant="outline" className="text-[0.625rem] font-semibold h-5 rounded-full px-2.5">
             {tipo}
           </Badge>
         );
@@ -334,7 +334,7 @@ export function HistorialModal({
                             <div className="flex items-center gap-1.5 flex-wrap">
                               {renderBadgeTipo(item.tipo)}
                               {item.anulado && (
-                                <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/35 text-[10px] font-semibold h-5 rounded-full px-2">
+                                <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/35 text-[0.625rem] font-semibold h-5 rounded-full px-2">
                                   Anulado
                                 </Badge>
                               )}
@@ -361,7 +361,7 @@ export function HistorialModal({
                               {chipsDetalle.map((chip, idx) => (
                                 <span
                                   key={idx}
-                                  className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#1e1e1e] border border-[#2e2e2e] text-[11px] text-slate-300 tabular-nums"
+                                  className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#1e1e1e] border border-[#2e2e2e] text-[0.6875rem] text-slate-300 tabular-nums"
                                 >
                                   {chip}
                                 </span>
@@ -371,7 +371,7 @@ export function HistorialModal({
 
                           {/* Fila 3: Fecha + Botón Anular en móvil */}
                           <div className="flex items-center justify-between gap-2 pt-0.5">
-                            <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-slate-400">
+                            <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[0.6875rem] text-slate-400">
                               <span className="inline-flex items-center gap-1 whitespace-nowrap">
                                 <Clock className="h-3 w-3 text-slate-400 shrink-0" />
                                 {format(fechaObj, 'dd/MM/yyyy • hh:mm a', { locale: es })}

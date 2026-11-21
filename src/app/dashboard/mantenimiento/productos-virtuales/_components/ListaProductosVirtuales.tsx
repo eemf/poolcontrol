@@ -76,7 +76,7 @@ export function ListaProductosVirtuales({
                     <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
                       {producto.nombre}
                     </p>
-                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-slate-400 font-medium">
+                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.6875rem] text-slate-400 font-medium">
                       <span className="inline-flex items-center gap-1 text-sky-400">
                         <Tag className="h-3 w-3 shrink-0" />
                         {producto.categoria || 'Sin categoría'}
@@ -93,17 +93,17 @@ export function ListaProductosVirtuales({
                     </p>
                     <div className="flex items-center gap-1">
                       {producto.incluirEnPOS && (
-                        <Badge className="rounded-full text-[10px] font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        <Badge className="rounded-full text-[0.625rem] font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                           POS
                         </Badge>
                       )}
                       {producto.incluirEnCompras && (
-                        <Badge className="rounded-full text-[10px] font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                        <Badge className="rounded-full text-[0.625rem] font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30">
                           Compras
                         </Badge>
                       )}
                       {!producto.incluirEnPOS && !producto.incluirEnCompras && (
-                        <Badge className="rounded-full text-[10px] font-semibold px-2 py-0.5 bg-slate-500/20 text-slate-300 border border-slate-500/30">
+                        <Badge className="rounded-full text-[0.625rem] font-semibold px-2 py-0.5 bg-slate-500/20 text-slate-300 border border-slate-500/30">
                           Oculto
                         </Badge>
                       )}
@@ -116,27 +116,27 @@ export function ListaProductosVirtuales({
                 <div className="space-y-3.5">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
-                      <p className="text-[11px] text-slate-400 font-medium">Código de búsqueda</p>
+                      <p className="text-[0.6875rem] text-slate-400 font-medium">Código de búsqueda</p>
                       <p className="text-sm font-bold text-slate-100 truncate mt-0.5">
                         {producto.codigoBusqueda || 'No definido'}
                       </p>
                     </div>
                     <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5">
-                      <p className="text-[11px] text-slate-400 font-medium">Existencia</p>
+                      <p className="text-[0.6875rem] text-slate-400 font-medium">Existencia</p>
                       <p className="text-sm font-bold text-slate-100 tabular-nums mt-0.5">
                         {producto.existencia ?? 0}
                       </p>
                     </div>
                     <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5">
-                      <p className="text-[11px] text-slate-400 font-medium">Visibilidad en módulos</p>
+                      <p className="text-[0.6875rem] text-slate-400 font-medium">Visibilidad en módulos</p>
                       <div className="flex flex-wrap gap-1.5 mt-1">
                         {producto.incluirEnPOS && (
-                          <Badge className="rounded-full text-[10px] font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          <Badge className="rounded-full text-[0.625rem] font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                             <ShoppingCart className="h-2.5 w-2.5 mr-1" /> POS
                           </Badge>
                         )}
                         {producto.incluirEnCompras && (
-                          <Badge className="rounded-full text-[10px] font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                          <Badge className="rounded-full text-[0.625rem] font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30">
                             <PackageCheck className="h-2.5 w-2.5 mr-1" /> Compras
                           </Badge>
                         )}

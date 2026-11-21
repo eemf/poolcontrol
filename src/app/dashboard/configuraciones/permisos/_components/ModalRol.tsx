@@ -102,7 +102,7 @@ export function ModalRol({
                           <span className="text-xs sm:text-sm font-semibold leading-none text-slate-100 group-hover:text-sky-400 transition-colors block">
                             {perm.label}
                           </span>
-                          <p className="text-[11px] text-slate-400 font-body leading-tight font-normal">
+                          <p className="text-[0.6875rem] text-slate-400 font-body leading-tight font-normal">
                             {perm.description}
                           </p>
                         </Label>

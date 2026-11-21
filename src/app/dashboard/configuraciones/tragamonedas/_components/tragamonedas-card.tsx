@@ -14,13 +14,13 @@ export function TragamonedasCard({ maquina, onEdit, onDelete }: TragamonedasCard
   const getEstadoBadge = (estado: EstadoTragamonedas) => {
     switch (estado) {
       case 'activo':
-        return <Badge className="rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold px-2.5 py-0.5 shrink-0">Activo</Badge>
+        return <Badge className="rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[0.625rem] font-semibold px-2.5 py-0.5 shrink-0">Activo</Badge>
       case 'mantenimiento':
-        return <Badge className="rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-semibold px-2.5 py-0.5 shrink-0">Mantenimiento</Badge>
+        return <Badge className="rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[0.625rem] font-semibold px-2.5 py-0.5 shrink-0">Mantenimiento</Badge>
       case 'inactivo':
-        return <Badge className="rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[10px] font-semibold px-2.5 py-0.5 shrink-0">Inactivo</Badge>
+        return <Badge className="rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[0.625rem] font-semibold px-2.5 py-0.5 shrink-0">Inactivo</Badge>
       default:
-        return <Badge variant="secondary" className="rounded-full text-[10px] font-semibold px-2.5 py-0.5 shrink-0">{estado}</Badge>
+        return <Badge variant="secondary" className="rounded-full text-[0.625rem] font-semibold px-2.5 py-0.5 shrink-0">{estado}</Badge>
     }
   }
 

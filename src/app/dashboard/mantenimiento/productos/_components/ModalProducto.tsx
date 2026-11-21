@@ -312,7 +312,7 @@ export function ModalProducto({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div className="space-y-1">
-                    <Label className="text-[11px] font-medium text-slate-300 ml-1">Nombre</Label>
+                    <Label className="text-[0.6875rem] font-medium text-slate-300 ml-1">Nombre</Label>
                     <Input
                       placeholder="Ej: Con clamato"
                       value={nuevaPrep.nombre}
@@ -322,9 +322,9 @@ export function ModalProducto({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[11px] font-medium text-slate-300 ml-1">Precio venta</Label>
+                    <Label className="text-[0.6875rem] font-medium text-slate-300 ml-1">Precio venta</Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-[11px] font-bold pointer-events-none">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 text-[0.6875rem] font-bold pointer-events-none">
                         Q
                       </span>
                       <Input
@@ -340,7 +340,7 @@ export function ModalProducto({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-[11px] font-medium text-slate-300 ml-1">Ingredientes que descuenta</Label>
+                  <Label className="text-[0.6875rem] font-medium text-slate-300 ml-1">Ingredientes que descuenta</Label>
                   <div className="flex gap-2">
                     <Select value={ingSelecId} onValueChange={setIngSelecId}>
                       <SelectTrigger className="rounded-full h-9 text-xs flex-1 bg-[#1e1e1e] border-[#2e2e2e] hover:bg-[#313131]">
@@ -376,7 +376,7 @@ export function ModalProducto({
                       <Badge
                         key={i}
                         variant="secondary"
-                        className="rounded-full h-6 pl-2.5 pr-1 gap-1 text-[11px] font-medium bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]"
+                        className="rounded-full h-6 pl-2.5 pr-1 gap-1 text-[0.6875rem] font-medium bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e]"
                       >
                         {ing.nombreProducto} x {ing.cantidad}
                         <Button

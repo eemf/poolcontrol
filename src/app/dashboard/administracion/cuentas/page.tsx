@@ -159,7 +159,7 @@ export default function CuentasPage() {
                                     <p className="text-xs text-muted-foreground uppercase font-semibold tracking-tighter">{cuenta.tipo}</p>
                                 </CardHeader>
                                 <CardContent className="text-center py-4">
-                                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-1">Saldo Actual</p>
+                                    <p className="text-[0.625rem] text-muted-foreground font-bold uppercase tracking-widest mb-1">Saldo Actual</p>
                                     <p className="text-3xl font-bold text-primary">Q{cuenta.saldo.toFixed(2)}</p>
                                 </CardContent>
                                 <CardFooter className="flex justify-end gap-2 p-3 bg-muted/10">

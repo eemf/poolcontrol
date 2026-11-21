@@ -116,14 +116,14 @@ export function ListaUsuarios({
                       <p className="font-bold text-sm sm:text-base text-slate-100 truncate">
                         {usuario.nombre}
                       </p>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[0.6875rem] text-slate-400 truncate">
                         {usuario.email}
                       </p>
                     </div>
                   </div>
 
                   <div className="shrink-0">
-                    <Badge className={cn('rounded-full font-semibold px-2.5 py-0.5 text-[10px]', getRolBadgeClasses(usuario.rol))}>
+                    <Badge className={cn('rounded-full font-semibold px-2.5 py-0.5 text-[0.625rem]', getRolBadgeClasses(usuario.rol))}>
                       {usuario.rol}
                     </Badge>
                   </div>
@@ -134,7 +134,7 @@ export function ListaUsuarios({
                 <div className="space-y-3.5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
-                      <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
+                      <p className="text-[0.6875rem] text-slate-400 font-medium flex items-center gap-1.5">
                         <Mail className="h-3 w-3 text-sky-400 shrink-0" />
                         Correo electrónico
                       </p>
@@ -143,11 +143,11 @@ export function ListaUsuarios({
                       </p>
                     </div>
                     <div className="bg-[#252526] border border-[#2e2e2e] rounded-xl px-3 py-2.5 min-w-0">
-                      <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
+                      <p className="text-[0.6875rem] text-slate-400 font-medium flex items-center gap-1.5">
                         <Shield className="h-3 w-3 text-sky-400 shrink-0" />
                         Identificador de seguridad
                       </p>
-                      <p className="text-[11px] font-mono text-slate-300 break-all mt-1">
+                      <p className="text-[0.6875rem] font-mono text-slate-300 break-all mt-1">
                         {usuario.authUid}
                       </p>
                     </div>

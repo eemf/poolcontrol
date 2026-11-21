@@ -74,7 +74,7 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
                         </span>
                         <div className="flex items-center gap-1 mt-0.5">
                           <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">
+                          <span className="text-[0.625rem] sm:text-xs text-muted-foreground font-medium truncate">
                             {format(compra.fecha.toDate(), "dd MMM, yyyy", { locale: es })}
                           </span>
                         </div>
@@ -85,7 +85,7 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
                       <p className="font-bold text-xs sm:text-sm text-rose-400 whitespace-nowrap tabular-nums leading-tight">
                         - Q{compra.montoTotal.toFixed(2)}
                       </p>
-                      <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
+                      <Badge className="rounded-full text-[0.625rem] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                         Pendiente
                       </Badge>
                     </div>
@@ -100,7 +100,7 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
                         <ShoppingCart className="h-3.5 w-3.5 text-sky-400" />
                         <span>Detalle de la compra #{compra.idCompra}</span>
                       </h4>
-                      <span className="text-[11px] font-medium text-slate-400 tabular-nums">
+                      <span className="text-[0.6875rem] font-medium text-slate-400 tabular-nums">
                         {compra.items?.length || 0} {(compra.items?.length || 0) === 1 ? 'artículo' : 'artículos'}
                       </span>
                     </div>
@@ -109,7 +109,7 @@ export function ListaCompras({ items, selected, onSelect, onSelectAll }: ListaCo
                         <div key={idx} className="flex justify-between items-center bg-[#252526] border border-[#2e2e2e] p-2.5 rounded-xl text-xs">
                           <div className="min-w-0 pr-2">
                             <p className="font-semibold text-slate-100 truncate">{subItem.nombreProducto}</p>
-                            <p className="text-[10px] text-slate-400 tabular-nums">
+                            <p className="text-[0.625rem] text-slate-400 tabular-nums">
                               {subItem.tipo === 'producto' ? `${subItem.cantidad} unidades × Q${subItem.costoUnitario.toFixed(2)}` : 'Gasto directo'}
                             </p>
                           </div>

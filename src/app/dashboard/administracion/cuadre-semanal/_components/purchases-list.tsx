@@ -72,7 +72,7 @@ export function PurchasesList({ items, selected, onSelect, onSelectAll }: Purcha
                     <p className="font-bold text-base sm:text-lg text-rose-400 whitespace-nowrap tabular-nums">
                       - Q{compra.montoTotal.toFixed(2)}
                     </p>
-                    <Badge className="h-5 rounded-full text-[10px] font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                    <Badge className="h-5 rounded-full text-[0.625rem] font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">
                       Pendiente
                     </Badge>
                   </div>

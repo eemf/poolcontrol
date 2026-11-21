@@ -197,7 +197,7 @@ export function ListaPromociones({
                         <p className="font-bold text-sm sm:text-base text-slate-100 truncate">
                           {promo.nombre}
                         </p>
-                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-slate-400 font-medium mt-0.5">
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[0.6875rem] text-slate-400 font-medium mt-0.5">
                           <span className="text-sky-400 font-semibold">{resumenRegla(promo)}</span>
                           <span>•</span>
                           <span className="tabular-nums">
@@ -209,12 +209,12 @@ export function ListaPromociones({
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <Badge className="hidden sm:inline-flex rounded-full text-[10px] font-semibold px-2.5 py-0.5 bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e]">
+                      <Badge className="hidden sm:inline-flex rounded-full text-[0.625rem] font-semibold px-2.5 py-0.5 bg-[#1e1e1e] text-slate-300 border border-[#2e2e2e]">
                         {etiquetaTipo(promo.tipo)}
                       </Badge>
                       <Badge
                         className={cn(
-                          'rounded-full text-[10px] font-semibold px-2.5 py-0.5',
+                          'rounded-full text-[0.625rem] font-semibold px-2.5 py-0.5',
                           promo.activa
                             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                             : 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
@@ -246,7 +246,7 @@ export function ListaPromociones({
                           </span>
                         )}
                         {promo.combinable && (
-                          <Badge className="rounded-full text-[10px] bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                          <Badge className="rounded-full text-[0.625rem] bg-sky-500/15 text-sky-300 border border-sky-500/30">
                             Combinable entre productos
                           </Badge>
                         )}
@@ -262,7 +262,7 @@ export function ListaPromociones({
                         {productosNombres.map((nombreProd, idx) => (
                           <Badge
                             key={idx}
-                            className="rounded-full text-[11px] font-medium bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e] px-2.5 py-0.5"
+                            className="rounded-full text-[0.6875rem] font-medium bg-[#1e1e1e] text-slate-200 border border-[#2e2e2e] px-2.5 py-0.5"
                           >
                             {nombreProd}
                           </Badge>

@@ -109,7 +109,7 @@ export function TarifaDialog({
                 <p className="text-xs font-semibold text-amber-400">Configuración de controles</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-slate-300 ml-1">Controles base</Label>
+                    <Label className="text-[0.6875rem] text-slate-300 ml-1">Controles base</Label>
                     <InputNumero
                       value={tarifaForm.controlesBase}
                       onChange={e => setTarifaForm(p => ({ ...p, controlesBase: Number(e.target.value) }))}
@@ -118,7 +118,7 @@ export function TarifaDialog({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-slate-300 ml-1">Extra por ctrl / hora</Label>
+                    <Label className="text-[0.6875rem] text-slate-300 ml-1">Extra por ctrl / hora</Label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 text-xs font-bold pointer-events-none">
                         Q
@@ -157,7 +157,7 @@ export function TarifaDialog({
                 <Label className="text-xs font-semibold text-slate-200 block">Intervalos de precios</Label>
                 <div className="flex gap-2 items-end">
                   <div className="flex-1 space-y-1">
-                    <Label className="text-[11px] text-slate-400 ml-1">Minutos</Label>
+                    <Label className="text-[0.6875rem] text-slate-400 ml-1">Minutos</Label>
                     <InputNumero
                       value={nuevoIntervalo.duracionMinutos}
                       onChange={e => setNuevoIntervalo(p => ({ ...p, duracionMinutos: Number(e.target.value) }))}
@@ -166,7 +166,7 @@ export function TarifaDialog({
                     />
                   </div>
                   <div className="flex-1 space-y-1">
-                    <Label className="text-[11px] text-slate-400 ml-1">Precio (Q)</Label>
+                    <Label className="text-[0.6875rem] text-slate-400 ml-1">Precio (Q)</Label>
                     <InputNumero
                       step="0.01"
                       value={nuevoIntervalo.precio}

@@ -99,7 +99,7 @@ export function AuditoriaFiltros({
           <SlidersHorizontal className="h-4 w-4 shrink-0" />
           <span className="hidden sm:inline">{mostrarFiltros ? 'Ocultar' : 'Opciones'}</span>
           {filtrosActivosCount > 0 && (
-            <span className="min-w-[18px] h-[18px] rounded-full bg-amber-400 text-slate-950 font-black text-[10px] inline-flex items-center justify-center px-1">
+            <span className="min-w-[18px] h-[18px] rounded-full bg-amber-400 text-slate-950 font-black text-[0.625rem] inline-flex items-center justify-center px-1">
               {filtrosActivosCount}
             </span>
           )}
@@ -154,7 +154,7 @@ export function AuditoriaFiltros({
 
           {/* Píldoras de Categorías Rápida Selección */}
           <div className="pt-2 border-t border-[#2e2e2e]">
-            <span className="text-[11px] text-muted-foreground block mb-1.5 font-medium">
+            <span className="text-[0.6875rem] text-muted-foreground block mb-1.5 font-medium">
               Filtro rápido por categoría:
             </span>
             <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs no-scrollbar">

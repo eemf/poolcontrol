@@ -56,7 +56,7 @@ export function DashboardCharts({
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-100">Rendimiento Semanal</h3>
-              <p className="text-[11px] text-muted-foreground">Ingresos liquidados (Últimos 7 días)</p>
+              <p className="text-[0.6875rem] text-muted-foreground">Ingresos liquidados (Últimos 7 días)</p>
             </div>
           </div>
           <div className="flex items-center gap-4 text-xs">
@@ -122,7 +122,7 @@ export function DashboardCharts({
           </div>
           <div>
             <h3 className="text-sm font-bold text-slate-100">Rendimiento por Estación</h3>
-            <p className="text-[11px] text-muted-foreground">Facturación por tipo de estación (Últimos 7 días)</p>
+            <p className="text-[0.6875rem] text-muted-foreground">Facturación por tipo de estación (Últimos 7 días)</p>
           </div>
         </div>
 
@@ -172,7 +172,7 @@ export function DashboardCharts({
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-100">Rendimiento de Monedas</h3>
-              <p className="text-[11px] text-muted-foreground">Flujo neto por día (Últimos 7 días)</p>
+              <p className="text-[0.6875rem] text-muted-foreground">Flujo neto por día (Últimos 7 días)</p>
             </div>
           </div>
 
@@ -216,7 +216,7 @@ export function DashboardCharts({
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-100">Rendimiento Mensual</h3>
-                <p className="text-[11px] text-muted-foreground">Balance liquidado (Últimos 6 meses)</p>
+                <p className="text-[0.6875rem] text-muted-foreground">Balance liquidado (Últimos 6 meses)</p>
               </div>
             </div>
             <div className="flex items-center gap-3 text-xs">

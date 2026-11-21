@@ -116,7 +116,7 @@ function FilaBotonesAccionCuenta({
         <Button
           type="button"
           className={cn(
-            'h-7 rounded-full text-[11px] font-semibold bg-violet-500/20 hover:bg-violet-600 text-violet-300 hover:text-white border border-violet-500/35 shadow-sm transition-colors shrink-0',
+            'h-7 rounded-full text-[0.6875rem] font-semibold bg-violet-500/20 hover:bg-violet-600 text-violet-300 hover:text-white border border-violet-500/35 shadow-sm transition-colors shrink-0',
             conTexto ? 'px-2.5' : 'w-7 p-0'
           )}
           onClick={() => actions.abrirDialogoConsumoInterno(venta)}
@@ -133,7 +133,7 @@ function FilaBotonesAccionCuenta({
           <Button
             type="button"
             className={cn(
-              'h-7 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
+              'h-7 rounded-full text-[0.6875rem] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
               conTexto ? 'px-2.5' : 'w-7 p-0'
             )}
             onClick={() => actions.manejarClickEditar(venta)}
@@ -148,7 +148,7 @@ function FilaBotonesAccionCuenta({
         <Button
           type="button"
           className={cn(
-            'h-7 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
+            'h-7 rounded-full text-[0.6875rem] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
             conTexto ? 'px-2.5' : 'w-7 p-0'
           )}
           onClick={() => actions.manejarClickEditar(venta)}
@@ -164,7 +164,7 @@ function FilaBotonesAccionCuenta({
         <Button
           type="button"
           className={cn(
-            'h-7 rounded-full text-[11px] font-semibold bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border border-amber-500/35 shadow-sm transition-colors shrink-0',
+            'h-7 rounded-full text-[0.6875rem] font-semibold bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border border-amber-500/35 shadow-sm transition-colors shrink-0',
             conTexto ? 'px-2.5' : 'w-7 p-0'
           )}
           onClick={() => actions.manejarClickPasarACredito(venta)}
@@ -184,7 +184,7 @@ function FilaBotonesAccionCuenta({
         <Button
           type="button"
           className={cn(
-            'h-7 rounded-full text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
+            'h-7 rounded-full text-[0.6875rem] font-semibold bg-sky-500/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/35 shadow-sm transition-colors shrink-0',
             conTexto ? 'px-2.5' : 'w-7 p-0'
           )}
           onClick={() => actions.abrirDialogoTraslado!(venta)}
@@ -199,7 +199,7 @@ function FilaBotonesAccionCuenta({
       {/* El botón Pagar siempre muestra icono + texto */}
       <Button
         type="button"
-        className="h-7 px-3 rounded-full text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shrink-0"
+        className="h-7 px-3 rounded-full text-[0.6875rem] font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shrink-0"
         onClick={() => actions.abrirDialogoPago(venta)}
         disabled={idVentaActiva === venta.id}
         title="Pagar cuenta"
@@ -382,7 +382,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
               <span className="text-xs font-bold text-slate-100 truncate">
                 {resumenCredito.titulo}
               </span>
-              <span className="text-[11px] text-slate-400 truncate">
+              <span className="text-[0.6875rem] text-slate-400 truncate">
                 {resumenCredito.subtitulo}
               </span>
             </div>
@@ -392,7 +392,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
               Q{resumenCredito.monto.toFixed(2)}
             </span>
             {resumenCredito.deudaTotalGlobal !== null && (
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[0.625rem] text-slate-400 font-medium">
                 Total:{' '}
                 <span className="text-amber-400 font-bold tabular-nums">
                   Q{resumenCredito.deudaTotalGlobal.toFixed(2)}
@@ -477,7 +477,7 @@ export function POSAccounts({ state, actions, refs }: POSAccountsProps) {
                             {venta.nombreCliente}
                           </p>
                           {esRecienActualizada && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/35 animate-pulse shrink-0">
+                            <span className="text-[0.625rem] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/35 animate-pulse shrink-0">
                               Recién actualizada
                             </span>
                           )}

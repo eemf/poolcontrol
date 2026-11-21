@@ -39,14 +39,14 @@ export function SucursalCard({
               <h3 className="font-bold text-base text-slate-100 truncate leading-tight">
                 {sucursal.nombre}
               </h3>
-              <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-1 truncate">
+              <p className="text-[0.6875rem] text-slate-400 flex items-center gap-1 mt-1 truncate">
                 <MapPin className="h-3 w-3 text-slate-500 shrink-0" />
                 <span className="truncate">{sucursal.direccion || 'Sin dirección registrada'}</span>
               </p>
             </div>
           </div>
 
-          <Badge className="rounded-full text-[10px] font-semibold px-2.5 py-0.5 bg-[#1e1e1e] text-sky-400 border border-[#2e2e2e] tabular-nums shrink-0">
+          <Badge className="rounded-full text-[0.625rem] font-semibold px-2.5 py-0.5 bg-[#1e1e1e] text-sky-400 border border-[#2e2e2e] tabular-nums shrink-0">
             #{sucursal.idSucursal}
           </Badge>
         </div>
@@ -69,7 +69,7 @@ export function SucursalCard({
               <span className="text-xs font-medium text-slate-300">Comandos de voz</span>
               <span
                 className={cn(
-                  "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
+                  "text-[0.625rem] font-semibold px-1.5 py-0.5 rounded-full",
                   vozActiva
                     ? "bg-emerald-500/15 text-emerald-300"
                     : "bg-[#252526] text-slate-400"

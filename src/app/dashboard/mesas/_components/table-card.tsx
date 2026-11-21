@@ -140,7 +140,7 @@ export function TableCard({
                 {mesa.modoJuego === 'definido' ? 'Tiempo Definido' : 'Tiempo Libre'}
               </span>
               {isConsola && mesa.numControles && mesa.numControles > 0 && (
-                <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full h-5 px-2 text-[11px] font-semibold">
+                <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full h-5 px-2 text-[0.6875rem] font-semibold">
                   <Users className="h-3 w-3 mr-1" /> {mesa.numControles} Ctrl.
                 </Badge>
               )}
@@ -240,11 +240,11 @@ export function TableCard({
                         </span>
                       </span>
                       {mesa.alquilerPagado ? (
-                        <Badge className="text-[10px] px-2 h-4 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                        <Badge className="text-[0.625rem] px-2 h-4 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
                           Pagado
                         </Badge>
                       ) : (
-                        <Badge className="text-[10px] px-2 h-4 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                        <Badge className="text-[0.625rem] px-2 h-4 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
                           Pendiente
                         </Badge>
                       )}
@@ -258,7 +258,7 @@ export function TableCard({
                           {formatMinutesToTime(tiempoAjustePagado)}
                         </span>
                       </span>
-                      <Badge className="text-[10px] px-2 h-4 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                      <Badge className="text-[0.625rem] px-2 h-4 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
                         Pagado
                       </Badge>
                     </div>
@@ -271,7 +271,7 @@ export function TableCard({
                           {formatMinutesToTime(tiempoAjustePendiente)}
                         </span>
                       </span>
-                      <Badge className="text-[10px] px-2 h-4 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                      <Badge className="text-[0.625rem] px-2 h-4 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
                         Pendiente
                       </Badge>
                     </div>
@@ -290,13 +290,13 @@ export function TableCard({
 
                 <div className="grid grid-cols-2 divide-x divide-[#2e2e2e] pt-2.5 border-t border-[#2e2e2e]">
                   <div className="px-2">
-                    <p className="text-[11px] font-medium text-slate-400">Alquiler</p>
+                    <p className="text-[0.6875rem] font-medium text-slate-400">Alquiler</p>
                     <p className="text-sm font-bold text-slate-100 tabular-nums">
                       Q{costoAlquilerReal.toFixed(2)}
                     </p>
                   </div>
                   <div className="px-2">
-                    <p className="text-[11px] font-medium text-slate-400">Consumo</p>
+                    <p className="text-[0.6875rem] font-medium text-slate-400">Consumo</p>
                     <p className="text-sm font-bold text-slate-100 tabular-nums">
                       Q{totalConsumo.toFixed(2)}
                     </p>
@@ -323,7 +323,7 @@ export function TableCard({
                                   <p className="font-semibold text-slate-100 truncate leading-tight">
                                     {item.cantidad}x {item.nombreProducto}
                                   </p>
-                                  <p className="text-[10px] text-slate-400 mt-0.5">
+                                  <p className="text-[0.625rem] text-slate-400 mt-0.5">
                                     {getFechaFormateada(item.fechaAgregado)}
                                   </p>
                                 </div>

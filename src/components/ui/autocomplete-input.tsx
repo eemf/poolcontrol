@@ -264,7 +264,7 @@ export const AutocompleteInput = React.forwardRef<
                     <div className="flex items-center gap-2 w-full">
                       <span className="truncate font-medium">{option.label}</span>
                       {option.badge && (
-                        <Badge variant="secondary" className="h-4 px-1.5 text-[10px] font-semibold rounded-full shrink-0 bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                        <Badge variant="secondary" className="h-4 px-1.5 text-[0.625rem] font-semibold rounded-full shrink-0 bg-sky-500/20 text-sky-300 border border-sky-500/30">
                           {option.badge}
                         </Badge>
                       )}

@@ -113,7 +113,7 @@ export function PanelConfiguracionRango({
                 <span>{progreso}%</span>
               </div>
               <Progress value={progreso} className="h-2 bg-[#1e1e1e]" />
-              <p className="text-[11px] text-center text-slate-400 italic">
+              <p className="text-[0.6875rem] text-center text-slate-400 italic">
                 Por favor, no cierres esta ventana hasta que el proceso finalice.
               </p>
             </div>

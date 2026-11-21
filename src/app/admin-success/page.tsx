@@ -87,7 +87,7 @@ export default function AdminDashboardPage() {
             <SurfaceCard variant="panel" className="p-4 sm:p-5 space-y-4">
                 <div>
                     <h2 className="text-sm font-bold text-slate-100">Accesos rápidos</h2>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[0.6875rem] text-slate-400">
                         Navega directamente a cada módulo administrativo
                     </p>
                 </div>
@@ -114,7 +114,7 @@ export default function AdminDashboardPage() {
                                         {mod.disabled && (
                                             <Badge
                                                 variant="outline"
-                                                className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-400 text-[11px] font-medium px-2.5 py-0.5"
+                                                className="rounded-full bg-[#1e1e1e] border-[#2e2e2e] text-slate-400 text-[0.6875rem] font-medium px-2.5 py-0.5"
                                             >
                                                 En desarrollo
                                             </Badge>

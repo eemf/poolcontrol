@@ -25,7 +25,8 @@ export function getFontScaleStorageKey(uid?: string | null): string {
 export function applyFontScale(percent: number): void {
   if (typeof document === 'undefined') return;
   const clamped = clampFontScale(percent);
-  document.documentElement.style.fontSize = `${(16 * clamped) / 100}px`;
+  const px = Math.round((16 * clamped) / 100);
+  document.documentElement.style.fontSize = `${px}px`;
 }
 
 /**

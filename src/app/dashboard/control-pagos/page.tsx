@@ -78,7 +78,7 @@ export default function PaginaControlPagos() {
                 {cierres && cierres.length > 0 && (
                   <>
                     <Separator className="my-1.5 bg-[#2e2e2e]" />
-                    <p className="px-2 py-1 text-[10px] font-semibold text-slate-400">
+                    <p className="px-2 py-1 text-[0.625rem] font-semibold text-slate-400">
                       Turnos anteriores
                     </p>
                     {cierres.slice(0, 15).map((c) => (

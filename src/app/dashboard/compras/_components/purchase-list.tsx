@@ -63,19 +63,19 @@ export function PurchaseList({
     switch (estado) {
       case 'Pagado':
         return (
-          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[11px] font-semibold px-2.5 py-0.5">
+          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[0.6875rem] font-semibold px-2.5 py-0.5">
             Pagado
           </Badge>
         );
       case 'Pendiente':
         return (
-          <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-[11px] font-semibold px-2.5 py-0.5">
+          <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-[0.6875rem] font-semibold px-2.5 py-0.5">
             Pendiente
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="rounded-full text-[11px]">
+          <Badge variant="outline" className="rounded-full text-[0.6875rem]">
             {estado}
           </Badge>
         );
@@ -129,7 +129,7 @@ export function PurchaseList({
                     <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
                       #{compra.idCompra}. {compra.proveedorNombre}
                     </p>
-                    <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+                    <span className="inline-flex items-center gap-1 text-[0.6875rem] text-slate-400 font-medium">
                       <Clock className="h-3 w-3 text-slate-500 shrink-0" />
                       {format(compra.fecha.toDate(), "dd/MM/yyyy • hh:mm a", { locale: es })}
                     </span>
@@ -150,7 +150,7 @@ export function PurchaseList({
                         <ShoppingCart className="h-3.5 w-3.5 text-sky-400" />
                         <span>Detalle de la compra</span>
                       </h4>
-                      <span className="text-[11px] font-medium text-slate-400 tabular-nums">
+                      <span className="text-[0.6875rem] font-medium text-slate-400 tabular-nums">
                         {compra.items.length} {compra.items.length === 1 ? 'artículo' : 'artículos'}
                       </span>
                     </div>
@@ -163,11 +163,11 @@ export function PurchaseList({
                           <div className="min-w-0 pr-2">
                             <p className="font-semibold text-slate-100 truncate">{item.nombreProducto}</p>
                             {item.tipo === 'producto' ? (
-                              <p className="text-[10px] text-slate-400 tabular-nums">
+                              <p className="text-[0.625rem] text-slate-400 tabular-nums">
                                 {item.cantidad} unidades &times; Q{item.costoUnitario.toFixed(2)}
                               </p>
                             ) : (
-                              <p className="text-[10px] text-slate-400">Gasto directo</p>
+                              <p className="text-[0.625rem] text-slate-400">Gasto directo</p>
                             )}
                           </div>
                           <p className="font-bold text-sky-400 tabular-nums shrink-0">

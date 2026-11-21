@@ -249,7 +249,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
                 {confirmarEliminarConsumo?.nombre}
               </p>
               {confirmarEliminarConsumo?.cantidad !== undefined && (
-                <p className="text-[11px] text-slate-400 mt-0.5 tabular-nums">
+                <p className="text-[0.6875rem] text-slate-400 mt-0.5 tabular-nums">
                   {confirmarEliminarConsumo.cantidad} &times; Q
                   {Number(confirmarEliminarConsumo.precioUnitario ?? 0).toFixed(2)} c/u
                 </p>
@@ -262,7 +262,7 @@ export function MesasDialogs({ mesas, iMobile }: MesasDialogsProps) {
             )}
           </div>
 
-          <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-300 leading-snug">
+          <div className="pt-2 border-t border-[#2e2e2e] text-[0.6875rem] text-slate-300 leading-snug">
             {confirmarEliminarConsumo?.idProducto !== 'item-manual' ? (
               <span>
                 Se devolverá{' '}

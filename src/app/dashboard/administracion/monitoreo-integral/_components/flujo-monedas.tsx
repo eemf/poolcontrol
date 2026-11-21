@@ -266,27 +266,27 @@ export function FlujoMonedas({
               <div className="min-w-0">
                 <div className="font-bold text-sm sm:text-base text-white flex items-center gap-2 flex-wrap">
                   <span>Apertura de monedas del período</span>
-                  <Badge className="text-[10px] bg-purple-500/20 text-purple-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
+                  <Badge className="text-[0.625rem] bg-purple-500/20 text-purple-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
                     <Coins className="h-2.5 w-2.5 sm:hidden" />
                     <span>Apertura</span>
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
+                <p className="text-[0.6875rem] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
                   <Clock className="h-3 w-3 text-slate-500" /> {format(inicioPeriodo, "dd/MM/yyyy hh:mm a", { locale: es })}
                 </p>
               </div>
             </div>
             <div className="text-right shrink-0">
               <div className="flex items-baseline justify-end gap-1.5">
-                <span className="text-[11px] text-slate-400 font-medium">Efectivo:</span>
+                <span className="text-[0.6875rem] text-slate-400 font-medium">Efectivo:</span>
                 <span className="text-sm sm:text-base font-bold text-emerald-400 tabular-nums">
                   Q{efectivoInicialMonedas.toFixed(2)}
                 </span>
               </div>
-              <p className="text-[10px] font-bold text-purple-300 tabular-nums mt-0.5">
+              <p className="text-[0.625rem] font-bold text-purple-300 tabular-nums mt-0.5">
                 Stock: {monedasIniciales} monedas
               </p>
-              <p className="text-[9px] text-slate-400 font-medium">Existencia y saldo inicial</p>
+              <p className="text-[0.5625rem] text-slate-400 font-medium">Existencia y saldo inicial</p>
             </div>
           </SurfaceCard>
         )}
@@ -362,20 +362,20 @@ export function FlujoMonedas({
                         {mov.desc}
                       </span>
                       <Badge className={cn(
-                        "text-[10px] font-semibold rounded-full px-2 py-0.5 border-none flex items-center gap-1",
+                        "text-[0.625rem] font-semibold rounded-full px-2 py-0.5 border-none flex items-center gap-1",
                         getIconColor()
                       )}>
                         <span className="sm:hidden">{getIcon(true)}</span>
                         <span>{getBadgeLabel()}</span>
                       </Badge>
                       {mov.ref && (
-                        <span className="text-[10px] text-slate-400 truncate hidden sm:inline font-medium">
+                        <span className="text-[0.625rem] text-slate-400 truncate hidden sm:inline font-medium">
                           Ref: {mov.ref}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1 font-medium">
+                    <div className="flex items-center gap-2 text-[0.6875rem] text-slate-400 mt-1 font-medium">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3 text-slate-500" />
                         {format(toDate(mov.fecha), "hh:mm:ss a")}
@@ -404,7 +404,7 @@ export function FlujoMonedas({
                   </div>
 
                   {/* Efectivo acumulado de monedas en el período */}
-                  <p className="text-[10px] text-slate-400 tabular-nums mt-0.5 font-medium">
+                  <p className="text-[0.625rem] text-slate-400 tabular-nums mt-0.5 font-medium">
                     Efectivo en período: <span className={cn(
                       "font-bold",
                       (mov.cashAcumulado ?? 0) >= 0 ? "text-white" : "text-amber-400"
@@ -414,7 +414,7 @@ export function FlujoMonedas({
                   </p>
 
                   {/* Stock acumulado de monedas */}
-                  <p className="text-[10px] text-purple-300 tabular-nums font-medium">
+                  <p className="text-[0.625rem] text-purple-300 tabular-nums font-medium">
                     Stock: <span className="font-bold">{mov.stockAcumulado} monedas</span>{' '}
                     {mov.tipo === 'abono' || mov.tipo === 'cobro' ? (
                       <span className="text-slate-400 font-normal">(Cobro sin salida de stock)</span>
@@ -443,27 +443,27 @@ export function FlujoMonedas({
               <div className="min-w-0">
                 <div className="font-bold text-sm sm:text-base text-white flex items-center gap-2 flex-wrap">
                   <span>Apertura de monedas del período</span>
-                  <Badge className="text-[10px] bg-purple-500/20 text-purple-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
+                  <Badge className="text-[0.625rem] bg-purple-500/20 text-purple-300 border-none rounded-full px-2 py-0.5 flex items-center gap-1">
                     <Coins className="h-2.5 w-2.5 sm:hidden" />
                     <span>Apertura</span>
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
+                <p className="text-[0.6875rem] text-slate-400 flex items-center gap-1.5 mt-1 font-medium">
                   <Clock className="h-3 w-3 text-slate-500" /> {format(inicioPeriodo, "dd/MM/yyyy hh:mm a", { locale: es })}
                 </p>
               </div>
             </div>
             <div className="text-right shrink-0">
               <div className="flex items-baseline justify-end gap-1.5">
-                <span className="text-[11px] text-slate-400 font-medium">Efectivo:</span>
+                <span className="text-[0.6875rem] text-slate-400 font-medium">Efectivo:</span>
                 <span className="text-sm sm:text-base font-bold text-emerald-400 tabular-nums">
                   Q{efectivoInicialMonedas.toFixed(2)}
                 </span>
               </div>
-              <p className="text-[10px] font-bold text-purple-300 tabular-nums mt-0.5">
+              <p className="text-[0.625rem] font-bold text-purple-300 tabular-nums mt-0.5">
                 Stock: {monedasIniciales} monedas
               </p>
-              <p className="text-[9px] text-slate-400 font-medium">Existencia y saldo inicial</p>
+              <p className="text-[0.5625rem] text-slate-400 font-medium">Existencia y saldo inicial</p>
             </div>
           </SurfaceCard>
         )}

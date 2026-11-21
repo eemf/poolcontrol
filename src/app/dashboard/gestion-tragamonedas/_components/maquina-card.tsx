@@ -40,25 +40,25 @@ export const MaquinaCard = React.memo(function MaquinaCard({
     switch (estado) {
       case 'activo':
         return (
-          <Badge className="rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold h-5 px-2.5">
+          <Badge className="rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[0.625rem] font-semibold h-5 px-2.5">
             Activo
           </Badge>
         );
       case 'mantenimiento':
         return (
-          <Badge className="rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-semibold h-5 px-2.5">
+          <Badge className="rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[0.625rem] font-semibold h-5 px-2.5">
             Mantenimiento
           </Badge>
         );
       case 'inactivo':
         return (
-          <Badge className="rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[10px] font-semibold h-5 px-2.5">
+          <Badge className="rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[0.625rem] font-semibold h-5 px-2.5">
             Inactivo
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="rounded-full text-[10px] h-5 px-2.5">
+          <Badge variant="outline" className="rounded-full text-[0.625rem] h-5 px-2.5">
             {estado}
           </Badge>
         );
@@ -76,7 +76,7 @@ export const MaquinaCard = React.memo(function MaquinaCard({
             <div className="min-w-0">
               <h3 className="text-sm font-bold text-slate-100 truncate">{maquina.nombre}</h3>
               {maquina.modelo && (
-                <p className="text-[11px] text-slate-400 truncate">{maquina.modelo}</p>
+                <p className="text-[0.6875rem] text-slate-400 truncate">{maquina.modelo}</p>
               )}
             </div>
           </div>

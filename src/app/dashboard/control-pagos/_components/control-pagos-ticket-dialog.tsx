@@ -35,7 +35,7 @@ export function ControlPagosTicketDialog({
               <ReceiptText className="h-5 w-5 text-sky-400" />
               Comprobante de Pago
             </DialogTitle>
-            <Badge className="text-[10px] font-medium rounded-full bg-sky-600 text-white">
+            <Badge className="text-[0.625rem] font-medium rounded-full bg-sky-600 text-white">
               {pago.metodoPago}
             </Badge>
           </div>
@@ -50,10 +50,10 @@ export function ControlPagosTicketDialog({
             <h3 className="font-bold text-sm text-slate-100">
               {sucursalNombre || 'Pool Control'}
             </h3>
-            <p className="text-[11px] text-muted-foreground font-mono">
+            <p className="text-[0.6875rem] text-muted-foreground font-mono">
               Comprobante {pago.idsPagoTexto}
             </p>
-            <div className="text-[10px] text-muted-foreground pt-1 border-t border-app-border mt-1">
+            <div className="text-[0.625rem] text-muted-foreground pt-1 border-t border-app-border mt-1">
               {format(pago.fecha, "dd 'de' MMMM, yyyy - hh:mm:ss a", { locale: es })}
             </div>
           </div>
@@ -82,7 +82,7 @@ export function ControlPagosTicketDialog({
 
           {/* Desglose por Ventas en el Ticket */}
           <div className="space-y-2">
-            <p className="text-[10px] font-medium text-muted-foreground">
+            <p className="text-[0.625rem] font-medium text-muted-foreground">
               Distribución en ventas y artículos
             </p>
             <div className="max-h-[180px] overflow-y-auto space-y-2 pr-1">
@@ -94,7 +94,7 @@ export function ControlPagosTicketDialog({
                   </div>
                   <div className="space-y-1">
                     {v.itemsSaldados?.map((it, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-[11px] text-muted-foreground">
+                      <div key={idx} className="flex justify-between items-center text-[0.6875rem] text-muted-foreground">
                         <span>{it.cantidad || 1}x {it.nombreProducto}</span>
                         <span className="font-mono text-slate-300">Q{(it.montoAplicado || 0).toFixed(2)}</span>
                       </div>

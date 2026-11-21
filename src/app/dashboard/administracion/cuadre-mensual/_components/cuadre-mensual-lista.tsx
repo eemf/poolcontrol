@@ -91,7 +91,7 @@ export function CuadreMensualLista({
                         <span className="font-bold text-xs sm:text-sm text-slate-100 truncate">
                           #{cuadre.idCuadreSemanal} • {format(cuadre.fecha.toDate(), "dd 'de' MMMM, yyyy", { locale: es })}
                         </span>
-                        <span className="text-[10px] sm:text-xs text-slate-400 font-medium flex items-center gap-1 truncate mt-0.5">
+                        <span className="text-[0.625rem] sm:text-xs text-slate-400 font-medium flex items-center gap-1 truncate mt-0.5">
                           <span className="truncate">{cuadre.cuentas.origenNombre}</span>
                           <ArrowRight className="h-3 w-3 shrink-0" />
                           <span className="truncate">{cuadre.cuentas.destinoNombre}</span>
@@ -102,7 +102,7 @@ export function CuadreMensualLista({
                       <p className="font-bold text-sm sm:text-base text-emerald-400 whitespace-nowrap tabular-nums leading-tight">
                         Q{cuadre.resumen.balanceLiquidado.toFixed(2)}
                       </p>
-                      <Badge className="rounded-full text-[10px] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
+                      <Badge className="rounded-full text-[0.625rem] font-semibold border border-amber-500/30 bg-amber-500/20 text-amber-300 px-2 py-0.5">
                         Pendiente
                       </Badge>
                     </div>

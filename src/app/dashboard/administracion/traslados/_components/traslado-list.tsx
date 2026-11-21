@@ -69,28 +69,28 @@ export function TrasladoList({
     switch (estado) {
       case 'en_transito':
         return (
-          <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] font-semibold px-2.5 py-0.5">
+          <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full flex items-center gap-1 w-fit text-[0.6875rem] font-semibold px-2.5 py-0.5">
             <Clock className="h-3 w-3" />
             <span>En Tránsito</span>
           </Badge>
         );
       case 'recibido':
         return (
-          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] font-semibold px-2.5 py-0.5">
+          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1 w-fit text-[0.6875rem] font-semibold px-2.5 py-0.5">
             <CheckCircle2 className="h-3 w-3" />
             <span>Recibido</span>
           </Badge>
         );
       case 'cancelado':
         return (
-          <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full flex items-center gap-1 w-fit text-[11px] font-semibold px-2.5 py-0.5">
+          <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full flex items-center gap-1 w-fit text-[0.6875rem] font-semibold px-2.5 py-0.5">
             <XCircle className="h-3 w-3" />
             <span>Cancelado</span>
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="rounded-full text-[11px]">
+          <Badge variant="outline" className="rounded-full text-[0.6875rem]">
             {estado}
           </Badge>
         );
@@ -155,7 +155,7 @@ export function TrasladoList({
                       <p className="font-bold text-sm sm:text-base text-slate-100 truncate w-full">
                         #TR-{traslado.idTraslado} • {traslado.sucursalOrigenNombre} → {traslado.sucursalDestinoNombre}
                       </p>
-                      <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+                      <span className="inline-flex items-center gap-1 text-[0.6875rem] text-slate-400 font-medium">
                         <Clock className="h-3 w-3 text-slate-500 shrink-0" />
                         {fechaStr}
                       </span>
@@ -175,14 +175,14 @@ export function TrasladoList({
                     {/* Ruta de Envío */}
                     <div className="p-2.5 rounded-xl bg-[#252526] border border-[#2e2e2e] flex items-center justify-between text-xs gap-2">
                       <div className="flex-1 min-w-0">
-                        <span className="text-[10px] text-slate-400 block font-medium">Origen</span>
+                        <span className="text-[0.625rem] text-slate-400 block font-medium">Origen</span>
                         <span className={`font-semibold truncate block ${esOrigen ? 'text-sky-400' : 'text-slate-200'}`}>
                           {traslado.sucursalOrigenNombre}
                         </span>
                       </div>
                       <ArrowRight className="h-4 w-4 text-slate-400 shrink-0 mx-1" />
                       <div className="flex-1 min-w-0 text-right">
-                        <span className="text-[10px] text-slate-400 block font-medium">Destino</span>
+                        <span className="text-[0.625rem] text-slate-400 block font-medium">Destino</span>
                         <span className={`font-semibold truncate block ${esDestino ? 'text-emerald-400' : 'text-slate-200'}`}>
                           {traslado.sucursalDestinoNombre}
                         </span>
@@ -196,7 +196,7 @@ export function TrasladoList({
                           <Boxes className="h-3.5 w-3.5 text-sky-400" />
                           <span>Productos trasladados</span>
                         </h4>
-                        <span className="text-[11px] font-medium text-slate-400 tabular-nums">
+                        <span className="text-[0.6875rem] font-medium text-slate-400 tabular-nums">
                           {traslado.cantidadTotalItems} uds ({traslado.items?.length || 0}{' '}
                           {(traslado.items?.length || 0) === 1 ? 'artículo' : 'artículos'})
                         </span>
@@ -209,7 +209,7 @@ export function TrasladoList({
                           >
                             <div className="min-w-0 pr-2">
                               <p className="font-semibold text-slate-100 truncate">{item.nombreProducto}</p>
-                              <p className="text-[10px] text-slate-400 tabular-nums">
+                              <p className="text-[0.625rem] text-slate-400 tabular-nums">
                                 {item.cantidad} unidades &times; Q{item.costoUnitario.toFixed(2)}
                               </p>
                             </div>

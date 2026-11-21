@@ -78,7 +78,7 @@ export function HistorialDialogs({
                     Q{(ventaAAnular?.totalPagadoPeriodo || 0).toFixed(2)}
                   </span>
                 </div>
-                <div className="pt-2 border-t border-[#2e2e2e] text-[11px] text-slate-400 leading-relaxed">
+                <div className="pt-2 border-t border-[#2e2e2e] text-[0.6875rem] text-slate-400 leading-relaxed">
                   Esta acción descontará los cobros registrados de la caja actual y devolverá al inventario las existencias de los productos consumidos.
                 </div>
               </div>

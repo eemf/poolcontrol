@@ -18,13 +18,13 @@ export function MesaCard({ mesa, tarifas, onEdit, onDelete }: MesaCardProps) {
   const getEstadoBadge = (estado: string) => {
     switch (estado) {
       case 'disponible':
-        return <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold">Disponible</Badge>
+        return <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[0.6875rem] font-semibold">Disponible</Badge>
       case 'ocupado':
-        return <Badge className="bg-rose-500/15 text-rose-400 border border-rose-500/30 text-[11px] font-semibold">Ocupado</Badge>
+        return <Badge className="bg-rose-500/15 text-rose-400 border border-rose-500/30 text-[0.6875rem] font-semibold">Ocupado</Badge>
       case 'mantenimiento':
-        return <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[11px] font-semibold">Mantenimiento</Badge>
+        return <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[0.6875rem] font-semibold">Mantenimiento</Badge>
       default:
-        return <Badge variant="secondary" className="text-[11px] font-semibold">{estado}</Badge>
+        return <Badge variant="secondary" className="text-[0.6875rem] font-semibold">{estado}</Badge>
     }
   }
 
@@ -49,7 +49,7 @@ export function MesaCard({ mesa, tarifas, onEdit, onDelete }: MesaCardProps) {
 
       <CardContent className="flex-grow pt-0 pb-3">
         <div className="flex items-center justify-between gap-2 bg-[#1e1e1e] px-3 py-2 rounded-xl border border-[#2e2e2e]">
-          <span className="text-[11px] font-medium text-slate-400">Tarifa asignada</span>
+          <span className="text-[0.6875rem] font-medium text-slate-400">Tarifa asignada</span>
           <span className="text-xs font-semibold text-slate-100 truncate">
             {tarifa?.nombre || 'No asignada'}
           </span>

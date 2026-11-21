@@ -154,7 +154,7 @@ export default function LayoutDashboard({
         {subInfo.isExpiringSoon && (
             <div className="bg-amber-100 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 p-2 text-center flex items-center justify-center gap-3 animate-in slide-in-from-top duration-500">
                 <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-                <p className="text-[11px] sm:text-xs font-bold text-amber-800 dark:text-amber-400 font-body">
+                <p className="text-[0.6875rem] sm:text-xs font-bold text-amber-800 dark:text-amber-400 font-body">
                     Aviso: Tu suscripción vence pronto. Contacta a soporte.
                 </p>
             </div>

@@ -104,21 +104,21 @@ export function DialogoUltimosMovimientos({
     switch (tipo) {
       case 'venta_rapida':
         return (
-          <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
+          <Badge className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
             <Zap className="h-3 w-3" />
             Venta Rápida
           </Badge>
         );
       case 'venta_creada':
         return (
-          <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
+          <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
             <CheckCircle2 className="h-3 w-3" />
             Cuenta Creada
           </Badge>
         );
       case 'productos_agregados':
         return (
-          <Badge className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[10px] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
+          <Badge className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
             <PlusCircle className="h-3 w-3" />
             Productos Agregados
           </Badge>
@@ -126,28 +126,28 @@ export function DialogoUltimosMovimientos({
       case 'pago':
       case 'abono':
         return (
-          <Badge className="bg-teal-500/15 text-teal-300 border border-teal-500/30 text-[10px] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
+          <Badge className="bg-teal-500/15 text-teal-300 border border-teal-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
             <CreditCard className="h-3 w-3" />
             {tipo === 'abono' ? 'Abono Registrado' : 'Cobro de Cuenta'}
           </Badge>
         );
       case 'item_eliminado':
         return (
-          <Badge className="bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[10px] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
+          <Badge className="bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
             <Trash2 className="h-3 w-3" />
             Ítem Eliminado
           </Badge>
         );
       case 'consumo_interno':
         return (
-          <Badge className="bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[10px] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
+          <Badge className="bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[0.625rem] font-semibold h-5 rounded-full px-2 gap-1 shrink-0">
             <Gift className="h-3 w-3" />
             Cortesía
           </Badge>
         );
       default:
         return (
-          <Badge className="bg-slate-700 text-slate-300 text-[10px] font-semibold h-5 rounded-full px-2">
+          <Badge className="bg-slate-700 text-slate-300 text-[0.625rem] font-semibold h-5 rounded-full px-2">
             Operación
           </Badge>
         );
@@ -244,13 +244,13 @@ export function DialogoUltimosMovimientos({
                       {renderBadgeTipo(mov.tipo)}
 
                       {idVentaStr && (
-                        <span className="text-[11px] font-bold tabular-nums text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20 shrink-0">
+                        <span className="text-[0.6875rem] font-bold tabular-nums text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20 shrink-0">
                           #{idVentaStr}
                         </span>
                       )}
 
                       {mov.promocionNombre && (
-                        <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30 shrink-0">
+                        <span className="text-[0.625rem] font-semibold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30 shrink-0">
                           {mov.promocionNombre}
                         </span>
                       )}
@@ -278,7 +278,7 @@ export function DialogoUltimosMovimientos({
                           <strong className="text-sky-400 font-bold tabular-nums">{it.cantidad}x</strong>
                           <span>{it.nombre}</span>
                           {it.subtotal !== undefined && mov.items!.length > 1 && (
-                            <span className="text-[11px] text-slate-400 tabular-nums">
+                            <span className="text-[0.6875rem] text-slate-400 tabular-nums">
                               (Q{it.subtotal.toFixed(2)})
                             </span>
                           )}
@@ -292,7 +292,7 @@ export function DialogoUltimosMovimientos({
                   )}
 
                   {/* Fila 3: Metadatos compactos en una sola línea */}
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400 flex-wrap">
+                  <div className="flex items-center gap-1.5 text-[0.6875rem] text-slate-400 flex-wrap">
                     <span className="text-sky-400 font-medium">Hace {tiempoAtras}</span>
                     <span className="tabular-nums text-slate-500">({horaCorta})</span>
                     {mov.metodoPago && (
@@ -318,7 +318,7 @@ export function DialogoUltimosMovimientos({
 
         {/* Pie del modal */}
         <div className="pt-1 flex items-center justify-between gap-3">
-          <p className="text-[11px] text-slate-400 truncate">
+          <p className="text-[0.6875rem] text-slate-400 truncate">
             Mostrando <strong className="text-slate-200 font-bold">{movimientosFiltrados.length}</strong> operaciones del turno en tiempo real.
           </p>
           <Button

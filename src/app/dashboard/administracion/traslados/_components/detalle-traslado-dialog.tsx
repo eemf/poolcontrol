@@ -100,7 +100,7 @@ export function DetalleTrasladoDialog({
 
             <div className="flex flex-col items-center px-4">
               <ArrowRight className="h-5 w-5 text-sky-400 print:text-gray-800" />
-              <span className="text-[10px] text-slate-400 print:text-gray-500 font-medium">Traslado</span>
+              <span className="text-[0.625rem] text-slate-400 print:text-gray-500 font-medium">Traslado</span>
             </div>
 
             <div className="space-y-1 text-right">
@@ -154,7 +154,7 @@ export function DetalleTrasladoDialog({
                     <p className="text-xs font-semibold text-white truncate">{it.nombreProducto}</p>
                     {it.nombreProductoDestino &&
                       it.nombreProductoDestino.trim().toLowerCase() !== it.nombreProducto.trim().toLowerCase() && (
-                        <p className="text-[11px] text-sky-400 mt-0.5">
+                        <p className="text-[0.6875rem] text-sky-400 mt-0.5">
                           Recibido en destino como: {it.nombreProductoDestino}
                         </p>
                       )}

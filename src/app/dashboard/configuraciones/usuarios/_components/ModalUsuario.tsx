@@ -98,7 +98,7 @@ export function ModalUsuario({
                   className="rounded-full h-10 bg-[#252526] border-[#2e2e2e] text-sm text-slate-100 placeholder:text-slate-500"
                   autoComplete="new-password"
                 />
-                <p className="text-[11px] text-slate-400 ml-1">
+                <p className="text-[0.6875rem] text-slate-400 ml-1">
                   Solo ingresa una contraseña si deseas actualizar la actual de este usuario.
                 </p>
               </div>
