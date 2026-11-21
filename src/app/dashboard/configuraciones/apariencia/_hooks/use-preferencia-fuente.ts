@@ -91,11 +91,15 @@ export function usePreferenciaFuente() {
       }
 
       if (firestore && sucursalId && user?.uid) {
-        await setDoc(
-          doc(firestore, `sucursales/${sucursalId}/usuarios`, user.uid),
-          { preferencias: { escalaFuente: valorFinal } },
-          { merge: true }
-        );
+        try {
+          await setDoc(
+            doc(firestore, `sucursales/${sucursalId}/usuarios`, user.uid),
+            { preferencias: { escalaFuente: valorFinal } },
+            { merge: true }
+          );
+        } catch {
+          // Perfiles sin permiso de escritura en usuarios conservan su preferencia en localStorage
+        }
       }
 
       setEscalaState(valorFinal);

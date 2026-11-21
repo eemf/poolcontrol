@@ -12,9 +12,22 @@ export interface ReleaseItem {
 export const releaseHistory: ReleaseItem[] = [
   {
     version: "2.0.0",
-    build: 242,
+    build: 243,
     fecha: "2026-11-20",
     estado: "publicada_actual",
+    tipo: "Compilación",
+    tagGit: "v2.0.0-b243",
+    descripcion: "Habilitada la opción Tamaño de Fuente para todos los perfiles sin restricciones de permisos.",
+    cambios: [
+      "Menú Principal (`client-dashboard-nav.tsx`): Removida la restricción de permisos en el grupo `Configuraciones` (manteniendo permisos por subopción) y en `Tamaño de Fuente` para que aparezca en todos los perfiles.",
+      "Preferencia de Fuente (`use-preferencia-fuente.ts`): Respaldo local garantizado incluso para roles sin permisos de escritura en documentos de usuario."
+    ]
+  },
+  {
+    version: "2.0.0",
+    build: 242,
+    fecha: "2026-11-20",
+    estado: "publicada_anterior",
     tipo: "Compilación",
     tagGit: "v2.0.0-b242",
     descripcion: "Nueva página configurable de Tamaño de Fuente por usuario en Configuraciones.",

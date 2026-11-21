@@ -105,13 +105,12 @@ export const navItems: NavItemType[] = [
     label: 'Configuraciones',
     icon: Settings,
     iconColor: 'text-slate-300',
-    anyPermission: ['config.usuarios', 'config.permisos', 'config.mesas', 'config.tragamonedas', 'dashboard.ver'],
     items: [
       { href: '/dashboard/configuraciones/usuarios', label: 'Usuarios', icon: UserCheck, iconColor: 'text-sky-400', permission: 'config.usuarios' },
       { href: '/dashboard/configuraciones/permisos', label: 'Permisos', icon: ShieldCheck, iconColor: 'text-indigo-400', permission: 'config.permisos' },
       { href: '/dashboard/configuraciones/mesas', label: 'Mesas', icon: LayoutGrid, iconColor: 'text-emerald-400', permission: 'config.mesas', feature: 'configMesas' },
       { href: '/dashboard/configuraciones/tragamonedas', label: 'Tragamonedas', icon: Dices, iconColor: 'text-amber-400', permission: 'config.tragamonedas', feature: 'configTragamonedas' },
-      { href: '/dashboard/configuraciones/apariencia', label: 'Tamaño de Fuente', icon: Type, iconColor: 'text-sky-400', permission: 'dashboard.ver' },
+      { href: '/dashboard/configuraciones/apariencia', label: 'Tamaño de Fuente', icon: Type, iconColor: 'text-sky-400' },
       { href: '/dashboard/configuraciones/acerca-de', label: 'Acerca del Sistema', icon: Info, iconColor: 'text-cyan-400', permission: 'dashboard.ver' },
     ]
   },
